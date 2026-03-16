@@ -30,3 +30,5 @@ Follow these rules when developing:
    2. PHPStan: `composer phpstan`
 
 10. Don't run tests, `cs-fix` and `phpstan` when only documentation is updated.
+
+11. When you have to run tests then call shell script `composer test-all`
