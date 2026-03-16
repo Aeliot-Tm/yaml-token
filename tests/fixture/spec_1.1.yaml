@@ -1,0 +1,236 @@
+# YAML 1.1 Specification Fixture
+# Contains elements according to the YAML 1.1 specification (2005-01-18)
+
+# Document 1: Bare document
+bare_document:
+  first: bare document in stream
+  without: document start marker
+...
+# Document 2: Directives and basic structures
+%YAML 1.1
+%TAG ! tag:yaml.org,2002:
+%TAG !foo! tag:example.com,2000:
+---
+# Comments (c-comment)
+key: value
+plain_scalar: unquoted text
+null_value: null
+tilde_null: ~
+string_like_number: '012345'
+# Booleans: y, yes, on, n, no, off, true, false (all recognized in 1.1; only true/false in 1.2)
+booleans:
+  - true
+  - false
+  - yes
+  - no
+  - on
+  - off
+  - y
+  - n
+
+# Block sequence (c-sequence-entry)
+block_sequence:
+  - one
+  - two
+  - three
+
+# Block mapping (c-mapping-key, c-mapping-value)
+block_mapping:
+  sky: blue
+  sea: green
+
+# Merge key << (1.1 only - removed in 1.2)
+defaults: &defaults
+  color: blue
+  size: large
+merge_example:
+  << : *defaults
+  name: Custom
+
+# Value key = (1.1 only - removed in 1.2)
+value_key_example:
+  = : default value
+  other: override
+
+# Flow sequence
+flow_sequence: [one, two, three]
+
+# Flow mapping
+flow_mapping: {sky: blue, sea: green}
+
+# Flow collection with trailing comma
+trailing_comma: [a, b, c, ]
+flow_mapping_trailing_comma: {a: 1, b: 2, }
+flow_empty_key: { ? foo: , ? : bar }
+flow_separate_values: { unquoted: "separate", https://example.com, omitted value: , ? : omitted key }
+single_pair_flow: [foo: bar]
+explicit_flow_pair: [? foo bar : baz]
+
+# Implicit keys
+implicit_quoted_keys:
+  "implicit block key": [ "implicit flow key": value ]
+implicit_plain_keys:
+  implicit block key: [ implicit flow key: value ]
+# Single-quoted scalar
+single_quoted: 'Howdy! he said.'
+single_with_escape: 'It''s escaped'
+single_backslash: '|\-*-/|'
+single_multiline: ' 1st non-empty
+
+ 2nd non-empty 3rd non-empty '
+
+# Double-quoted scalar with escape sequences
+double_quoted: "Line1\nLine2\tTabbed"
+unicode_escape: "Sosa did fine.\u263A"
+hex_escape: "\x0d\x0a is CRLF"
+control_escape: "\b1998\t1999\t2000\n"
+# Note: \/ escape added in 1.2 for JSON compatibility
+escapes_1_1: "\a \b \e \f \r \v \\ \_ \N \L \P \U00000041"
+escaped_newline: "folded to space,\
+  or preserved\t"
+double_multiline: "So does this
+  quoted scalar."
+
+# Literal block scalar
+literal_block: |
+  Line one
+  Line two
+  Line three
+literal_empty_header: |
+ literal
+literal_empty: |-
+literal_strip: |-
+  No trailing newline
+literal_keep: |+
+  With trailing newlines
+
+
+# Folded block scalar
+folded_block: >
+  This is a long line
+  that folds into space
+  unless more-indented.
+
+  New paragraph here.
+  More indented preserves
+  line breaks.
+
+folded_strip: >-
+  No trailing newline in folded
+folded_keep: >+
+  Keeps trailing newlines
+
+
+# Indentation indicator
+indented_block: |2
+    Content indented relative to indicator
+folded_indent: >1
+ folded
+folded_indent_strip: >1-
+ strip
+block_with_tab: |
+	void main() {
+		printf("Hello\n");
+	}
+
+# Anchors and Aliases
+anchored: &anchor_name This value is anchored
+alias: *anchor_name
+
+# Tagged nodes - in 1.1: !!str is default, !foo is application-specific
+explicit_str: !!str 2002-04-28
+explicit_int: !!int 42
+explicit_float: !!float 3.14
+local_tag: !custom tagged value
+verbatim_tag: !<tag:clarkevans.com,2002:invoice>
+  id: 123
+named_handle: !foo!custom value
+# !!binary, !!set, !!omap, !!pairs, !!timestamp - in 1.1 type repository (dropped from default in 1.2)
+binary: !!binary |
+ R0lGODlhDAAMAIQAAP//9/X
+ 17unp5WZmZgAAAOfn515eXv
+ Pz7Y6OjuDg4J+fn5OTk6enp
+set_example: !!set
+  ? Mark McGwire
+  ? Sammy Sosa
+  ? Ken Griffey
+omap_example: !!omap
+  - Mark McGwire: 65
+  - Sammy Sosa: 63
+  - Ken Griffey: 58
+pairs_example: !!pairs
+  - meeting: with team
+  - meeting: with boss
+  - lunch: with friend
+timestamp_tagged: !!timestamp 2001-12-15T02:59:43.1Z
+
+# Complex mapping key
+complex_key:
+  ? [multi, line, key]
+  : value for complex key
+  ? - Detroit Tigers
+    - Chicago Cubs
+  : [ 2001-07-23 ]
+  ? [ New York Yankees,
+      Atlanta Braves ]
+  : [ 2001-07-02, 2001-08-12,
+      2001-08-14 ]
+
+# Compact nested block
+compact_nested:
+  - item: Super Hoop
+    quantity: 1
+  - item: Basketball
+    quantity: 4
+sequence_entry_types:
+  - 
+  - - one
+    - two
+  - one: two
+
+# Plain scalars starting with : ? -
+plain_special_starters:
+  - ::vector
+  - -123
+  - https://example.com/foo#bar
+
+# Integers - octal without 0o prefix in 1.1, sexagesimal supported
+integer_canonical: 12345
+integer_decimal: +12345
+integer_negative: -12345
+integer_octal: 014
+integer_hex: 0xC
+integer_sexagesimal: 3:25:45
+
+# Floats - sexagesimal supported in 1.1
+float_canonical: 1.23015e+3
+float_exponential: 12.3015e+02
+float_fixed: 1230.15
+float_sexagesimal: 190:20:30.15
+float_negative_infinity: -.inf
+float_positive_infinity: .inf
+float_nan: .nan
+
+# Timestamps
+timestamp_canonical: 2001-12-15T02:59:43.1Z
+timestamp_iso8601: 2001-12-14t21:59:43.10-05:00
+timestamp_spaced: 2001-12-14 21:59:43.10 -5
+date_only: 2002-12-14
+
+# Empty scalar
+empty_scalar:
+
+# Multi-line plain scalar
+plain_multiline:
+  This unquoted scalar
+  spans many lines.
+
+...
+# Document 3
+---
+document_three: third document in stream
+...
+# Document 4
+---
+bare_doc: fourth document
+final_key: final value

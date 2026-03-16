@@ -1,0 +1,217 @@
+# YAML 1.0 Specification Fixture
+# Contains elements according to the YAML 1.0 specification (2004-01-29)
+# Note: Directive format uses colon - %YAML:1.0 (changed to space in 1.1)
+
+# Document 1: Bare document
+bare_document:
+  first: bare document in stream
+  without: document start marker
+...
+# Document 2: Directives - 1.0 uses %YAML:1.0 (colon separator)
+%YAML:1.0
+---
+# Comments
+key: value
+plain_scalar: unquoted text
+null_value: ~
+# Booleans: y, n, yes, no, true, false, on, off (all recognized in 1.0)
+booleans:
+  - y
+  - n
+  - yes
+  - no
+  - true
+  - false
+  - on
+  - off
+
+# Block sequence
+block_sequence:
+  - one
+  - two
+  - three
+
+# Block mapping
+block_mapping:
+  sky: blue
+  sea: green
+
+# Flow sequence
+flow_sequence: [one, two, three]
+
+# Flow mapping
+flow_mapping: {sky: blue, sea: green}
+
+# Trailing comma
+trailing_comma: [a, b, c, ]
+flow_mapping_trailing_comma: {a: 1, b: 2, }
+
+# Flow mapping with empty key
+flow_empty_key: { ? foo: , ? : bar }
+# Flow mapping with separate values, URL as key, omitted value/key
+flow_separate_values: { unquoted: "separate", https://example.com, omitted value: , ? : omitted key }
+# Single pair flow mapping
+single_pair_flow: [foo: bar]
+# Explicit flow pair with ?
+explicit_flow_pair: [? foo bar : baz]
+
+# Implicit keys
+implicit_quoted_keys:
+  "implicit block key": [ "implicit flow key": value ]
+implicit_plain_keys:
+  implicit block key: [ implicit flow key: value ]
+
+# Single-quoted scalar
+single_quoted: 'Howdy! he said.'
+single_with_escape: 'It''s escaped'
+single_backslash: '|\-*-/|'
+single_multiline: ' 1st non-empty
+
+ 2nd non-empty 3rd non-empty '
+
+# Double-quoted scalar
+double_quoted: "Line1\nLine2\tTabbed"
+unicode_escape: "Sosa did fine.\u263A"
+hex_escape: "\x0d\x0a is CRLF"
+control_escape: "\b1998\t1999\t2000\n"
+double_multiline: "So does this
+  quoted scalar."
+# Full escape sequences available in 1.0
+escapes_full: "\0 \a \b \e \f \n \r \t \v \\ \_ \N \L \P \U00000041"
+# \^ escape - unique to 1.0, removed in 1.1 (literal ^ character)
+caret_escape: "\^"
+# Escaped newline - line fold in double-quoted scalar
+escaped_newline: "folded to space,\
+  or preserved\t"
+
+# Literal block scalar
+literal_block: |
+  Line one
+  Line two
+  Line three
+literal_empty_header: |
+ literal
+# Literal with empty content
+literal_empty: |-
+literal_strip: |-
+  No trailing newline
+literal_keep: |+
+  With trailing newlines
+
+
+# Folded block scalar
+folded_block: >
+  This is a long line
+  that folds into space
+  unless more-indented.
+
+  New paragraph here.
+  More indented preserves
+  line breaks.
+
+folded_strip: >-
+  No trailing newline
+folded_keep: >+
+  Keeps trailing newlines
+
+
+# Indentation indicator
+indented_block: |2
+    Content indented relative to indicator
+# Folded with indentation indicator
+folded_indent: >1
+ folded
+folded_indent_strip: >1-
+ strip
+block_with_tab: |
+	void main() {
+		printf("Hello\n");
+	}
+
+# Anchors and Aliases
+anchored: &anchor_name This value is anchored
+alias: *anchor_name
+
+# Tagged nodes - in 1.0: !type for built-in, !!type for application-specific (opposite of 1.1/1.2)
+explicit_str: !str 2002-04-28
+explicit_int: !int 42
+explicit_float: !float 3.14
+application_tag: !!something tagged value
+# Binary - !binary in 1.0
+binary: !binary |
+ R0lGODlhDAAMAIQAAP//9/X
+ 17unp5WZmZgAAAOfn515eXv
+ Pz7Y6OjuDg4J+fn5OTk6enp
+
+# ^ tag prefix - sets URI prefix for subsequent !^ tags (removed in 1.1, replaced by %TAG)
+tag_prefix_root: !example.com,2000/^base tagged value
+tag_using_prefix: !^derived prefixed value
+
+# Complex mapping key
+complex_key:
+  ? - Detroit Tigers
+    - Chicago Cubs
+  : [ 2001-07-23 ]
+  ? [ New York Yankees,
+      Atlanta Braves ]
+  : [ 2001-07-02, 2001-08-12,
+      2001-08-14 ]
+
+# Compact nested block
+compact_nested:
+  - item: Super Hoop
+    quantity: 1
+  - item: Basketball
+    quantity: 4
+sequence_entry_types:
+  - 
+  - - one
+    - two
+  - one: two
+
+# Plain scalars
+plain_special_starters:
+  - ::vector
+  - -123
+  - https://example.com/foo#bar
+
+# Integers - octal 014 (no 0o prefix in 1.0), sexagesimal supported
+integer_canonical: 12345
+integer_decimal: +12345
+integer_negative: -12345
+integer_octal: 014
+integer_hex: 0xC
+integer_sexagesimal: 3:25:45
+
+# Floats - sexagesimal supported in 1.0
+float_canonical: 1.23015e+3
+float_exponential: 12.3015e+02
+float_fixed: 1230.15
+float_sexagesimal: 190:20:30.15
+float_negative_infinity: -.inf
+float_positive_infinity: .inf
+float_nan: .nan
+
+# Timestamps
+timestamp_canonical: 2001-12-15T02:59:43.1Z
+timestamp_iso8601: 2001-12-14t21:59:43.10-05:00
+timestamp_spaced: 2001-12-14 21:59:43.10 -5
+date_only: 2002-12-14
+
+# Empty scalar
+empty_scalar:
+
+# Multi-line plain scalar
+plain_multiline:
+  This unquoted scalar
+  spans many lines.
+
+...
+# Document 3
+---
+document_three: third document in stream
+...
+# Document 4
+---
+bare_doc: fourth document
+final_key: final value

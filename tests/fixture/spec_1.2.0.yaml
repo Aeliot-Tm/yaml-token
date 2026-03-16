@@ -1,0 +1,237 @@
+# YAML 1.2.0 Specification Fixture
+# Contains all possible elements according to the YAML 1.2.0 specification (original 2009-07-21)
+# Note: BOM (U+FEFF) may optionally appear at the very start of the stream (Example 5.1)
+
+# Document 1: Bare document (no ---, no directives - Section 9.1.3)
+bare_document:
+  first: bare document in stream
+  without: document start marker
+...
+# Document 2: Directives and basic structures
+%YAML 1.2
+%TAG ! tag:yaml.org,2002:
+%TAG !foo! tag:example.com,2000:
+# Reserved directive (Example 6.13) - processors should ignore with warning
+%FOO bar baz
+---
+# Comments (c-comment)
+key: value
+plain_scalar: unquoted text
+null_value: null
+tilde_null: ~
+string_like_number: '012345'
+booleans:
+  - true
+  - false
+
+# Block sequence (c-sequence-entry)
+block_sequence:
+  - one
+  - two
+  - three
+
+# Block mapping (c-mapping-key, c-mapping-value)
+block_mapping:
+  sky: blue
+  sea: green
+
+# Flow sequence (c-sequence-start, c-sequence-end, c-collect-entry)
+flow_sequence: [one, two, three]
+
+# Flow mapping (c-mapping-start, c-mapping-end)
+flow_mapping: {sky: blue, sea: green}
+
+# Flow collection with trailing comma (allowed in YAML)
+trailing_comma: [a, b, c, ]
+# Flow mapping with trailing comma
+flow_mapping_trailing_comma: {a: 1, b: 2, }
+# Flow mapping with empty key (Example 7.16)
+flow_empty_key: { ? foo: , ? : bar }
+# Flow mapping with separate values, URL as key, omitted value/key (Example 7.17)
+flow_separate_values: { unquoted: "separate", https://example.com, omitted value: , ? : omitted key }
+# Single pair flow mapping - mapping in sequence without {} (Example 7.19)
+single_pair_flow: [foo: bar]
+# Explicit flow pair with ? (Example 7.20)
+explicit_flow_pair: [? foo bar : baz]
+
+# Implicit keys - quoted and plain with spaces (Example 7.4, 7.11)
+implicit_quoted_keys:
+  "implicit block key": [ "implicit flow key": value ]
+implicit_plain_keys:
+  implicit block key: [ implicit flow key: value ]
+# Single-quoted scalar (c-single-quote)
+single_quoted: 'Howdy! he said.'
+single_with_escape: 'It''s escaped'
+# Single-quoted with backslash literal - no escape in single-quoted (Example 2.17)
+single_backslash: '|\-*-/|'
+# Single-quoted multi-line (Example 7.9)
+single_multiline: ' 1st non-empty
+
+ 2nd non-empty 3rd non-empty '
+
+# Double-quoted scalar (c-double-quote) with escape sequences
+double_quoted: "Line1\nLine2\tTabbed"
+unicode_escape: "Sosa did fine.\u263A"
+hex_escape: "\x0d\x0a is CRLF"
+control_escape: "\b1998\t1999\t2000\n"
+# Additional escapes (Example 5.13): \a \b \e \f \r \v \\ \/ \_ \N \L \P \U
+escapes_full: "\a \b \e \f \r \v \\ \/ space\_and \N \L \P \U00000041"
+# Escaped newline preserves trailing space (Example 7.5)
+escaped_newline: "folded to space,\
+  or preserved\t"
+# Multi-line double-quoted - newlines folded (Example 2.18)
+double_multiline: "So does this
+  quoted scalar."
+
+# Literal block scalar (c-literal) - preserves newlines
+literal_block: |
+  Line one
+  Line two
+  Line three
+# Literal with empty header (Example 8.1)
+literal_empty_header: |
+ literal
+# Literal with empty content (Example 8.6)
+literal_empty: |-
+
+# Literal with chomping: strip trailing newlines (|-)
+literal_strip: |-
+  No trailing newline
+
+# Literal with chomping: keep all newlines (|+)
+literal_keep: |+
+  With trailing newlines
+
+
+# Folded block scalar (c-folded) - newlines become spaces
+folded_block: >
+  This is a long line
+  that folds into space
+  unless more-indented.
+
+  New paragraph here.
+  More indented preserves
+  line breaks.
+
+# Folded with chomping
+folded_strip: >-
+  No trailing newline in folded
+folded_keep: >+
+  Keeps trailing newlines
+
+
+# Indentation indicator for block scalars (c-indentation-indicator)
+indented_block: |2
+    Content indented relative to indicator
+# Folded with indentation indicator (Example 8.1)
+folded_indent: >1
+ folded
+# Folded with both indentation and chomping (Example 8.1: >1-)
+folded_indent_strip: >1-
+ strip
+# Block scalar with tab in content (Example 6.12)
+block_with_tab: |
+	void main() {
+		printf("Hello\n");
+	}
+
+# Anchors (c-anchor) and Aliases (c-alias)
+anchored: &anchor_name This value is anchored
+alias: *anchor_name
+
+# Tagged nodes (c-tag)
+explicit_str: !!str 2002-04-28
+explicit_int: !!int 42
+explicit_float: !!float 3.14
+local_tag: !custom tagged value
+# Verbatim tag (Example 6.24)
+verbatim_tag: !<tag:clarkevans.com,2002:invoice>
+  id: 123
+# Named handle (Example 6.20)
+named_handle: !foo!custom value
+# !!binary (Example 2.23)
+binary: !!binary |
+ R0lGODlhDAAMAIQAAP//9/X
+ 17unp5WZmZgAAAOfn515eXv
+ Pz7Y6OjuDg4J+fn5OTk6enp
+# !!set - mapping keys with null values (Example 2.25)
+set_example: !!set
+  ? Mark McGwire
+  ? Sammy Sosa
+  ? Ken Griffey
+# !!omap - ordered mapping (Example 2.26)
+omap_example: !!omap
+  - Mark McGwire: 65
+  - Sammy Sosa: 63
+  - Ken Griffey: 58
+
+# Complex mapping key (c-mapping-key with ?)
+complex_key:
+  ? [multi, line, key]
+  : value for complex key
+  ? - Detroit Tigers
+    - Chicago Cubs
+  : [ 2001-07-23 ]
+  ? [ New York Yankees,
+      Atlanta Braves ]
+  : [ 2001-07-02, 2001-08-12,
+      2001-08-14 ]
+
+# Compact nested block (inline block collection)
+compact_nested:
+  - item: Super Hoop
+    quantity: 1
+  - item: Basketball
+    quantity: 4
+# Block sequence entry types (Example 8.15): empty, compact sequence, compact mapping
+sequence_entry_types:
+  - 
+  - - one
+    - two
+  - one: two
+
+# Plain scalars starting with : ? - (Example 7.10)
+plain_special_starters:
+  - ::vector
+  - -123
+  - https://example.com/foo#bar
+# Non-specific tag ! (Example 6.28)
+non_specific_tag: ! 12
+# Integers (JSON schema)
+integer_canonical: 12345
+integer_decimal: +12345
+integer_negative: -12345
+integer_octal: 0o14
+integer_hex: 0xC
+
+# Floats (JSON schema)
+float_canonical: 1.23015e+3
+float_exponential: 12.3015e+02
+float_fixed: 1230.15
+float_negative_infinity: -.inf
+float_positive_infinity: .inf
+float_nan: .nan
+
+# Timestamps (plain strings in 1.2, not part of Core schema)
+timestamp_canonical: 2001-12-15T02:59:43.1Z
+timestamp_iso8601: 2001-12-14t21:59:43.10-05:00
+timestamp_spaced: 2001-12-14 21:59:43.10 -5
+date_only: 2002-12-14
+
+# Empty scalar
+empty_scalar:
+
+# Multi-line plain scalar (flow)
+plain_multiline:
+  This unquoted scalar
+  spans many lines.
+
+...
+# Document 3: Document end marker (c-document-end)
+---
+document_three: third document in stream
+...
+# Document 4
+---
+bare_doc: fourth document
+final_key: final value
