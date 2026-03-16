@@ -17,3 +17,12 @@ and quotes are retained and can be restored when reassembling the file.
 
 **Complex values.** Both keys and values of objects can have different structures:
 plain text, quoted strings, multiline blocks, or nested collections.
+
+## YAML Specifications
+
+- [YAML 1.0](https://yaml.org/spec/1.0/) (2004-01-29)
+- [YAML 1.1](https://yaml.org/spec/1.1/) (2005-01-18)
+- [YAML 1.2.0](https://yaml.org/spec/1.2.0/) (2009-07-21)
+- [YAML 1.2.1](https://yaml.org/spec/1.2.1/) (2009-10-01)
+- [YAML 1.2.2](https://yaml.org/spec/1.2.2/) (2021-10-01)
+- [Specification Changes](https://yaml.org/spec/1.2.2/ext/changes/)
