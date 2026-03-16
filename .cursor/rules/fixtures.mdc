@@ -1,0 +1,10 @@
+---
+alwaysApply: false
+globs: tests/fixture/**
+---
+
+# Test Fixtures
+
+When working with specification-related fixtures in `tests/fixture/spec/`,
+read [Specification Cover Fixtures Structure](../docs/Architecture/SpecificationCoverFixtures.md)
+for the full directory layout, version-specific file mapping, and modification rules.

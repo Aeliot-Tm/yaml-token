@@ -6,7 +6,7 @@ alwaysApply: true
 
 Download descriptions from files IF you need to understand the work:
 1. Architecture (Technical solutions):
-    - (not implemented jet)
+   - [Specification Cover Fixtures Structure](../docs/Architecture/SpecificationCoverFixtures.md)
 
 2. Features:
    - (not implemented jet)
@@ -30,3 +30,5 @@ When creating new documentation files:
 IMPORTANT: You MUST NOT create links from user's documents to `.cursor` rules! Keep them totally separated.
            But you can use vice versa (link from your documentation to user's documentation)
            where it makes sense and does not lead to excessive use of context.
+
+All documentation have to be written on English.
