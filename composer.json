@@ -24,7 +24,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Aeliot\\YamlToken\\Test\\": "tests/"
+            "Aeliot\\YamlToken\\Test\\Unit\\": "tests/unit/"
         }
     },
     "config": {
@@ -35,6 +35,37 @@
     },
     "require": {
         "php": "^8.2"
+    },
+    "require-dev": {
+        "dg/bypass-finals": "^1.7"
+    },
+    "scripts": {
+        "bin-phpunit": "XDEBUG_MODE=off tools/phpunit.phar -c .infra/scripts/phpunit/phpunit.xml",
+        "check-all": [
+            "@cs-fixer-check",
+            "@phpstan",
+            "@phpunit"
+        ],
+        "cs-baseline": "@cs-fixer-baseline",
+        "cs-check": "@cs-fixer-check",
+        "cs-fix": "@cs-fixer-fix",
+        "cs-fixer-baseline": "XDEBUG_MODE=off tools/pcsf-baseline.phar -b .infra/scripts/php-cs-fixer/baseline.json -c .infra/scripts/php-cs-fixer/config.php -f .infra/scripts/php-cs-fixer/finder.php",
+        "cs-fixer-check": "@cs-fixer-fix --dry-run",
+        "cs-fixer-fix": "XDEBUG_MODE=off tools/php-cs-fixer.phar fix -vv --config=.infra/scripts/php-cs-fixer/config.php",
+        "phive-install": "phive install --trust-gpg-keys $(cat .phive/trust-gpg-keys.txt)",
+        "phpstan": [
+            "@phpstan-clear",
+            "@phpstan-analyse"
+        ],
+        "phpstan-analyse": "XDEBUG_MODE=off tools/phpstan.phar analyse  -c .infra/scripts/phpstan/config.neon",
+        "phpstan-baseline": [
+            "@phpstan-clear",
+            "@phpstan-analyse --generate-baseline .infra/scripts/phpstan/baseline.neon --allow-empty-baseline"
+        ],
+        "phpstan-clear": "XDEBUG_MODE=off tools/phpstan.phar clear-result-cache -c .infra/scripts/phpstan/config.neon",
+        "require-check": "XDEBUG_MODE=off tools/composer-require-checker.phar check --config-file=.infra/scripts/composer-require-checker/config.json composer.json --output=text",
+        "test-all": "@bin-phpunit",
+        "unused": "XDEBUG_MODE=off tools/composer-unused.phar unused -c .infra/scripts/composer-unused/config.php"
     },
     "support": {
         "issues": "https://github.com/Aeliot-Tm/yaml-token/issues"
