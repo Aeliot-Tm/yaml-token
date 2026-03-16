@@ -1,0 +1,26 @@
+---
+alwaysApply: true
+---
+Follow these rules when developing:
+
+1. Stack:
+   - (not described jet)
+
+2. When changing existing classes, try to use file renaming (`git mv`)
+   instead of creating new ones and deleting old ones where possible.
+
+3. When rename class, look for data types of properties, parameters and variables.
+   If their names match old class name then rename them too.
+
+4. Write all comments in code and everything that is output to logs or console in English.
+
+5. Nether use comments like `@phpstan-ignore-next-line` which suppress issues detected by PHPStan.
+
+6. Do not add more than ONE blank line in a row to any file (.php, .yaml, .md and so on):
+   - Maximum 1 blank line to separate logical blocks.
+   - Maximum 1 blank line at the end of the file.
+
+7. Do not create new documentation files without an explicit request.
+
+8. Project runs in Docker containers configured in `compose.yaml`.
+   To execute shell scripts, add prefix `docker compose exec php-cli ` to them.
