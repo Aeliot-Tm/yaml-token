@@ -1,0 +1,16 @@
+services:
+  php-cli:
+    build:
+      context: ./
+      dockerfile: .infra/docker/php/Dockerfile
+    environment:
+      XDEBUG_CONFIG: "client_host=host.docker.internal"
+      XDEBUG_ENABLE: 1
+    expose:
+      - '9003'
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    stdin_open: true
+    tty: true
+    volumes:
+      - .:/app
