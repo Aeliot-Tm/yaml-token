@@ -1,0 +1,3 @@
+%TAG !foo! tag:example.com,2000:
+---
+key: !foo!custom value

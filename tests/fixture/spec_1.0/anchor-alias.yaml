@@ -1,0 +1,2 @@
+anchored: &name value
+alias: *name

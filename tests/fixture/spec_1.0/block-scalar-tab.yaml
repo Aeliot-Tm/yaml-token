@@ -1,0 +1,4 @@
+key: |
+	void main() {
+		printf("Hello\n");
+	}

@@ -1,0 +1,3 @@
+--- # comment after document start
+key: value
+... # comment after document end

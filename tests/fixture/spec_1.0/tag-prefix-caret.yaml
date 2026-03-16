@@ -1,0 +1,2 @@
+root: !example.com,2000/^base tagged value
+child: !^derived prefixed value
