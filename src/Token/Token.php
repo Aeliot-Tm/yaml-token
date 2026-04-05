@@ -15,6 +15,10 @@ namespace Aeliot\YamlToken\Token;
 
 use Aeliot\YamlToken\Enum\TokenType;
 
+/**
+ * @param int $line 1-based line number
+ * @param int $column 1-based Unicode code point column on that line
+ */
 class Token
 {
     public function __construct(

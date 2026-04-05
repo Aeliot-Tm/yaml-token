@@ -80,8 +80,6 @@ final class Lexer
         if ("\xEF" === $char && $cursor->position + 2 < $length
             && "\xBB" === $input[$cursor->position + 1] && "\xBF" === $input[$cursor->position + 2]) {
             $this->advance($input, $cursor, $length);
-            $this->advance($input, $cursor, $length);
-            $this->advance($input, $cursor, $length);
 
             return new Token(TokenType::BYTE_ORDER_MARK, "\xEF\xBB\xBF", $startLine, $startColumn);
         }
@@ -231,15 +229,73 @@ final class Lexer
 
     private function advance(string $input, Cursor $cursor, int $length): void
     {
-        if ($cursor->position < $length) {
-            if ("\n" === $input[$cursor->position]) {
-                ++$cursor->line;
-                $cursor->column = 1;
-            } else {
-                ++$cursor->column;
-            }
-            ++$cursor->position;
+        if ($cursor->position >= $length) {
+            return;
         }
+        if ("\n" === $input[$cursor->position]) {
+            ++$cursor->line;
+            $cursor->column = 1;
+            ++$cursor->position;
+
+            return;
+        }
+        $width = $this->utf8CodePointByteWidth($input, $cursor->position, $length);
+        $cursor->position += $width;
+        ++$cursor->column;
+    }
+
+    /**
+     * UTF-8 byte length of the code point starting at $position, without validating continuation bytes.
+     * If the sequence is truncated or the leading byte is invalid, returns 1.
+     */
+    private function utf8CodePointByteWidth(string $input, int $position, int $length): int
+    {
+        if ($position >= $length) {
+            return 0;
+        }
+        $byte = \ord($input[$position]);
+        if ($byte < 0x80) {
+            return 1;
+        }
+        if (0x80 === ($byte & 0xC0)) {
+            return 1;
+        }
+        $expected = 0;
+        if (0xC0 === ($byte & 0xE0)) {
+            $expected = 2;
+        } elseif (0xE0 === ($byte & 0xF0)) {
+            $expected = 3;
+        } elseif (0xF0 === ($byte & 0xF8)) {
+            $expected = 4;
+        } else {
+            return 1;
+        }
+        if ($length - $position < $expected) {
+            return 1;
+        }
+
+        return $expected;
+    }
+
+    private function codePointFragmentAt(string $input, int $position, int $length): string
+    {
+        if ($position >= $length) {
+            return '';
+        }
+        if ("\n" === $input[$position]) {
+            return "\n";
+        }
+        $width = $this->utf8CodePointByteWidth($input, $position, $length);
+
+        return substr($input, $position, $width);
+    }
+
+    private function consumeCodePoint(string $input, Cursor $cursor, int $length): string
+    {
+        $fragment = $this->codePointFragmentAt($input, $cursor->position, $length);
+        $this->advance($input, $cursor, $length);
+
+        return $fragment;
     }
 
     private function match(string $input, Cursor $cursor, int $length, string $str): bool
@@ -264,12 +320,10 @@ final class Lexer
         while ($cursor->position < $length) {
             $char = $input[$cursor->position];
             if (' ' === $char) {
-                $result .= $char;
-                $this->advance($input, $cursor, $length);
+                $result .= $this->consumeCodePoint($input, $cursor, $length);
                 ++$cursor->currentIndent;
             } elseif ("\t" === $char) {
-                $result .= $char;
-                $this->advance($input, $cursor, $length);
+                $result .= $this->consumeCodePoint($input, $cursor, $length);
                 $cursor->currentIndent += 4; // Tab as 4 spaces for indent tracking
             } else {
                 break;
@@ -285,8 +339,7 @@ final class Lexer
         while ($cursor->position < $length) {
             $char = $input[$cursor->position];
             if (' ' === $char || "\t" === $char) {
-                $result .= $char;
-                $this->advance($input, $cursor, $length);
+                $result .= $this->consumeCodePoint($input, $cursor, $length);
             } else {
                 break;
             }
@@ -304,8 +357,7 @@ final class Lexer
             if ("\n" === $char || "\r" === $char) {
                 break;
             }
-            $result .= $char;
-            $this->advance($input, $cursor, $length);
+            $result .= $this->consumeCodePoint($input, $cursor, $length);
         }
 
         return $result;
@@ -319,8 +371,7 @@ final class Lexer
             if ("\n" === $char || "\r" === $char) {
                 break;
             }
-            $result .= $char;
-            $this->advance($input, $cursor, $length);
+            $result .= $this->consumeCodePoint($input, $cursor, $length);
         }
 
         return $result;
@@ -334,8 +385,7 @@ final class Lexer
             if ("\n" === $char || "\r" === $char) {
                 break;
             }
-            $result .= $char;
-            $this->advance($input, $cursor, $length);
+            $result .= $this->consumeCodePoint($input, $cursor, $length);
         }
 
         return $result;
@@ -349,8 +399,7 @@ final class Lexer
             if ("\n" === $char || "\r" === $char) {
                 break;
             }
-            $result .= $char;
-            $this->advance($input, $cursor, $length);
+            $result .= $this->consumeCodePoint($input, $cursor, $length);
         }
 
         return $result;
@@ -397,8 +446,7 @@ final class Lexer
         while ($cursor->position < $length) {
             $char = $input[$cursor->position];
             if ($this->isAnchorChar($char)) {
-                $result .= $char;
-                $this->advance($input, $cursor, $length);
+                $result .= $this->consumeCodePoint($input, $cursor, $length);
             } else {
                 break;
             }
@@ -414,8 +462,7 @@ final class Lexer
         while ($cursor->position < $length) {
             $char = $input[$cursor->position];
             if ($this->isAnchorChar($char)) {
-                $result .= $char;
-                $this->advance($input, $cursor, $length);
+                $result .= $this->consumeCodePoint($input, $cursor, $length);
             } else {
                 break;
             }
@@ -440,8 +487,7 @@ final class Lexer
             $result .= '<';
             $this->advance($input, $cursor, $length);
             while ($cursor->position < $length && '>' !== $input[$cursor->position]) {
-                $result .= $input[$cursor->position];
-                $this->advance($input, $cursor, $length);
+                $result .= $this->consumeCodePoint($input, $cursor, $length);
             }
             if ($cursor->position < $length) {
                 $result .= '>';
@@ -454,8 +500,7 @@ final class Lexer
         while ($cursor->position < $length) {
             $char = $input[$cursor->position];
             if ($this->isTagChar($char)) {
-                $result .= $char;
-                $this->advance($input, $cursor, $length);
+                $result .= $this->consumeCodePoint($input, $cursor, $length);
             } else {
                 break;
             }
@@ -478,19 +523,15 @@ final class Lexer
         while ($cursor->position < $length) {
             $char = $input[$cursor->position];
             if ('\\' === $char) {
-                $result .= $char;
-                $this->advance($input, $cursor, $length);
+                $result .= $this->consumeCodePoint($input, $cursor, $length);
                 if ($cursor->position < $length) {
-                    $result .= $input[$cursor->position];
-                    $this->advance($input, $cursor, $length);
+                    $result .= $this->consumeCodePoint($input, $cursor, $length);
                 }
             } elseif ('"' === $char) {
-                $result .= $char;
-                $this->advance($input, $cursor, $length);
+                $result .= $this->consumeCodePoint($input, $cursor, $length);
                 break;
             } else {
-                $result .= $char;
-                $this->advance($input, $cursor, $length);
+                $result .= $this->consumeCodePoint($input, $cursor, $length);
             }
         }
 
@@ -504,17 +545,14 @@ final class Lexer
         while ($cursor->position < $length) {
             $char = $input[$cursor->position];
             if ("'" === $char) {
-                $result .= $char;
-                $this->advance($input, $cursor, $length);
+                $result .= $this->consumeCodePoint($input, $cursor, $length);
                 if ($cursor->position < $length && "'" === $input[$cursor->position]) {
-                    $result .= "'";
-                    $this->advance($input, $cursor, $length);
+                    $result .= $this->consumeCodePoint($input, $cursor, $length);
                 } else {
                     break;
                 }
             } else {
-                $result .= $char;
-                $this->advance($input, $cursor, $length);
+                $result .= $this->consumeCodePoint($input, $cursor, $length);
             }
         }
 
@@ -540,11 +578,9 @@ final class Lexer
 
         while ($cursor->position < $length) {
             if ("\n" === $input[$cursor->position] || "\r" === $input[$cursor->position]) {
-                $result .= $input[$cursor->position];
-                $this->advance($input, $cursor, $length);
+                $result .= $this->consumeCodePoint($input, $cursor, $length);
                 if ($cursor->position > 0 && "\r" === $input[$cursor->position - 1] && $cursor->position < $length && "\n" === $input[$cursor->position]) {
-                    $result .= "\n";
-                    $this->advance($input, $cursor, $length);
+                    $result .= $this->consumeCodePoint($input, $cursor, $length);
                 }
                 continue;
             }
@@ -553,8 +589,7 @@ final class Lexer
             $lineIndent = 0;
             while ($cursor->position < $length && (' ' === $input[$cursor->position] || "\t" === $input[$cursor->position])) {
                 $lineIndent += "\t" === $input[$cursor->position] ? 4 : 1;
-                $result .= $input[$cursor->position];
-                $this->advance($input, $cursor, $length);
+                $result .= $this->consumeCodePoint($input, $cursor, $length);
             }
 
             if ($cursor->position >= $length || "\n" === $input[$cursor->position] || "\r" === $input[$cursor->position]) {
@@ -568,12 +603,12 @@ final class Lexer
                 $backtrack = $cursor->position - $indentStart;
                 $result = substr($result, 0, -$backtrack);
                 $cursor->position = $indentStart;
+                $cursor->column = max(1, $cursor->column - $backtrack);
                 break;
             }
 
             while ($cursor->position < $length && "\n" !== $input[$cursor->position] && "\r" !== $input[$cursor->position]) {
-                $result .= $input[$cursor->position];
-                $this->advance($input, $cursor, $length);
+                $result .= $this->consumeCodePoint($input, $cursor, $length);
             }
         }
 
@@ -582,11 +617,9 @@ final class Lexer
 
     private function readBlockScalarHeader(string $input, Cursor $cursor, int $length): string
     {
-        $result = $input[$cursor->position];
-        $this->advance($input, $cursor, $length);
+        $result = $this->consumeCodePoint($input, $cursor, $length);
         while ($cursor->position < $length && "\n" !== $input[$cursor->position] && "\r" !== $input[$cursor->position]) {
-            $result .= $input[$cursor->position];
-            $this->advance($input, $cursor, $length);
+            $result .= $this->consumeCodePoint($input, $cursor, $length);
         }
 
         return $result;
@@ -615,8 +648,7 @@ final class Lexer
                     break;
                 }
             }
-            $result .= $char;
-            $this->advance($input, $cursor, $length);
+            $result .= $this->consumeCodePoint($input, $cursor, $length);
         }
 
         return $result;

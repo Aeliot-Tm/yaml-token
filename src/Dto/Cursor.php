@@ -13,8 +13,13 @@ declare(strict_types=1);
 
 namespace Aeliot\YamlToken\Dto;
 
+/**
+ * Lexer cursor: {@see self::$position} is a byte offset into the input string;
+ * {@see self::$column} is a 1-based Unicode code point index on the current line.
+ */
 final class Cursor
 {
+    /** Byte offset from the start of the input. */
     public int $position = 0;
     public int $line = 1;
     public int $column = 1;
