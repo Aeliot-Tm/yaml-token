@@ -48,6 +48,16 @@ final class Lexer
         return $stream;
     }
 
+    private function getNextChar(string $input, Cursor $cursor, int $length): ?string
+    {
+        $next = $cursor->position + 1;
+        if ($next >= $length) {
+            return null;
+        }
+
+        return $input[$next];
+    }
+
     private function readToken(string $input, Cursor $cursor, int $length): ?Token
     {
         $char = $input[$cursor->position];
@@ -356,33 +366,30 @@ final class Lexer
 
     private function isSequenceEntry(string $input, Cursor $cursor, int $length): bool
     {
-        $next = $cursor->position + 1;
-        if ($next >= $length) {
+        $nextChar = $this->getNextChar($input, $cursor, $length);
+        if (null === $nextChar) {
             return true;
         }
-        $nextChar = $input[$next];
 
         return ' ' === $nextChar || "\t" === $nextChar || "\n" === $nextChar || "\r" === $nextChar;
     }
 
     private function isMappingKey(string $input, Cursor $cursor, int $length): bool
     {
-        $next = $cursor->position + 1;
-        if ($next >= $length) {
+        $nextChar = $this->getNextChar($input, $cursor, $length);
+        if (null === $nextChar) {
             return true;
         }
-        $nextChar = $input[$next];
 
         return ' ' === $nextChar || "\t" === $nextChar || "\n" === $nextChar || "\r" === $nextChar;
     }
 
     private function isMappingValue(string $input, Cursor $cursor, int $length): bool
     {
-        $next = $cursor->position + 1;
-        if ($next >= $length) {
+        $nextChar = $this->getNextChar($input, $cursor, $length);
+        if (null === $nextChar) {
             return true;
         }
-        $nextChar = $input[$next];
 
         return ' ' === $nextChar || "\t" === $nextChar || "\n" === $nextChar || "\r" === $nextChar
             || '#' === $nextChar || '[' === $nextChar || '{' === $nextChar || '"' === $nextChar || "'" === $nextChar;
@@ -510,11 +517,10 @@ final class Lexer
 
     private function isBlockScalarStart(string $input, Cursor $cursor, int $length): bool
     {
-        $next = $cursor->position + 1;
-        if ($next >= $length) {
+        $nextChar = $this->getNextChar($input, $cursor, $length);
+        if (null === $nextChar) {
             return true;
         }
-        $nextChar = $input[$next];
 
         return ' ' === $nextChar || "\t" === $nextChar || "\n" === $nextChar || "\r" === $nextChar
             || '+' === $nextChar || '-' === $nextChar;
