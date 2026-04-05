@@ -40,6 +40,7 @@ enum TokenType: string
     // Service characters
     case INDENTATION = 'INDENTATION';
     case NEWLINE = 'NEWLINE';
+    case UNRECOGNIZED = 'UNRECOGNIZED';
     case WHITESPACE = 'WHITESPACE';
 
     // Scalars

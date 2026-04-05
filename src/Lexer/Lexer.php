@@ -81,10 +81,7 @@ final class Lexer
         $length = \strlen($input);
 
         while ($cursor->position < $length) {
-            $token = $this->readToken($input, $cursor, $length);
-            if (null !== $token) {
-                $stream->addToken($token);
-            }
+            $stream->addToken($this->readToken($input, $cursor, $length));
         }
 
         return $stream;
@@ -100,7 +97,7 @@ final class Lexer
         return $input[$next];
     }
 
-    private function readToken(string $input, Cursor $cursor, int $length): ?Token
+    private function readToken(string $input, Cursor $cursor, int $length): Token
     {
         $char = $input[$cursor->position];
         $startLine = $cursor->line;
@@ -266,10 +263,9 @@ final class Lexer
             return new Token(TokenType::PLAIN_SCALAR, $plain, $startLine, $startColumn);
         }
 
-        // Unknown character - advance to avoid infinite loop
-        $this->advance($input, $cursor, $length);
+        $text = $this->consumeCodePoint($input, $cursor, $length);
 
-        return null;
+        return new Token(TokenType::UNRECOGNIZED, $text, $startLine, $startColumn);
     }
 
     private function advance(string $input, Cursor $cursor, int $length): void
