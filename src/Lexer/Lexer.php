@@ -231,14 +231,14 @@ final class Lexer
 
         // ANCHOR (&name)
         if ('&' === $char) {
-            $anchor = $this->readAnchor($input, $cursor, $length);
+            $anchor = '&'.$this->readAnchorOrAlias($input, $cursor, $length);
 
             return new Token(TokenType::ANCHOR, $anchor, $startLine, $startColumn);
         }
 
         // ALIAS (*name)
         if ('*' === $char) {
-            $alias = $this->readAlias($input, $cursor, $length);
+            $alias = '*'.$this->readAnchorOrAlias($input, $cursor, $length);
 
             return new Token(TokenType::ALIAS, $alias, $startLine, $startColumn);
         }
@@ -437,25 +437,9 @@ final class Lexer
         return \in_array($nextChar, self::CHARS_MAPPING_VALUE_SUFFIX, true);
     }
 
-    private function readAnchor(string $input, Cursor $cursor, int $length): string
+    private function readAnchorOrAlias(string $input, Cursor $cursor, int $length): string
     {
-        $result = '&';
-        $this->advance($input, $cursor, $length);
-        while ($cursor->position < $length) {
-            $char = $input[$cursor->position];
-            if ($this->isAnchorChar($char)) {
-                $result .= $this->consumeCodePoint($input, $cursor, $length);
-            } else {
-                break;
-            }
-        }
-
-        return $result;
-    }
-
-    private function readAlias(string $input, Cursor $cursor, int $length): string
-    {
-        $result = '*';
+        $result = '';
         $this->advance($input, $cursor, $length);
         while ($cursor->position < $length) {
             $char = $input[$cursor->position];
