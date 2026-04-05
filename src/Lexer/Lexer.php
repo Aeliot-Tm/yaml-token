@@ -71,6 +71,8 @@ final class Lexer
         ',' => TokenType::FLOW_ENTRY,
     ];
 
+    private const INDENT_SIZE_TAB = 4;
+
     public function tokenize(string $input): TokenStream
     {
         $stream = new TokenStream();
@@ -366,7 +368,7 @@ final class Lexer
                 ++$cursor->currentIndent;
             } elseif ("\t" === $char) {
                 $result .= $this->consumeCodePoint($input, $cursor, $length);
-                $cursor->currentIndent += 4; // Tab as 4 spaces for indent tracking
+                $cursor->currentIndent += self::INDENT_SIZE_TAB; // Tab as 4 spaces for indent tracking
             } else {
                 break;
             }
@@ -577,7 +579,7 @@ final class Lexer
             $indentStart = $cursor->position;
             $lineIndent = 0;
             while ($cursor->position < $length && \in_array($input[$cursor->position], self::CHARS_HORIZONTAL_WHITESPACE, true)) {
-                $lineIndent += "\t" === $input[$cursor->position] ? 4 : 1;
+                $lineIndent += "\t" === $input[$cursor->position] ? self::INDENT_SIZE_TAB : 1;
                 $result .= $this->consumeCodePoint($input, $cursor, $length);
             }
 
