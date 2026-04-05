@@ -21,6 +21,46 @@ use Aeliot\YamlToken\Token\TokenStream;
 final class Lexer
 {
     /**
+     * @var list<string>
+     */
+    private const CHARS_ANCHOR_OR_TAG_FORBIDDEN = [...self::CHARS_WHITESPACE, '[', ']', '{', '}', ',', ':', '#', "\0"];
+
+    /**
+     * @var list<string>
+     */
+    private const CHARS_BLOCK_SCALAR_INDICATORS = ['|', '>'];
+
+    /**
+     * @var list<string>
+     */
+    private const CHARS_BLOCK_SCALAR_START = [...self::CHARS_WHITESPACE, '+', '-'];
+
+    /**
+     * @var list<string>
+     */
+    private const CHARS_HORIZONTAL_WHITESPACE = [' ', "\t"];
+
+    /**
+     * @var list<string>
+     */
+    private const CHARS_LINE_BREAK = ["\n", "\r"];
+
+    /**
+     * @var list<string>
+     */
+    private const CHARS_MAPPING_VALUE_SUFFIX = [...self::CHARS_WHITESPACE, '#', '[', '{', '"', "'"];
+
+    /**
+     * @var list<string>
+     */
+    private const CHARS_PLAIN_SCALAR_STOP = [...self::CHARS_LINE_BREAK, '[', ']', '{', '}', ',', ':', '#', '?'];
+
+    /**
+     * @var list<string>
+     */
+    private const CHARS_WHITESPACE = [...self::CHARS_HORIZONTAL_WHITESPACE, ...self::CHARS_LINE_BREAK];
+
+    /**
      * @var array<string, TokenType>
      */
     private const FLOW_INDICATOR_TOKEN_TYPES = [
@@ -83,7 +123,7 @@ final class Lexer
         }
 
         // INDENTATION (spaces at line start, after newline)
-        if (1 === $cursor->column && (' ' === $char || "\t" === $char)) {
+        if (1 === $cursor->column && \in_array($char, self::CHARS_HORIZONTAL_WHITESPACE, true)) {
             $indent = $this->readIndentation($input, $cursor, $length);
             if ('' !== $indent) {
                 return new Token(TokenType::INDENTATION, $indent, $startLine, $startColumn);
@@ -91,7 +131,7 @@ final class Lexer
         }
 
         // WHITESPACE (within line)
-        if (' ' === $char || "\t" === $char) {
+        if (\in_array($char, self::CHARS_HORIZONTAL_WHITESPACE, true)) {
             $spaces = $this->readWhitespace($input, $cursor, $length);
 
             return new Token(TokenType::WHITESPACE, $spaces, $startLine, $startColumn);
@@ -208,7 +248,7 @@ final class Lexer
         }
 
         // BLOCK SCALAR (| or >)
-        if (('|' === $char || '>' === $char) && $this->isBlockScalarStart($input, $cursor, $length)) {
+        if (\in_array($char, self::CHARS_BLOCK_SCALAR_INDICATORS, true) && $this->isBlockScalarStart($input, $cursor, $length)) {
             $scalar = '|' === $char
                 ? $this->readLiteralBlockScalar($input, $cursor, $length)
                 : $this->readFoldedBlockScalar($input, $cursor, $length);
@@ -340,7 +380,7 @@ final class Lexer
         $result = '';
         while ($cursor->position < $length) {
             $char = $input[$cursor->position];
-            if (' ' === $char || "\t" === $char) {
+            if (\in_array($char, self::CHARS_HORIZONTAL_WHITESPACE, true)) {
                 $result .= $this->consumeCodePoint($input, $cursor, $length);
             } else {
                 break;
@@ -355,7 +395,7 @@ final class Lexer
         $result = '';
         while ($cursor->position < $length) {
             $char = $input[$cursor->position];
-            if ("\n" === $char || "\r" === $char) {
+            if (\in_array($char, self::CHARS_LINE_BREAK, true)) {
                 break;
             }
             $result .= $this->consumeCodePoint($input, $cursor, $length);
@@ -371,7 +411,7 @@ final class Lexer
             return true;
         }
 
-        return ' ' === $nextChar || "\t" === $nextChar || "\n" === $nextChar || "\r" === $nextChar;
+        return \in_array($nextChar, self::CHARS_WHITESPACE, true);
     }
 
     private function isMappingKey(string $input, Cursor $cursor, int $length): bool
@@ -381,7 +421,7 @@ final class Lexer
             return true;
         }
 
-        return ' ' === $nextChar || "\t" === $nextChar || "\n" === $nextChar || "\r" === $nextChar;
+        return \in_array($nextChar, self::CHARS_WHITESPACE, true);
     }
 
     private function isMappingValue(string $input, Cursor $cursor, int $length): bool
@@ -391,8 +431,7 @@ final class Lexer
             return true;
         }
 
-        return ' ' === $nextChar || "\t" === $nextChar || "\n" === $nextChar || "\r" === $nextChar
-            || '#' === $nextChar || '[' === $nextChar || '{' === $nextChar || '"' === $nextChar || "'" === $nextChar;
+        return \in_array($nextChar, self::CHARS_MAPPING_VALUE_SUFFIX, true);
     }
 
     private function readAnchor(string $input, Cursor $cursor, int $length): string
@@ -429,9 +468,7 @@ final class Lexer
 
     private function isAnchorChar(string $char): bool
     {
-        return ' ' !== $char && "\t" !== $char && "\n" !== $char && "\r" !== $char
-            && '[' !== $char && ']' !== $char && '{' !== $char && '}' !== $char && ',' !== $char
-            && ':' !== $char && '#' !== $char && "\0" !== $char;
+        return !\in_array($char, self::CHARS_ANCHOR_OR_TAG_FORBIDDEN, true);
     }
 
     private function readTag(string $input, Cursor $cursor, int $length): string
@@ -467,9 +504,7 @@ final class Lexer
 
     private function isTagChar(string $char): bool
     {
-        return ' ' !== $char && "\t" !== $char && "\n" !== $char && "\r" !== $char
-            && '[' !== $char && ']' !== $char && '{' !== $char && '}' !== $char && ',' !== $char
-            && ':' !== $char && '#' !== $char && "\0" !== $char;
+        return !\in_array($char, self::CHARS_ANCHOR_OR_TAG_FORBIDDEN, true);
     }
 
     private function readDoubleQuotedScalar(string $input, Cursor $cursor, int $length): string
@@ -522,8 +557,7 @@ final class Lexer
             return true;
         }
 
-        return ' ' === $nextChar || "\t" === $nextChar || "\n" === $nextChar || "\r" === $nextChar
-            || '+' === $nextChar || '-' === $nextChar;
+        return \in_array($nextChar, self::CHARS_BLOCK_SCALAR_START, true);
     }
 
     private function readLiteralBlockScalar(string $input, Cursor $cursor, int $length): string
@@ -532,7 +566,7 @@ final class Lexer
         $minIndent = null;
 
         while ($cursor->position < $length) {
-            if ("\n" === $input[$cursor->position] || "\r" === $input[$cursor->position]) {
+            if (\in_array($input[$cursor->position], self::CHARS_LINE_BREAK, true)) {
                 $result .= $this->consumeCodePoint($input, $cursor, $length);
                 if ($cursor->position > 0 && "\r" === $input[$cursor->position - 1] && $cursor->position < $length && "\n" === $input[$cursor->position]) {
                     $result .= $this->consumeCodePoint($input, $cursor, $length);
@@ -542,12 +576,12 @@ final class Lexer
 
             $indentStart = $cursor->position;
             $lineIndent = 0;
-            while ($cursor->position < $length && (' ' === $input[$cursor->position] || "\t" === $input[$cursor->position])) {
+            while ($cursor->position < $length && \in_array($input[$cursor->position], self::CHARS_HORIZONTAL_WHITESPACE, true)) {
                 $lineIndent += "\t" === $input[$cursor->position] ? 4 : 1;
                 $result .= $this->consumeCodePoint($input, $cursor, $length);
             }
 
-            if ($cursor->position >= $length || "\n" === $input[$cursor->position] || "\r" === $input[$cursor->position]) {
+            if ($cursor->position >= $length || \in_array($input[$cursor->position], self::CHARS_LINE_BREAK, true)) {
                 continue;
             }
 
@@ -562,7 +596,7 @@ final class Lexer
                 break;
             }
 
-            while ($cursor->position < $length && "\n" !== $input[$cursor->position] && "\r" !== $input[$cursor->position]) {
+            while ($cursor->position < $length && !\in_array($input[$cursor->position], self::CHARS_LINE_BREAK, true)) {
                 $result .= $this->consumeCodePoint($input, $cursor, $length);
             }
         }
@@ -573,7 +607,7 @@ final class Lexer
     private function readBlockScalarHeader(string $input, Cursor $cursor, int $length): string
     {
         $result = $this->consumeCodePoint($input, $cursor, $length);
-        while ($cursor->position < $length && "\n" !== $input[$cursor->position] && "\r" !== $input[$cursor->position]) {
+        while ($cursor->position < $length && !\in_array($input[$cursor->position], self::CHARS_LINE_BREAK, true)) {
             $result .= $this->consumeCodePoint($input, $cursor, $length);
         }
 
@@ -590,16 +624,15 @@ final class Lexer
         $result = '';
         while ($cursor->position < $length) {
             $char = $input[$cursor->position];
-            if ("\n" === $char || "\r" === $char || ':' === $char || '#' === $char || '[' === $char || ']' === $char
-                || '{' === $char || '}' === $char || ',' === $char || '?' === $char) {
+            if (\in_array($char, self::CHARS_PLAIN_SCALAR_STOP, true)) {
                 break;
             }
-            if (' ' === $char || "\t" === $char) {
+            if (\in_array($char, self::CHARS_HORIZONTAL_WHITESPACE, true)) {
                 $peek = $cursor->position + 1;
-                while ($peek < $length && (' ' === $input[$peek] || "\t" === $input[$peek])) {
+                while ($peek < $length && \in_array($input[$peek], self::CHARS_HORIZONTAL_WHITESPACE, true)) {
                     ++$peek;
                 }
-                if ($peek >= $length || "\n" === $input[$peek] || "\r" === $input[$peek] || '#' === $input[$peek]) {
+                if ($peek >= $length || \in_array($input[$peek], self::CHARS_LINE_BREAK, true) || '#' === $input[$peek]) {
                     break;
                 }
             }
