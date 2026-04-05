@@ -107,28 +107,29 @@ final class Lexer
 
         // COMMENT
         if ('#' === $char) {
-            $comment = $this->readComment($input, $cursor, $length);
+            $this->advance($input, $cursor, $length);
+            $comment = '#'.$this->readUntilNewline($input, $cursor, $length);
 
             return new Token(TokenType::COMMENT, $comment, $startLine, $startColumn);
         }
 
         // YAML_DIRECTIVE (%YAML ...)
         if ($this->match($input, $cursor, $length, '%YAML')) {
-            $directive = $this->readYamlDirective($input, $cursor, $length);
+            $directive = '%YAML'.$this->readUntilNewline($input, $cursor, $length);
 
             return new Token(TokenType::YAML_DIRECTIVE, $directive, $startLine, $startColumn);
         }
 
         // TAG_DIRECTIVE (%TAG ...)
         if ($this->match($input, $cursor, $length, '%TAG')) {
-            $directive = $this->readTagDirective($input, $cursor, $length);
+            $directive = '%TAG'.$this->readUntilNewline($input, $cursor, $length);
 
             return new Token(TokenType::TAG_DIRECTIVE, $directive, $startLine, $startColumn);
         }
 
         // DIRECTIVE (%... for other directives)
         if ('%' === $char) {
-            $directive = $this->readGenericDirective($input, $cursor, $length);
+            $directive = $this->readUntilNewline($input, $cursor, $length);
 
             return new Token(TokenType::DIRECTIVE, $directive, $startLine, $startColumn);
         }
@@ -339,50 +340,7 @@ final class Lexer
         return $result;
     }
 
-    private function readComment(string $input, Cursor $cursor, int $length): string
-    {
-        $result = '#';
-        $this->advance($input, $cursor, $length);
-        while ($cursor->position < $length) {
-            $char = $input[$cursor->position];
-            if ("\n" === $char || "\r" === $char) {
-                break;
-            }
-            $result .= $this->consumeCodePoint($input, $cursor, $length);
-        }
-
-        return $result;
-    }
-
-    private function readYamlDirective(string $input, Cursor $cursor, int $length): string
-    {
-        $result = '%YAML';
-        while ($cursor->position < $length) {
-            $char = $input[$cursor->position];
-            if ("\n" === $char || "\r" === $char) {
-                break;
-            }
-            $result .= $this->consumeCodePoint($input, $cursor, $length);
-        }
-
-        return $result;
-    }
-
-    private function readTagDirective(string $input, Cursor $cursor, int $length): string
-    {
-        $result = '%TAG';
-        while ($cursor->position < $length) {
-            $char = $input[$cursor->position];
-            if ("\n" === $char || "\r" === $char) {
-                break;
-            }
-            $result .= $this->consumeCodePoint($input, $cursor, $length);
-        }
-
-        return $result;
-    }
-
-    private function readGenericDirective(string $input, Cursor $cursor, int $length): string
+    private function readUntilNewline(string $input, Cursor $cursor, int $length): string
     {
         $result = '';
         while ($cursor->position < $length) {
