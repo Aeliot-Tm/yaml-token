@@ -16,28 +16,20 @@ namespace Aeliot\YamlToken\Test\Unit\Lexer;
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Lexer\Lexer;
 use Aeliot\YamlToken\Token\Token;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Lexer::class)]
-#[UsesClass(Token::class)]
-final class LexerTest extends TestCase
+abstract class LexerMappingTestCase extends TestCase
 {
     /**
      * @return iterable<string,array{0: array<string,string|TokenType>, 1: string }>
      */
-    public static function getDataForTestMapping(): iterable
-    {
-        yield [[], ''];
-    }
+    abstract public static function getDataForTestMapping(): iterable;
 
     #[DataProvider('getDataForTestMapping')]
-    public function testMapping(array $expectedTokens, string $input): void
+    public function testMapping(array $expectedTokens, string $path): void
     {
-        $this->markTestIncomplete();
-        $stream = (new Lexer())->tokenize($input);
+        $stream = (new Lexer())->tokenize(file_get_contents($path));
         self::assertSame(
             $expectedTokens,
             array_map(static fn (Token $token): array => [
