@@ -20,6 +20,17 @@ use Aeliot\YamlToken\Token\TokenStream;
 
 final class Lexer
 {
+    /**
+     * @var array<string, TokenType>
+     */
+    private const FLOW_INDICATOR_TOKEN_TYPES = [
+        '[' => TokenType::FLOW_SEQUENCE_START,
+        ']' => TokenType::FLOW_SEQUENCE_END,
+        '{' => TokenType::FLOW_MAPPING_START,
+        '}' => TokenType::FLOW_MAPPING_END,
+        ',' => TokenType::FLOW_ENTRY,
+    ];
+
     public function tokenize(string $input): TokenStream
     {
         $stream = new TokenStream();
@@ -123,30 +134,10 @@ final class Lexer
         }
 
         // FLOW indicators
-        if ('[' === $char) {
+        if (isset(self::FLOW_INDICATOR_TOKEN_TYPES[$char])) {
             $this->advance($input, $cursor, $length);
 
-            return new Token(TokenType::FLOW_SEQUENCE_START, '[', $startLine, $startColumn);
-        }
-        if (']' === $char) {
-            $this->advance($input, $cursor, $length);
-
-            return new Token(TokenType::FLOW_SEQUENCE_END, ']', $startLine, $startColumn);
-        }
-        if ('{' === $char) {
-            $this->advance($input, $cursor, $length);
-
-            return new Token(TokenType::FLOW_MAPPING_START, '{', $startLine, $startColumn);
-        }
-        if ('}' === $char) {
-            $this->advance($input, $cursor, $length);
-
-            return new Token(TokenType::FLOW_MAPPING_END, '}', $startLine, $startColumn);
-        }
-        if (',' === $char) {
-            $this->advance($input, $cursor, $length);
-
-            return new Token(TokenType::FLOW_ENTRY, ',', $startLine, $startColumn);
+            return new Token(self::FLOW_INDICATOR_TOKEN_TYPES[$char], $char, $startLine, $startColumn);
         }
 
         // DOUBLE_QUOTED_SCALAR
