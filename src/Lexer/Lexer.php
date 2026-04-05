@@ -109,6 +109,7 @@ final class Lexer
         // NEWLINE (CRLF, CR, LF)
         if ("\r" === $char) {
             $this->advance($input, $cursor, $length);
+            $cursor->currentIndent = 0;
             if ($cursor->position < $length && "\n" === $input[$cursor->position]) {
                 $this->advance($input, $cursor, $length);
 
