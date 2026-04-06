@@ -41,9 +41,17 @@ final class LexerMappingLiteralBlockTest extends LexerMappingTestCase
                 'text' => ' ',
             ],
             [
+                'type' => TokenType::LITERAL_BLOCK_SCALAR_INDICATOR,
+                'text' => '|',
+            ],
+            [
+                'type' => TokenType::NEWLINE,
+                'text' => '
+',
+            ],
+            [
                 'type' => TokenType::LITERAL_BLOCK_SCALAR,
-                'text' => '|
-  Line one
+                'text' => '  Line one
   Line two
   Line three
 ',

@@ -41,10 +41,18 @@ final class LexerMappingBlockScalarTabTest extends LexerMappingTestCase
                 'text' => ' ',
             ],
             [
+                'type' => TokenType::LITERAL_BLOCK_SCALAR_INDICATOR,
+                'text' => '|',
+            ],
+            [
+                'type' => TokenType::NEWLINE,
+                'text' => '
+',
+            ],
+            [
                 'type' => TokenType::LITERAL_BLOCK_SCALAR,
-                'text' => '|
-	void main() {
-		printf("Hello\\n");
+                'text' => '	void main() {
+		printf("Hello\n");
 	}
 ',
             ],

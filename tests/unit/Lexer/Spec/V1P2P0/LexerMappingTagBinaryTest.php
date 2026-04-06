@@ -49,9 +49,17 @@ final class LexerMappingTagBinaryTest extends LexerMappingTestCase
                 'text' => ' ',
             ],
             [
+                'type' => TokenType::LITERAL_BLOCK_SCALAR_INDICATOR,
+                'text' => '|',
+            ],
+            [
+                'type' => TokenType::NEWLINE,
+                'text' => '
+',
+            ],
+            [
                 'type' => TokenType::LITERAL_BLOCK_SCALAR,
-                'text' => '|
- R0lGODlhDAAMAIQAAP//9/X
+                'text' => ' R0lGODlhDAAMAIQAAP//9/X
 ',
             ],
         ], __DIR__.'/../../../../fixture/spec/1.2.0/tag-binary.yaml'];

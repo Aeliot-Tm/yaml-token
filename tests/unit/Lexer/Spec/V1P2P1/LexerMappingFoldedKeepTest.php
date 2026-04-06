@@ -41,9 +41,21 @@ final class LexerMappingFoldedKeepTest extends LexerMappingTestCase
                 'text' => ' ',
             ],
             [
+                'type' => TokenType::FOLDED_BLOCK_SCALAR_INDICATOR,
+                'text' => '>',
+            ],
+            [
+                'type' => TokenType::BLOCK_SCALAR_CHOMPING_INDICATOR,
+                'text' => '+',
+            ],
+            [
+                'type' => TokenType::NEWLINE,
+                'text' => '
+',
+            ],
+            [
                 'type' => TokenType::FOLDED_BLOCK_SCALAR,
-                'text' => '>+
-  Keeps trailing newlines
+                'text' => '  Keeps trailing newlines
 
 
 ',

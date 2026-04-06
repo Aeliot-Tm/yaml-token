@@ -41,9 +41,17 @@ final class LexerMappingFoldedBlockTest extends LexerMappingTestCase
                 'text' => ' ',
             ],
             [
+                'type' => TokenType::FOLDED_BLOCK_SCALAR_INDICATOR,
+                'text' => '>',
+            ],
+            [
+                'type' => TokenType::NEWLINE,
+                'text' => '
+',
+            ],
+            [
                 'type' => TokenType::FOLDED_BLOCK_SCALAR,
-                'text' => '>
-  This is a long line
+                'text' => '  This is a long line
   that folds into space.
 
   New paragraph here.

@@ -41,9 +41,21 @@ final class LexerMappingLiteralKeepTest extends LexerMappingTestCase
                 'text' => ' ',
             ],
             [
+                'type' => TokenType::LITERAL_BLOCK_SCALAR_INDICATOR,
+                'text' => '|',
+            ],
+            [
+                'type' => TokenType::BLOCK_SCALAR_CHOMPING_INDICATOR,
+                'text' => '+',
+            ],
+            [
+                'type' => TokenType::NEWLINE,
+                'text' => '
+',
+            ],
+            [
                 'type' => TokenType::LITERAL_BLOCK_SCALAR,
-                'text' => '|+
-  With trailing newlines
+                'text' => '  With trailing newlines
 
 
 ',

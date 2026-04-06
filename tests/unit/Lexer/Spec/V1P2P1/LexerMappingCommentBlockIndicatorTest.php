@@ -41,9 +41,25 @@ final class LexerMappingCommentBlockIndicatorTest extends LexerMappingTestCase
                 'text' => ' ',
             ],
             [
+                'type' => TokenType::LITERAL_BLOCK_SCALAR_INDICATOR,
+                'text' => '|',
+            ],
+            [
+                'type' => TokenType::WHITESPACE,
+                'text' => ' ',
+            ],
+            [
+                'type' => TokenType::COMMENT,
+                'text' => '# comment after block indicator',
+            ],
+            [
+                'type' => TokenType::NEWLINE,
+                'text' => '
+',
+            ],
+            [
                 'type' => TokenType::LITERAL_BLOCK_SCALAR,
-                'text' => '| # comment after block indicator
-  content
+                'text' => '  content
 ',
             ],
         ], __DIR__.'/../../../../fixture/spec/1.2.1/comment-block-indicator.yaml'];

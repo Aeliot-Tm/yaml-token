@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Aeliot\YamlToken\Dto;
 
+use Aeliot\YamlToken\Enum\TokenType;
+
 /**
  * Lexer cursor: {@see self::$position} is a byte offset into the input string;
  * {@see self::$column} is a 1-based Unicode code point index on the current line.
@@ -24,4 +26,22 @@ final class Cursor
     public int $line = 1;
     public int $column = 1;
     public int $currentIndent = 0;
+
+    /**
+     * After {@see TokenType::LITERAL_BLOCK_SCALAR_INDICATOR} / {@see TokenType::FOLDED_BLOCK_SCALAR_INDICATOR} until the header line break.
+     */
+    public bool $inBlockScalarHeaderLine = false;
+
+    /**
+     * Set when emitting {@see TokenType::LITERAL_BLOCK_SCALAR_INDICATOR} or {@see TokenType::FOLDED_BLOCK_SCALAR_INDICATOR}:
+     * {@see TokenType::LITERAL_BLOCK_SCALAR} or {@see TokenType::FOLDED_BLOCK_SCALAR} for the upcoming body token.
+     */
+    public ?TokenType $blockScalarBodyTokenType = null;
+
+    /**
+     * After the block scalar header newline (or EOF before body), the next token is block body.
+     *
+     * @var TokenType::LITERAL_BLOCK_SCALAR|TokenType::FOLDED_BLOCK_SCALAR|null
+     */
+    public ?TokenType $pendingBlockScalarBody = null;
 }

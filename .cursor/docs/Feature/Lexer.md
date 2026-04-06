@@ -29,8 +29,9 @@ The rules below describe the practical behavior relied upon by lexer unit tests.
   - `'`...`'` → `SINGLE_QUOTED_SCALAR` (`''` is preserved as escaped `'`)
 - **Block scalars**:
   - `|` / `>` start a block scalar when followed by whitespace or `+`/`-`
-  - emitted as a single token: `LITERAL_BLOCK_SCALAR` / `FOLDED_BLOCK_SCALAR`
-  - token text includes the header and subsequent indented content as raw text
+  - `LITERAL_BLOCK_SCALAR_INDICATOR` / `FOLDED_BLOCK_SCALAR_INDICATOR` for the `|` / `>` character
+  - the rest of the block scalar header line uses the same rules as elsewhere on the line: `WHITESPACE`, `COMMENT`, `BLOCK_SCALAR_CHOMPING_INDICATOR` (`+` or `-`), `BLOCK_SCALAR_INDENTATION_INDICATOR` (one digit), then `NEWLINE` ending the header line; the cursor holds the expected body token type (`LITERAL_BLOCK_SCALAR` / `FOLDED_BLOCK_SCALAR`) while the header line is open, then `pendingBlockScalarBody` for the body token (no token queue)
+  - `LITERAL_BLOCK_SCALAR` / `FOLDED_BLOCK_SCALAR` carry only the indented block body (raw text), without the indicator or header line
 - **Structural indicators with lookahead**:
   - `-` is `SEQUENCE_ENTRY` only when followed by whitespace or end of input
   - `?` is `EXPLICIT_KEY_INDICATOR` only when followed by whitespace or end of input

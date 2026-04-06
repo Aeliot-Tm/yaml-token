@@ -42,7 +42,7 @@ final class LexerMappingCaretEscapeTest extends LexerMappingTestCase
             ],
             [
                 'type' => TokenType::DOUBLE_QUOTED_SCALAR,
-                'text' => '"\\^"',
+                'text' => '"\^"',
             ],
             [
                 'type' => TokenType::NEWLINE,

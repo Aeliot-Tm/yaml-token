@@ -28,11 +28,6 @@ final class Lexer
     /**
      * @var list<string>
      */
-    private const CHARS_BLOCK_SCALAR_INDICATORS = ['|', '>'];
-
-    /**
-     * @var list<string>
-     */
     private const CHARS_BLOCK_SCALAR_START = [...self::CHARS_WHITESPACE, '+', '-'];
 
     /**
@@ -80,7 +75,20 @@ final class Lexer
 
         $length = \strlen($input);
 
-        while ($cursor->position < $length) {
+        while ($cursor->position < $length || null !== $cursor->pendingBlockScalarBody) {
+            if ($cursor->position >= $length && $cursor->inBlockScalarHeaderLine) {
+                $this->promoteBlockScalarBodyFromHeader($cursor);
+
+                continue;
+            }
+            if (null !== $cursor->pendingBlockScalarBody) {
+                $stream->addToken($this->readBlockScalarBodyToken($input, $cursor, $length));
+
+                continue;
+            }
+            if ($cursor->position >= $length) {
+                break;
+            }
             $stream->addToken($this->readToken($input, $cursor, $length));
         }
 
@@ -97,6 +105,13 @@ final class Lexer
         return $input[$next];
     }
 
+    private function promoteBlockScalarBodyFromHeader(Cursor $cursor): void
+    {
+        $cursor->inBlockScalarHeaderLine = false;
+        $cursor->pendingBlockScalarBody = $cursor->blockScalarBodyTokenType;
+        $cursor->blockScalarBodyTokenType = null;
+    }
+
     private function readToken(string $input, Cursor $cursor, int $length): Token
     {
         $char = $input[$cursor->position];
@@ -109,8 +124,14 @@ final class Lexer
             $cursor->currentIndent = 0;
             if ($cursor->position < $length && "\n" === $input[$cursor->position]) {
                 $this->advance($input, $cursor, $length);
+                if ($cursor->inBlockScalarHeaderLine) {
+                    $this->promoteBlockScalarBodyFromHeader($cursor);
+                }
 
                 return new Token(TokenType::NEWLINE, "\r\n", $startLine, $startColumn);
+            }
+            if ($cursor->inBlockScalarHeaderLine) {
+                $this->promoteBlockScalarBodyFromHeader($cursor);
             }
 
             return new Token(TokenType::NEWLINE, "\r", $startLine, $startColumn);
@@ -118,6 +139,9 @@ final class Lexer
         if ("\n" === $char) {
             $this->advance($input, $cursor, $length);
             $cursor->currentIndent = 0;
+            if ($cursor->inBlockScalarHeaderLine) {
+                $this->promoteBlockScalarBodyFromHeader($cursor);
+            }
 
             return new Token(TokenType::NEWLINE, "\n", $startLine, $startColumn);
         }
@@ -205,6 +229,20 @@ final class Lexer
             return new Token(TokenType::SINGLE_QUOTED_SCALAR, $scalar, $startLine, $startColumn);
         }
 
+        // Block scalar header line (chomping / indentation) — before SEQUENCE_ENTRY so '-' is not a list entry
+        if ($cursor->inBlockScalarHeaderLine) {
+            if ('+' === $char || '-' === $char) {
+                $this->advance($input, $cursor, $length);
+
+                return new Token(TokenType::BLOCK_SCALAR_CHOMPING_INDICATOR, $char, $startLine, $startColumn);
+            }
+            if ($char >= '0' && $char <= '9') {
+                $this->advance($input, $cursor, $length);
+
+                return new Token(TokenType::BLOCK_SCALAR_INDENTATION_INDICATOR, $char, $startLine, $startColumn);
+            }
+        }
+
         // SEQUENCE_ENTRY (-) - must check before plain scalar
         if ('-' === $char && $this->isSequenceEntry($input, $cursor, $length)) {
             $this->advance($input, $cursor, $length);
@@ -247,14 +285,22 @@ final class Lexer
             return new Token(TokenType::TAG, $tag, $startLine, $startColumn);
         }
 
-        // BLOCK SCALAR (| or >)
-        if (\in_array($char, self::CHARS_BLOCK_SCALAR_INDICATORS, true) && $this->isBlockScalarStart($input, $cursor, $length)) {
-            $scalar = '|' === $char
-                ? $this->readLiteralBlockScalar($input, $cursor, $length)
-                : $this->readFoldedBlockScalar($input, $cursor, $length);
-            $type = '|' === $char ? TokenType::LITERAL_BLOCK_SCALAR : TokenType::FOLDED_BLOCK_SCALAR;
+        // FOLDED BLOCK SCALAR (>)
+        if ('>' === $char && $this->isBlockScalarStart($input, $cursor, $length)) {
+            $this->advance($input, $cursor, $length);
+            $cursor->inBlockScalarHeaderLine = true;
+            $cursor->blockScalarBodyTokenType = TokenType::FOLDED_BLOCK_SCALAR;
 
-            return new Token($type, $scalar, $startLine, $startColumn);
+            return new Token(TokenType::FOLDED_BLOCK_SCALAR_INDICATOR, $char, $startLine, $startColumn);
+        }
+
+        // LITERAL BLOCK SCALAR (|)
+        if ('|' === $char && $this->isBlockScalarStart($input, $cursor, $length)) {
+            $this->advance($input, $cursor, $length);
+            $cursor->inBlockScalarHeaderLine = true;
+            $cursor->blockScalarBodyTokenType = TokenType::LITERAL_BLOCK_SCALAR;
+
+            return new Token(TokenType::LITERAL_BLOCK_SCALAR_INDICATOR, $char, $startLine, $startColumn);
         }
 
         // PLAIN_SCALAR
@@ -543,9 +589,9 @@ final class Lexer
         return \in_array($nextChar, self::CHARS_BLOCK_SCALAR_START, true);
     }
 
-    private function readLiteralBlockScalar(string $input, Cursor $cursor, int $length): string
+    private function readBlockScalarBody(string $input, Cursor $cursor, int $length): string
     {
-        $result = $this->readBlockScalarHeader($input, $cursor, $length);
+        $result = '';
         $minIndent = null;
 
         while ($cursor->position < $length) {
@@ -554,6 +600,7 @@ final class Lexer
                 if ($cursor->position > 0 && "\r" === $input[$cursor->position - 1] && $cursor->position < $length && "\n" === $input[$cursor->position]) {
                     $result .= $this->consumeCodePoint($input, $cursor, $length);
                 }
+
                 continue;
             }
 
@@ -587,19 +634,13 @@ final class Lexer
         return $result;
     }
 
-    private function readBlockScalarHeader(string $input, Cursor $cursor, int $length): string
+    private function readBlockScalarBodyToken(string $input, Cursor $cursor, int $length): Token
     {
-        $result = $this->consumeCodePoint($input, $cursor, $length);
-        while ($cursor->position < $length && !\in_array($input[$cursor->position], self::CHARS_LINE_BREAK, true)) {
-            $result .= $this->consumeCodePoint($input, $cursor, $length);
-        }
+        $type = $cursor->pendingBlockScalarBody;
+        $cursor->pendingBlockScalarBody = null;
+        $text = $this->readBlockScalarBody($input, $cursor, $length);
 
-        return $result;
-    }
-
-    private function readFoldedBlockScalar(string $input, Cursor $cursor, int $length): string
-    {
-        return $this->readLiteralBlockScalar($input, $cursor, $length);
+        return new Token($type, $text, $cursor->line, $cursor->column);
     }
 
     private function readPlainScalar(string $input, Cursor $cursor, int $length): string

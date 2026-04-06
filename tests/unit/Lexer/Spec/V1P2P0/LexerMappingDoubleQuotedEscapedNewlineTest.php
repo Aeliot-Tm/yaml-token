@@ -42,8 +42,8 @@ final class LexerMappingDoubleQuotedEscapedNewlineTest extends LexerMappingTestC
             ],
             [
                 'type' => TokenType::DOUBLE_QUOTED_SCALAR,
-                'text' => '"folded to space,\\
-  or preserved\\t"',
+                'text' => '"folded to space,\
+  or preserved\t"',
             ],
             [
                 'type' => TokenType::NEWLINE,

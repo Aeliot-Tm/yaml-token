@@ -42,7 +42,7 @@ final class LexerMappingDoubleQuotedUnicodeTest extends LexerMappingTestCase
             ],
             [
                 'type' => TokenType::DOUBLE_QUOTED_SCALAR,
-                'text' => '"\\u263A \\x0d\\x0a \\U00000041"',
+                'text' => '"\u263A \x0d\x0a \U00000041"',
             ],
             [
                 'type' => TokenType::NEWLINE,
