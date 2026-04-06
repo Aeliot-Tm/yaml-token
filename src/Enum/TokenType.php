@@ -32,10 +32,10 @@ enum TokenType: string
     case FLOW_SEQUENCE_START = 'FLOW_SEQUENCE_START';
     case FOLDED = 'FOLDED';
     case LITERAL = 'LITERAL';
-    case MAPPING_VALUE = 'MAPPING_VALUE';
     case SEQUENCE_ENTRY = 'SEQUENCE_ENTRY';
     case SINGLE_QUOTE = 'SINGLE_QUOTE';
     case TAG = 'TAG';
+    case VALUE_INDICATOR = 'VALUE_INDICATOR';
 
     // Service characters
     case INDENTATION = 'INDENTATION';

@@ -75,7 +75,7 @@ final class LexerMappingComplexKeyTest extends LexerMappingTestCase
 ',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [

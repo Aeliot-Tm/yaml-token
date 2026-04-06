@@ -33,7 +33,7 @@ final class LexerMappingBlockMappingTest extends LexerMappingTestCase
                 'text' => 'sky',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [
@@ -54,7 +54,7 @@ final class LexerMappingBlockMappingTest extends LexerMappingTestCase
                 'text' => 'sea',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [

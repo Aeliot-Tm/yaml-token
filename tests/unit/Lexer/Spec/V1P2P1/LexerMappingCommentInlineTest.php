@@ -33,7 +33,7 @@ final class LexerMappingCommentInlineTest extends LexerMappingTestCase
                 'text' => 'key',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [
@@ -62,7 +62,7 @@ final class LexerMappingCommentInlineTest extends LexerMappingTestCase
                 'text' => 'other',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [

@@ -33,7 +33,7 @@ final class LexerMappingFloatSpecialTest extends LexerMappingTestCase
                 'text' => 'negative_infinity',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [
@@ -54,7 +54,7 @@ final class LexerMappingFloatSpecialTest extends LexerMappingTestCase
                 'text' => 'positive_infinity',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [
@@ -75,7 +75,7 @@ final class LexerMappingFloatSpecialTest extends LexerMappingTestCase
                 'text' => 'nan',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [

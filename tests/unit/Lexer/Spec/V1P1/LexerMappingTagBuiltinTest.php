@@ -33,7 +33,7 @@ final class LexerMappingTagBuiltinTest extends LexerMappingTestCase
                 'text' => 'str',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [
@@ -62,7 +62,7 @@ final class LexerMappingTagBuiltinTest extends LexerMappingTestCase
                 'text' => 'int',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [
@@ -91,7 +91,7 @@ final class LexerMappingTagBuiltinTest extends LexerMappingTestCase
                 'text' => 'float',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [

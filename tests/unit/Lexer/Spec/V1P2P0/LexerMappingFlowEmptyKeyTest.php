@@ -45,7 +45,7 @@ final class LexerMappingFlowEmptyKeyTest extends LexerMappingTestCase
                 'text' => 'foo',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [
@@ -69,7 +69,7 @@ final class LexerMappingFlowEmptyKeyTest extends LexerMappingTestCase
                 'text' => ' ',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [

@@ -38,7 +38,7 @@ final class LexerUTFColumnTest extends TestCase
                 'column' => 1,
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
                 'line' => 1,
                 'column' => 3,
@@ -65,7 +65,7 @@ final class LexerUTFColumnTest extends TestCase
                 'column' => 1,
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
                 'line' => 1,
                 'column' => 4,
@@ -104,7 +104,7 @@ final class LexerUTFColumnTest extends TestCase
                 'column' => 2,
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
                 'line' => 1,
                 'column' => 4,

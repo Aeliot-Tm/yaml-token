@@ -33,7 +33,7 @@ final class LexerMappingSexagesimalTest extends LexerMappingTestCase
                 'text' => 'integer',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [
@@ -70,7 +70,7 @@ final class LexerMappingSexagesimalTest extends LexerMappingTestCase
                 'text' => 'float',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [

@@ -33,7 +33,7 @@ final class LexerMappingValueKeyTest extends LexerMappingTestCase
                 'text' => 'mapping',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [
@@ -50,7 +50,7 @@ final class LexerMappingValueKeyTest extends LexerMappingTestCase
                 'text' => '= ',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [
@@ -75,7 +75,7 @@ final class LexerMappingValueKeyTest extends LexerMappingTestCase
                 'text' => 'other',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [

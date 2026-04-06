@@ -33,7 +33,7 @@ final class LexerMappingMultiDocumentTest extends LexerMappingTestCase
                 'text' => 'first',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [
@@ -72,7 +72,7 @@ final class LexerMappingMultiDocumentTest extends LexerMappingTestCase
                 'text' => 'second',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [

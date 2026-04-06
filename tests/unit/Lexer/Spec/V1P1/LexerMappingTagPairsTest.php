@@ -50,7 +50,7 @@ final class LexerMappingTagPairsTest extends LexerMappingTestCase
                 'text' => 'meeting',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [
@@ -79,7 +79,7 @@ final class LexerMappingTagPairsTest extends LexerMappingTestCase
                 'text' => 'meeting',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [
@@ -108,7 +108,7 @@ final class LexerMappingTagPairsTest extends LexerMappingTestCase
                 'text' => 'lunch',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [

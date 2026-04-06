@@ -50,7 +50,7 @@ final class LexerMappingTagOmapTest extends LexerMappingTestCase
                 'text' => 'Mark McGwire',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [
@@ -79,7 +79,7 @@ final class LexerMappingTagOmapTest extends LexerMappingTestCase
                 'text' => 'Sammy Sosa',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [
@@ -108,7 +108,7 @@ final class LexerMappingTagOmapTest extends LexerMappingTestCase
                 'text' => 'Ken Griffey',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [

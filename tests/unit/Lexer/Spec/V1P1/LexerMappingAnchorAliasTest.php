@@ -33,7 +33,7 @@ final class LexerMappingAnchorAliasTest extends LexerMappingTestCase
                 'text' => 'anchored',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [
@@ -62,7 +62,7 @@ final class LexerMappingAnchorAliasTest extends LexerMappingTestCase
                 'text' => 'alias',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [

@@ -33,7 +33,7 @@ final class LexerMappingMergeKeyTest extends LexerMappingTestCase
                 'text' => 'defaults',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [
@@ -58,7 +58,7 @@ final class LexerMappingMergeKeyTest extends LexerMappingTestCase
                 'text' => 'color',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [
@@ -83,7 +83,7 @@ final class LexerMappingMergeKeyTest extends LexerMappingTestCase
                 'text' => 'size',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [
@@ -104,7 +104,7 @@ final class LexerMappingMergeKeyTest extends LexerMappingTestCase
                 'text' => 'custom',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [
@@ -121,7 +121,7 @@ final class LexerMappingMergeKeyTest extends LexerMappingTestCase
                 'text' => '<<',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [
@@ -146,7 +146,7 @@ final class LexerMappingMergeKeyTest extends LexerMappingTestCase
                 'text' => 'name',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [

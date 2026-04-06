@@ -45,7 +45,7 @@ final class LexerMappingExplicitFlowPairTest extends LexerMappingTestCase
                 'text' => 'foo bar ',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [

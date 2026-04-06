@@ -41,7 +41,7 @@ final class LexerMappingCompactNestedTest extends LexerMappingTestCase
                 'text' => 'item',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [
@@ -66,7 +66,7 @@ final class LexerMappingCompactNestedTest extends LexerMappingTestCase
                 'text' => 'quantity',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [
@@ -95,7 +95,7 @@ final class LexerMappingCompactNestedTest extends LexerMappingTestCase
                 'text' => 'item',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [
@@ -120,7 +120,7 @@ final class LexerMappingCompactNestedTest extends LexerMappingTestCase
                 'text' => 'quantity',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [

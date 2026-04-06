@@ -33,7 +33,7 @@ final class LexerMappingImplicitKeyTest extends LexerMappingTestCase
                 'text' => '"implicit block key"',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [
@@ -54,7 +54,7 @@ final class LexerMappingImplicitKeyTest extends LexerMappingTestCase
                 'text' => '"implicit flow key"',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [

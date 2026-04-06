@@ -33,7 +33,7 @@ final class LexerMappingTimestampTest extends LexerMappingTestCase
                 'text' => 'canonical',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [
@@ -70,7 +70,7 @@ final class LexerMappingTimestampTest extends LexerMappingTestCase
                 'text' => 'iso8601',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [
@@ -115,7 +115,7 @@ final class LexerMappingTimestampTest extends LexerMappingTestCase
                 'text' => 'spaced',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [
@@ -152,7 +152,7 @@ final class LexerMappingTimestampTest extends LexerMappingTestCase
                 'text' => 'date',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [

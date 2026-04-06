@@ -33,7 +33,7 @@ final class LexerMappingDoubleQuotedEscapedNewlineTest extends LexerMappingTestC
                 'text' => 'key',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [

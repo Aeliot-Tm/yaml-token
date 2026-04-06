@@ -219,11 +219,11 @@ final class Lexer
             return new Token(TokenType::EXPLICIT_KEY_INDICATOR, '?', $startLine, $startColumn);
         }
 
-        // MAPPING_VALUE (:)
+        // VALUE_INDICATOR (:)
         if (':' === $char && $this->isMappingValue($input, $cursor, $length)) {
             $this->advance($input, $cursor, $length);
 
-            return new Token(TokenType::MAPPING_VALUE, ':', $startLine, $startColumn);
+            return new Token(TokenType::VALUE_INDICATOR, ':', $startLine, $startColumn);
         }
 
         // ANCHOR (&name)

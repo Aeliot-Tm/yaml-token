@@ -50,7 +50,7 @@ final class LexerMappingCommentAfterMarkerTest extends LexerMappingTestCase
                 'text' => 'key',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [

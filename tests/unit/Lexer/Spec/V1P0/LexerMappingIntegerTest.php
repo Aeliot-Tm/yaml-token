@@ -33,7 +33,7 @@ final class LexerMappingIntegerTest extends LexerMappingTestCase
                 'text' => 'canonical',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [
@@ -54,7 +54,7 @@ final class LexerMappingIntegerTest extends LexerMappingTestCase
                 'text' => 'decimal',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [
@@ -75,7 +75,7 @@ final class LexerMappingIntegerTest extends LexerMappingTestCase
                 'text' => 'negative',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [
@@ -96,7 +96,7 @@ final class LexerMappingIntegerTest extends LexerMappingTestCase
                 'text' => 'octal',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [
@@ -117,7 +117,7 @@ final class LexerMappingIntegerTest extends LexerMappingTestCase
                 'text' => 'hex',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [

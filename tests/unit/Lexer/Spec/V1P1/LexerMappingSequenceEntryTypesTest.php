@@ -100,7 +100,7 @@ final class LexerMappingSequenceEntryTypesTest extends LexerMappingTestCase
                 'text' => 'one',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [

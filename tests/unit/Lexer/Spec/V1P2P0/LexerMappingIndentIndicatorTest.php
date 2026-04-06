@@ -33,7 +33,7 @@ final class LexerMappingIndentIndicatorTest extends LexerMappingTestCase
                 'text' => 'literal',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [
@@ -67,7 +67,7 @@ final class LexerMappingIndentIndicatorTest extends LexerMappingTestCase
                 'text' => 'folded',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [
@@ -101,7 +101,7 @@ final class LexerMappingIndentIndicatorTest extends LexerMappingTestCase
                 'text' => 'combined',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [

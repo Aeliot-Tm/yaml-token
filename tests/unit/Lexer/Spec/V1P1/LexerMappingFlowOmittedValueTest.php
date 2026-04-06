@@ -57,7 +57,7 @@ final class LexerMappingFlowOmittedValueTest extends LexerMappingTestCase
                 'text' => 'omitted value',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [
@@ -81,7 +81,7 @@ final class LexerMappingFlowOmittedValueTest extends LexerMappingTestCase
                 'text' => ' ',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [

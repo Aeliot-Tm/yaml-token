@@ -33,7 +33,7 @@ final class LexerMappingCommentBetweenDocsTest extends LexerMappingTestCase
                 'text' => 'first',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [
@@ -81,7 +81,7 @@ final class LexerMappingCommentBetweenDocsTest extends LexerMappingTestCase
                 'text' => 'second',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [

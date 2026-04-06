@@ -33,7 +33,7 @@ final class LexerMappingTagPrefixCaretTest extends LexerMappingTestCase
                 'text' => 'root',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [
@@ -62,7 +62,7 @@ final class LexerMappingTagPrefixCaretTest extends LexerMappingTestCase
                 'text' => 'child',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [

@@ -33,7 +33,7 @@ final class LexerMappingTagVerbatimTest extends LexerMappingTestCase
                 'text' => 'key',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [
@@ -58,7 +58,7 @@ final class LexerMappingTagVerbatimTest extends LexerMappingTestCase
                 'text' => 'id',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [

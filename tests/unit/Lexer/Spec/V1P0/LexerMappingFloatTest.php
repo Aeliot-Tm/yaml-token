@@ -33,7 +33,7 @@ final class LexerMappingFloatTest extends LexerMappingTestCase
                 'text' => 'canonical',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [
@@ -54,7 +54,7 @@ final class LexerMappingFloatTest extends LexerMappingTestCase
                 'text' => 'exponential',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [
@@ -75,7 +75,7 @@ final class LexerMappingFloatTest extends LexerMappingTestCase
                 'text' => 'fixed',
             ],
             [
-                'type' => TokenType::MAPPING_VALUE,
+                'type' => TokenType::VALUE_INDICATOR,
                 'text' => ':',
             ],
             [

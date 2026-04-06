@@ -34,7 +34,7 @@ The rules below describe the practical behavior relied upon by lexer unit tests.
 - **Structural indicators with lookahead**:
   - `-` is `SEQUENCE_ENTRY` only when followed by whitespace or end of input
   - `?` is `EXPLICIT_KEY_INDICATOR` only when followed by whitespace or end of input
-  - `:` is `MAPPING_VALUE` only when followed by whitespace, `#`, `[`, `{`, `"`, `'`, or end of input
+  - `:` is `VALUE_INDICATOR` only when followed by whitespace, `#`, `[`, `{`, `"`, `'`, or end of input
 - **Anchors, aliases, tags**:
   - `&name` → `ANCHOR`, `*name` → `ALIAS`
   - `!<...>` and `!tag` → `TAG`
