@@ -9,7 +9,7 @@ Download descriptions from files IF you need to understand the work:
    - [Specification Cover Fixtures Structure](../docs/Architecture/SpecificationCoverFixtures.md)
 
 2. Features:
-   - (not implemented jet)
+   - [Lexer](../docs/Feature/Lexer.md)
 
 When updating functionality or when explicitly requested, update the corresponding documentation files.
    - First, business logic/steps with minimal technical details, then additional logic with minimal technical details,
