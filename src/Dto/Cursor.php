@@ -35,6 +35,8 @@ final class Cursor
     /**
      * Set when emitting {@see TokenType::LITERAL_BLOCK_SCALAR_INDICATOR} or {@see TokenType::FOLDED_BLOCK_SCALAR_INDICATOR}:
      * {@see TokenType::LITERAL_BLOCK_SCALAR} or {@see TokenType::FOLDED_BLOCK_SCALAR} for the upcoming body token.
+     *
+     * @var TokenType::LITERAL_BLOCK_SCALAR|TokenType::FOLDED_BLOCK_SCALAR|null
      */
     public ?TokenType $blockScalarBodyTokenType = null;
 

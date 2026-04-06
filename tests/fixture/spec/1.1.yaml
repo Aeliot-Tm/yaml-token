@@ -90,6 +90,13 @@ escaped_newline: "folded to space,\
   or preserved\t"
 double_multiline: "So does this
   quoted scalar."
+# Example 6.5 empty lines (spec §6.4): double-quoted folding vs literal chomping
+double_quoted_empty_line: "Empty line
+
+  as a line feed"
+literal_chomping_clipped_empty_lines: |-
+  Clipped empty lines
+
 
 # Literal block scalar
 literal_block: |

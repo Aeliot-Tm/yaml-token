@@ -27,15 +27,15 @@ contain no comments (except for `comment-*.yaml` files that specifically test co
 ```
 tests/fixture/spec/
 ├── 1.0.yaml              # covering fixture
-├── 1.0/                   # 57 minimal examples
+├── 1.0/                   # 59 minimal examples
 ├── 1.1.yaml
-├── 1.1/                   # 64 minimal examples
+├── 1.1/                   # 66 minimal examples
 ├── 1.2.0.yaml
-├── 1.2.0/                 # 61 minimal examples
+├── 1.2.0/                 # 63 minimal examples
 ├── 1.2.1.yaml
-├── 1.2.1/                 # 61 minimal examples (identical to 1.2.0/)
+├── 1.2.1/                 # 63 minimal examples (identical to 1.2.0/)
 ├── 1.2.2.yaml
-└── 1.2.2/                 # 61 minimal examples (identical to 1.2.0/)
+└── 1.2.2/                 # 63 minimal examples (identical to 1.2.0/)
 ```
 
 ### Common files (present in every version)
@@ -50,8 +50,8 @@ has version-specific syntax (e.g. `boolean.yaml`, `integer.yaml`, `double-quoted
 | Flow collections | `flow-sequence`, `flow-mapping`, `trailing-comma`, `flow-empty-key`, `flow-omitted-value`, `single-pair-flow`, `explicit-flow-pair`, `implicit-key` |
 | Plain scalars | `plain-scalar`, `plain-multiline`, `plain-special-chars` |
 | Single-quoted | `single-quoted`, `single-quoted-escape`, `single-quoted-multiline` |
-| Double-quoted | `double-quoted`, `double-quoted-multiline`, `double-quoted-escapes`, `double-quoted-unicode`, `double-quoted-escaped-newline` |
-| Block scalars | `literal-block`, `literal-strip`, `literal-keep`, `literal-empty`, `folded-block`, `folded-strip`, `folded-keep`, `indent-indicator`, `block-scalar-tab` |
+| Double-quoted | `double-quoted`, `double-quoted-empty-line`, `double-quoted-escapes`, `double-quoted-escaped-newline`, `double-quoted-multiline`, `double-quoted-unicode` |
+| Block scalars | `literal-block`, `literal-chomping-clipped-empty-lines`, `literal-empty`, `literal-keep`, `literal-strip`, `folded-block`, `folded-strip`, `folded-keep`, `indent-indicator`, `block-scalar-tab` |
 | Types | `null`, `boolean`, `integer`, `float`, `float-special`, `timestamp`, `empty-scalar` |
 | Anchors & Tags | `anchor-alias`, `tag-builtin`, `tag-binary` |
 | Comments | `comment-full-line`, `comment-inline`, `comment-block-indicator`, `comment-between-docs`, `comment-after-marker` |

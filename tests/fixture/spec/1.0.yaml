@@ -76,6 +76,14 @@ hex_escape: "\x0d\x0a is CRLF"
 control_escape: "\b1998\t1999\t2000\n"
 double_multiline: "So does this
   quoted scalar."
+# Example 6.5 empty lines (spec §6.4): double-quoted folding vs literal chomping
+double_quoted_empty_line: "Empty line
+
+  as a line feed"
+literal_chomping_clipped_empty_lines: |-
+  Clipped empty lines
+
+
 # Full escape sequences available in 1.0
 escapes_full: "\0 \a \b \e \f \n \r \t \v \\ \_ \N \L \P \U00000041"
 # \^ escape - unique to 1.0, removed in 1.1 (literal ^ character)

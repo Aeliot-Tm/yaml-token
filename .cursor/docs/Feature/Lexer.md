@@ -48,4 +48,5 @@ The rules below describe the practical behavior relied upon by lexer unit tests.
 
 - **Spec fixtures**: `tests/fixture/spec/<version>/` should contain one syntactic feature per file. Avoid comments except `comment-*.yaml` files.
 - **Mapping tests**: `tests/unit/Lexer/Spec/*` must assert token sequences exactly (`TokenType` + `text`), including `INDENTATION`, `WHITESPACE`, and `NEWLINE`.
+- **Example 6.5 (YAML 1.2 spec §6.4 empty lines)**: minimal files `double-quoted-empty-line.yaml` (flow double-quoted with a blank line inside the string) and `literal-chomping-clipped-empty-lines.yaml` (`|-` with body text `Clipped empty lines` and trailing empty lines in the block body) mirror the spec’s Folding / Chomping illustration; the same structure appears in covering fixtures `*.yaml` under keys `double_quoted_empty_line` and `literal_chomping_clipped_empty_lines`.
 
