@@ -42,5 +42,103 @@ final class LexerMappingEmptyScalarTest extends LexerMappingTestCase
 ',
             ],
         ], __DIR__.'/../../../../fixture/spec/1.2.0/empty-scalar.yaml'];
+        yield [[
+            [
+                'type' => TokenType::PLAIN_SCALAR,
+                'text' => 'key',
+            ],
+            [
+                'type' => TokenType::VALUE_INDICATOR,
+                'text' => ':',
+            ],
+            [
+                'type' => TokenType::NEWLINE,
+                'text' => '
+',
+            ],
+            [
+                'type' => TokenType::NEWLINE,
+                'text' => '
+',
+            ],
+            [
+                'type' => TokenType::INDENTATION,
+                'text' => '  ',
+            ],
+            [
+                'type' => TokenType::PLAIN_SCALAR,
+                'text' => 'text',
+            ],
+            [
+                'type' => TokenType::NEWLINE,
+                'text' => '
+',
+            ],
+        ], __DIR__.'/../../../../fixture/spec/1.2.0/empty-scalar-blank-before-continuation.yaml'];
+
+        yield [[
+            [
+                'type' => TokenType::PLAIN_SCALAR,
+                'text' => 'keyA',
+            ],
+            [
+                'type' => TokenType::VALUE_INDICATOR,
+                'text' => ':',
+            ],
+            [
+                'type' => TokenType::NEWLINE,
+                'text' => '
+',
+            ],
+            [
+                'type' => TokenType::NEWLINE,
+                'text' => '
+',
+            ],
+            [
+                'type' => TokenType::PLAIN_SCALAR,
+                'text' => 'keyB',
+            ],
+            [
+                'type' => TokenType::VALUE_INDICATOR,
+                'text' => ':',
+            ],
+            [
+                'type' => TokenType::NEWLINE,
+                'text' => '
+',
+            ],
+            [
+                'type' => TokenType::PLAIN_SCALAR,
+                'text' => 'keyC',
+            ],
+            [
+                'type' => TokenType::VALUE_INDICATOR,
+                'text' => ':',
+            ],
+            [
+                'type' => TokenType::NEWLINE,
+                'text' => '
+',
+            ],
+            [
+                'type' => TokenType::NEWLINE,
+                'text' => '
+',
+            ],
+            [
+                'type' => TokenType::PLAIN_SCALAR,
+                'text' => 'keyD',
+            ],
+            [
+                'type' => TokenType::VALUE_INDICATOR,
+                'text' => ':',
+            ],
+            [
+                'type' => TokenType::NEWLINE,
+                'text' => '
+',
+            ],
+        ], __DIR__.'/../../../../fixture/spec/1.2.0/empty-scalar-multiple.yaml'];
     }
 }

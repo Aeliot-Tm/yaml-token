@@ -27,15 +27,15 @@ contain no comments (except for `comment-*.yaml` files that specifically test co
 ```
 tests/fixture/spec/
 ├── 1.0.yaml              # covering fixture
-├── 1.0/                   # 59 minimal examples
+├── 1.0/                   # 61 minimal examples
 ├── 1.1.yaml
-├── 1.1/                   # 66 minimal examples
+├── 1.1/                   # 68 minimal examples
 ├── 1.2.0.yaml
-├── 1.2.0/                 # 63 minimal examples
+├── 1.2.0/                 # 65 minimal examples
 ├── 1.2.1.yaml
-├── 1.2.1/                 # 63 minimal examples (identical to 1.2.0/)
+├── 1.2.1/                 # 65 minimal examples (identical to 1.2.0/)
 ├── 1.2.2.yaml
-└── 1.2.2/                 # 63 minimal examples (identical to 1.2.0/)
+└── 1.2.2/                 # 65 minimal examples (identical to 1.2.0/)
 ```
 
 ### Common files (present in every version)
@@ -52,7 +52,7 @@ has version-specific syntax (e.g. `boolean.yaml`, `integer.yaml`, `double-quoted
 | Single-quoted | `single-quoted`, `single-quoted-escape`, `single-quoted-multiline` |
 | Double-quoted | `double-quoted`, `double-quoted-empty-line`, `double-quoted-escapes`, `double-quoted-escaped-newline`, `double-quoted-multiline`, `double-quoted-unicode` |
 | Block scalars | `literal-block`, `literal-chomping-clipped-empty-lines`, `literal-empty`, `literal-keep`, `literal-strip`, `folded-block`, `folded-strip`, `folded-keep`, `indent-indicator`, `block-scalar-tab` |
-| Types | `null`, `boolean`, `integer`, `float`, `float-special`, `timestamp`, `empty-scalar` |
+| Types | `null`, `boolean`, `integer`, `float`, `float-special`, `timestamp`, `empty-scalar`, `empty-scalar-blank-before-continuation`, `empty-scalar-multiple` |
 | Anchors & Tags | `anchor-alias`, `tag-builtin`, `tag-binary` |
 | Comments | `comment-full-line`, `comment-inline`, `comment-block-indicator`, `comment-between-docs`, `comment-after-marker` |
 
