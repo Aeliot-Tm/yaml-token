@@ -29,7 +29,7 @@ final class LexerMappingTagNamedHandleTest extends LexerMappingTestCase
     {
         yield [[
             [
-                'type' => TokenType::TAG_DIRECTIVE,
+                'type' => TokenType::DIRECTIVE_TAG,
                 'text' => '%TAG !foo! tag:example.com,2000:',
             ],
             [

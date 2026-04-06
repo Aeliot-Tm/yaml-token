@@ -17,8 +17,8 @@ The rules below describe the practical behavior relied upon by lexer unit tests.
 - **Document markers**: `---` → `DOCUMENT_START`, `...` → `DOCUMENT_END`.
 - **Comments**: `#...` until line break is `COMMENT` (newline is a separate `NEWLINE` token).
 - **Directives**:
-  - `%YAML...` until line break → `YAML_DIRECTIVE`
-  - `%TAG...` until line break → `TAG_DIRECTIVE`
+  - `%YAML...` until line break → `DIRECTIVE_YAML`
+  - `%TAG...` until line break → `DIRECTIVE_TAG`
   - any other `%...` until line break → `DIRECTIVE`
 - **Flow indicators**: `[ ] { } ,` are emitted as flow tokens:
   - `FLOW_SEQUENCE_START`, `FLOW_SEQUENCE_END`

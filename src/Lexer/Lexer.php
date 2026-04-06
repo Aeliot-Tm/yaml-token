@@ -163,18 +163,18 @@ final class Lexer
             return new Token(TokenType::COMMENT, $comment, $startLine, $startColumn);
         }
 
-        // YAML_DIRECTIVE (%YAML ...)
+        // DIRECTIVE_YAML (%YAML ...)
         if ($this->match($input, $cursor, $length, '%YAML')) {
             $directive = '%YAML'.$this->readUntilNewline($input, $cursor, $length);
 
-            return new Token(TokenType::YAML_DIRECTIVE, $directive, $startLine, $startColumn);
+            return new Token(TokenType::DIRECTIVE_YAML, $directive, $startLine, $startColumn);
         }
 
-        // TAG_DIRECTIVE (%TAG ...)
+        // DIRECTIVE_TAG (%TAG ...)
         if ($this->match($input, $cursor, $length, '%TAG')) {
             $directive = '%TAG'.$this->readUntilNewline($input, $cursor, $length);
 
-            return new Token(TokenType::TAG_DIRECTIVE, $directive, $startLine, $startColumn);
+            return new Token(TokenType::DIRECTIVE_TAG, $directive, $startLine, $startColumn);
         }
 
         // DIRECTIVE (%... for other directives)

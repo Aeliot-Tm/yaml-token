@@ -52,6 +52,6 @@ enum TokenType: string
     case SINGLE_QUOTED_SCALAR = 'SINGLE_QUOTED_SCALAR';
 
     // Directives
-    case TAG_DIRECTIVE = 'TAG_DIRECTIVE';
-    case YAML_DIRECTIVE = 'YAML_DIRECTIVE';
+    case DIRECTIVE_TAG = 'DIRECTIVE_TAG';
+    case DIRECTIVE_YAML = 'DIRECTIVE_YAML';
 }
