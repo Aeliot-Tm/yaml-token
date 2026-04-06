@@ -212,11 +212,11 @@ final class Lexer
             return new Token(TokenType::SEQUENCE_ENTRY, '-', $startLine, $startColumn);
         }
 
-        // MAPPING_KEY (?)
+        // EXPLICIT_KEY_INDICATOR (?)
         if ('?' === $char && $this->isMappingKey($input, $cursor, $length)) {
             $this->advance($input, $cursor, $length);
 
-            return new Token(TokenType::MAPPING_KEY, '?', $startLine, $startColumn);
+            return new Token(TokenType::EXPLICIT_KEY_INDICATOR, '?', $startLine, $startColumn);
         }
 
         // MAPPING_VALUE (:)

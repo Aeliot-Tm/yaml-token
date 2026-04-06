@@ -29,7 +29,7 @@ final class LexerMappingComplexKeyTest extends LexerMappingTestCase
     {
         yield [[
             [
-                'type' => TokenType::MAPPING_KEY,
+                'type' => TokenType::EXPLICIT_KEY_INDICATOR,
                 'text' => '?',
             ],
             [

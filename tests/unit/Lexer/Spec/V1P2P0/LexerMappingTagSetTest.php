@@ -38,7 +38,7 @@ final class LexerMappingTagSetTest extends LexerMappingTestCase
 ',
             ],
             [
-                'type' => TokenType::MAPPING_KEY,
+                'type' => TokenType::EXPLICIT_KEY_INDICATOR,
                 'text' => '?',
             ],
             [
@@ -55,7 +55,7 @@ final class LexerMappingTagSetTest extends LexerMappingTestCase
 ',
             ],
             [
-                'type' => TokenType::MAPPING_KEY,
+                'type' => TokenType::EXPLICIT_KEY_INDICATOR,
                 'text' => '?',
             ],
             [
@@ -72,7 +72,7 @@ final class LexerMappingTagSetTest extends LexerMappingTestCase
 ',
             ],
             [
-                'type' => TokenType::MAPPING_KEY,
+                'type' => TokenType::EXPLICIT_KEY_INDICATOR,
                 'text' => '?',
             ],
             [
