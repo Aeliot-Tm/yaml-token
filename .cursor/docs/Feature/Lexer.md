@@ -30,7 +30,10 @@ The rules below describe the practical behavior relied upon by lexer unit tests.
 - **Block scalars**:
   - `|` / `>` start a block scalar when followed by whitespace or `+`/`-`
   - `LITERAL_BLOCK_SCALAR_INDICATOR` / `FOLDED_BLOCK_SCALAR_INDICATOR` for the `|` / `>` character
-  - the rest of the block scalar header line uses the same rules as elsewhere on the line: `WHITESPACE`, `COMMENT`, `BLOCK_SCALAR_CHOMPING_INDICATOR` (`+` or `-`), `BLOCK_SCALAR_INDENTATION_INDICATOR` (one digit), then `NEWLINE` ending the header line; the cursor holds the expected body token type (`LITERAL_BLOCK_SCALAR` / `FOLDED_BLOCK_SCALAR`) while the header line is open, then `pendingBlockScalarBody` for the body token (no token queue)
+  - the rest of the block scalar header line uses the same rules as elsewhere on the line: `WHITESPACE`, `COMMENT`,
+    `BLOCK_SCALAR_CHOMPING_INDICATOR` (`+` or `-`), `BLOCK_SCALAR_INDENTATION_INDICATOR` (one digit),
+    then `NEWLINE` ending the header line; the cursor holds the expected body token type (`LITERAL_BLOCK_SCALAR` / `FOLDED_BLOCK_SCALAR`)
+    while the header line is open, then `pendingBlockScalarBody` for the body token (no token queue)
   - `LITERAL_BLOCK_SCALAR` / `FOLDED_BLOCK_SCALAR` carry only the indented block body (raw text), without the indicator or header line
 - **Structural indicators with lookahead**:
   - `-` is `SEQUENCE_ENTRY` only when followed by whitespace or end of input
@@ -48,5 +51,8 @@ The rules below describe the practical behavior relied upon by lexer unit tests.
 
 - **Spec fixtures**: `tests/fixture/spec/<version>/` should contain one syntactic feature per file. Avoid comments except `comment-*.yaml` files.
 - **Mapping tests**: `tests/unit/Lexer/Spec/*` must assert token sequences exactly (`TokenType` + `text`), including `INDENTATION`, `WHITESPACE`, and `NEWLINE`.
-- **Example 6.5 (YAML 1.2 spec §6.4 empty lines)**: minimal files `double-quoted-empty-line.yaml` (flow double-quoted with a blank line inside the string) and `literal-chomping-clipped-empty-lines.yaml` (`|-` with body text `Clipped empty lines` and trailing empty lines in the block body) mirror the spec’s Folding / Chomping illustration; the same structure appears in covering fixtures `*.yaml` under keys `double_quoted_empty_line` and `literal_chomping_clipped_empty_lines`.
+- **Example 6.5 (YAML 1.2 spec §6.4 empty lines)**: minimal files `double-quoted-empty-line.yaml` (flow double-quoted with a blank line inside the string)
+  and `literal-chomping-clipped-empty-lines.yaml` (`|-` with body text `Clipped empty lines` and trailing empty lines in the block body)
+  mirror the spec’s Folding / Chomping illustration; the same structure appears in covering fixtures `*.yaml`
+  under keys `double_quoted_empty_line` and `literal_chomping_clipped_empty_lines`.
 

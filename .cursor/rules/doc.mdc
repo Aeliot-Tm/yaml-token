@@ -6,10 +6,11 @@ alwaysApply: true
 
 Download descriptions from files IF you need to understand the work:
 1. Architecture (Technical solutions):
-   - [Specification Cover Fixtures Structure](../docs/Architecture/SpecificationCoverFixtures.md)
+   - (not implemented jet)
 
 2. Features:
    - [Lexer](../docs/Feature/Lexer.md)
+   - [Specification Cover Fixtures Structure](../docs/Feature/SpecificationCoverFixtures.md)
 
 When updating functionality or when explicitly requested, update the corresponding documentation files.
    - First, business logic/steps with minimal technical details, then additional logic with minimal technical details,

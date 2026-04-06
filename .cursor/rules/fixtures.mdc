@@ -6,5 +6,5 @@ globs: tests/fixture/**
 # Test Fixtures
 
 When working with specification-related fixtures in `tests/fixture/spec/`,
-read [Specification Cover Fixtures Structure](../docs/Architecture/SpecificationCoverFixtures.md)
+read [Specification Cover Fixtures Structure](../docs/Feature/SpecificationCoverFixtures.md)
 for the full directory layout, version-specific file mapping, and modification rules.
