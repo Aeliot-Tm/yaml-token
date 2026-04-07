@@ -22,6 +22,31 @@ Directories `<version>/` contain the same coverage **split into minimal examples
 one syntactic feature per file. File names are self-descriptive; the files themselves
 contain no comments (except for `comment-*.yaml` files that specifically test comment syntax).
 
+### File naming (section suffixes)
+
+Minimal example files use the format:
+
+`<feature>_<section>.yaml`
+
+- `<feature>`: a stable, self-descriptive feature name (e.g. `explicit-flow-pair`, `folded-block`, `directive-tag`).
+- `<section>`: the **primary section number** of the official YAML specification for the matching `<version>`
+  that most directly defines the syntax being exercised (e.g. `4.5.2`, `9.1.1`, `8.2.1`).
+
+When a fixture relates to multiple places in the spec (common for cross-cutting rules like indentation, separation, or comments),
+the suffix should still contain a single number: pick the section that **introduces/defines the construct under test**,
+not a tangential section that merely mentions it.
+
+Notes:
+
+- The section suffix is version-specific. The same `<feature>` can map to different `<section>` numbers across YAML 1.0, 1.1 and 1.2.x
+  because the specification structure and numbering differs.
+- The `1.2.0/`, `1.2.1/`, `1.2.2/` directories must remain identical; therefore, section suffixes
+  and file names in these directories must be kept identical as well.
+- If a file is renamed, update all test references that point to it (many tests use string paths to `tests/fixture/spec/<version>/...`).
+
+To (re)generate and apply these renames consistently, use `bin/spec_fixture_suffixes.py`
+(it performs renames via `git mv` and rewrites test references).
+
 ### Directory layout
 
 ```

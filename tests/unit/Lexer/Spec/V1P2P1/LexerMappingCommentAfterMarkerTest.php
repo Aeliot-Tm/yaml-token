@@ -83,6 +83,6 @@ final class LexerMappingCommentAfterMarkerTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.2.1/comment-after-marker.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.2.1/comment-after-marker_6.6.yaml'];
     }
 }

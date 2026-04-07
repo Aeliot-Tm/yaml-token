@@ -49,6 +49,6 @@ final class LexerMappingDoubleQuotedEscapesTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.2.2/double-quoted-escapes.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.2.2/double-quoted-escapes_7.3.1.yaml'];
     }
 }

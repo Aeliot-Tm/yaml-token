@@ -62,6 +62,6 @@ final class LexerMappingTagBinaryTest extends LexerMappingTestCase
                 'text' => ' R0lGODlhDAAMAIQAAP//9/X
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.1/tag-binary.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.1/tag-binary_8.2.yaml'];
     }
 }

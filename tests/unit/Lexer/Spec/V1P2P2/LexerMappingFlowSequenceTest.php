@@ -69,6 +69,6 @@ final class LexerMappingFlowSequenceTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.2.2/flow-sequence.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.2.2/flow-sequence_7.4.1.yaml'];
     }
 }

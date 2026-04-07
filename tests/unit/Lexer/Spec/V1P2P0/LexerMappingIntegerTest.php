@@ -133,6 +133,6 @@ final class LexerMappingIntegerTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.2.0/integer.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.2.0/integer_10.3.yaml'];
     }
 }

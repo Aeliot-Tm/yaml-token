@@ -77,6 +77,6 @@ final class LexerMappingTrailingCommaTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.0/trailing-comma.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.0/trailing-comma_4.5.2.yaml'];
     }
 }

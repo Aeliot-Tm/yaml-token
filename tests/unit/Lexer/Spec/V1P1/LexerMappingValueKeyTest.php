@@ -91,6 +91,6 @@ final class LexerMappingValueKeyTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.1/value-key.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.1/value-key_10.2.1.yaml'];
     }
 }

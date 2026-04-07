@@ -88,6 +88,6 @@ final class LexerMappingMultiDocumentTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.2.0/multi-document.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.2.0/multi-document_9.1.yaml'];
     }
 }

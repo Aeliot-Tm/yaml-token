@@ -75,6 +75,6 @@ final class LexerMappingDirectiveTagTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.1/directive-tag.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.1/directive-tag_7.1.yaml'];
     }
 }

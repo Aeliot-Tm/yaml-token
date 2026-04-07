@@ -57,6 +57,6 @@ final class LexerMappingTagLocalTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.1/tag-local.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.1/tag-local_8.2.yaml'];
     }
 }

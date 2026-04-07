@@ -75,6 +75,6 @@ final class LexerMappingTagNamedHandleTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.2.2/tag-named-handle.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.2.2/tag-named-handle_6.9.1.yaml'];
     }
 }

@@ -74,6 +74,6 @@ final class LexerMappingTagVerbatimTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.1/tag-verbatim.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.1/tag-verbatim_8.2.yaml'];
     }
 }

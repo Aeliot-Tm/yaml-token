@@ -60,6 +60,6 @@ final class LexerMappingFoldedKeepTest extends LexerMappingTestCase
 
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.1/folded-keep.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.1/folded-keep_9.3.2.yaml'];
     }
 }

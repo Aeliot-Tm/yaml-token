@@ -57,6 +57,6 @@ final class LexerMappingTagApplicationTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.0/tag-application.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.0/tag-application_4.3.5.yaml'];
     }
 }

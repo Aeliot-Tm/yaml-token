@@ -62,6 +62,6 @@ final class LexerMappingCommentBlockIndicatorTest extends LexerMappingTestCase
                 'text' => '  content
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.2.1/comment-block-indicator.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.2.1/comment-block-indicator_6.6.yaml'];
     }
 }

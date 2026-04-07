@@ -97,6 +97,6 @@ final class LexerMappingCommentBetweenDocsTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.2.0/comment-between-docs.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.2.0/comment-between-docs_6.6.yaml'];
     }
 }

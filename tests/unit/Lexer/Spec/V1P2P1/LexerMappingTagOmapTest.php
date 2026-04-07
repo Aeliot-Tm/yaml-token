@@ -124,6 +124,6 @@ final class LexerMappingTagOmapTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.2.1/tag-omap.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.2.1/tag-omap_6.9.1.yaml'];
     }
 }

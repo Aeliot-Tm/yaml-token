@@ -78,6 +78,6 @@ final class LexerMappingAnchorAliasTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.2.0/anchor-alias.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.2.0/anchor-alias_3.2.2.2.yaml'];
     }
 }

@@ -67,6 +67,6 @@ final class LexerMappingPlainMultilineTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.2.0/plain-multiline.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.2.0/plain-multiline_7.3.3.yaml'];
     }
 }

@@ -130,6 +130,6 @@ final class LexerMappingIndentIndicatorTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.0/indent-indicator.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.0/indent-indicator_4.6.3.yaml'];
     }
 }

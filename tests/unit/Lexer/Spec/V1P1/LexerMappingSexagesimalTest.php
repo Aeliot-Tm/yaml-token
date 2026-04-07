@@ -102,6 +102,6 @@ final class LexerMappingSexagesimalTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.1/sexagesimal.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.1/sexagesimal_3.2.1.2.yaml'];
     }
 }

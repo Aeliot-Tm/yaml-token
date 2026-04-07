@@ -99,6 +99,6 @@ final class LexerMappingPlainSpecialCharsTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.2.1/plain-special-chars.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.2.1/plain-special-chars_7.3.3.yaml'];
     }
 }

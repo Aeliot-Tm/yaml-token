@@ -41,7 +41,7 @@ final class LexerMappingEmptyScalarTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.0/empty-scalar.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.0/empty-scalar_2.4.yaml'];
 
         yield [[
             [
@@ -75,7 +75,7 @@ final class LexerMappingEmptyScalarTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.0/empty-scalar-blank-before-continuation.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.0/empty-scalar-blank-before-continuation_2.4.yaml'];
 
         yield [[
             [
@@ -140,6 +140,6 @@ final class LexerMappingEmptyScalarTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.0/empty-scalar-multiple.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.0/empty-scalar-multiple_2.4.yaml'];
     }
 }

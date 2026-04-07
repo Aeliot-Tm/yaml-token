@@ -168,6 +168,6 @@ final class LexerMappingTimestampTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.2.1/timestamp.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.2.1/timestamp_10.3.yaml'];
     }
 }

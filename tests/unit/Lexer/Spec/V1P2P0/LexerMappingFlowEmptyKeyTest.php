@@ -89,6 +89,6 @@ final class LexerMappingFlowEmptyKeyTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.2.0/flow-empty-key.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.2.0/flow-empty-key_7.4.2.yaml'];
     }
 }

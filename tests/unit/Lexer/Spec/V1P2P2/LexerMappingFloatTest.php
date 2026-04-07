@@ -91,6 +91,6 @@ final class LexerMappingFloatTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.2.2/float.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.2.2/float_10.3.yaml'];
     }
 }

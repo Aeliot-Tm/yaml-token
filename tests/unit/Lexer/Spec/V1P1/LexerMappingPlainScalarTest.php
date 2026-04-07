@@ -49,6 +49,6 @@ final class LexerMappingPlainScalarTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.1/plain-scalar.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.1/plain-scalar_9.1.3.yaml'];
     }
 }

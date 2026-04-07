@@ -57,6 +57,6 @@ final class LexerMappingSinglePairFlowTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.0/single-pair-flow.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.0/single-pair-flow_4.5.2.yaml'];
     }
 }

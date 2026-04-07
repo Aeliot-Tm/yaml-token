@@ -67,6 +67,6 @@ final class LexerMappingCommentFullLineTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.0/comment-full-line.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.0/comment-full-line_4.2.2.yaml'];
     }
 }

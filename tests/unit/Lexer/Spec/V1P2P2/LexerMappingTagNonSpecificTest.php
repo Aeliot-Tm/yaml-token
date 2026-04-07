@@ -57,6 +57,6 @@ final class LexerMappingTagNonSpecificTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.2.2/tag-non-specific.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.2.2/tag-non-specific_6.9.1.yaml'];
     }
 }

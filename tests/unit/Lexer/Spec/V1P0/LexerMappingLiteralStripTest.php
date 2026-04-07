@@ -58,6 +58,6 @@ final class LexerMappingLiteralStripTest extends LexerMappingTestCase
                 'text' => '  No trailing newline
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.0/literal-strip.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.0/literal-strip_4.6.5.yaml'];
     }
 }

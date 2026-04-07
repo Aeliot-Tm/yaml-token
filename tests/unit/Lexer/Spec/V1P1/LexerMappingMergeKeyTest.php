@@ -162,6 +162,6 @@ final class LexerMappingMergeKeyTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.1/merge-key.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.1/merge-key_10.2.1.yaml'];
     }
 }

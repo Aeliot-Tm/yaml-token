@@ -49,6 +49,6 @@ final class LexerMappingBareDocumentTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.0/bare-document.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.0/bare-document_4.3.1.yaml'];
     }
 }

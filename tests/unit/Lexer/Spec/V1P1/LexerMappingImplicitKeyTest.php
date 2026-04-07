@@ -74,6 +74,6 @@ final class LexerMappingImplicitKeyTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.1/implicit-key.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.1/implicit-key_10.2.1.yaml'];
     }
 }

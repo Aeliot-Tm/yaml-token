@@ -51,6 +51,6 @@ final class LexerMappingDoubleQuotedEmptyLineTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.2.0/double-quoted-empty-line.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.2.0/double-quoted-empty-line_7.3.1.yaml'];
     }
 }

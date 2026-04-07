@@ -56,6 +56,6 @@ final class LexerMappingLiteralBlockTest extends LexerMappingTestCase
   Line three
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.2.1/literal-block.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.2.1/literal-block_8.1.2.yaml'];
     }
 }

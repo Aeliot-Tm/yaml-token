@@ -56,6 +56,6 @@ final class LexerMappingBlockScalarTabTest extends LexerMappingTestCase
 	}
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.0/block-scalar-tab.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.0/block-scalar-tab_4.2.1.yaml'];
     }
 }

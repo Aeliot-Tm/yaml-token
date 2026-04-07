@@ -101,6 +101,6 @@ final class LexerMappingFlowOmittedValueTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.0/flow-omitted-value.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.0/flow-omitted-value_4.5.2.yaml'];
     }
 }

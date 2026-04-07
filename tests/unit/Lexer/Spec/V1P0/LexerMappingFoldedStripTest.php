@@ -58,6 +58,6 @@ final class LexerMappingFoldedStripTest extends LexerMappingTestCase
                 'text' => '  No trailing newline
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.0/folded-strip.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.0/folded-strip_4.6.7.yaml'];
     }
 }

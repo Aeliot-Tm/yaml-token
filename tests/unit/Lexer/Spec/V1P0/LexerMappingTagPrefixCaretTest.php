@@ -86,6 +86,6 @@ final class LexerMappingTagPrefixCaretTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.0/tag-prefix-caret.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.0/tag-prefix-caret_4.3.5.yaml'];
     }
 }

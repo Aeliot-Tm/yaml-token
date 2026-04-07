@@ -73,6 +73,6 @@ final class LexerMappingTagTimestampTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.1/tag-timestamp.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.1/tag-timestamp_8.2.yaml'];
     }
 }

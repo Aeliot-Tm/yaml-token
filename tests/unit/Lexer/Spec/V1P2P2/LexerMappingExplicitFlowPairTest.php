@@ -65,6 +65,6 @@ final class LexerMappingExplicitFlowPairTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.2.2/explicit-flow-pair.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.2.2/explicit-flow-pair_7.4.2.yaml'];
     }
 }

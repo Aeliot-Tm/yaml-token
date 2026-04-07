@@ -57,6 +57,6 @@ final class LexerMappingFoldedBlockTest extends LexerMappingTestCase
   New paragraph here.
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.0/folded-block.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.0/folded-block_4.6.7.yaml'];
     }
 }

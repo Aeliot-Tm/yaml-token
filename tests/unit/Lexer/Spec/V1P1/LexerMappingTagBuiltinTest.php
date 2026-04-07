@@ -115,6 +115,6 @@ final class LexerMappingTagBuiltinTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.1/tag-builtin.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.1/tag-builtin_8.2.yaml'];
     }
 }

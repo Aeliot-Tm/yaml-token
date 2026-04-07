@@ -58,6 +58,6 @@ final class LexerMappingDocumentEndTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.1/document-end.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.1/document-end_7.3.yaml'];
     }
 }

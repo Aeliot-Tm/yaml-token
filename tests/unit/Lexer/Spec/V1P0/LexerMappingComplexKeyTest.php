@@ -99,6 +99,6 @@ final class LexerMappingComplexKeyTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.0/complex-key.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.0/complex-key_4.5.2.yaml'];
     }
 }

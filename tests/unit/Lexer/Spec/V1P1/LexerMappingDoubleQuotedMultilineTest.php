@@ -50,6 +50,6 @@ final class LexerMappingDoubleQuotedMultilineTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.1/double-quoted-multiline.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.1/double-quoted-multiline_9.1.1.yaml'];
     }
 }

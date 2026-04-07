@@ -49,6 +49,6 @@ final class LexerMappingSingleQuotedTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.2.0/single-quoted.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.2.0/single-quoted_7.3.2.yaml'];
     }
 }

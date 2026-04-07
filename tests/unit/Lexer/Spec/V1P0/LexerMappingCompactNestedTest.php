@@ -136,6 +136,6 @@ final class LexerMappingCompactNestedTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.0/compact-nested.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.0/compact-nested_4.5.2.yaml'];
     }
 }

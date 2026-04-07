@@ -51,6 +51,6 @@ final class LexerMappingSingleQuotedMultilineTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.1/single-quoted-multiline.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.1/single-quoted-multiline_9.1.2.yaml'];
     }
 }

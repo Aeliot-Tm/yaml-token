@@ -60,6 +60,6 @@ final class LexerMappingLiteralKeepTest extends LexerMappingTestCase
 
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.2.1/literal-keep.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.2.1/literal-keep_8.1.2.yaml'];
     }
 }

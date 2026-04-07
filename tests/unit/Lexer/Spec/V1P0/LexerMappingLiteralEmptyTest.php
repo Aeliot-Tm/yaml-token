@@ -57,6 +57,6 @@ final class LexerMappingLiteralEmptyTest extends LexerMappingTestCase
                 'type' => TokenType::LITERAL_BLOCK_SCALAR,
                 'text' => '',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.0/literal-empty.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.0/literal-empty_4.6.5.yaml'];
     }
 }

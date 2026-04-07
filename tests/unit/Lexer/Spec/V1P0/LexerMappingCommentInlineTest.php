@@ -86,6 +86,6 @@ final class LexerMappingCommentInlineTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.0/comment-inline.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.0/comment-inline_4.2.2.yaml'];
     }
 }

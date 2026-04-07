@@ -62,6 +62,6 @@ final class LexerMappingBooleanTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.2.1/boolean.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.2.1/boolean_10.3.yaml'];
     }
 }

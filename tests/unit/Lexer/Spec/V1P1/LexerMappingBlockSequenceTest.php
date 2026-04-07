@@ -79,6 +79,6 @@ final class LexerMappingBlockSequenceTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.1/block-sequence.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.1/block-sequence_10.1.2.yaml'];
     }
 }

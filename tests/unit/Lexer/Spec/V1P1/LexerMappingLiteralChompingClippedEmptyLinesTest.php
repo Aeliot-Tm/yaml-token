@@ -59,6 +59,6 @@ final class LexerMappingLiteralChompingClippedEmptyLinesTest extends LexerMappin
 
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.1/literal-chomping-clipped-empty-lines.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.1/literal-chomping-clipped-empty-lines_9.3.1.yaml'];
     }
 }

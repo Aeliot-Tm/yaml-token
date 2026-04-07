@@ -50,6 +50,6 @@ final class LexerMappingDoubleQuotedEscapedNewlineTest extends LexerMappingTestC
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.0/double-quoted-escaped-newline.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.0/double-quoted-escaped-newline_4.6.10.yaml'];
     }
 }

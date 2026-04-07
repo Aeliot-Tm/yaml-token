@@ -116,6 +116,6 @@ final class LexerMappingSequenceEntryTypesTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.0/sequence-entry-types.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.0/sequence-entry-types_4.5.2.yaml'];
     }
 }

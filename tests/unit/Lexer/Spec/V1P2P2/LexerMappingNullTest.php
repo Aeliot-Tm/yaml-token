@@ -49,6 +49,6 @@ final class LexerMappingNullTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.2.2/null.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.2.2/null_10.3.yaml'];
     }
 }
