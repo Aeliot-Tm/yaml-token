@@ -55,8 +55,16 @@ final class LexerMappingLiteralChompingClippedEmptyLinesTest extends LexerMappin
             ],
             [
                 'type' => TokenType::LITERAL_BLOCK_SCALAR,
-                'text' => '  Clipped empty lines
-
+                'text' => '  Clipped empty lines',
+            ],
+            [
+                'type' => TokenType::NEWLINE,
+                'text' => '
+',
+            ],
+            [
+                'type' => TokenType::NEWLINE,
+                'text' => '
 ',
             ],
         ], __DIR__.'/../../../../fixture/spec/1.1/literal-chomping-clipped-empty-lines_9.3.1.yaml'];

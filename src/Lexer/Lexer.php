@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Aeliot\YamlToken\Lexer;
 
 use Aeliot\YamlToken\Dto\Cursor;
+use Aeliot\YamlToken\Enum\BlockScalarChomping;
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Token\Token;
 use Aeliot\YamlToken\Token\TokenStream;
@@ -107,6 +108,9 @@ final class Lexer
 
     private function promoteBlockScalarBodyFromHeader(Cursor $cursor): void
     {
+        if (null === $cursor->blockScalarChomping) {
+            $cursor->blockScalarChomping = BlockScalarChomping::Clip;
+        }
         $cursor->inBlockScalarHeaderLine = false;
         $cursor->pendingBlockScalarBody = $cursor->blockScalarBodyTokenType;
         $cursor->blockScalarBodyTokenType = null;
@@ -233,6 +237,7 @@ final class Lexer
         if ($cursor->inBlockScalarHeaderLine) {
             if ('+' === $char || '-' === $char) {
                 $this->advance($input, $cursor, $length);
+                $cursor->blockScalarChomping = '-' === $char ? BlockScalarChomping::Strip : BlockScalarChomping::Keep;
 
                 return new Token(TokenType::BLOCK_SCALAR_CHOMPING_INDICATOR, $char, $startLine, $startColumn);
             }
@@ -290,6 +295,7 @@ final class Lexer
             $this->advance($input, $cursor, $length);
             $cursor->inBlockScalarHeaderLine = true;
             $cursor->blockScalarBodyTokenType = TokenType::FOLDED_BLOCK_SCALAR;
+            $cursor->blockScalarChomping = null;
 
             return new Token(TokenType::FOLDED_BLOCK_SCALAR_INDICATOR, $char, $startLine, $startColumn);
         }
@@ -299,6 +305,7 @@ final class Lexer
             $this->advance($input, $cursor, $length);
             $cursor->inBlockScalarHeaderLine = true;
             $cursor->blockScalarBodyTokenType = TokenType::LITERAL_BLOCK_SCALAR;
+            $cursor->blockScalarChomping = null;
 
             return new Token(TokenType::LITERAL_BLOCK_SCALAR_INDICATOR, $char, $startLine, $startColumn);
         }
@@ -638,9 +645,11 @@ final class Lexer
             }
             if ($lineIndent < $minIndent && '' !== $result && "\n" === substr($result, -1)) {
                 $backtrack = $cursor->position - $indentStart;
-                $result = substr($result, 0, -$backtrack);
-                $cursor->position = $indentStart;
-                $cursor->column = max(1, $cursor->column - $backtrack);
+                if ($backtrack > 0) {
+                    $result = substr($result, 0, -$backtrack);
+                    $cursor->position = $indentStart;
+                    $cursor->column = max(1, $cursor->column - $backtrack);
+                }
                 break;
             }
 
@@ -656,9 +665,119 @@ final class Lexer
     {
         $type = $cursor->pendingBlockScalarBody;
         $cursor->pendingBlockScalarBody = null;
+        $chomping = $cursor->blockScalarChomping ?? BlockScalarChomping::Clip;
         $text = $this->readBlockScalarBody($input, $cursor, $length);
 
+        if (BlockScalarChomping::Strip === $chomping) {
+            $suffixLen = $this->computeBlockScalarStripSuffixLength($text);
+            if ($suffixLen > 0) {
+                $text = substr($text, 0, -$suffixLen);
+                $cursor->position -= $suffixLen;
+                $this->syncCursorLineColumnFromPrefix($input, $cursor, $length);
+            }
+        }
+
+        $cursor->blockScalarChomping = null;
+
         return new Token($type, $text, $cursor->line, $cursor->column);
+    }
+
+    /**
+     * Strip chomping (YAML 1.0 / 1.2): exclude the final line break after the last non-empty line and any
+     * trailing empty lines. Bytes from the first such line break onward are detached and re-tokenized
+     * (e.g. {@see TokenType::NEWLINE}, {@see TokenType::INDENTATION}).
+     */
+    private function computeBlockScalarStripSuffixLength(string $result): int
+    {
+        if ('' === $result) {
+            return 0;
+        }
+
+        $len = \strlen($result);
+        $offset = 0;
+        $lastNonEmptyContentEnd = null;
+
+        while ($offset < $len) {
+            $nl = $this->findNextLineBreakInString($result, $offset, $len);
+            if (null === $nl) {
+                $lineContent = substr($result, $offset);
+                if ($this->blockScalarLineHasNonSpaceTabContent($lineContent)) {
+                    $lastNonEmptyContentEnd = $len;
+                }
+                break;
+            }
+
+            $lineContent = substr($result, $offset, $nl['start'] - $offset);
+            if ($this->blockScalarLineHasNonSpaceTabContent($lineContent)) {
+                $lastNonEmptyContentEnd = $nl['start'];
+            }
+            $offset = $nl['start'] + $nl['len'];
+        }
+
+        if (null === $lastNonEmptyContentEnd) {
+            return 0;
+        }
+
+        return $len - $lastNonEmptyContentEnd;
+    }
+
+    private function blockScalarLineHasNonSpaceTabContent(string $line): bool
+    {
+        return 1 === preg_match('/[^ \t]/', $line);
+    }
+
+    /**
+     * @return array{start: int, len: int}|null
+     */
+    private function findNextLineBreakInString(string $input, int $offset, int $length): ?array
+    {
+        for ($i = $offset; $i < $length; ++$i) {
+            if ("\n" === $input[$i]) {
+                return ['start' => $i, 'len' => 1];
+            }
+            if ("\r" === $input[$i]) {
+                if ($i + 1 < $length && "\n" === $input[$i + 1]) {
+                    return ['start' => $i, 'len' => 2];
+                }
+
+                return ['start' => $i, 'len' => 1];
+            }
+        }
+
+        return null;
+    }
+
+    private function syncCursorLineColumnFromPrefix(string $input, Cursor $cursor, int $length): void
+    {
+        $pos = min($cursor->position, $length);
+        $line = 1;
+        $column = 1;
+        $i = 0;
+        while ($i < $pos) {
+            $c = $input[$i];
+            if ("\n" === $c) {
+                ++$line;
+                $column = 1;
+                ++$i;
+
+                continue;
+            }
+            if ("\r" === $c) {
+                ++$line;
+                $column = 1;
+                ++$i;
+                if ($i < $pos && "\n" === $input[$i]) {
+                    ++$i;
+                }
+
+                continue;
+            }
+            $w = $this->utf8CodePointByteWidth($input, $i, $length);
+            ++$column;
+            $i += $w;
+        }
+        $cursor->line = $line;
+        $cursor->column = $column;
     }
 
     private function readPlainScalar(string $input, Cursor $cursor, int $length): string

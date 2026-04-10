@@ -76,7 +76,7 @@ has version-specific syntax (e.g. `boolean.yaml`, `integer.yaml`, `double-quoted
 | Plain scalars | `plain-scalar`, `plain-multiline`, `plain-special-chars` |
 | Single-quoted | `single-quoted`, `single-quoted-escape`, `single-quoted-multiline` |
 | Double-quoted | `double-quoted`, `double-quoted-empty-line`, `double-quoted-escapes`, `double-quoted-escaped-newline`, `double-quoted-multiline`, `double-quoted-unicode` |
-| Block scalars | `literal-block`, `literal-chomping-clipped-empty-lines`, `literal-empty`, `literal-keep`, `literal-strip`, `folded-block`, `folded-strip`, `folded-keep`, `indent-indicator`, `block-scalar-tab` |
+| Block scalars | `literal-block`, `literal-chomping-clipped-empty-lines`, `literal-empty`, `literal-keep`, `literal-strip`, `folded-block`, `folded-strip`, `folded-strip-indented-empty-tail`, `folded-strip-then-sibling-key`, `folded-keep`, `indent-indicator`, `block-scalar-tab` |
 | Types | `null`, `boolean`, `integer`, `float`, `float-special`, `timestamp`, `empty-scalar`, `empty-scalar-blank-before-continuation`, `empty-scalar-multiple` |
 | Anchors & Tags | `anchor-alias`, `tag-builtin`, `tag-binary` |
 | Comments | `comment-full-line`, `comment-inline`, `comment-block-indicator`, `comment-between-docs`, `comment-after-marker` |

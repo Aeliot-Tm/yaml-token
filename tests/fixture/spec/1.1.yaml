@@ -127,6 +127,15 @@ folded_strip: >-
 folded_keep: >+
   Keeps trailing newlines
 
+folded_strip_indented_empty_tail: >-
+  one
+  
+  
+  
+folded_strip_then_sibling_a: >-
+  body
+
+folded_strip_then_sibling_b: x
 
 # Indentation indicator
 indented_block: |2

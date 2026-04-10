@@ -55,7 +55,11 @@ final class LexerMappingLiteralStripTest extends LexerMappingTestCase
             ],
             [
                 'type' => TokenType::LITERAL_BLOCK_SCALAR,
-                'text' => '  No trailing newline
+                'text' => '  No trailing newline',
+            ],
+            [
+                'type' => TokenType::NEWLINE,
+                'text' => '
 ',
             ],
         ], __DIR__.'/../../../../fixture/spec/1.2.1/literal-strip_8.1.2.yaml'];

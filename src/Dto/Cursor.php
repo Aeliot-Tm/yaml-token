@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Aeliot\YamlToken\Dto;
 
+use Aeliot\YamlToken\Enum\BlockScalarChomping;
 use Aeliot\YamlToken\Enum\TokenType;
 
 /**
@@ -46,4 +47,10 @@ final class Cursor
      * @var TokenType::LITERAL_BLOCK_SCALAR|TokenType::FOLDED_BLOCK_SCALAR|null
      */
     public ?TokenType $pendingBlockScalarBody = null;
+
+    /**
+     * Chomping from the block scalar header: set on {@see TokenType::BLOCK_SCALAR_CHOMPING_INDICATOR},
+     * default {@see BlockScalarChomping::Clip} when the header line ends without +/-.
+     */
+    public ?BlockScalarChomping $blockScalarChomping = null;
 }
