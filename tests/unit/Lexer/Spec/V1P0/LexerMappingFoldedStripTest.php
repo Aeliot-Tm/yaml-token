@@ -56,6 +56,8 @@ final class LexerMappingFoldedStripTest extends LexerMappingTestCase
             [
                 'type' => TokenType::FOLDED_BLOCK_SCALAR,
                 'text' => '  No trailing newline
+
+
 ',
             ],
         ], __DIR__.'/../../../../fixture/spec/1.0/folded-strip_4.6.7.yaml'];
