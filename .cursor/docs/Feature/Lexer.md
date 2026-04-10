@@ -28,12 +28,16 @@ The rules below describe the practical behavior relied upon by lexer unit tests.
   - `"`...`"` → `DOUBLE_QUOTED_SCALAR` (backslash escapes are preserved as raw text)
   - `'`...`'` → `SINGLE_QUOTED_SCALAR` (`''` is preserved as escaped `'`)
 - **Block scalars**:
-  - `|` / `>` start a block scalar when followed by whitespace or `+`/`-`
+  - `|` / `>` start a block scalar when followed by whitespace, `+`/`-`, or a digit (`0`–`9`, the block-indentation indicator)
   - `LITERAL_BLOCK_SCALAR_INDICATOR` / `FOLDED_BLOCK_SCALAR_INDICATOR` for the `|` / `>` character
   - the rest of the block scalar header line uses the same rules as elsewhere on the line: `WHITESPACE`, `COMMENT`,
     `BLOCK_SCALAR_CHOMPING_INDICATOR` (`+` or `-`), `BLOCK_SCALAR_INDENTATION_INDICATOR` (one digit),
     then `NEWLINE` ending the header line; the cursor holds the expected body token type (`LITERAL_BLOCK_SCALAR` / `FOLDED_BLOCK_SCALAR`)
-    while the header line is open, then `pendingBlockScalarBody` for the body token (no token queue)
+    while the header line is open
+  - **Body tokenization**: if the header included a digit `BLOCK_SCALAR_INDENTATION_INDICATOR`, the block body is not a single
+    `LITERAL_BLOCK_SCALAR` / `FOLDED_BLOCK_SCALAR` token; it is split per physical line into leading horizontal whitespace as
+    `INDENTATION`, non-whitespace line suffix as `PLAIN_SCALAR`, and line breaks as `NEWLINE` (same raw bytes as in the source).
+    Otherwise the next token is one `pendingBlockScalarBody` body token as before
   - chomping: `BlockScalarChomping` on the cursor is set from `+` / `-` (`Keep` / `Strip`); if the header ends without them, it defaults to `Clip` when the body is promoted
   - **Strip** (`-`): after the block body is read, the line break that ends the last body line with non-horizontal-whitespace content is excluded from the block body token, together with any following trailing empty lines (lines with only horizontal whitespace in the body); the lexer rewinds the byte offset and line/column so those bytes are emitted next as normal tokens (`NEWLINE`, and leading `INDENTATION` when empty lines were indented in the source)
   - `LITERAL_BLOCK_SCALAR` / `FOLDED_BLOCK_SCALAR` carry only the indented block body (raw text), without the indicator or header line

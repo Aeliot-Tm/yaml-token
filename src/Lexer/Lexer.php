@@ -29,7 +29,7 @@ final class Lexer
     /**
      * @var list<string>
      */
-    private const CHARS_BLOCK_SCALAR_START = [...self::CHARS_WHITESPACE, '+', '-'];
+    private const CHARS_BLOCK_SCALAR_START = [...self::CHARS_WHITESPACE, '+', '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 
     /**
      * @var list<string>
@@ -87,6 +87,21 @@ final class Lexer
 
                 continue;
             }
+            if ($cursor->inExplicitIndentBlockScalarBody) {
+                if (null === $cursor->explicitBlockScalarPendingTokens) {
+                    $body = $this->readBlockScalarBodyAndApplyChomping($input, $cursor, $length);
+                    $cursor->explicitBlockScalarPendingTokens = $this->splitExplicitIndentBlockBodyToTokens($body);
+                }
+                if ([] !== $cursor->explicitBlockScalarPendingTokens) {
+                    $stream->addToken(array_shift($cursor->explicitBlockScalarPendingTokens));
+
+                    continue;
+                }
+                $cursor->inExplicitIndentBlockScalarBody = false;
+                $cursor->explicitBlockScalarPendingTokens = null;
+
+                continue;
+            }
             if ($cursor->position >= $length) {
                 break;
             }
@@ -112,7 +127,13 @@ final class Lexer
             $cursor->blockScalarChomping = BlockScalarChomping::Clip;
         }
         $cursor->inBlockScalarHeaderLine = false;
-        $cursor->pendingBlockScalarBody = $cursor->blockScalarBodyTokenType;
+        if ($cursor->blockScalarExplicitIndentIndicator) {
+            $cursor->inExplicitIndentBlockScalarBody = true;
+            $cursor->explicitBlockScalarPendingTokens = null;
+            $cursor->blockScalarExplicitIndentIndicator = false;
+        } else {
+            $cursor->pendingBlockScalarBody = $cursor->blockScalarBodyTokenType;
+        }
         $cursor->blockScalarBodyTokenType = null;
     }
 
@@ -243,6 +264,7 @@ final class Lexer
             }
             if ($char >= '0' && $char <= '9') {
                 $this->advance($input, $cursor, $length);
+                $cursor->blockScalarExplicitIndentIndicator = true;
 
                 return new Token(TokenType::BLOCK_SCALAR_INDENTATION_INDICATOR, $char, $startLine, $startColumn);
             }
@@ -296,6 +318,7 @@ final class Lexer
             $cursor->inBlockScalarHeaderLine = true;
             $cursor->blockScalarBodyTokenType = TokenType::FOLDED_BLOCK_SCALAR;
             $cursor->blockScalarChomping = null;
+            $cursor->blockScalarExplicitIndentIndicator = false;
 
             return new Token(TokenType::FOLDED_BLOCK_SCALAR_INDICATOR, $char, $startLine, $startColumn);
         }
@@ -306,6 +329,7 @@ final class Lexer
             $cursor->inBlockScalarHeaderLine = true;
             $cursor->blockScalarBodyTokenType = TokenType::LITERAL_BLOCK_SCALAR;
             $cursor->blockScalarChomping = null;
+            $cursor->blockScalarExplicitIndentIndicator = false;
 
             return new Token(TokenType::LITERAL_BLOCK_SCALAR_INDICATOR, $char, $startLine, $startColumn);
         }
@@ -665,6 +689,13 @@ final class Lexer
     {
         $type = $cursor->pendingBlockScalarBody;
         $cursor->pendingBlockScalarBody = null;
+        $text = $this->readBlockScalarBodyAndApplyChomping($input, $cursor, $length);
+
+        return new Token($type, $text, $cursor->line, $cursor->column);
+    }
+
+    private function readBlockScalarBodyAndApplyChomping(string $input, Cursor $cursor, int $length): string
+    {
         $chomping = $cursor->blockScalarChomping ?? BlockScalarChomping::Clip;
         $text = $this->readBlockScalarBody($input, $cursor, $length);
 
@@ -679,7 +710,43 @@ final class Lexer
 
         $cursor->blockScalarChomping = null;
 
-        return new Token($type, $text, $cursor->line, $cursor->column);
+        return $text;
+    }
+
+    /**
+     * @return list<Token>
+     */
+    private function splitExplicitIndentBlockBodyToTokens(string $body): array
+    {
+        $tokens = [];
+        $len = \strlen($body);
+        $offset = 0;
+        while ($offset < $len) {
+            $nl = $this->findNextLineBreakInString($body, $offset, $len);
+            $lineEnd = null !== $nl ? $nl['start'] : $len;
+            $line = substr($body, $offset, $lineEnd - $offset);
+            $lineLen = \strlen($line);
+            $i = 0;
+            $indentBytes = '';
+            while ($i < $lineLen && \in_array($line[$i], self::CHARS_HORIZONTAL_WHITESPACE, true)) {
+                $indentBytes .= $line[$i];
+                ++$i;
+            }
+            if ('' !== $indentBytes) {
+                $tokens[] = new Token(TokenType::INDENTATION, $indentBytes, 1, 1);
+            }
+            $rest = substr($line, $i);
+            if ('' !== $rest) {
+                $tokens[] = new Token(TokenType::PLAIN_SCALAR, $rest, 1, 1);
+            }
+            if (null === $nl) {
+                break;
+            }
+            $tokens[] = new Token(TokenType::NEWLINE, substr($body, $nl['start'], $nl['len']), 1, 1);
+            $offset = $nl['start'] + $nl['len'];
+        }
+
+        return $tokens;
     }
 
     /**
