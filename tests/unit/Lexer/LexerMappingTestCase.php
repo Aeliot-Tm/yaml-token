@@ -29,7 +29,9 @@ abstract class LexerMappingTestCase extends TestCase
     #[DataProvider('getDataForTestMapping')]
     public function testMapping(array $expectedTokens, string $path): void
     {
-        $stream = (new Lexer())->tokenize(file_get_contents($path));
+        $input = file_get_contents($path);
+        $input = str_replace(["\r\n", "\r"], "\n", $input);
+        $stream = (new Lexer())->tokenize($input);
         self::assertSame(
             $expectedTokens,
             array_map(static fn (Token $token): array => [

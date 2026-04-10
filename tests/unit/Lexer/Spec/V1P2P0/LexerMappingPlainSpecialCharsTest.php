@@ -37,16 +37,8 @@ final class LexerMappingPlainSpecialCharsTest extends LexerMappingTestCase
                 'text' => ' ',
             ],
             [
-                'type' => TokenType::UNRECOGNIZED,
-                'text' => ':',
-            ],
-            [
-                'type' => TokenType::UNRECOGNIZED,
-                'text' => ':',
-            ],
-            [
                 'type' => TokenType::PLAIN_SCALAR,
-                'text' => 'vector',
+                'text' => '::vector',
             ],
             [
                 'type' => TokenType::NEWLINE,
@@ -80,19 +72,7 @@ final class LexerMappingPlainSpecialCharsTest extends LexerMappingTestCase
             ],
             [
                 'type' => TokenType::PLAIN_SCALAR,
-                'text' => 'https',
-            ],
-            [
-                'type' => TokenType::UNRECOGNIZED,
-                'text' => ':',
-            ],
-            [
-                'type' => TokenType::PLAIN_SCALAR,
-                'text' => '//example.com/foo',
-            ],
-            [
-                'type' => TokenType::COMMENT,
-                'text' => '#bar',
+                'text' => 'https://example.com/foo#bar',
             ],
             [
                 'type' => TokenType::NEWLINE,

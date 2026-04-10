@@ -42,23 +42,7 @@ final class LexerMappingTimestampTest extends LexerMappingTestCase
             ],
             [
                 'type' => TokenType::PLAIN_SCALAR,
-                'text' => '2001-12-15T02',
-            ],
-            [
-                'type' => TokenType::UNRECOGNIZED,
-                'text' => ':',
-            ],
-            [
-                'type' => TokenType::PLAIN_SCALAR,
-                'text' => '59',
-            ],
-            [
-                'type' => TokenType::UNRECOGNIZED,
-                'text' => ':',
-            ],
-            [
-                'type' => TokenType::PLAIN_SCALAR,
-                'text' => '43.1Z',
+                'text' => '2001-12-15T02:59:43.1Z',
             ],
             [
                 'type' => TokenType::NEWLINE,
@@ -79,31 +63,7 @@ final class LexerMappingTimestampTest extends LexerMappingTestCase
             ],
             [
                 'type' => TokenType::PLAIN_SCALAR,
-                'text' => '2001-12-14t21',
-            ],
-            [
-                'type' => TokenType::UNRECOGNIZED,
-                'text' => ':',
-            ],
-            [
-                'type' => TokenType::PLAIN_SCALAR,
-                'text' => '59',
-            ],
-            [
-                'type' => TokenType::UNRECOGNIZED,
-                'text' => ':',
-            ],
-            [
-                'type' => TokenType::PLAIN_SCALAR,
-                'text' => '43.10-05',
-            ],
-            [
-                'type' => TokenType::UNRECOGNIZED,
-                'text' => ':',
-            ],
-            [
-                'type' => TokenType::PLAIN_SCALAR,
-                'text' => '00',
+                'text' => '2001-12-14t21:59:43.10-05:00',
             ],
             [
                 'type' => TokenType::NEWLINE,
@@ -124,23 +84,7 @@ final class LexerMappingTimestampTest extends LexerMappingTestCase
             ],
             [
                 'type' => TokenType::PLAIN_SCALAR,
-                'text' => '2001-12-14 21',
-            ],
-            [
-                'type' => TokenType::UNRECOGNIZED,
-                'text' => ':',
-            ],
-            [
-                'type' => TokenType::PLAIN_SCALAR,
-                'text' => '59',
-            ],
-            [
-                'type' => TokenType::UNRECOGNIZED,
-                'text' => ':',
-            ],
-            [
-                'type' => TokenType::PLAIN_SCALAR,
-                'text' => '43.10 -5',
+                'text' => '2001-12-14 21:59:43.10 -5',
             ],
             [
                 'type' => TokenType::NEWLINE,

@@ -23,18 +23,14 @@ use PHPUnit\Framework\Attributes\UsesClass;
 #[CoversClass(Lexer::class)]
 #[UsesClass(Token::class)]
 #[UsesClass(TokenType::class)]
-final class LexerMappingTimestampTest extends LexerMappingTestCase
+final class LexerMappingFlowWithUrlTest extends LexerMappingTestCase
 {
     public static function getDataForTestMapping(): iterable
     {
         yield [[
             [
-                'type' => TokenType::PLAIN_SCALAR,
-                'text' => 'canonical',
-            ],
-            [
-                'type' => TokenType::VALUE_INDICATOR,
-                'text' => ':',
+                'type' => TokenType::FLOW_SEQUENCE_START,
+                'text' => '[',
             ],
             [
                 'type' => TokenType::WHITESPACE,
@@ -42,20 +38,11 @@ final class LexerMappingTimestampTest extends LexerMappingTestCase
             ],
             [
                 'type' => TokenType::PLAIN_SCALAR,
-                'text' => '2001-12-15T02:59:43.1Z',
+                'text' => 'https://simple.uri',
             ],
             [
-                'type' => TokenType::NEWLINE,
-                'text' => '
-',
-            ],
-            [
-                'type' => TokenType::PLAIN_SCALAR,
-                'text' => 'iso8601',
-            ],
-            [
-                'type' => TokenType::VALUE_INDICATOR,
-                'text' => ':',
+                'type' => TokenType::FLOW_ENTRY,
+                'text' => ',',
             ],
             [
                 'type' => TokenType::WHITESPACE,
@@ -63,20 +50,11 @@ final class LexerMappingTimestampTest extends LexerMappingTestCase
             ],
             [
                 'type' => TokenType::PLAIN_SCALAR,
-                'text' => '2001-12-14t21:59:43.10-05:00',
+                'text' => 'https://with.query?a[]=b&a[]=b',
             ],
             [
-                'type' => TokenType::NEWLINE,
-                'text' => '
-',
-            ],
-            [
-                'type' => TokenType::PLAIN_SCALAR,
-                'text' => 'spaced',
-            ],
-            [
-                'type' => TokenType::VALUE_INDICATOR,
-                'text' => ':',
+                'type' => TokenType::FLOW_ENTRY,
+                'text' => ',',
             ],
             [
                 'type' => TokenType::WHITESPACE,
@@ -84,34 +62,21 @@ final class LexerMappingTimestampTest extends LexerMappingTestCase
             ],
             [
                 'type' => TokenType::PLAIN_SCALAR,
-                'text' => '2001-12-14 21:59:43.10 -5',
-            ],
-            [
-                'type' => TokenType::NEWLINE,
-                'text' => '
-',
-            ],
-            [
-                'type' => TokenType::PLAIN_SCALAR,
-                'text' => 'date',
-            ],
-            [
-                'type' => TokenType::VALUE_INDICATOR,
-                'text' => ':',
+                'text' => 'https://with.anchor?a=b#anc',
             ],
             [
                 'type' => TokenType::WHITESPACE,
                 'text' => ' ',
             ],
             [
-                'type' => TokenType::PLAIN_SCALAR,
-                'text' => '2002-12-14',
+                'type' => TokenType::FLOW_SEQUENCE_END,
+                'text' => ']',
             ],
             [
                 'type' => TokenType::NEWLINE,
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.0/timestamp_2.4.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.0/flow-with-url.yaml'];
     }
 }

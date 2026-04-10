@@ -50,23 +50,7 @@ final class LexerMappingTagTimestampTest extends LexerMappingTestCase
             ],
             [
                 'type' => TokenType::PLAIN_SCALAR,
-                'text' => '2001-12-15T02',
-            ],
-            [
-                'type' => TokenType::UNRECOGNIZED,
-                'text' => ':',
-            ],
-            [
-                'type' => TokenType::PLAIN_SCALAR,
-                'text' => '59',
-            ],
-            [
-                'type' => TokenType::UNRECOGNIZED,
-                'text' => ':',
-            ],
-            [
-                'type' => TokenType::PLAIN_SCALAR,
-                'text' => '43.1Z',
+                'text' => '2001-12-15T02:59:43.1Z',
             ],
             [
                 'type' => TokenType::NEWLINE,

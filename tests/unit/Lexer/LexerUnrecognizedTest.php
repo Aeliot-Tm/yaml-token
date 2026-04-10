@@ -21,13 +21,11 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(Lexer::class)]
 final class LexerUnrecognizedTest extends TestCase
 {
-    public function testQuestionMarkNotMappingKeyIsUnrecognizedThenPlain(): void
+    public function testQuestionMarkNotMappingKeyIsPlainScalar(): void
     {
         $tokens = (new Lexer())->tokenize('?key')->getTokens();
 
-        $this->assertSame(TokenType::UNRECOGNIZED, $tokens[0]->type);
-        $this->assertSame('?', $tokens[0]->text);
-        $this->assertSame(TokenType::PLAIN_SCALAR, $tokens[1]->type);
-        $this->assertSame('key', $tokens[1]->text);
+        $this->assertSame(TokenType::PLAIN_SCALAR, $tokens[0]->type);
+        $this->assertSame('?key', $tokens[0]->text);
     }
 }

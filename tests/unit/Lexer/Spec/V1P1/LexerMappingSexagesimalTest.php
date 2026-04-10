@@ -42,23 +42,7 @@ final class LexerMappingSexagesimalTest extends LexerMappingTestCase
             ],
             [
                 'type' => TokenType::PLAIN_SCALAR,
-                'text' => '3',
-            ],
-            [
-                'type' => TokenType::UNRECOGNIZED,
-                'text' => ':',
-            ],
-            [
-                'type' => TokenType::PLAIN_SCALAR,
-                'text' => '25',
-            ],
-            [
-                'type' => TokenType::UNRECOGNIZED,
-                'text' => ':',
-            ],
-            [
-                'type' => TokenType::PLAIN_SCALAR,
-                'text' => '45',
+                'text' => '3:25:45',
             ],
             [
                 'type' => TokenType::NEWLINE,
@@ -79,23 +63,7 @@ final class LexerMappingSexagesimalTest extends LexerMappingTestCase
             ],
             [
                 'type' => TokenType::PLAIN_SCALAR,
-                'text' => '190',
-            ],
-            [
-                'type' => TokenType::UNRECOGNIZED,
-                'text' => ':',
-            ],
-            [
-                'type' => TokenType::PLAIN_SCALAR,
-                'text' => '20',
-            ],
-            [
-                'type' => TokenType::UNRECOGNIZED,
-                'text' => ':',
-            ],
-            [
-                'type' => TokenType::PLAIN_SCALAR,
-                'text' => '30.15',
+                'text' => '190:20:30.15',
             ],
             [
                 'type' => TokenType::NEWLINE,

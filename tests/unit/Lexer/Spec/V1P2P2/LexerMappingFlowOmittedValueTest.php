@@ -34,15 +34,7 @@ final class LexerMappingFlowOmittedValueTest extends LexerMappingTestCase
             ],
             [
                 'type' => TokenType::PLAIN_SCALAR,
-                'text' => 'https',
-            ],
-            [
-                'type' => TokenType::UNRECOGNIZED,
-                'text' => ':',
-            ],
-            [
-                'type' => TokenType::PLAIN_SCALAR,
-                'text' => '//example.com',
+                'text' => 'https://example.com',
             ],
             [
                 'type' => TokenType::FLOW_ENTRY,

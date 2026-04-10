@@ -48,7 +48,7 @@ final class Lexer
     /**
      * @var list<string>
      */
-    private const CHARS_PLAIN_SCALAR_STOP = [...self::CHARS_LINE_BREAK, '[', ']', '{', '}', ',', ':', '#', '?'];
+    private const CHARS_PLAIN_SCALAR_STOP = [...self::CHARS_LINE_BREAK, ',', ']', '}'];
 
     /**
      * @var list<string>
@@ -180,7 +180,7 @@ final class Lexer
         }
 
         // COMMENT
-        if ('#' === $char) {
+        if ('#' === $char && $this->isCommentStart($input, $cursor, $length)) {
             $this->advance($input, $cursor, $length);
             $comment = '#'.$this->readUntilNewline($input, $cursor, $length);
 
@@ -479,6 +479,24 @@ final class Lexer
         return \in_array($nextChar, self::CHARS_MAPPING_VALUE_SUFFIX, true);
     }
 
+    /**
+     * In YAML, "#" starts a comment only when separated from other tokens by whitespace.
+     */
+    private function isCommentStart(string $input, Cursor $cursor, int $length): bool
+    {
+        if ($cursor->position >= $length) {
+            return false;
+        }
+        if ('#' !== $input[$cursor->position]) {
+            return false;
+        }
+        if (0 === $cursor->position) {
+            return true;
+        }
+
+        return \in_array($input[$cursor->position - 1], self::CHARS_WHITESPACE, true);
+    }
+
     private function readAnchorOrAlias(string $input, Cursor $cursor, int $length): string
     {
         $result = '';
@@ -648,6 +666,29 @@ final class Lexer
         $result = '';
         while ($cursor->position < $length) {
             $char = $input[$cursor->position];
+            if (':' === $char && $this->isMappingValue($input, $cursor, $length)) {
+                break;
+            }
+            if ('?' === $char && $this->isMappingKey($input, $cursor, $length)) {
+                break;
+            }
+            if ('#' === $char && $this->isCommentStart($input, $cursor, $length)) {
+                break;
+            }
+            if ((']' === $char || '}' === $char) && '' !== $result) {
+                $nextChar = $this->getNextChar($input, $cursor, $length);
+                if (null === $nextChar
+                    || \in_array($nextChar, self::CHARS_WHITESPACE, true)
+                    || \in_array($nextChar, [',', ']', '}', "\n", "\r"], true)) {
+                    break;
+                }
+                $result .= $this->consumeCodePoint($input, $cursor, $length);
+
+                continue;
+            }
+            if (('[' === $char || '{' === $char) && '' === $result) {
+                break;
+            }
             if (\in_array($char, self::CHARS_PLAIN_SCALAR_STOP, true)) {
                 break;
             }
@@ -656,7 +697,10 @@ final class Lexer
                 while ($peek < $length && \in_array($input[$peek], self::CHARS_HORIZONTAL_WHITESPACE, true)) {
                     ++$peek;
                 }
-                if ($peek >= $length || \in_array($input[$peek], self::CHARS_LINE_BREAK, true) || '#' === $input[$peek]) {
+                if ($peek >= $length
+                    || \in_array($input[$peek], self::CHARS_LINE_BREAK, true)
+                    || '#' === $input[$peek]
+                    || \in_array($input[$peek], [',', ']', '}', '[', '{'], true)) {
                     break;
                 }
             }
