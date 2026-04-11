@@ -73,7 +73,6 @@ final class Lexer
     public function tokenize(string $input): TokenStream
     {
         $harvester = new Harvester($input);
-        $stream = new TokenStream();
 
         while ($harvester->cursor->position < $harvester->length || null !== $harvester->cursor->pendingBlockScalarBody) {
             if ($harvester->cursor->position >= $harvester->length && $harvester->cursor->inBlockScalarHeaderLine) {
@@ -83,7 +82,7 @@ final class Lexer
             }
 
             if (null !== $harvester->cursor->pendingBlockScalarBody) {
-                $stream->addToken($this->readBlockScalarBodyToken($harvester));
+                $this->readBlockScalarBodyToken($harvester);
 
                 continue;
             }
@@ -94,7 +93,7 @@ final class Lexer
                     $harvester->cursor->explicitBlockScalarPendingTokens = $this->splitExplicitIndentBlockBodyToTokens($body);
                 }
                 if ([] !== $harvester->cursor->explicitBlockScalarPendingTokens) {
-                    $stream->addToken(array_shift($harvester->cursor->explicitBlockScalarPendingTokens));
+                    $harvester->stream->addToken(array_shift($harvester->cursor->explicitBlockScalarPendingTokens));
 
                     continue;
                 }
@@ -109,34 +108,28 @@ final class Lexer
             }
 
             if ($this->shouldTokenizeYamlDirectiveAsParts($harvester)) {
-                foreach ($this->tokenizeYamlDirectiveLine($harvester) as $yamlDirectiveToken) {
-                    $stream->addToken($yamlDirectiveToken);
-                }
+                $this->tokenizeYamlDirectiveLine($harvester);
 
                 continue;
             }
 
             if ($this->shouldTokenizeTagDirectiveAsParts($harvester)) {
-                foreach ($this->tokenizeTagDirectiveLine($harvester) as $tagDirectiveToken) {
-                    $stream->addToken($tagDirectiveToken);
-                }
+                $this->tokenizeTagDirectiveLine($harvester);
 
                 continue;
             }
 
             // TAG (!...) — see {@see tokenizeExplicitTag} in {@see tokenize}
             if ($harvester->cursor->position < $harvester->length && '!' === $harvester->input[$harvester->cursor->position]) {
-                foreach ($this->tokenizeExplicitTag($harvester) as $tagToken) {
-                    $stream->addToken($tagToken);
-                }
+                $this->tokenizeExplicitTag($harvester);
 
                 continue;
             }
 
-            $stream->addToken($this->readToken($harvester));
+            $this->readToken($harvester);
         }
 
-        return $stream;
+        return $harvester->stream;
     }
 
     private function getNextChar(Harvester $harvester): ?string
@@ -165,7 +158,7 @@ final class Lexer
         $cursor->blockScalarBodyTokenType = null;
     }
 
-    private function readToken(Harvester $harvester): Token
+    private function readToken(Harvester $harvester): void
     {
         $char = $harvester->input[$harvester->cursor->position];
         $startLine = $harvester->cursor->line;
@@ -181,13 +174,17 @@ final class Lexer
                     $this->promoteBlockScalarBodyFromHeader($harvester->cursor);
                 }
 
-                return new Token(TokenType::NEWLINE, "\r\n", $startLine, $startColumn);
+                $harvester->stream->addToken(new Token(TokenType::NEWLINE, "\r\n", $startLine, $startColumn));
+
+                return;
             }
             if ($harvester->cursor->inBlockScalarHeaderLine) {
                 $this->promoteBlockScalarBodyFromHeader($harvester->cursor);
             }
 
-            return new Token(TokenType::NEWLINE, "\r", $startLine, $startColumn);
+            $harvester->stream->addToken(new Token(TokenType::NEWLINE, "\r", $startLine, $startColumn));
+
+            return;
         }
         if ("\n" === $char) {
             $this->advance($harvester);
@@ -196,90 +193,107 @@ final class Lexer
                 $this->promoteBlockScalarBodyFromHeader($harvester->cursor);
             }
 
-            return new Token(TokenType::NEWLINE, "\n", $startLine, $startColumn);
+            $harvester->stream->addToken(new Token(TokenType::NEWLINE, "\n", $startLine, $startColumn));
+
+            return;
         }
 
         // INDENTATION (spaces at line start, after newline)
         if (1 === $harvester->cursor->column && \in_array($char, self::CHARS_HORIZONTAL_WHITESPACE, true)) {
             $indent = $this->readIndentation($harvester);
             if ('' !== $indent) {
-                return new Token(TokenType::INDENTATION, $indent, $startLine, $startColumn);
+                $harvester->stream->addToken(new Token(TokenType::INDENTATION, $indent, $startLine, $startColumn));
+
+                return;
             }
         }
 
         // WHITESPACE (within line)
         if (\in_array($char, self::CHARS_HORIZONTAL_WHITESPACE, true)) {
             $spaces = $this->readWhitespace($harvester);
+            $harvester->stream->addToken(new Token(TokenType::WHITESPACE, $spaces, $startLine, $startColumn));
 
-            return new Token(TokenType::WHITESPACE, $spaces, $startLine, $startColumn);
+            return;
         }
 
         // BYTE_ORDER_MARK
         if ("\xEF" === $char && $harvester->cursor->position + 2 < $harvester->length
             && "\xBB" === $harvester->input[$harvester->cursor->position + 1] && "\xBF" === $harvester->input[$harvester->cursor->position + 2]) {
             $this->advance($harvester);
+            $harvester->stream->addToken(new Token(TokenType::BYTE_ORDER_MARK, "\xEF\xBB\xBF", $startLine, $startColumn));
 
-            return new Token(TokenType::BYTE_ORDER_MARK, "\xEF\xBB\xBF", $startLine, $startColumn);
+            return;
         }
 
         // DOCUMENT_START (---)
         if ($this->match($harvester, '---')) {
-            return new Token(TokenType::DOCUMENT_START, '---', $startLine, $startColumn);
+            $harvester->stream->addToken(new Token(TokenType::DOCUMENT_START, '---', $startLine, $startColumn));
+
+            return;
         }
 
         // DOCUMENT_END (...)
         if ($this->match($harvester, '...')) {
-            return new Token(TokenType::DOCUMENT_END, '...', $startLine, $startColumn);
+            $harvester->stream->addToken(new Token(TokenType::DOCUMENT_END, '...', $startLine, $startColumn));
+
+            return;
         }
 
         // COMMENT
         if ('#' === $char && $this->isCommentStart($harvester)) {
             $this->advance($harvester);
             $comment = '#'.$this->readUntilNewline($harvester);
+            $harvester->stream->addToken(new Token(TokenType::COMMENT, $comment, $startLine, $startColumn));
 
-            return new Token(TokenType::COMMENT, $comment, $startLine, $startColumn);
+            return;
         }
 
         // DIRECTIVE_YAML (%YAML ...) — split into parts in {@see tokenizeYamlDirectiveLine} when applicable
         if ($this->match($harvester, '%YAML')) {
             $directive = '%YAML'.$this->readUntilNewline($harvester);
+            $harvester->stream->addToken(new Token(TokenType::DIRECTIVE_YAML, $directive, $startLine, $startColumn));
 
-            return new Token(TokenType::DIRECTIVE_YAML, $directive, $startLine, $startColumn);
+            return;
         }
 
         // DIRECTIVE_TAG (%TAG ...) — split into parts in {@see tokenizeTagDirectiveLine} when applicable
         if ($this->match($harvester, '%TAG')) {
             $directive = '%TAG'.$this->readUntilNewline($harvester);
+            $harvester->stream->addToken(new Token(TokenType::DIRECTIVE_TAG, $directive, $startLine, $startColumn));
 
-            return new Token(TokenType::DIRECTIVE_TAG, $directive, $startLine, $startColumn);
+            return;
         }
 
         // DIRECTIVE (%... for other directives)
         if ('%' === $char) {
             $directive = $this->readUntilNewline($harvester);
+            $harvester->stream->addToken(new Token(TokenType::DIRECTIVE, $directive, $startLine, $startColumn));
 
-            return new Token(TokenType::DIRECTIVE, $directive, $startLine, $startColumn);
+            return;
         }
 
         // FLOW indicators
         if (isset(self::FLOW_INDICATOR_TOKEN_TYPES[$char])) {
             $this->advance($harvester);
+            $harvester->stream->addToken(new Token(self::FLOW_INDICATOR_TOKEN_TYPES[$char], $char, $startLine, $startColumn));
 
-            return new Token(self::FLOW_INDICATOR_TOKEN_TYPES[$char], $char, $startLine, $startColumn);
+            return;
         }
 
         // DOUBLE_QUOTED_SCALAR
         if ('"' === $char) {
             $scalar = $this->readDoubleQuotedScalar($harvester);
+            $harvester->stream->addToken(new Token(TokenType::DOUBLE_QUOTED_SCALAR, $scalar, $startLine, $startColumn));
 
-            return new Token(TokenType::DOUBLE_QUOTED_SCALAR, $scalar, $startLine, $startColumn);
+            return;
         }
 
         // SINGLE_QUOTED_SCALAR
         if ("'" === $char) {
             $scalar = $this->readSingleQuotedScalar($harvester);
+            $harvester->stream->addToken(new Token(TokenType::SINGLE_QUOTED_SCALAR, $scalar, $startLine, $startColumn));
 
-            return new Token(TokenType::SINGLE_QUOTED_SCALAR, $scalar, $startLine, $startColumn);
+            return;
         }
 
         // Block scalar header line (chomping / indentation) — before SEQUENCE_ENTRY so '-' is not a list entry
@@ -287,50 +301,57 @@ final class Lexer
             if ('+' === $char || '-' === $char) {
                 $this->advance($harvester);
                 $harvester->cursor->blockScalarChomping = '-' === $char ? BlockScalarChomping::Strip : BlockScalarChomping::Keep;
+                $harvester->stream->addToken(new Token(TokenType::BLOCK_SCALAR_CHOMPING_INDICATOR, $char, $startLine, $startColumn));
 
-                return new Token(TokenType::BLOCK_SCALAR_CHOMPING_INDICATOR, $char, $startLine, $startColumn);
+                return;
             }
             if ($char >= '0' && $char <= '9') {
                 $this->advance($harvester);
                 $harvester->cursor->blockScalarExplicitIndentIndicator = true;
+                $harvester->stream->addToken(new Token(TokenType::BLOCK_SCALAR_INDENTATION_INDICATOR, $char, $startLine, $startColumn));
 
-                return new Token(TokenType::BLOCK_SCALAR_INDENTATION_INDICATOR, $char, $startLine, $startColumn);
+                return;
             }
         }
 
         // SEQUENCE_ENTRY (-) - must check before plain scalar
         if ('-' === $char && $this->isSequenceEntry($harvester)) {
             $this->advance($harvester);
+            $harvester->stream->addToken(new Token(TokenType::SEQUENCE_ENTRY, '-', $startLine, $startColumn));
 
-            return new Token(TokenType::SEQUENCE_ENTRY, '-', $startLine, $startColumn);
+            return;
         }
 
         // EXPLICIT_KEY_INDICATOR (?)
         if ('?' === $char && $this->isMappingKey($harvester)) {
             $this->advance($harvester);
+            $harvester->stream->addToken(new Token(TokenType::EXPLICIT_KEY_INDICATOR, '?', $startLine, $startColumn));
 
-            return new Token(TokenType::EXPLICIT_KEY_INDICATOR, '?', $startLine, $startColumn);
+            return;
         }
 
         // VALUE_INDICATOR (:)
         if (':' === $char && $this->isMappingValue($harvester)) {
             $this->advance($harvester);
+            $harvester->stream->addToken(new Token(TokenType::VALUE_INDICATOR, ':', $startLine, $startColumn));
 
-            return new Token(TokenType::VALUE_INDICATOR, ':', $startLine, $startColumn);
+            return;
         }
 
         // ANCHOR (&name)
         if ('&' === $char) {
             $anchor = '&'.$this->readAnchorOrAlias($harvester);
+            $harvester->stream->addToken(new Token(TokenType::ANCHOR, $anchor, $startLine, $startColumn));
 
-            return new Token(TokenType::ANCHOR, $anchor, $startLine, $startColumn);
+            return;
         }
 
         // ALIAS (*name)
         if ('*' === $char) {
             $alias = '*'.$this->readAnchorOrAlias($harvester);
+            $harvester->stream->addToken(new Token(TokenType::ALIAS, $alias, $startLine, $startColumn));
 
-            return new Token(TokenType::ALIAS, $alias, $startLine, $startColumn);
+            return;
         }
 
         // FOLDED BLOCK SCALAR (>)
@@ -340,8 +361,9 @@ final class Lexer
             $harvester->cursor->blockScalarBodyTokenType = TokenType::FOLDED_BLOCK_SCALAR;
             $harvester->cursor->blockScalarChomping = null;
             $harvester->cursor->blockScalarExplicitIndentIndicator = false;
+            $harvester->stream->addToken(new Token(TokenType::FOLDED_BLOCK_SCALAR_INDICATOR, $char, $startLine, $startColumn));
 
-            return new Token(TokenType::FOLDED_BLOCK_SCALAR_INDICATOR, $char, $startLine, $startColumn);
+            return;
         }
 
         // LITERAL BLOCK SCALAR (|)
@@ -351,27 +373,30 @@ final class Lexer
             $harvester->cursor->blockScalarBodyTokenType = TokenType::LITERAL_BLOCK_SCALAR;
             $harvester->cursor->blockScalarChomping = null;
             $harvester->cursor->blockScalarExplicitIndentIndicator = false;
+            $harvester->stream->addToken(new Token(TokenType::LITERAL_BLOCK_SCALAR_INDICATOR, $char, $startLine, $startColumn));
 
-            return new Token(TokenType::LITERAL_BLOCK_SCALAR_INDICATOR, $char, $startLine, $startColumn);
+            return;
         }
 
         // MERGE_INDICATOR (YAML 1.1 merge key << before :)
         if ($this->isMergeKeyPlainSequence($harvester)) {
             $this->advance($harvester);
             $this->advance($harvester);
+            $harvester->stream->addToken(new Token(TokenType::MERGE_INDICATOR, '<<', $startLine, $startColumn));
 
-            return new Token(TokenType::MERGE_INDICATOR, '<<', $startLine, $startColumn);
+            return;
         }
 
         // PLAIN_SCALAR
         $plain = $this->readPlainScalar($harvester);
         if ('' !== $plain) {
-            return new Token(TokenType::PLAIN_SCALAR, $plain, $startLine, $startColumn);
+            $harvester->stream->addToken(new Token(TokenType::PLAIN_SCALAR, $plain, $startLine, $startColumn));
+
+            return;
         }
 
         $text = $this->consumeCodePoint($harvester);
-
-        return new Token(TokenType::UNRECOGNIZED, $text, $startLine, $startColumn);
+        $harvester->stream->addToken(new Token(TokenType::UNRECOGNIZED, $text, $startLine, $startColumn));
     }
 
     private function advance(Harvester $harvester): void
@@ -533,50 +558,46 @@ final class Lexer
         return ctype_digit($after);
     }
 
-    /**
-     * @return list<Token>
-     */
-    private function tokenizeYamlDirectiveLine(Harvester $harvester): array
+    private function tokenizeYamlDirectiveLine(Harvester $harvester): void
     {
-        $tokens = [];
         $directiveYamlLine = $harvester->cursor->line;
         $directiveYamlColumn = $harvester->cursor->column;
         if (!$this->match($harvester, '%YAML')) {
-            return [];
+            return;
         }
-        $tokens[] = new Token(TokenType::DIRECTIVE_YAML, '%YAML', $directiveYamlLine, $directiveYamlColumn);
+        $harvester->stream->addToken(new Token(TokenType::DIRECTIVE_YAML, '%YAML', $directiveYamlLine, $directiveYamlColumn));
 
         if ($harvester->cursor->position < $harvester->length && \in_array($harvester->input[$harvester->cursor->position], self::CHARS_HORIZONTAL_WHITESPACE, true)) {
             $wsLine = $harvester->cursor->line;
             $wsColumn = $harvester->cursor->column;
             $ws = $this->readWhitespace($harvester);
-            $tokens[] = new Token(TokenType::WHITESPACE, $ws, $wsLine, $wsColumn);
+            $harvester->stream->addToken(new Token(TokenType::WHITESPACE, $ws, $wsLine, $wsColumn));
         }
 
         if ($harvester->cursor->position < $harvester->length && ':' === $harvester->input[$harvester->cursor->position]) {
             $colonLine = $harvester->cursor->line;
             $colonColumn = $harvester->cursor->column;
             $this->advance($harvester);
-            $tokens[] = new Token(TokenType::VALUE_INDICATOR, ':', $colonLine, $colonColumn);
+            $harvester->stream->addToken(new Token(TokenType::VALUE_INDICATOR, ':', $colonLine, $colonColumn));
         }
 
         if ($harvester->cursor->position < $harvester->length && \in_array($harvester->input[$harvester->cursor->position], self::CHARS_HORIZONTAL_WHITESPACE, true)) {
             $wsLine = $harvester->cursor->line;
             $wsColumn = $harvester->cursor->column;
             $ws = $this->readWhitespace($harvester);
-            $tokens[] = new Token(TokenType::WHITESPACE, $ws, $wsLine, $wsColumn);
+            $harvester->stream->addToken(new Token(TokenType::WHITESPACE, $ws, $wsLine, $wsColumn));
         }
 
         $versionLine = $harvester->cursor->line;
         $versionColumn = $harvester->cursor->column;
         $version = $this->readYamlDirectiveVersion($harvester);
-        $tokens[] = new Token(TokenType::DIRECTIVE_YAML_VERSION, $version, $versionLine, $versionColumn);
+        $harvester->stream->addToken(new Token(TokenType::DIRECTIVE_YAML_VERSION, $version, $versionLine, $versionColumn));
 
         if ($harvester->cursor->position < $harvester->length && \in_array($harvester->input[$harvester->cursor->position], self::CHARS_HORIZONTAL_WHITESPACE, true)) {
             $wsLine = $harvester->cursor->line;
             $wsColumn = $harvester->cursor->column;
             $ws = $this->readWhitespace($harvester);
-            $tokens[] = new Token(TokenType::WHITESPACE, $ws, $wsLine, $wsColumn);
+            $harvester->stream->addToken(new Token(TokenType::WHITESPACE, $ws, $wsLine, $wsColumn));
         }
 
         if ($harvester->cursor->position < $harvester->length && '#' === $harvester->input[$harvester->cursor->position] && $this->isCommentStart($harvester)) {
@@ -584,10 +605,8 @@ final class Lexer
             $commentColumn = $harvester->cursor->column;
             $this->advance($harvester);
             $comment = '#'.$this->readUntilNewline($harvester);
-            $tokens[] = new Token(TokenType::COMMENT, $comment, $commentLine, $commentColumn);
+            $harvester->stream->addToken(new Token(TokenType::COMMENT, $comment, $commentLine, $commentColumn));
         }
-
-        return $tokens;
     }
 
     private function readYamlDirectiveVersion(Harvester $harvester): string
@@ -631,48 +650,44 @@ final class Lexer
         return \in_array($after, self::CHARS_HORIZONTAL_WHITESPACE, true) || '!' === $after;
     }
 
-    /**
-     * @return list<Token>
-     */
-    private function tokenizeTagDirectiveLine(Harvester $harvester): array
+    private function tokenizeTagDirectiveLine(Harvester $harvester): void
     {
-        $tokens = [];
         $directiveTagLine = $harvester->cursor->line;
         $directiveTagColumn = $harvester->cursor->column;
         if (!$this->match($harvester, '%TAG')) {
-            return [];
+            return;
         }
-        $tokens[] = new Token(TokenType::DIRECTIVE_TAG, '%TAG', $directiveTagLine, $directiveTagColumn);
+        $harvester->stream->addToken(new Token(TokenType::DIRECTIVE_TAG, '%TAG', $directiveTagLine, $directiveTagColumn));
 
         if ($harvester->cursor->position < $harvester->length && \in_array($harvester->input[$harvester->cursor->position], self::CHARS_HORIZONTAL_WHITESPACE, true)) {
             $wsLine = $harvester->cursor->line;
             $wsColumn = $harvester->cursor->column;
             $ws = $this->readWhitespace($harvester);
-            $tokens[] = new Token(TokenType::WHITESPACE, $ws, $wsLine, $wsColumn);
+            $harvester->stream->addToken(new Token(TokenType::WHITESPACE, $ws, $wsLine, $wsColumn));
         }
 
         $handleLine = $harvester->cursor->line;
         $handleColumn = $harvester->cursor->column;
         $handle = $this->readTagDirectiveHandle($harvester);
-        $tokens[] = new Token(TokenType::DIRECTIVE_TAG_HANDLE, $handle, $handleLine, $handleColumn);
+        $harvester->stream->addToken(new Token(TokenType::DIRECTIVE_TAG_HANDLE, $handle, $handleLine, $handleColumn));
 
         if ($harvester->cursor->position < $harvester->length && \in_array($harvester->input[$harvester->cursor->position], self::CHARS_HORIZONTAL_WHITESPACE, true)) {
             $wsLine = $harvester->cursor->line;
             $wsColumn = $harvester->cursor->column;
             $ws = $this->readWhitespace($harvester);
-            $tokens[] = new Token(TokenType::WHITESPACE, $ws, $wsLine, $wsColumn);
+            $harvester->stream->addToken(new Token(TokenType::WHITESPACE, $ws, $wsLine, $wsColumn));
         }
 
         $prefixLine = $harvester->cursor->line;
         $prefixColumn = $harvester->cursor->column;
         $prefix = $this->readTagDirectivePrefix($harvester);
-        $tokens[] = new Token(TokenType::DIRECTIVE_TAG_PREFIX, $prefix, $prefixLine, $prefixColumn);
+        $harvester->stream->addToken(new Token(TokenType::DIRECTIVE_TAG_PREFIX, $prefix, $prefixLine, $prefixColumn));
 
         if ($harvester->cursor->position < $harvester->length && \in_array($harvester->input[$harvester->cursor->position], self::CHARS_HORIZONTAL_WHITESPACE, true)) {
             $wsLine = $harvester->cursor->line;
             $wsColumn = $harvester->cursor->column;
             $ws = $this->readWhitespace($harvester);
-            $tokens[] = new Token(TokenType::WHITESPACE, $ws, $wsLine, $wsColumn);
+            $harvester->stream->addToken(new Token(TokenType::WHITESPACE, $ws, $wsLine, $wsColumn));
         }
 
         if ($harvester->cursor->position < $harvester->length && '#' === $harvester->input[$harvester->cursor->position] && $this->isCommentStart($harvester)) {
@@ -680,10 +695,8 @@ final class Lexer
             $commentColumn = $harvester->cursor->column;
             $this->advance($harvester);
             $comment = '#'.$this->readUntilNewline($harvester);
-            $tokens[] = new Token(TokenType::COMMENT, $comment, $commentLine, $commentColumn);
+            $harvester->stream->addToken(new Token(TokenType::COMMENT, $comment, $commentLine, $commentColumn));
         }
-
-        return $tokens;
     }
 
     private function readTagDirectiveHandle(Harvester $harvester): string
@@ -851,18 +864,18 @@ final class Lexer
 
     /**
      * Explicit tag property at a node: `!<...>` verbatim, shorthand (`!`, `!!`, `!name!`) + suffix, or non-specific `!`.
-     * Does not apply to `%TAG` directive lines (handled in {@see tokenizeTagDirectiveLine}).
-     *
-     * @return list<Token>
+     * Tokens are appended to {@see Harvester::$stream}. Does not apply to `%TAG` directive lines (handled in {@see tokenizeTagDirectiveLine}).
      */
-    private function tokenizeExplicitTag(Harvester $harvester): array
+    private function tokenizeExplicitTag(Harvester $harvester): void
     {
         $bangLine = $harvester->cursor->line;
         $bangColumn = $harvester->cursor->column;
         $this->advance($harvester);
 
         if ($harvester->cursor->position >= $harvester->length) {
-            return [new Token(TokenType::TAG_NON_SPECIFIC, '!', $bangLine, $bangColumn)];
+            $harvester->stream->addToken(new Token(TokenType::TAG_NON_SPECIFIC, '!', $bangLine, $bangColumn));
+
+            return;
         }
 
         $next = $harvester->input[$harvester->cursor->position];
@@ -886,12 +899,12 @@ final class Lexer
                 $this->advance($harvester);
             }
 
-            return [
-                new Token(TokenType::TAG_VERBATIM_INDICATOR, '!', $bangLine, $bangColumn),
-                new Token(TokenType::TAG_VERBATIM_OPEN, '<', $openLine, $openColumn),
-                new Token(TokenType::TAG_BODY, $body, $bodyLine, $bodyColumn),
-                new Token(TokenType::TAG_VERBATIM_CLOSE, $closeText, $closeLine, $closeColumn),
-            ];
+            $harvester->stream->addToken(new Token(TokenType::TAG_VERBATIM_INDICATOR, '!', $bangLine, $bangColumn));
+            $harvester->stream->addToken(new Token(TokenType::TAG_VERBATIM_OPEN, '<', $openLine, $openColumn));
+            $harvester->stream->addToken(new Token(TokenType::TAG_BODY, $body, $bodyLine, $bodyColumn));
+            $harvester->stream->addToken(new Token(TokenType::TAG_VERBATIM_CLOSE, $closeText, $closeLine, $closeColumn));
+
+            return;
         }
 
         if ('!' === $next) {
@@ -900,10 +913,10 @@ final class Lexer
             $suffixColumn = $harvester->cursor->column;
             $suffix = $this->readTagShorthandSuffix($harvester);
 
-            return [
-                new Token(TokenType::TAG_HANDLE_SECONDARY, '!!', $bangLine, $bangColumn),
-                new Token(TokenType::TAG_BODY, $suffix, $suffixLine, $suffixColumn),
-            ];
+            $harvester->stream->addToken(new Token(TokenType::TAG_HANDLE_SECONDARY, '!!', $bangLine, $bangColumn));
+            $harvester->stream->addToken(new Token(TokenType::TAG_BODY, $suffix, $suffixLine, $suffixColumn));
+
+            return;
         }
 
         $firstBangPos = $harvester->cursor->position - 1;
@@ -922,23 +935,23 @@ final class Lexer
             $suffixColumn = $harvester->cursor->column;
             $suffix = $this->readTagShorthandSuffix($harvester);
 
-            return [
-                new Token(TokenType::TAG_HANDLE_NAMED, $handleText, $bangLine, $bangColumn),
-                new Token(TokenType::TAG_BODY, $suffix, $suffixLine, $suffixColumn),
-            ];
+            $harvester->stream->addToken(new Token(TokenType::TAG_HANDLE_NAMED, $handleText, $bangLine, $bangColumn));
+            $harvester->stream->addToken(new Token(TokenType::TAG_BODY, $suffix, $suffixLine, $suffixColumn));
+
+            return;
         }
 
         $suffixLine = $harvester->cursor->line;
         $suffixColumn = $harvester->cursor->column;
         $suffix = $this->readTagShorthandSuffix($harvester);
         if ('' === $suffix) {
-            return [new Token(TokenType::TAG_NON_SPECIFIC, '!', $bangLine, $bangColumn)];
+            $harvester->stream->addToken(new Token(TokenType::TAG_NON_SPECIFIC, '!', $bangLine, $bangColumn));
+
+            return;
         }
 
-        return [
-            new Token(TokenType::TAG_HANDLE_PRIMARY, '!', $bangLine, $bangColumn),
-            new Token(TokenType::TAG_BODY, $suffix, $suffixLine, $suffixColumn),
-        ];
+        $harvester->stream->addToken(new Token(TokenType::TAG_HANDLE_PRIMARY, '!', $bangLine, $bangColumn));
+        $harvester->stream->addToken(new Token(TokenType::TAG_BODY, $suffix, $suffixLine, $suffixColumn));
     }
 
     private function isTagHandleNameChar(string $char): bool
@@ -1104,13 +1117,12 @@ final class Lexer
         return $result;
     }
 
-    private function readBlockScalarBodyToken(Harvester $harvester): Token
+    private function readBlockScalarBodyToken(Harvester $harvester): void
     {
         $type = $harvester->cursor->pendingBlockScalarBody;
         $harvester->cursor->pendingBlockScalarBody = null;
         $text = $this->readBlockScalarBodyAndApplyChomping($harvester);
-
-        return new Token($type, $text, $harvester->cursor->line, $harvester->cursor->column);
+        $harvester->stream->addToken(new Token($type, $text, $harvester->cursor->line, $harvester->cursor->column));
     }
 
     private function readBlockScalarBodyAndApplyChomping(Harvester $harvester): string
