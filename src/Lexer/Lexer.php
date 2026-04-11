@@ -570,6 +570,15 @@ final class Lexer
         // Shorthand tag
         while ($cursor->position < $length) {
             $char = $input[$cursor->position];
+            // YAML 1.0 tag URI shorthand: "domain,YYYY/..." (comma + registration year), not a flow "," separator.
+            if (',' === $char && $this->tagCommaStartsRegistrationYear($input, $cursor->position, $length)) {
+                $result .= $this->consumeCodePoint($input, $cursor, $length);
+                for ($i = 0; $i < 4; ++$i) {
+                    $result .= $this->consumeCodePoint($input, $cursor, $length);
+                }
+
+                continue;
+            }
             if ($this->isTagChar($char)) {
                 $result .= $this->consumeCodePoint($input, $cursor, $length);
             } else {
@@ -578,6 +587,23 @@ final class Lexer
         }
 
         return $result;
+    }
+
+    /**
+     * After "!", comma + four ASCII digits begin the registration date in global tag shorthand (YAML 1.0 style).
+     */
+    private function tagCommaStartsRegistrationYear(string $input, int $commaPosition, int $length): bool
+    {
+        if ($commaPosition + 5 > $length) {
+            return false;
+        }
+        for ($i = 1; $i <= 4; ++$i) {
+            if (!ctype_digit($input[$commaPosition + $i])) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private function isTagChar(string $char): bool

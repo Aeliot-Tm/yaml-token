@@ -49,6 +49,8 @@ The rules below describe the practical behavior relied upon by lexer unit tests.
   - `&name` → `ANCHOR`, `*name` → `ALIAS`
   - `!<...>` and `!tag` → `TAG`
   - the name continues until a forbidden delimiter: whitespace, `[]{} , : #` or `\0`
+  - exception (YAML 1.0-style global tag shorthand): a comma followed by four ASCII digits (`!,NNNN`) is part of the tag (registration year after the domain), not a flow `,` token
+  - after that `!,NNNN` segment, optional `-MM` / `-DD` (tag URI / ISO date parts) and the rest of the shorthand continue as normal tag characters (for example `!domain,2000-01-01/path`)
 - **Plain scalars**: everything else is `PLAIN_SCALAR` until a stop character is reached: line break, `[ ] { } , : # ?`.
   - trailing whitespace before newline or a comment does not become part of the plain scalar token
 - **Fallback**: anything not consumed by rules above is emitted as `UNRECOGNIZED` (one UTF-8 code point fragment).

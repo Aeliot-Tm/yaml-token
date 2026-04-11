@@ -11,7 +11,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace Aeliot\YamlToken\Test\Unit\Lexer\Spec\V1P0;
+namespace Aeliot\YamlToken\Test\Unit\Lexer\Spec\V1P2P2;
 
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Lexer\Lexer;
@@ -23,14 +23,14 @@ use PHPUnit\Framework\Attributes\UsesClass;
 #[CoversClass(Lexer::class)]
 #[UsesClass(Token::class)]
 #[UsesClass(TokenType::class)]
-final class LexerMappingTagPrefixCaretTest extends LexerMappingTestCase
+final class LexerMappingTagDateTest extends LexerMappingTestCase
 {
     public static function getDataForTestMapping(): iterable
     {
         yield [[
             [
                 'type' => TokenType::PLAIN_SCALAR,
-                'text' => 'root',
+                'text' => 'year',
             ],
             [
                 'type' => TokenType::VALUE_INDICATOR,
@@ -42,7 +42,7 @@ final class LexerMappingTagPrefixCaretTest extends LexerMappingTestCase
             ],
             [
                 'type' => TokenType::TAG,
-                'text' => '!example.com,2000/^base',
+                'text' => '!example.com,2000/^t',
             ],
             [
                 'type' => TokenType::WHITESPACE,
@@ -50,7 +50,7 @@ final class LexerMappingTagPrefixCaretTest extends LexerMappingTestCase
             ],
             [
                 'type' => TokenType::PLAIN_SCALAR,
-                'text' => 'tagged value',
+                'text' => 'valueA',
             ],
             [
                 'type' => TokenType::NEWLINE,
@@ -59,7 +59,7 @@ final class LexerMappingTagPrefixCaretTest extends LexerMappingTestCase
             ],
             [
                 'type' => TokenType::PLAIN_SCALAR,
-                'text' => 'child',
+                'text' => 'month',
             ],
             [
                 'type' => TokenType::VALUE_INDICATOR,
@@ -71,7 +71,7 @@ final class LexerMappingTagPrefixCaretTest extends LexerMappingTestCase
             ],
             [
                 'type' => TokenType::TAG,
-                'text' => '!^derived',
+                'text' => '!example.com,2000-01/^t',
             ],
             [
                 'type' => TokenType::WHITESPACE,
@@ -79,13 +79,42 @@ final class LexerMappingTagPrefixCaretTest extends LexerMappingTestCase
             ],
             [
                 'type' => TokenType::PLAIN_SCALAR,
-                'text' => 'prefixed value',
+                'text' => 'valueB',
             ],
             [
                 'type' => TokenType::NEWLINE,
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.0/tag-prefix-caret_4.3.5.yaml'];
+            [
+                'type' => TokenType::PLAIN_SCALAR,
+                'text' => 'day',
+            ],
+            [
+                'type' => TokenType::VALUE_INDICATOR,
+                'text' => ':',
+            ],
+            [
+                'type' => TokenType::WHITESPACE,
+                'text' => ' ',
+            ],
+            [
+                'type' => TokenType::TAG,
+                'text' => '!example.com,2000-01-01/^t',
+            ],
+            [
+                'type' => TokenType::WHITESPACE,
+                'text' => ' ',
+            ],
+            [
+                'type' => TokenType::PLAIN_SCALAR,
+                'text' => 'valueC',
+            ],
+            [
+                'type' => TokenType::NEWLINE,
+                'text' => '
+',
+            ],
+        ], __DIR__.'/../../../../fixture/spec/1.2.2/tag-date_6.9.1.yaml'];
     }
 }
