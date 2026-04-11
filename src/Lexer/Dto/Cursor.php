@@ -15,7 +15,6 @@ namespace Aeliot\YamlToken\Lexer\Dto;
 
 use Aeliot\YamlToken\Enum\BlockScalarChomping;
 use Aeliot\YamlToken\Enum\TokenType;
-use Aeliot\YamlToken\Token\Token;
 
 /**
  * Lexer cursor: {@see self::$position} is a byte offset into the input string;
@@ -65,11 +64,4 @@ final class Cursor
      * ({@see TokenType::INDENTATION}, {@see TokenType::PLAIN_SCALAR}, {@see TokenType::NEWLINE}), not a single block body token.
      */
     public bool $inExplicitIndentBlockScalarBody = false;
-
-    /**
-     * Queued tokens for explicit-indent block body; null until the body string is read and split.
-     *
-     * @var list<Token>|null
-     */
-    public ?array $explicitBlockScalarPendingTokens = null;
 }

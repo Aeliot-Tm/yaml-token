@@ -88,17 +88,9 @@ final class Lexer
             }
 
             if ($harvester->cursor->inExplicitIndentBlockScalarBody) {
-                if (null === $harvester->cursor->explicitBlockScalarPendingTokens) {
-                    $body = $this->readBlockScalarBodyAndApplyChomping($harvester);
-                    $harvester->cursor->explicitBlockScalarPendingTokens = $this->splitExplicitIndentBlockBodyToTokens($body);
-                }
-                if ([] !== $harvester->cursor->explicitBlockScalarPendingTokens) {
-                    $harvester->stream->addToken(array_shift($harvester->cursor->explicitBlockScalarPendingTokens));
-
-                    continue;
-                }
+                $body = $this->readBlockScalarBodyAndApplyChomping($harvester);
+                $this->splitExplicitIndentBlockBodyToTokens($harvester, $body);
                 $harvester->cursor->inExplicitIndentBlockScalarBody = false;
-                $harvester->cursor->explicitBlockScalarPendingTokens = null;
 
                 continue;
             }
@@ -150,7 +142,6 @@ final class Lexer
         $cursor->inBlockScalarHeaderLine = false;
         if ($cursor->blockScalarExplicitIndentIndicator) {
             $cursor->inExplicitIndentBlockScalarBody = true;
-            $cursor->explicitBlockScalarPendingTokens = null;
             $cursor->blockScalarExplicitIndentIndicator = false;
         } else {
             $cursor->pendingBlockScalarBody = $cursor->blockScalarBodyTokenType;
@@ -1144,12 +1135,8 @@ final class Lexer
         return $text;
     }
 
-    /**
-     * @return list<Token>
-     */
-    private function splitExplicitIndentBlockBodyToTokens(string $body): array
+    private function splitExplicitIndentBlockBodyToTokens(Harvester $harvester, string $body): void
     {
-        $tokens = [];
         $len = \strlen($body);
         $offset = 0;
         while ($offset < $len) {
@@ -1164,20 +1151,18 @@ final class Lexer
                 ++$i;
             }
             if ('' !== $indentBytes) {
-                $tokens[] = new Token(TokenType::INDENTATION, $indentBytes, 1, 1);
+                $harvester->stream->addToken(new Token(TokenType::INDENTATION, $indentBytes, 1, 1));
             }
             $rest = substr($line, $i);
             if ('' !== $rest) {
-                $tokens[] = new Token(TokenType::PLAIN_SCALAR, $rest, 1, 1);
+                $harvester->stream->addToken(new Token(TokenType::PLAIN_SCALAR, $rest, 1, 1));
             }
             if (null === $nl) {
                 break;
             }
-            $tokens[] = new Token(TokenType::NEWLINE, substr($body, $nl['start'], $nl['len']), 1, 1);
+            $harvester->stream->addToken(new Token(TokenType::NEWLINE, substr($body, $nl['start'], $nl['len']), 1, 1));
             $offset = $nl['start'] + $nl['len'];
         }
-
-        return $tokens;
     }
 
     /**
