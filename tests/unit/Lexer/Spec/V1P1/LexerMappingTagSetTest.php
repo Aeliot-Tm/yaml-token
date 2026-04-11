@@ -29,8 +29,12 @@ final class LexerMappingTagSetTest extends LexerMappingTestCase
     {
         yield [[
             [
-                'type' => TokenType::TAG,
-                'text' => '!!set',
+                'type' => TokenType::TAG_HANDLE_SECONDARY,
+                'text' => '!!',
+            ],
+            [
+                'type' => TokenType::TAG_BODY,
+                'text' => 'set',
             ],
             [
                 'type' => TokenType::NEWLINE,

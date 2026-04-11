@@ -48,8 +48,13 @@ The rules below describe the practical behavior relied upon by lexer unit tests.
   - `<<` is `MERGE_INDICATOR` (YAML 1.1 merge key) only when followed by optional horizontal whitespace and the same `:` lookahead as for `VALUE_INDICATOR`; otherwise plain scalar `<` / `<<`… is tokenized as `PLAIN_SCALAR`
 - **Anchors, aliases, tags**:
   - `&name` → `ANCHOR`, `*name` → `ALIAS`
-  - `!<...>` and `!tag` → `TAG`
-  - the name continues until a forbidden delimiter: whitespace, `[]{} , : #` or `\0`
+  - Explicit tag property at a node (not `%TAG` directive lines):
+    - Shorthand primary `!suffix` → `TAG_HANDLE_PRIMARY` (`!`), `TAG_BODY` (suffix)
+    - Shorthand secondary `!!suffix` → `TAG_HANDLE_SECONDARY` (`!!`), `TAG_BODY` (suffix)
+    - Shorthand named `!name!suffix` → `TAG_HANDLE_NAMED` (`!name!`), `TAG_BODY` (suffix)
+    - Non-specific explicit tag `!` alone → `TAG_NON_SPECIFIC` (`!`)
+    - Verbatim `!<...>` → `TAG_VERBATIM_INDICATOR` (`!`), `TAG_VERBATIM_OPEN` (`<`), `TAG_BODY` (content between brackets), `TAG_VERBATIM_CLOSE` (`>`)
+  - Tag suffix / shorthand continues until a forbidden delimiter: whitespace, `[]{} , : #` or `\0`
   - exception (YAML 1.0-style global tag shorthand): a comma followed by four ASCII digits (`!,NNNN`) is part of the tag (registration year after the domain), not a flow `,` token
   - after that `!,NNNN` segment, optional `-MM` / `-DD` (tag URI / ISO date parts) and the rest of the shorthand continue as normal tag characters (for example `!domain,2000-01-01/path`)
 - **Plain scalars**: everything else is `PLAIN_SCALAR` until a stop character is reached: line break, `[ ] { } , : # ?`.

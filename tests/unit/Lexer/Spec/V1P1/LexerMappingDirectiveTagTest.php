@@ -75,8 +75,12 @@ final class LexerMappingDirectiveTagTest extends LexerMappingTestCase
                 'text' => ' ',
             ],
             [
-                'type' => TokenType::TAG,
-                'text' => '!str',
+                'type' => TokenType::TAG_HANDLE_PRIMARY,
+                'text' => '!',
+            ],
+            [
+                'type' => TokenType::TAG_BODY,
+                'text' => 'str',
             ],
             [
                 'type' => TokenType::WHITESPACE,

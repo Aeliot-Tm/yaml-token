@@ -29,8 +29,12 @@ final class LexerMappingTagOmapTest extends LexerMappingTestCase
     {
         yield [[
             [
-                'type' => TokenType::TAG,
-                'text' => '!!omap',
+                'type' => TokenType::TAG_HANDLE_SECONDARY,
+                'text' => '!!',
+            ],
+            [
+                'type' => TokenType::TAG_BODY,
+                'text' => 'omap',
             ],
             [
                 'type' => TokenType::NEWLINE,

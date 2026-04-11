@@ -29,8 +29,12 @@ final class LexerMappingTagPairsTest extends LexerMappingTestCase
     {
         yield [[
             [
-                'type' => TokenType::TAG,
-                'text' => '!!pairs',
+                'type' => TokenType::TAG_HANDLE_SECONDARY,
+                'text' => '!!',
+            ],
+            [
+                'type' => TokenType::TAG_BODY,
+                'text' => 'pairs',
             ],
             [
                 'type' => TokenType::NEWLINE,

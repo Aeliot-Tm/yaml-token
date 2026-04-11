@@ -41,8 +41,12 @@ final class LexerMappingTagTimestampTest extends LexerMappingTestCase
                 'text' => ' ',
             ],
             [
-                'type' => TokenType::TAG,
-                'text' => '!!timestamp',
+                'type' => TokenType::TAG_HANDLE_SECONDARY,
+                'text' => '!!',
+            ],
+            [
+                'type' => TokenType::TAG_BODY,
+                'text' => 'timestamp',
             ],
             [
                 'type' => TokenType::WHITESPACE,

@@ -82,11 +82,13 @@ final class Lexer
 
                 continue;
             }
+
             if (null !== $cursor->pendingBlockScalarBody) {
                 $stream->addToken($this->readBlockScalarBodyToken($input, $cursor, $length));
 
                 continue;
             }
+
             if ($cursor->inExplicitIndentBlockScalarBody) {
                 if (null === $cursor->explicitBlockScalarPendingTokens) {
                     $body = $this->readBlockScalarBodyAndApplyChomping($input, $cursor, $length);
@@ -102,9 +104,11 @@ final class Lexer
 
                 continue;
             }
+
             if ($cursor->position >= $length) {
                 break;
             }
+
             if ($this->shouldTokenizeYamlDirectiveAsParts($input, $cursor, $length)) {
                 foreach ($this->tokenizeYamlDirectiveLine($input, $cursor, $length) as $yamlDirectiveToken) {
                     $stream->addToken($yamlDirectiveToken);
@@ -112,6 +116,7 @@ final class Lexer
 
                 continue;
             }
+
             if ($this->shouldTokenizeTagDirectiveAsParts($input, $cursor, $length)) {
                 foreach ($this->tokenizeTagDirectiveLine($input, $cursor, $length) as $tagDirectiveToken) {
                     $stream->addToken($tagDirectiveToken);
@@ -119,6 +124,16 @@ final class Lexer
 
                 continue;
             }
+
+            // TAG (!...) — see {@see tokenizeExplicitTag} in {@see tokenize}
+            if ($cursor->position < $length && '!' === $input[$cursor->position]) {
+                foreach ($this->tokenizeExplicitTag($input, $cursor, $length) as $tagToken) {
+                    $stream->addToken($tagToken);
+                }
+
+                continue;
+            }
+
             $stream->addToken($this->readToken($input, $cursor, $length));
         }
 
@@ -317,13 +332,6 @@ final class Lexer
             $alias = '*'.$this->readAnchorOrAlias($input, $cursor, $length);
 
             return new Token(TokenType::ALIAS, $alias, $startLine, $startColumn);
-        }
-
-        // TAG (!...)
-        if ('!' === $char) {
-            $tag = $this->readTag($input, $cursor, $length);
-
-            return new Token(TokenType::TAG, $tag, $startLine, $startColumn);
         }
 
         // FOLDED BLOCK SCALAR (>)
@@ -842,28 +850,121 @@ final class Lexer
         return !\in_array($char, self::CHARS_ANCHOR_OR_TAG_FORBIDDEN, true);
     }
 
-    private function readTag(string $input, Cursor $cursor, int $length): string
+    /**
+     * Explicit tag property at a node: `!<...>` verbatim, shorthand (`!`, `!!`, `!name!`) + suffix, or non-specific `!`.
+     * Does not apply to `%TAG` directive lines (handled in {@see tokenizeTagDirectiveLine}).
+     *
+     * @return list<Token>
+     */
+    private function tokenizeExplicitTag(string $input, Cursor $cursor, int $length): array
     {
-        $result = '!';
+        $bangLine = $cursor->line;
+        $bangColumn = $cursor->column;
         $this->advance($input, $cursor, $length);
-        // Verbatim tag !<...>
-        if ($cursor->position < $length && '<' === $input[$cursor->position]) {
-            $result .= '<';
+
+        if ($cursor->position >= $length) {
+            return [new Token(TokenType::TAG_NON_SPECIFIC, '!', $bangLine, $bangColumn)];
+        }
+
+        $next = $input[$cursor->position];
+
+        if ('<' === $next) {
+            $openLine = $cursor->line;
+            $openColumn = $cursor->column;
             $this->advance($input, $cursor, $length);
+
+            $bodyLine = $cursor->line;
+            $bodyColumn = $cursor->column;
+            $body = '';
             while ($cursor->position < $length && '>' !== $input[$cursor->position]) {
-                $result .= $this->consumeCodePoint($input, $cursor, $length);
+                $body .= $this->consumeCodePoint($input, $cursor, $length);
             }
-            if ($cursor->position < $length) {
-                $result .= '>';
+            $closeLine = $cursor->line;
+            $closeColumn = $cursor->column;
+            $closeText = '';
+            if ($cursor->position < $length && '>' === $input[$cursor->position]) {
+                $closeText = '>';
                 $this->advance($input, $cursor, $length);
             }
 
-            return $result;
+            return [
+                new Token(TokenType::TAG_VERBATIM_INDICATOR, '!', $bangLine, $bangColumn),
+                new Token(TokenType::TAG_VERBATIM_OPEN, '<', $openLine, $openColumn),
+                new Token(TokenType::TAG_BODY, $body, $bodyLine, $bodyColumn),
+                new Token(TokenType::TAG_VERBATIM_CLOSE, $closeText, $closeLine, $closeColumn),
+            ];
         }
-        // Shorthand tag
+
+        if ('!' === $next) {
+            $this->advance($input, $cursor, $length);
+            $suffixLine = $cursor->line;
+            $suffixColumn = $cursor->column;
+            $suffix = $this->readTagShorthandSuffix($input, $cursor, $length);
+
+            return [
+                new Token(TokenType::TAG_HANDLE_SECONDARY, '!!', $bangLine, $bangColumn),
+                new Token(TokenType::TAG_BODY, $suffix, $suffixLine, $suffixColumn),
+            ];
+        }
+
+        $firstBangPos = $cursor->position - 1;
+        $nameStart = $cursor->position;
+        $j = $nameStart;
+        while ($j < $length && $this->isTagHandleNameChar($input[$j])) {
+            ++$j;
+        }
+        if ($j < $length && '!' === $input[$j] && $j > $nameStart) {
+            $handleEnd = $j;
+            while ($cursor->position <= $handleEnd) {
+                $this->advance($input, $cursor, $length);
+            }
+            $handleText = substr($input, $firstBangPos, $handleEnd - $firstBangPos + 1);
+            $suffixLine = $cursor->line;
+            $suffixColumn = $cursor->column;
+            $suffix = $this->readTagShorthandSuffix($input, $cursor, $length);
+
+            return [
+                new Token(TokenType::TAG_HANDLE_NAMED, $handleText, $bangLine, $bangColumn),
+                new Token(TokenType::TAG_BODY, $suffix, $suffixLine, $suffixColumn),
+            ];
+        }
+
+        $suffixLine = $cursor->line;
+        $suffixColumn = $cursor->column;
+        $suffix = $this->readTagShorthandSuffix($input, $cursor, $length);
+        if ('' === $suffix) {
+            return [new Token(TokenType::TAG_NON_SPECIFIC, '!', $bangLine, $bangColumn)];
+        }
+
+        return [
+            new Token(TokenType::TAG_HANDLE_PRIMARY, '!', $bangLine, $bangColumn),
+            new Token(TokenType::TAG_BODY, $suffix, $suffixLine, $suffixColumn),
+        ];
+    }
+
+    private function isTagHandleNameChar(string $char): bool
+    {
+        if ('-' === $char) {
+            return true;
+        }
+        if ($char >= '0' && $char <= '9') {
+            return true;
+        }
+        if ($char >= 'A' && $char <= 'Z') {
+            return true;
+        }
+        if ($char >= 'a' && $char <= 'z') {
+            return true;
+        }
+
+        return false;
+    }
+
+    private function readTagShorthandSuffix(string $input, Cursor $cursor, int $length): string
+    {
+        $result = '';
         while ($cursor->position < $length) {
             $char = $input[$cursor->position];
-            // YAML 1.0 tag URI shorthand: "domain,YYYY/..." (comma + registration year), not a flow "," separator.
             if (',' === $char && $this->tagCommaStartsRegistrationYear($input, $cursor->position, $length)) {
                 $result .= $this->consumeCodePoint($input, $cursor, $length);
                 for ($i = 0; $i < 4; ++$i) {

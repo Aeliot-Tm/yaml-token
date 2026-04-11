@@ -41,8 +41,12 @@ final class LexerMappingTagApplicationTest extends LexerMappingTestCase
                 'text' => ' ',
             ],
             [
-                'type' => TokenType::TAG,
-                'text' => '!!something',
+                'type' => TokenType::TAG_HANDLE_SECONDARY,
+                'text' => '!!',
+            ],
+            [
+                'type' => TokenType::TAG_BODY,
+                'text' => 'something',
             ],
             [
                 'type' => TokenType::WHITESPACE,

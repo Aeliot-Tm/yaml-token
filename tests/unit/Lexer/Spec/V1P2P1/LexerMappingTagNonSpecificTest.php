@@ -41,7 +41,7 @@ final class LexerMappingTagNonSpecificTest extends LexerMappingTestCase
                 'text' => ' ',
             ],
             [
-                'type' => TokenType::TAG,
+                'type' => TokenType::TAG_NON_SPECIFIC,
                 'text' => '!',
             ],
             [
