@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Aeliot\YamlToken\Lexer;
 
-use Aeliot\YamlToken\Dto\Cursor;
 use Aeliot\YamlToken\Enum\BlockScalarChomping;
 use Aeliot\YamlToken\Enum\TokenType;
+use Aeliot\YamlToken\Lexer\Dto\Cursor;
 use Aeliot\YamlToken\Token\Token;
 use Aeliot\YamlToken\Token\TokenStream;
 
