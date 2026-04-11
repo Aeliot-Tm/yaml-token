@@ -30,7 +30,23 @@ final class LexerMappingTagNamedHandleTest extends LexerMappingTestCase
         yield [[
             [
                 'type' => TokenType::DIRECTIVE_TAG,
-                'text' => '%TAG !foo! tag:example.com,2000:',
+                'text' => '%TAG',
+            ],
+            [
+                'type' => TokenType::WHITESPACE,
+                'text' => ' ',
+            ],
+            [
+                'type' => TokenType::DIRECTIVE_TAG_HANDLE,
+                'text' => '!foo!',
+            ],
+            [
+                'type' => TokenType::WHITESPACE,
+                'text' => ' ',
+            ],
+            [
+                'type' => TokenType::DIRECTIVE_TAG_PREFIX,
+                'text' => 'tag:example.com,2000:',
             ],
             [
                 'type' => TokenType::NEWLINE,

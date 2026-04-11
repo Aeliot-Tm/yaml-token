@@ -30,7 +30,23 @@ final class LexerMappingDirectiveTagTest extends LexerMappingTestCase
         yield [[
             [
                 'type' => TokenType::DIRECTIVE_TAG,
-                'text' => '%TAG ! tag:yaml.org,2002:',
+                'text' => '%TAG',
+            ],
+            [
+                'type' => TokenType::WHITESPACE,
+                'text' => ' ',
+            ],
+            [
+                'type' => TokenType::DIRECTIVE_TAG_HANDLE,
+                'text' => '!',
+            ],
+            [
+                'type' => TokenType::WHITESPACE,
+                'text' => ' ',
+            ],
+            [
+                'type' => TokenType::DIRECTIVE_TAG_PREFIX,
+                'text' => 'tag:yaml.org,2002:',
             ],
             [
                 'type' => TokenType::NEWLINE,

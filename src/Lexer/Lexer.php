@@ -105,6 +105,13 @@ final class Lexer
             if ($cursor->position >= $length) {
                 break;
             }
+            if ($this->shouldTokenizeTagDirectiveAsParts($input, $cursor, $length)) {
+                foreach ($this->tokenizeTagDirectiveLine($input, $cursor, $length) as $tagDirectiveToken) {
+                    $stream->addToken($tagDirectiveToken);
+                }
+
+                continue;
+            }
             $stream->addToken($this->readToken($input, $cursor, $length));
         }
 
@@ -219,7 +226,7 @@ final class Lexer
             return new Token(TokenType::DIRECTIVE_YAML, $directive, $startLine, $startColumn);
         }
 
-        // DIRECTIVE_TAG (%TAG ...)
+        // DIRECTIVE_TAG (%TAG ...) — split into parts in {@see tokenizeTagDirectiveLine} when applicable
         if ($this->match($input, $cursor, $length, '%TAG')) {
             $directive = '%TAG'.$this->readUntilNewline($input, $cursor, $length);
 
@@ -480,6 +487,142 @@ final class Lexer
         while ($cursor->position < $length) {
             $char = $input[$cursor->position];
             if (\in_array($char, self::CHARS_LINE_BREAK, true)) {
+                break;
+            }
+            $result .= $this->consumeCodePoint($input, $cursor, $length);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Split `%TAG` lines into `DIRECTIVE_TAG`, `DIRECTIVE_TAG_HANDLE`, `DIRECTIVE_TAG_PREFIX` only when the keyword
+     * is followed by a handle (starts with `!`) or horizontal whitespace / EOF — not when followed immediately by a
+     * line break (whole-line token as before).
+     */
+    private function shouldTokenizeTagDirectiveAsParts(string $input, Cursor $cursor, int $length): bool
+    {
+        if ($cursor->position + 4 > $length) {
+            return false;
+        }
+        if ('%TAG' !== substr($input, $cursor->position, 4)) {
+            return false;
+        }
+        if ($cursor->position + 4 >= $length) {
+            return true;
+        }
+        $after = $input[$cursor->position + 4];
+
+        return \in_array($after, self::CHARS_HORIZONTAL_WHITESPACE, true) || '!' === $after;
+    }
+
+    /**
+     * @return list<Token>
+     */
+    private function tokenizeTagDirectiveLine(string $input, Cursor $cursor, int $length): array
+    {
+        $tokens = [];
+        $directiveTagLine = $cursor->line;
+        $directiveTagColumn = $cursor->column;
+        if (!$this->match($input, $cursor, $length, '%TAG')) {
+            return [];
+        }
+        $tokens[] = new Token(TokenType::DIRECTIVE_TAG, '%TAG', $directiveTagLine, $directiveTagColumn);
+
+        if ($cursor->position < $length && \in_array($input[$cursor->position], self::CHARS_HORIZONTAL_WHITESPACE, true)) {
+            $wsLine = $cursor->line;
+            $wsColumn = $cursor->column;
+            $ws = $this->readWhitespace($input, $cursor, $length);
+            $tokens[] = new Token(TokenType::WHITESPACE, $ws, $wsLine, $wsColumn);
+        }
+
+        $handleLine = $cursor->line;
+        $handleColumn = $cursor->column;
+        $handle = $this->readTagDirectiveHandle($input, $cursor, $length);
+        $tokens[] = new Token(TokenType::DIRECTIVE_TAG_HANDLE, $handle, $handleLine, $handleColumn);
+
+        if ($cursor->position < $length && \in_array($input[$cursor->position], self::CHARS_HORIZONTAL_WHITESPACE, true)) {
+            $wsLine = $cursor->line;
+            $wsColumn = $cursor->column;
+            $ws = $this->readWhitespace($input, $cursor, $length);
+            $tokens[] = new Token(TokenType::WHITESPACE, $ws, $wsLine, $wsColumn);
+        }
+
+        $prefixLine = $cursor->line;
+        $prefixColumn = $cursor->column;
+        $prefix = $this->readTagDirectivePrefix($input, $cursor, $length);
+        $tokens[] = new Token(TokenType::DIRECTIVE_TAG_PREFIX, $prefix, $prefixLine, $prefixColumn);
+
+        if ($cursor->position < $length && \in_array($input[$cursor->position], self::CHARS_HORIZONTAL_WHITESPACE, true)) {
+            $wsLine = $cursor->line;
+            $wsColumn = $cursor->column;
+            $ws = $this->readWhitespace($input, $cursor, $length);
+            $tokens[] = new Token(TokenType::WHITESPACE, $ws, $wsLine, $wsColumn);
+        }
+
+        if ($cursor->position < $length && '#' === $input[$cursor->position] && $this->isCommentStart($input, $cursor, $length)) {
+            $commentLine = $cursor->line;
+            $commentColumn = $cursor->column;
+            $this->advance($input, $cursor, $length);
+            $comment = '#'.$this->readUntilNewline($input, $cursor, $length);
+            $tokens[] = new Token(TokenType::COMMENT, $comment, $commentLine, $commentColumn);
+        }
+
+        return $tokens;
+    }
+
+    private function readTagDirectiveHandle(string $input, Cursor $cursor, int $length): string
+    {
+        if ($cursor->position >= $length || '!' !== $input[$cursor->position]) {
+            return '';
+        }
+        $this->advance($input, $cursor, $length);
+        if ($cursor->position < $length && '!' === $input[$cursor->position]) {
+            $this->advance($input, $cursor, $length);
+
+            return '!!';
+        }
+        if ($cursor->position >= $length || \in_array($input[$cursor->position], self::CHARS_HORIZONTAL_WHITESPACE, true)) {
+            return '!';
+        }
+        $savedPosition = $cursor->position;
+        $savedLine = $cursor->line;
+        $savedColumn = $cursor->column;
+        $middle = '';
+        while ($cursor->position < $length) {
+            $c = $input[$cursor->position];
+            if ('!' === $c) {
+                $this->advance($input, $cursor, $length);
+
+                return '!'.$middle.'!';
+            }
+            if (\in_array($c, self::CHARS_HORIZONTAL_WHITESPACE, true)) {
+                break;
+            }
+            if (!$this->isTagChar($c)) {
+                break;
+            }
+            $middle .= $this->consumeCodePoint($input, $cursor, $length);
+        }
+        $cursor->position = $savedPosition;
+        $cursor->line = $savedLine;
+        $cursor->column = $savedColumn;
+
+        return '!';
+    }
+
+    private function readTagDirectivePrefix(string $input, Cursor $cursor, int $length): string
+    {
+        $result = '';
+        while ($cursor->position < $length) {
+            $c = $input[$cursor->position];
+            if (\in_array($c, self::CHARS_LINE_BREAK, true)) {
+                break;
+            }
+            if (\in_array($c, self::CHARS_HORIZONTAL_WHITESPACE, true)) {
+                break;
+            }
+            if ('#' === $c && $this->isCommentStart($input, $cursor, $length)) {
                 break;
             }
             $result .= $this->consumeCodePoint($input, $cursor, $length);
