@@ -47,9 +47,9 @@ merge_example:
   << : *defaults
   name: Custom
 
-# Value key = (1.1 only - removed in 1.2)
+# Simple block mapping entry (plain key, then ":"). See also 1.1/value-key_10.2.1.yaml
 value_key_example:
-  = : default value
+  primary: default value
   other: override
 
 # Flow sequence

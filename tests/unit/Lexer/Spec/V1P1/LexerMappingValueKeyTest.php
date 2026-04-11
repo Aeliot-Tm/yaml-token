@@ -47,7 +47,7 @@ final class LexerMappingValueKeyTest extends LexerMappingTestCase
             ],
             [
                 'type' => TokenType::PLAIN_SCALAR,
-                'text' => '= ',
+                'text' => 'primary',
             ],
             [
                 'type' => TokenType::VALUE_INDICATOR,
