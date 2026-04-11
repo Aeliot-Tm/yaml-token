@@ -45,6 +45,7 @@ The rules below describe the practical behavior relied upon by lexer unit tests.
   - `-` is `SEQUENCE_ENTRY` only when followed by whitespace or end of input
   - `?` is `EXPLICIT_KEY_INDICATOR` only when followed by whitespace or end of input
   - `:` is `VALUE_INDICATOR` only when followed by whitespace, `#`, `[`, `{`, `"`, `'`, or end of input
+  - `<<` is `MERGE_INDICATOR` (YAML 1.1 merge key) only when followed by optional horizontal whitespace and the same `:` lookahead as for `VALUE_INDICATOR`; otherwise plain scalar `<` / `<<`… is tokenized as `PLAIN_SCALAR`
 - **Anchors, aliases, tags**:
   - `&name` → `ANCHOR`, `*name` → `ALIAS`
   - `!<...>` and `!tag` → `TAG`

@@ -334,6 +334,14 @@ final class Lexer
             return new Token(TokenType::LITERAL_BLOCK_SCALAR_INDICATOR, $char, $startLine, $startColumn);
         }
 
+        // MERGE_INDICATOR (YAML 1.1 merge key << before :)
+        if ($this->isMergeKeyPlainSequence($input, $cursor, $length)) {
+            $this->advance($input, $cursor, $length);
+            $this->advance($input, $cursor, $length);
+
+            return new Token(TokenType::MERGE_INDICATOR, '<<', $startLine, $startColumn);
+        }
+
         // PLAIN_SCALAR
         $plain = $this->readPlainScalar($input, $cursor, $length);
         if ('' !== $plain) {
@@ -502,12 +510,46 @@ final class Lexer
 
     private function isMappingValue(string $input, Cursor $cursor, int $length): bool
     {
-        $nextChar = $this->getNextChar($input, $cursor, $length);
-        if (null === $nextChar) {
+        return $this->isColonMappingValueIndicator($input, $cursor->position, $length);
+    }
+
+    /**
+     * ':' introduces a mapping value when the byte at $colonPosition is ':' and the following byte, if any,
+     * matches {@see self::CHARS_MAPPING_VALUE_SUFFIX} or end of input.
+     */
+    private function isColonMappingValueIndicator(string $input, int $colonPosition, int $length): bool
+    {
+        if ($colonPosition >= $length || ':' !== $input[$colonPosition]) {
+            return false;
+        }
+        $afterColon = $colonPosition + 1;
+        if ($afterColon >= $length) {
             return true;
         }
 
-        return \in_array($nextChar, self::CHARS_MAPPING_VALUE_SUFFIX, true);
+        return \in_array($input[$afterColon], self::CHARS_MAPPING_VALUE_SUFFIX, true);
+    }
+
+    /**
+     * Plain sequence «<<» for the YAML 1.1 merge key: only when followed by optional horizontal whitespace and ':' as a value indicator.
+     */
+    private function isMergeKeyPlainSequence(string $input, Cursor $cursor, int $length): bool
+    {
+        if ($cursor->position + 2 > $length) {
+            return false;
+        }
+        if ('<' !== $input[$cursor->position] || '<' !== $input[$cursor->position + 1]) {
+            return false;
+        }
+        $pos = $cursor->position + 2;
+        while ($pos < $length && \in_array($input[$pos], self::CHARS_HORIZONTAL_WHITESPACE, true)) {
+            ++$pos;
+        }
+        if ($pos >= $length) {
+            return false;
+        }
+
+        return $this->isColonMappingValueIndicator($input, $pos, $length);
     }
 
     /**

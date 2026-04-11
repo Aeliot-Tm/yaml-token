@@ -117,7 +117,7 @@ final class LexerMappingMergeKeyTest extends LexerMappingTestCase
                 'text' => '  ',
             ],
             [
-                'type' => TokenType::PLAIN_SCALAR,
+                'type' => TokenType::MERGE_INDICATOR,
                 'text' => '<<',
             ],
             [
