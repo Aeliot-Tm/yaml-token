@@ -17,7 +17,7 @@ The rules below describe the practical behavior relied upon by lexer unit tests.
 - **Document markers**: `---` → `DOCUMENT_START`, `...` → `DOCUMENT_END`.
 - **Comments**: `#...` until line break is `COMMENT` (newline is a separate `NEWLINE` token).
 - **Directives**:
-  - `%YAML...` until line break → `DIRECTIVE_YAML`
+  - `%YAML` lines: when the keyword is followed by horizontal whitespace, `:`, or a digit, the line is split into `DIRECTIVE_YAML` (`%YAML`), optional `WHITESPACE`, optional `VALUE_INDICATOR` (`:`), optional `WHITESPACE`, `DIRECTIVE_YAML_VERSION` (text until horizontal whitespace, line break, or `#` that starts a comment), optional `WHITESPACE`, optional `COMMENT`, then the line break is a separate `NEWLINE`. If `%YAML` is immediately followed by a line break, or not followed by whitespace/`:`/digit (e.g. glued suffix), the rest of the line is emitted as a single `DIRECTIVE_YAML` token as before.
   - `%TAG` lines: when the keyword is followed by horizontal whitespace, `!` (start of a tag handle), or end of input, the line is split into `DIRECTIVE_TAG` (`%TAG`), optional `WHITESPACE`, `DIRECTIVE_TAG_HANDLE` (`!`, `!!`, or `!name!`), optional `WHITESPACE`, `DIRECTIVE_TAG_PREFIX` (URI prefix until whitespace, line break, or `#` that starts a comment), optional `WHITESPACE`, optional `COMMENT`, then the line break is a separate `NEWLINE`. If `%TAG` is immediately followed by a line break, or `%TAG` is not followed by whitespace/`!` (e.g. glued text), the rest of the line is emitted as a single `DIRECTIVE_TAG` token as before.
   - any other `%...` until line break → `DIRECTIVE`
 - **Flow indicators**: `[ ] { } ,` are emitted as flow tokens:

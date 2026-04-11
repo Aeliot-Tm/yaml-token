@@ -30,7 +30,15 @@ final class LexerMappingDirectiveTest extends LexerMappingTestCase
         yield [[
             [
                 'type' => TokenType::DIRECTIVE_YAML,
-                'text' => '%YAML 1.2',
+                'text' => '%YAML',
+            ],
+            [
+                'type' => TokenType::WHITESPACE,
+                'text' => ' ',
+            ],
+            [
+                'type' => TokenType::DIRECTIVE_YAML_VERSION,
+                'text' => '1.2',
             ],
             [
                 'type' => TokenType::NEWLINE,

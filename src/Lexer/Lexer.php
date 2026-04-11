@@ -105,6 +105,13 @@ final class Lexer
             if ($cursor->position >= $length) {
                 break;
             }
+            if ($this->shouldTokenizeYamlDirectiveAsParts($input, $cursor, $length)) {
+                foreach ($this->tokenizeYamlDirectiveLine($input, $cursor, $length) as $yamlDirectiveToken) {
+                    $stream->addToken($yamlDirectiveToken);
+                }
+
+                continue;
+            }
             if ($this->shouldTokenizeTagDirectiveAsParts($input, $cursor, $length)) {
                 foreach ($this->tokenizeTagDirectiveLine($input, $cursor, $length) as $tagDirectiveToken) {
                     $stream->addToken($tagDirectiveToken);
@@ -219,7 +226,7 @@ final class Lexer
             return new Token(TokenType::COMMENT, $comment, $startLine, $startColumn);
         }
 
-        // DIRECTIVE_YAML (%YAML ...)
+        // DIRECTIVE_YAML (%YAML ...) — split into parts in {@see tokenizeYamlDirectiveLine} when applicable
         if ($this->match($input, $cursor, $length, '%YAML')) {
             $directive = '%YAML'.$this->readUntilNewline($input, $cursor, $length);
 
@@ -487,6 +494,107 @@ final class Lexer
         while ($cursor->position < $length) {
             $char = $input[$cursor->position];
             if (\in_array($char, self::CHARS_LINE_BREAK, true)) {
+                break;
+            }
+            $result .= $this->consumeCodePoint($input, $cursor, $length);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Split `%YAML` lines into `DIRECTIVE_YAML`, `DIRECTIVE_YAML_VERSION` when the keyword is followed by horizontal
+     * whitespace, `:`, or a digit (version). Otherwise the whole line suffix stays on `DIRECTIVE_YAML` (see
+     * {@see readToken}).
+     */
+    private function shouldTokenizeYamlDirectiveAsParts(string $input, Cursor $cursor, int $length): bool
+    {
+        if ($cursor->position + 5 > $length) {
+            return false;
+        }
+        if ('%YAML' !== substr($input, $cursor->position, 5)) {
+            return false;
+        }
+        if ($cursor->position + 5 >= $length) {
+            return false;
+        }
+        $after = $input[$cursor->position + 5];
+        if (\in_array($after, self::CHARS_HORIZONTAL_WHITESPACE, true) || ':' === $after) {
+            return true;
+        }
+
+        return ctype_digit($after);
+    }
+
+    /**
+     * @return list<Token>
+     */
+    private function tokenizeYamlDirectiveLine(string $input, Cursor $cursor, int $length): array
+    {
+        $tokens = [];
+        $directiveYamlLine = $cursor->line;
+        $directiveYamlColumn = $cursor->column;
+        if (!$this->match($input, $cursor, $length, '%YAML')) {
+            return [];
+        }
+        $tokens[] = new Token(TokenType::DIRECTIVE_YAML, '%YAML', $directiveYamlLine, $directiveYamlColumn);
+
+        if ($cursor->position < $length && \in_array($input[$cursor->position], self::CHARS_HORIZONTAL_WHITESPACE, true)) {
+            $wsLine = $cursor->line;
+            $wsColumn = $cursor->column;
+            $ws = $this->readWhitespace($input, $cursor, $length);
+            $tokens[] = new Token(TokenType::WHITESPACE, $ws, $wsLine, $wsColumn);
+        }
+
+        if ($cursor->position < $length && ':' === $input[$cursor->position]) {
+            $colonLine = $cursor->line;
+            $colonColumn = $cursor->column;
+            $this->advance($input, $cursor, $length);
+            $tokens[] = new Token(TokenType::VALUE_INDICATOR, ':', $colonLine, $colonColumn);
+        }
+
+        if ($cursor->position < $length && \in_array($input[$cursor->position], self::CHARS_HORIZONTAL_WHITESPACE, true)) {
+            $wsLine = $cursor->line;
+            $wsColumn = $cursor->column;
+            $ws = $this->readWhitespace($input, $cursor, $length);
+            $tokens[] = new Token(TokenType::WHITESPACE, $ws, $wsLine, $wsColumn);
+        }
+
+        $versionLine = $cursor->line;
+        $versionColumn = $cursor->column;
+        $version = $this->readYamlDirectiveVersion($input, $cursor, $length);
+        $tokens[] = new Token(TokenType::DIRECTIVE_YAML_VERSION, $version, $versionLine, $versionColumn);
+
+        if ($cursor->position < $length && \in_array($input[$cursor->position], self::CHARS_HORIZONTAL_WHITESPACE, true)) {
+            $wsLine = $cursor->line;
+            $wsColumn = $cursor->column;
+            $ws = $this->readWhitespace($input, $cursor, $length);
+            $tokens[] = new Token(TokenType::WHITESPACE, $ws, $wsLine, $wsColumn);
+        }
+
+        if ($cursor->position < $length && '#' === $input[$cursor->position] && $this->isCommentStart($input, $cursor, $length)) {
+            $commentLine = $cursor->line;
+            $commentColumn = $cursor->column;
+            $this->advance($input, $cursor, $length);
+            $comment = '#'.$this->readUntilNewline($input, $cursor, $length);
+            $tokens[] = new Token(TokenType::COMMENT, $comment, $commentLine, $commentColumn);
+        }
+
+        return $tokens;
+    }
+
+    private function readYamlDirectiveVersion(string $input, Cursor $cursor, int $length): string
+    {
+        $result = '';
+        while ($cursor->position < $length) {
+            $c = $input[$cursor->position];
+            if (\in_array($c, self::CHARS_LINE_BREAK, true)) {
+                break;
+            }
+            if (\in_array($c, self::CHARS_HORIZONTAL_WHITESPACE, true)) {
+                break;
+            }
+            if ('#' === $c && $this->isCommentStart($input, $cursor, $length)) {
                 break;
             }
             $result .= $this->consumeCodePoint($input, $cursor, $length);
