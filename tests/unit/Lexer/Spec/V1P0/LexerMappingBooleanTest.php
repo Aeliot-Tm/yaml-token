@@ -38,7 +38,7 @@ final class LexerMappingBooleanTest extends LexerMappingTestCase
             ],
             [
                 'type' => TokenType::PLAIN_SCALAR,
-                'text' => 'y',
+                'text' => 'true',
             ],
             [
                 'type' => TokenType::NEWLINE,
@@ -55,7 +55,7 @@ final class LexerMappingBooleanTest extends LexerMappingTestCase
             ],
             [
                 'type' => TokenType::PLAIN_SCALAR,
-                'text' => 'n',
+                'text' => 'false',
             ],
             [
                 'type' => TokenType::NEWLINE,
@@ -106,40 +106,6 @@ final class LexerMappingBooleanTest extends LexerMappingTestCase
             ],
             [
                 'type' => TokenType::PLAIN_SCALAR,
-                'text' => 'true',
-            ],
-            [
-                'type' => TokenType::NEWLINE,
-                'text' => '
-',
-            ],
-            [
-                'type' => TokenType::SEQUENCE_ENTRY,
-                'text' => '-',
-            ],
-            [
-                'type' => TokenType::WHITESPACE,
-                'text' => ' ',
-            ],
-            [
-                'type' => TokenType::PLAIN_SCALAR,
-                'text' => 'false',
-            ],
-            [
-                'type' => TokenType::NEWLINE,
-                'text' => '
-',
-            ],
-            [
-                'type' => TokenType::SEQUENCE_ENTRY,
-                'text' => '-',
-            ],
-            [
-                'type' => TokenType::WHITESPACE,
-                'text' => ' ',
-            ],
-            [
-                'type' => TokenType::PLAIN_SCALAR,
                 'text' => 'on',
             ],
             [
@@ -158,6 +124,40 @@ final class LexerMappingBooleanTest extends LexerMappingTestCase
             [
                 'type' => TokenType::PLAIN_SCALAR,
                 'text' => 'off',
+            ],
+            [
+                'type' => TokenType::NEWLINE,
+                'text' => '
+',
+            ],
+            [
+                'type' => TokenType::SEQUENCE_ENTRY,
+                'text' => '-',
+            ],
+            [
+                'type' => TokenType::WHITESPACE,
+                'text' => ' ',
+            ],
+            [
+                'type' => TokenType::PLAIN_SCALAR,
+                'text' => 'y',
+            ],
+            [
+                'type' => TokenType::NEWLINE,
+                'text' => '
+',
+            ],
+            [
+                'type' => TokenType::SEQUENCE_ENTRY,
+                'text' => '-',
+            ],
+            [
+                'type' => TokenType::WHITESPACE,
+                'text' => ' ',
+            ],
+            [
+                'type' => TokenType::PLAIN_SCALAR,
+                'text' => 'n',
             ],
             [
                 'type' => TokenType::NEWLINE,
