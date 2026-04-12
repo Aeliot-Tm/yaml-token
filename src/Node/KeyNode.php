@@ -1,0 +1,42 @@
+<?php
+
+declare(strict_types=1);
+
+/*
+ * This file is part of the YAML Token project.
+ *
+ * (c) Anatoliy Melnikov <5785276@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
+namespace Aeliot\YamlToken\Node;
+
+class KeyNode extends AbstractNode
+{
+    private ?ExplicitKeyIndicatorNode $explicitKeyIndicatorNode = null;
+    private ScalarNode $name;
+
+    public function getExplicitKeyIndicatorNode(): ?ExplicitKeyIndicatorNode
+    {
+        return $this->explicitKeyIndicatorNode;
+    }
+
+    public function setExplicitKeyIndicator(ExplicitKeyIndicatorNode $node): void
+    {
+        $this->explicitKeyIndicatorNode = $node;
+        $this->addChild($node);
+    }
+
+    public function setName(ScalarNode $node): void
+    {
+        $this->name = $node;
+        $this->addChild($node);
+    }
+
+    public function getName(): ScalarNode
+    {
+        return $this->name;
+    }
+}

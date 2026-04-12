@@ -10,6 +10,7 @@ Download descriptions from files IF you need to understand the work:
 
 2. Features:
    - [Lexer](../docs/Feature/Lexer.md)
+   - [Parser](../docs/Feature/Parser.md)
    - [Specification Cover Fixtures Structure](../docs/Feature/SpecificationCoverFixtures.md)
 
 When updating functionality or when explicitly requested, update the corresponding documentation files.

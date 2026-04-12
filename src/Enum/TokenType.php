@@ -65,4 +65,21 @@ enum TokenType: string
     case LITERAL_BLOCK_SCALAR = 'LITERAL_BLOCK_SCALAR';
     case PLAIN_SCALAR = 'PLAIN_SCALAR';
     case SINGLE_QUOTED_SCALAR = 'SINGLE_QUOTED_SCALAR';
+
+    public const BLOCK_SCALAR_INDICATORS = [
+        self::FOLDED_BLOCK_SCALAR_INDICATOR,
+        self::LITERAL_BLOCK_SCALAR_INDICATOR,
+    ];
+
+    public function isScalar(): bool
+    {
+        return \in_array($this, [
+            self::DOUBLE_QUOTED_SCALAR,
+            self::EMPTY_SCALAR,
+            self::FOLDED_BLOCK_SCALAR,
+            self::LITERAL_BLOCK_SCALAR,
+            self::PLAIN_SCALAR,
+            self::SINGLE_QUOTED_SCALAR,
+        ], true);
+    }
 }

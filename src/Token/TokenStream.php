@@ -37,7 +37,7 @@ final class TokenStream
         return $this->tokens[$this->position] ?? null;
     }
 
-    public function peek(int $offset = 1): ?Token
+    public function peek(int $offset): ?Token
     {
         $index = $this->position + $offset;
 
