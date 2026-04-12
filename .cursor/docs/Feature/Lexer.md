@@ -53,7 +53,7 @@ The rules below describe the practical behavior relied upon by lexer unit tests.
     - Shorthand secondary `!!suffix` → `TAG_HANDLE_SECONDARY` (`!!`), `TAG_BODY` (suffix)
     - Shorthand named `!name!suffix` → `TAG_HANDLE_NAMED` (`!name!`), `TAG_BODY` (suffix)
     - Non-specific explicit tag `!` alone → `TAG_NON_SPECIFIC` (`!`)
-    - Verbatim `!<...>` → `TAG_VERBATIM_INDICATOR` (`!`), `TAG_VERBATIM_OPEN` (`<`), `TAG_BODY` (content between brackets), `TAG_VERBATIM_CLOSE` (`>`)
+    - Verbatim `!<...>` → `TAG_HANDLE_VERBATIM` (full `!<...>` including brackets)
   - Tag suffix / shorthand continues until a forbidden delimiter: whitespace, `[]{} , : #` or `\0`
   - exception (YAML 1.0-style global tag shorthand): a comma followed by four ASCII digits (`!,NNNN`) is part of the tag (registration year after the domain), not a flow `,` token
   - after that `!,NNNN` segment, optional `-MM` / `-DD` (tag URI / ISO date parts) and the rest of the shorthand continue as normal tag characters (for example `!domain,2000-01-01/path`)

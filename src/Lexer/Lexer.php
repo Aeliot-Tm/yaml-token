@@ -872,28 +872,20 @@ final class Lexer
         $next = $harvester->input[$harvester->cursor->position];
 
         if ('<' === $next) {
-            $openLine = $harvester->cursor->line;
-            $openColumn = $harvester->cursor->column;
             $this->advance($harvester);
 
-            $bodyLine = $harvester->cursor->line;
-            $bodyColumn = $harvester->cursor->column;
             $body = '';
             while ($harvester->cursor->position < $harvester->length && '>' !== $harvester->input[$harvester->cursor->position]) {
                 $body .= $this->consumeCodePoint($harvester);
             }
-            $closeLine = $harvester->cursor->line;
-            $closeColumn = $harvester->cursor->column;
             $closeText = '';
             if ($harvester->cursor->position < $harvester->length && '>' === $harvester->input[$harvester->cursor->position]) {
                 $closeText = '>';
                 $this->advance($harvester);
             }
 
-            $harvester->stream->addToken(new Token(TokenType::TAG_VERBATIM_INDICATOR, '!', $bangLine, $bangColumn));
-            $harvester->stream->addToken(new Token(TokenType::TAG_VERBATIM_OPEN, '<', $openLine, $openColumn));
-            $harvester->stream->addToken(new Token(TokenType::TAG_BODY, $body, $bodyLine, $bodyColumn));
-            $harvester->stream->addToken(new Token(TokenType::TAG_VERBATIM_CLOSE, $closeText, $closeLine, $closeColumn));
+            $verbatimText = '!<'.$body.$closeText;
+            $harvester->stream->addToken(new Token(TokenType::TAG_HANDLE_VERBATIM, $verbatimText, $bangLine, $bangColumn));
 
             return;
         }
