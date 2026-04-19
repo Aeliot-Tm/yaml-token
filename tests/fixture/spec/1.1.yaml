@@ -145,9 +145,9 @@ folded_indent: >1
 folded_indent_strip: >1-
  strip
 block_with_tab: |
-	void main() {
-		printf("Hello\n");
-	}
+  void main() {
+  	printf("Hello\n");
+  }
 
 # Anchors and Aliases
 anchored: &anchor_name This value is anchored

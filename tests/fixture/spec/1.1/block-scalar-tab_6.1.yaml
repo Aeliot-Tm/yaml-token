@@ -1,4 +1,4 @@
 key: |
-	void main() {
-		printf("Hello\n");
-	}
+  void main() {
+  	printf("Hello\n");
+  }

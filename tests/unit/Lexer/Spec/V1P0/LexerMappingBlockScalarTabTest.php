@@ -51,10 +51,7 @@ final class LexerMappingBlockScalarTabTest extends LexerMappingTestCase
             ],
             [
                 'type' => TokenType::LITERAL_BLOCK_SCALAR,
-                'text' => '	void main() {
-		printf("Hello\n");
-	}
-',
+                'text' => "  void main() {\n  \tprintf(\"Hello\\n\");\n  }\n",
             ],
         ], __DIR__.'/../../../../fixture/spec/1.0/block-scalar-tab_4.2.1.yaml'];
     }

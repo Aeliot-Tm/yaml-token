@@ -147,9 +147,9 @@ folded_indent_strip: >1-
  strip
 # Block scalar with tab in content (Example 6.12)
 block_with_tab: |
-	void main() {
-		printf("Hello\n");
-	}
+  void main() {
+  	printf("Hello\n");
+  }
 
 # Anchors (c-anchor) and Aliases (c-alias)
 anchored: &anchor_name This value is anchored
