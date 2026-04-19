@@ -11,9 +11,10 @@ The rules below describe the practical behavior relied upon by lexer unit tests.
 
 - **Newlines**: `\r\n`, `\r`, `\n` are emitted as `NEWLINE`. Newline resets tracked indentation state.
 - **Indentation vs whitespace**:
-  - At column 1, a run of spaces/tabs is emitted as `INDENTATION`.
+  - At column 1, a run of **spaces only** (U+0020) is emitted as `INDENTATION`.
+  - A **tab** at column 1 is not part of `INDENTATION` (YAML forbids tabs in structural indent): it is emitted as `WHITESPACE` together with any following horizontal whitespace on the same run, like elsewhere on the line.
+  - After a space-only `INDENTATION`, a tab on the same line is the start of the next `WHITESPACE` token (e.g. `  \t` → `INDENTATION` `"  "` then `WHITESPACE` `"\t"`).
   - Elsewhere within a line, a run of spaces/tabs is emitted as `WHITESPACE`.
-  - Tab counts as 4 spaces for indentation tracking.
 - **Document markers**: `---` → `DOCUMENT_START`, `...` → `DOCUMENT_END`.
 - **Comments**: `#...` until line break is `COMMENT` (newline is a separate `NEWLINE` token).
 - **Directives**:
@@ -65,6 +66,7 @@ The rules below describe the practical behavior relied upon by lexer unit tests.
 
 - **Spec fixtures**: `tests/fixture/spec/<version>/` should contain one syntactic feature per file. Avoid comments except `comment-*.yaml` files.
 - **Mapping tests**: `tests/unit/Lexer/Spec/*` must assert token sequences exactly (`TokenType` + `text`), including `INDENTATION`, `WHITESPACE`, and `NEWLINE`.
+- **Broken / invalid indent (tabs in indent)**: minimal samples in `tests/fixture/broken/`; `LexerBrokenIndentTabTest` asserts the split above.
 - **Example 6.5 (YAML 1.2 spec §6.4 empty lines)**: minimal files `double-quoted-empty-line.yaml` (flow double-quoted with a blank line inside the string)
   and `literal-chomping-clipped-empty-lines.yaml` (`|-` with body text `Clipped empty lines` and trailing empty lines in the block body)
   mirror the spec’s Folding / Chomping illustration; the same structure appears in covering fixtures `*.yaml`

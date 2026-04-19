@@ -189,8 +189,8 @@ final class Lexer
             return;
         }
 
-        // INDENTATION (spaces at line start, after newline)
-        if (1 === $harvester->cursor->column && \in_array($char, self::CHARS_HORIZONTAL_WHITESPACE, true)) {
+        // INDENTATION (spaces at line start, after newline; tab starts WHITESPACE — not valid YAML indent)
+        if (1 === $harvester->cursor->column && ' ' === $char) {
             $indent = $this->readIndentation($harvester);
             if ('' !== $indent) {
                 $harvester->stream->addToken(new Token(TokenType::INDENTATION, $indent, $startLine, $startColumn));
@@ -485,9 +485,6 @@ final class Lexer
             if (' ' === $char) {
                 $result .= $this->consumeCodePoint($harvester);
                 ++$harvester->cursor->currentIndent;
-            } elseif ("\t" === $char) {
-                $result .= $this->consumeCodePoint($harvester);
-                $harvester->cursor->currentIndent += self::INDENT_SIZE_TAB; // Tab as 4 spaces for indent tracking
             } else {
                 break;
             }
