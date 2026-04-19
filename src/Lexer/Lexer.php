@@ -68,8 +68,6 @@ final class Lexer
         ',' => TokenType::FLOW_ENTRY,
     ];
 
-    private const INDENT_SIZE_TAB = 4;
-
     public function tokenize(string $input): TokenStream
     {
         $harvester = new Harvester($input);
@@ -1067,8 +1065,11 @@ final class Lexer
 
             $indentStart = $harvester->cursor->position;
             $lineIndent = 0;
+            // YAML structural indent is space-only; tabs are still copied into the body but do not add to lineIndent.
             while ($harvester->cursor->position < $harvester->length && \in_array($harvester->input[$harvester->cursor->position], self::CHARS_HORIZONTAL_WHITESPACE, true)) {
-                $lineIndent += "\t" === $harvester->input[$harvester->cursor->position] ? self::INDENT_SIZE_TAB : 1;
+                if (' ' === $harvester->input[$harvester->cursor->position]) {
+                    ++$lineIndent;
+                }
                 $result .= $this->consumeCodePoint($harvester);
             }
 

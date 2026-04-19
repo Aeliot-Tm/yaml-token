@@ -39,6 +39,7 @@ The rules below describe the practical behavior relied upon by lexer unit tests.
     `LITERAL_BLOCK_SCALAR` / `FOLDED_BLOCK_SCALAR` token; it is split per physical line into leading horizontal whitespace as
     `INDENTATION`, non-whitespace line suffix as `PLAIN_SCALAR`, and line breaks as `NEWLINE` (same raw bytes as in the source).
     Otherwise the next token is one `pendingBlockScalarBody` body token as before
+  - **Single body token** (`|` / `>` without splitting per line): when scanning where the block body ends, only **leading spaces** (U+0020) on each line contribute to the indent depth used for comparison; tabs in that prefix are still copied into the body bytes but do not increase that depth (YAML structural indent is space-only).
   - chomping: `BlockScalarChomping` on the cursor is set from `+` / `-` (`Keep` / `Strip`); if the header ends without them, it defaults to `Clip` when the body is promoted
   - **Strip** (`-`): after the block body is read, the line break that ends the last body line with non-horizontal-whitespace content is excluded from the block body token, together with any following trailing empty lines (lines with only horizontal whitespace in the body); the lexer rewinds the byte offset and line/column so those bytes are emitted next as normal tokens (`NEWLINE`, and leading `INDENTATION` when empty lines were indented in the source)
   - `LITERAL_BLOCK_SCALAR` / `FOLDED_BLOCK_SCALAR` carry only the indented block body (raw text), without the indicator or header line
