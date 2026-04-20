@@ -17,7 +17,7 @@ class KeyValueCoupleNode extends AbstractNode
 {
     private ?IndentationNode $indentation = null;
     private KeyNode $key;
-    private Node $value;
+    private ValueNode $value;
 
     public function getIndentation(): ?IndentationNode
     {
@@ -41,12 +41,12 @@ class KeyValueCoupleNode extends AbstractNode
         $this->addChild($node);
     }
 
-    public function getValue(): Node
+    public function getValue(): ValueNode
     {
         return $this->value;
     }
 
-    public function setValue(Node $node): void
+    public function setValue(ValueNode $node): void
     {
         $this->value = $node;
         $this->addChild($node);

@@ -394,7 +394,7 @@ final class Parser
         $keyValueCouple->setValue($this->parseValue($harvester, $indentLen));
     }
 
-    private function parseValue(Harvester $harvester, int $parentIndentLen): Node
+    private function parseValue(Harvester $harvester, int $parentIndentLen): ValueNode
     {
         $valueNode = new ValueNode();
 
