@@ -17,6 +17,7 @@ class ValueNode extends AbstractNode
 {
     private ?AnchorNode $anchor = null;
     private ?BlockMappingNode $blockMapping = null;
+    private ?BlockSequenceNode $blockSequence = null;
     private ?ScalarNode $scalar = null;
 
     public function addChild(Node $child): void
@@ -27,6 +28,10 @@ class ValueNode extends AbstractNode
 
         if ($child instanceof BlockMappingNode) {
             $this->blockMapping = $child;
+        }
+
+        if ($child instanceof BlockSequenceNode) {
+            $this->blockSequence = $child;
         }
 
         if ($child instanceof ScalarNode) {
@@ -49,5 +54,10 @@ class ValueNode extends AbstractNode
     public function getBlockMapping(): ?BlockMappingNode
     {
         return $this->blockMapping;
+    }
+
+    public function getBlockSequence(): ?BlockSequenceNode
+    {
+        return $this->blockSequence;
     }
 }

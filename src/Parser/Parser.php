@@ -20,6 +20,7 @@ use Aeliot\YamlToken\Node\BlockMappingNode;
 use Aeliot\YamlToken\Node\BlockScalarChompingIndicatorNode;
 use Aeliot\YamlToken\Node\BlockScalarIndentationIndicatorNode;
 use Aeliot\YamlToken\Node\BlockScalarIndicatorNode;
+use Aeliot\YamlToken\Node\BlockSequenceNode;
 use Aeliot\YamlToken\Node\ByteOrderNode;
 use Aeliot\YamlToken\Node\CommentNode;
 use Aeliot\YamlToken\Node\DirectiveNode;
@@ -112,6 +113,7 @@ final class Parser
             TokenType::TAG_HANDLE_PRIMARY,
             TokenType::TAG_HANDLE_SECONDARY,
             TokenType::TAG_HANDLE_VERBATIM => new TagNode($token),
+            TokenType::SEQUENCE_ENTRY,
             TokenType::VALUE_INDICATOR => new SyntaxTokenNode($token),
             TokenType::WHITESPACE => new WhitespaceNode($token),
             default => throw new \DomainException(\sprintf('Not configured node for token type: %s', $token->type->value)),
@@ -410,6 +412,11 @@ final class Parser
         }
 
         $token = $harvester->tokens->current();
+        if (null === $token) {
+            $valueNode->addChild(new ScalarNode(new Token(TokenType::EMPTY_SCALAR, '', 1, 1)));
+
+            return $valueNode;
+        }
         if (\in_array($token->type, TokenType::BLOCK_SCALAR_INDICATORS, true)) {
             $valueNode->addChild(new BlockScalarIndicatorNode($token));
             $harvester->tokens->advance();
@@ -434,12 +441,12 @@ final class Parser
             $valueNode->addChild(new ScalarNode($token));
             $harvester->tokens->advance();
         } elseif (TokenType::NEWLINE === $token->type) {
-            $valueNode->addChild($this->parseBlockMappingValue($harvester, $parentIndentLen));
+            $valueNode->addChild($this->parseIndentedBlockValue($harvester, $parentIndentLen));
         } elseif ($token->type->isScalar()) {
             $valueNode->addChild(new ScalarNode($token));
             $harvester->tokens->advance();
         } elseif (TokenType::SEQUENCE_ENTRY === $token->type) {
-            // TODO implement
+            $valueNode->addChild($this->parseBlockSequenceValue($harvester, $parentIndentLen));
         } elseif (TokenType::FLOW_SEQUENCE_START === $token->type) {
             $valueNode->addChild($this->parseFlowSequence($harvester));
         } elseif (TokenType::FLOW_MAPPING_START === $token->type) {
@@ -454,6 +461,35 @@ final class Parser
         ], $valueNode);
 
         return $valueNode;
+    }
+
+    private function parseIndentedBlockValue(Harvester $harvester, int $parentIndentLen): Node
+    {
+        $token = $harvester->tokens->current();
+        if (TokenType::NEWLINE !== $token?->type) {
+            throw new \LogicException('Expected NEWLINE while parsing indented block value');
+        }
+
+        $indent = $harvester->tokens->peek(1);
+        if (null === $indent || TokenType::INDENTATION !== $indent->type) {
+            $harvester->tokens->advance();
+
+            return new ScalarNode(new Token(TokenType::EMPTY_SCALAR, '', $token->line, $token->column));
+        }
+
+        $indentLen = \strlen($indent->text);
+        if ($indentLen <= $parentIndentLen) {
+            $harvester->tokens->advance();
+
+            return new ScalarNode(new Token(TokenType::EMPTY_SCALAR, '', $token->line, $token->column));
+        }
+
+        $afterIndent = $harvester->tokens->peek(2);
+        if (TokenType::SEQUENCE_ENTRY === $afterIndent?->type) {
+            return $this->parseBlockSequenceValue($harvester, $parentIndentLen);
+        }
+
+        return $this->parseBlockMappingValue($harvester, $parentIndentLen);
     }
 
     private function parseBlockMappingValue(Harvester $harvester, int $parentIndentLen): BlockMappingNode
@@ -512,5 +548,65 @@ final class Parser
         }
 
         return $blockMapping;
+    }
+
+    private function parseBlockSequenceValue(Harvester $harvester, int $parentIndentLen): BlockSequenceNode
+    {
+        $blockSequence = new BlockSequenceNode();
+
+        $baseIndentLen = null;
+
+        while (!$harvester->tokens->isEnd()) {
+            $this->collectTypes($harvester, [
+                TokenType::NEWLINE,
+                TokenType::COMMENT,
+                TokenType::WHITESPACE,
+            ], $blockSequence);
+
+            $token = $harvester->tokens->current();
+            if (null === $token) {
+                break;
+            }
+
+            if (TokenType::INDENTATION !== $token->type) {
+                break;
+            }
+
+            $indentLen = \strlen($token->text);
+            if ($indentLen > 0) {
+                if (!$harvester->state->isIndentLenRegistered()) {
+                    $harvester->state->registerIndentStepLen($indentLen);
+                }
+                $harvester->state->assertIndentLenIsValid($indentLen);
+            }
+
+            if ($indentLen <= $parentIndentLen) {
+                break;
+            }
+
+            if (null === $baseIndentLen) {
+                $baseIndentLen = $indentLen;
+            } elseif ($indentLen !== $baseIndentLen) {
+                throw new \LogicException(\sprintf('Unexpected indentation %d while base indentation is %d', $indentLen, $baseIndentLen));
+            }
+
+            if (false === $this->isSequenceStart($harvester)) {
+                throw new \LogicException('Sequence entry expected while parsing block sequence value');
+            }
+
+            $sequenceEntry = new SequenceEntryNode();
+            $blockSequence->addChild($sequenceEntry);
+            $sequenceEntry->addChild(new IndentationNode($token));
+            $harvester->tokens->advance();
+
+            $this->collectTypes($harvester, [TokenType::SEQUENCE_ENTRY, TokenType::WHITESPACE], $sequenceEntry);
+            $sequenceEntry->setValue($this->parseValue($harvester, $indentLen));
+        }
+
+        if (null === $baseIndentLen) {
+            throw new \LogicException('Empty block sequence value is not supported');
+        }
+
+        return $blockSequence;
     }
 }
