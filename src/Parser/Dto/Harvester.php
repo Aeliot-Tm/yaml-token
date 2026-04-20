@@ -19,6 +19,7 @@ use Aeliot\YamlToken\Token\TokenStream;
 final class Harvester
 {
     public ParseRegistry $registry;
+    public ParseState $state;
     public StreamNode $stream;
 
     public function __construct(public readonly TokenStream $tokens)

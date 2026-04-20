@@ -43,6 +43,5 @@ abstract class AbstractNode implements Node
     public function setParent(Node $parent): void
     {
         $this->parent = $parent;
-        $parent->addChild($this);
     }
 }
