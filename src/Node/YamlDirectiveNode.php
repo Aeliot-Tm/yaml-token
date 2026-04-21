@@ -20,7 +20,7 @@ class YamlDirectiveNode extends AbstractNode
     private YamlDirectiveVersionNode $versionNode;
 
     public function __construct(
-        private Token $keywordToken,
+        private Token $token,
     ) {
     }
 
@@ -32,9 +32,9 @@ class YamlDirectiveNode extends AbstractNode
         parent::addChild($child);
     }
 
-    public function getKeywordToken(): Token
+    public function getToken(): Token
     {
-        return $this->keywordToken;
+        return $this->token;
     }
 
     public function getVersionNode(): YamlDirectiveVersionNode

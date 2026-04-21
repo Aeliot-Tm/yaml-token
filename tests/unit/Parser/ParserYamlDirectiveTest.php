@@ -60,13 +60,13 @@ final class ParserYamlDirectiveTest extends TestCase
         $first = $documents[0];
         $directive = $first->getChildren()[0];
         self::assertInstanceOf(YamlDirectiveNode::class, $directive);
-        self::assertSame('%YAML', $directive->getKeywordToken()->text);
+        self::assertSame('%YAML', $directive->getToken()->text);
         $versionNodes = array_values(array_filter(
             $directive->getChildren(),
             static fn ($n): bool => $n instanceof YamlDirectiveVersionNode,
         ));
         self::assertCount(1, $versionNodes);
-        self::assertSame('1.0', $versionNodes[0]->getKeywordToken()->text);
+        self::assertSame('1.0', $versionNodes[0]->getToken()->text);
     }
 
     public function testParsesYamlDirectiveWithSpaceSeparator(): void
@@ -89,7 +89,7 @@ final class ParserYamlDirectiveTest extends TestCase
             static fn ($n): bool => $n instanceof YamlDirectiveVersionNode,
         ));
         self::assertCount(1, $versionNodes);
-        self::assertSame('1.2', $versionNodes[0]->getKeywordToken()->text);
+        self::assertSame('1.2', $versionNodes[0]->getToken()->text);
 
         $second = $documents[1];
         $secondChildren = $second->getChildren();
