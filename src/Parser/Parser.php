@@ -349,24 +349,6 @@ final class Parser
         return $mergeInstruction;
     }
 
-    private function parseStream(TokenStream $tokens): StreamNode
-    {
-        $harvester = new Harvester($tokens);
-        $harvester->registry = new ParseRegistry();
-        $harvester->state = new ParseState();
-        $harvester->stream = $stream = new StreamNode();
-
-        $token = $harvester->tokens->current();
-        if (null !== $token && TokenType::BYTE_ORDER_MARK === $token->type) {
-            $harvester->stream->addChild(new ByteOrderNode($token));
-            $harvester->tokens->advance();
-        }
-
-        $this->parseDocuments($harvester, $stream);
-
-        return $stream;
-    }
-
     private function parseDocuments(Harvester $harvester, StreamNode $stream): void
     {
         $document = new DocumentNode();
@@ -475,6 +457,24 @@ final class Parser
         $this->collectTypes($harvester, [TokenType::VALUE_INDICATOR, TokenType::WHITESPACE], $keyValueCouple);
         $keyValueCouple->setValue($this->parseValue($harvester, $indentLen));
         $this->postProcessKeyValueCouple($harvester, $keyValueCouple);
+    }
+
+    private function parseStream(TokenStream $tokens): StreamNode
+    {
+        $harvester = new Harvester($tokens);
+        $harvester->registry = new ParseRegistry();
+        $harvester->state = new ParseState();
+        $harvester->stream = $stream = new StreamNode();
+
+        $token = $harvester->tokens->current();
+        if (null !== $token && TokenType::BYTE_ORDER_MARK === $token->type) {
+            $harvester->stream->addChild(new ByteOrderNode($token));
+            $harvester->tokens->advance();
+        }
+
+        $this->parseDocuments($harvester, $stream);
+
+        return $stream;
     }
 
     private function parseValue(Harvester $harvester, int $parentIndentLen): ValueNode
