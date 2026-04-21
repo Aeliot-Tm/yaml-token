@@ -480,6 +480,27 @@ final class Parser
         return $this->parseBlockMappingValue($harvester, $parentIndentLen);
     }
 
+    private function parseKeyValueCoupleAtCurrentPosition(Harvester $harvester, Node $root, int $indentLen): void
+    {
+        $token = $harvester->tokens->current();
+        if (null === $token) {
+            throw new \LogicException('Unexpected end of stream while parsing key/value couple');
+        }
+
+        $keyValueCouple = new KeyValueCoupleNode();
+        $root->addChild($keyValueCouple);
+
+        if (TokenType::INDENTATION === $token->type) {
+            $keyValueCouple->setIndentation(new IndentationNode($token));
+            $harvester->tokens->advance();
+        }
+
+        $keyValueCouple->setKey($this->getKeyNode($harvester));
+        $this->collectTypes($harvester, [TokenType::VALUE_INDICATOR, TokenType::WHITESPACE], $keyValueCouple);
+        $keyValueCouple->setValue($this->parseValue($harvester, $indentLen));
+        $this->postProcessKeyValueCouple($harvester, $keyValueCouple);
+    }
+
     private function parseMergeInstructionAtCurrentPosition(Harvester $harvester): MergeInstructionNode
     {
         $token = $harvester->tokens->current();
@@ -589,27 +610,6 @@ final class Parser
         if ($document->getChildren()) {
             $stream->addChild($document);
         }
-    }
-
-    private function parseKeyValueCoupleAtCurrentPosition(Harvester $harvester, Node $root, int $indentLen): void
-    {
-        $token = $harvester->tokens->current();
-        if (null === $token) {
-            throw new \LogicException('Unexpected end of stream while parsing key/value couple');
-        }
-
-        $keyValueCouple = new KeyValueCoupleNode();
-        $root->addChild($keyValueCouple);
-
-        if (TokenType::INDENTATION === $token->type) {
-            $keyValueCouple->setIndentation(new IndentationNode($token));
-            $harvester->tokens->advance();
-        }
-
-        $keyValueCouple->setKey($this->getKeyNode($harvester));
-        $this->collectTypes($harvester, [TokenType::VALUE_INDICATOR, TokenType::WHITESPACE], $keyValueCouple);
-        $keyValueCouple->setValue($this->parseValue($harvester, $indentLen));
-        $this->postProcessKeyValueCouple($harvester, $keyValueCouple);
     }
 
     private function parseStream(TokenStream $tokens): StreamNode
