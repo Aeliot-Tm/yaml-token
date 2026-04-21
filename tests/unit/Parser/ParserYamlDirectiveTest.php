@@ -28,8 +28,8 @@ use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Parser::class)]
-#[UsesClass(StreamNode::class)]
 #[UsesClass(DocumentNode::class)]
+#[UsesClass(StreamNode::class)]
 #[UsesClass(YamlDirectiveNode::class)]
 #[UsesClass(YamlDirectiveVersionNode::class)]
 final class ParserYamlDirectiveTest extends TestCase

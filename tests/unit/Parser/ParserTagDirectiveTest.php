@@ -23,8 +23,8 @@ use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Parser::class)]
-#[UsesClass(StreamNode::class)]
 #[UsesClass(DocumentNode::class)]
+#[UsesClass(StreamNode::class)]
 #[UsesClass(TagDirectiveNode::class)]
 final class ParserTagDirectiveTest extends TestCase
 {

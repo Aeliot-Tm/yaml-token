@@ -31,15 +31,15 @@ use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Parser::class)]
 #[UsesClass(Lexer::class)]
-#[UsesClass(StreamNode::class)]
-#[UsesClass(DocumentNode::class)]
-#[UsesClass(KeyValueCoupleNode::class)]
-#[UsesClass(ValueNode::class)]
-#[UsesClass(BlockMappingNode::class)]
-#[UsesClass(MergeInstructionNode::class)]
 #[UsesClass(AliasNode::class)]
 #[UsesClass(AnchorNode::class)]
+#[UsesClass(BlockMappingNode::class)]
+#[UsesClass(DocumentNode::class)]
+#[UsesClass(KeyValueCoupleNode::class)]
+#[UsesClass(MergeInstructionNode::class)]
 #[UsesClass(ScalarNode::class)]
+#[UsesClass(StreamNode::class)]
+#[UsesClass(ValueNode::class)]
 final class ParserMergeInstructionTest extends TestCase
 {
     public function testParsesMergeInstructionAsMappingChildNotCouple(): void
@@ -54,11 +54,11 @@ YAML);
 
         $document = $this->getOnlyDocument($stream);
         $rootCouples = $this->getKeyValueCouples($document);
-        self::assertSame(['a', 'b'], array_map(fn (KeyValueCoupleNode $c): string => $this->keyText($c), $rootCouples));
+        self::assertSame(['a', 'b'], array_map(fn (KeyValueCoupleNode $c): string => $this->getKeyText($c), $rootCouples));
 
         $b = $rootCouples[1];
-        $bValue = $this->asValueNode($b->getValue());
-        $bMapping = $this->requireBlockMapping($bValue);
+        $bValue = $b->getValue();
+        $bMapping = $this->getBlockMapping($bValue);
 
         $merge = $this->getOnlyMergeInstruction($bMapping);
         $aliases = $merge->getAliases();
@@ -71,11 +71,11 @@ YAML);
 
         $anchorCouple = $aliases[0]->getAnchor()->getDeclarationCouple();
         self::assertInstanceOf(KeyValueCoupleNode::class, $anchorCouple);
-        self::assertSame('a', $this->keyText($anchorCouple));
+        self::assertSame('a', $this->getKeyText($anchorCouple));
 
         $bCouples = $this->getKeyValueCouples($bMapping);
-        self::assertSame(['c'], array_map(fn (KeyValueCoupleNode $c): string => $this->keyText($c), $bCouples));
-        self::assertSame('valueC', $this->scalarValueText($bCouples[0]));
+        self::assertSame(['c'], array_map(fn (KeyValueCoupleNode $c): string => $this->getKeyText($c), $bCouples));
+        self::assertSame('valueC', $this->getScalarValueText($bCouples[0]));
     }
 
     public function testThrowsOnUndefinedAliasInMergeInstruction(): void
@@ -101,13 +101,12 @@ YAML);
 
         $document = $this->getOnlyDocument($stream);
         $rootCouples = $this->getKeyValueCouples($document);
-        self::assertSame(['a', 'a2', 'b'], array_map(fn (KeyValueCoupleNode $c): string => $this->keyText($c), $rootCouples));
+        self::assertSame(['a', 'a2', 'b'], array_map(fn (KeyValueCoupleNode $c): string => $this->getKeyText($c), $rootCouples));
 
-        $a2 = $rootCouples[1];
-        $b = $rootCouples[2];
+        [, $a2, $b] = $rootCouples;
 
-        $bValue = $this->asValueNode($b->getValue());
-        $bMapping = $this->requireBlockMapping($bValue);
+        $bValue = $b->getValue();
+        $bMapping = $this->getBlockMapping($bValue);
         $merge = $this->getOnlyMergeInstruction($bMapping);
         $aliases = $merge->getAliases();
         self::assertCount(1, $aliases);
@@ -118,16 +117,17 @@ YAML);
         self::assertSame($a2, $anchorCouple);
     }
 
-    private function getOnlyDocument(StreamNode $stream): DocumentNode
+    private function getBlockMapping(ValueNode $value): BlockMappingNode
     {
-        $documents = array_values(array_filter(
-            $stream->getChildren(),
-            static fn ($n): bool => $n instanceof DocumentNode,
-        ));
+        $blockMapping = $value->getBlockMapping();
+        self::assertInstanceOf(BlockMappingNode::class, $blockMapping);
 
-        self::assertCount(1, $documents);
+        return $blockMapping;
+    }
 
-        return $documents[0];
+    private function getKeyText(KeyValueCoupleNode $couple): string
+    {
+        return $couple->getKey()->getName()->getToken()->text;
     }
 
     /**
@@ -143,6 +143,18 @@ YAML);
         ));
     }
 
+    private function getOnlyDocument(StreamNode $stream): DocumentNode
+    {
+        $documents = array_values(array_filter(
+            $stream->getChildren(),
+            static fn ($n): bool => $n instanceof DocumentNode,
+        ));
+
+        self::assertCount(1, $documents);
+
+        return $documents[0];
+    }
+
     private function getOnlyMergeInstruction(object $node): MergeInstructionNode
     {
         $children = $node->getChildren();
@@ -156,32 +168,12 @@ YAML);
         return $instructions[0];
     }
 
-    private function keyText(KeyValueCoupleNode $couple): string
+    private function getScalarValueText(KeyValueCoupleNode $couple): string
     {
-        return $couple->getKey()->getName()->getToken()->text;
-    }
-
-    private function scalarValueText(KeyValueCoupleNode $couple): string
-    {
-        $valueNode = $this->asValueNode($couple->getValue());
+        $valueNode = $couple->getValue();
         $scalar = $valueNode->getScalar();
         self::assertInstanceOf(ScalarNode::class, $scalar);
 
         return $scalar->getToken()->text;
-    }
-
-    private function asValueNode(object $node): ValueNode
-    {
-        self::assertInstanceOf(ValueNode::class, $node);
-
-        return $node;
-    }
-
-    private function requireBlockMapping(ValueNode $value): BlockMappingNode
-    {
-        $blockMapping = $value->getBlockMapping();
-        self::assertInstanceOf(BlockMappingNode::class, $blockMapping);
-
-        return $blockMapping;
     }
 }

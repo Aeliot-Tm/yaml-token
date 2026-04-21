@@ -29,15 +29,15 @@ use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Parser::class)]
-#[UsesClass(Lexer::class)]
-#[UsesClass(StreamNode::class)]
-#[UsesClass(DocumentNode::class)]
-#[UsesClass(KeyValueCoupleNode::class)]
-#[UsesClass(ValueNode::class)]
 #[UsesClass(BlockMappingNode::class)]
 #[UsesClass(BlockSequenceNode::class)]
-#[UsesClass(SequenceEntryNode::class)]
+#[UsesClass(DocumentNode::class)]
+#[UsesClass(KeyValueCoupleNode::class)]
+#[UsesClass(Lexer::class)]
 #[UsesClass(ScalarNode::class)]
+#[UsesClass(SequenceEntryNode::class)]
+#[UsesClass(StreamNode::class)]
+#[UsesClass(ValueNode::class)]
 final class ParserNestedBlockSequenceTest extends TestCase
 {
     public function testParsesSimpleNestedBlockSequenceUnderKey(): void
@@ -53,14 +53,14 @@ YAML);
         $document = $this->getOnlyDocument($stream);
         $rootCouples = $this->getKeyValueCouples($document);
         self::assertCount(1, $rootCouples);
-        self::assertSame('levelA', $this->keyText($rootCouples[0]));
+        self::assertSame('levelA', $this->getKeyText($rootCouples[0]));
 
-        $levelAValue = $this->asValueNode($rootCouples[0]->getValue());
-        $levelACouples = $this->getKeyValueCouples($this->requireBlockMapping($levelAValue));
+        $levelAValue = $rootCouples[0]->getValue();
+        $levelACouples = $this->getKeyValueCouples($this->getBlockMapping($levelAValue));
         self::assertCount(2, $levelACouples);
-        self::assertSame(['levelB', 'levelC'], array_map(fn (KeyValueCoupleNode $c): string => $this->keyText($c), $levelACouples));
+        self::assertSame(['levelB', 'levelC'], array_map(fn (KeyValueCoupleNode $c): string => $this->getKeyText($c), $levelACouples));
 
-        $levelBValue = $this->asValueNode($levelACouples[0]->getValue());
+        $levelBValue = $levelACouples[0]->getValue();
         $seq = $levelBValue->getBlockSequence();
         self::assertInstanceOf(BlockSequenceNode::class, $seq);
 
@@ -69,10 +69,10 @@ YAML);
             static fn ($n): bool => $n instanceof SequenceEntryNode,
         ));
         self::assertCount(2, $entries);
-        self::assertSame('valueA', $this->sequenceScalarText($entries[0]));
-        self::assertSame('valueB', $this->sequenceScalarText($entries[1]));
+        self::assertSame('valueA', $this->getSequenceScalarText($entries[0]));
+        self::assertSame('valueB', $this->getSequenceScalarText($entries[1]));
 
-        $levelCValue = $this->asValueNode($levelACouples[1]->getValue());
+        $levelCValue = $levelACouples[1]->getValue();
         $levelCScalar = $levelCValue->getScalar();
         self::assertInstanceOf(ScalarNode::class, $levelCScalar);
         self::assertSame('', $levelCScalar->getToken()->text);
@@ -104,16 +104,17 @@ levelA:
 YAML);
     }
 
-    private function getOnlyDocument(StreamNode $stream): DocumentNode
+    private function getBlockMapping(ValueNode $value): BlockMappingNode
     {
-        $documents = array_values(array_filter(
-            $stream->getChildren(),
-            static fn ($n): bool => $n instanceof DocumentNode,
-        ));
+        $blockMapping = $value->getBlockMapping();
+        self::assertInstanceOf(BlockMappingNode::class, $blockMapping);
 
-        self::assertCount(1, $documents);
+        return $blockMapping;
+    }
 
-        return $documents[0];
+    private function getKeyText(KeyValueCoupleNode $couple): string
+    {
+        return $couple->getKey()->getName()->getToken()->text;
     }
 
     /**
@@ -129,29 +130,21 @@ YAML);
         ));
     }
 
-    private function keyText(KeyValueCoupleNode $couple): string
+    private function getOnlyDocument(StreamNode $stream): DocumentNode
     {
-        return $couple->getKey()->getName()->getToken()->text;
+        $documents = array_values(array_filter(
+            $stream->getChildren(),
+            static fn ($n): bool => $n instanceof DocumentNode,
+        ));
+
+        self::assertCount(1, $documents);
+
+        return $documents[0];
     }
 
-    private function asValueNode(object $node): ValueNode
+    private function getSequenceScalarText(SequenceEntryNode $entry): string
     {
-        self::assertInstanceOf(ValueNode::class, $node);
-
-        return $node;
-    }
-
-    private function requireBlockMapping(ValueNode $value): BlockMappingNode
-    {
-        $blockMapping = $value->getBlockMapping();
-        self::assertInstanceOf(BlockMappingNode::class, $blockMapping);
-
-        return $blockMapping;
-    }
-
-    private function sequenceScalarText(SequenceEntryNode $entry): string
-    {
-        $value = $this->asValueNode($entry->getValue());
+        $value = $entry->getValue();
         $scalar = $value->getScalar();
         self::assertInstanceOf(ScalarNode::class, $scalar);
 

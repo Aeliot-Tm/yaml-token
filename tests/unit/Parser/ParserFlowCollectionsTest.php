@@ -45,7 +45,6 @@ YAML);
 
         $couple = $this->getOnlyCouple($stream);
         $value = $couple->getValue();
-        self::assertInstanceOf(ValueNode::class, $value);
 
         $flows = array_values(array_filter(
             $value->getChildren(),
@@ -70,7 +69,6 @@ YAML);
 
         $couple = $this->getOnlyCouple($stream);
         $value = $couple->getValue();
-        self::assertInstanceOf(ValueNode::class, $value);
 
         $flows = array_values(array_filter(
             $value->getChildren(),
@@ -115,7 +113,6 @@ YAML);
     private function getScalarValueText(KeyValueCoupleNode $couple): string
     {
         $valueNode = $couple->getValue();
-        self::assertInstanceOf(ValueNode::class, $valueNode);
         $scalar = $valueNode->getScalar();
         self::assertInstanceOf(ScalarNode::class, $scalar);
 

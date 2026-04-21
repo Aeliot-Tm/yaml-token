@@ -61,7 +61,6 @@ final class ParserBlockScalarTest extends TestCase
         $couple = $this->getOnlyCouple($stream);
 
         $value = $couple->getValue();
-        self::assertInstanceOf(ValueNode::class, $value);
 
         $scalar = $value->getScalar();
         self::assertInstanceOf(ScalarNode::class, $scalar);

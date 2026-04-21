@@ -47,18 +47,15 @@ YAML);
         $couples = $this->getCouples($document);
         self::assertCount(2, $couples);
 
-        $a = $couples[0];
-        $b = $couples[1];
+        [$a, $b] = $couples;
 
         $aValue = $a->getValue();
-        self::assertInstanceOf(ValueNode::class, $aValue);
         $aAnchor = $aValue->getAnchor();
         self::assertInstanceOf(AnchorNode::class, $aAnchor);
         self::assertSame('A', $aAnchor->getName());
         self::assertSame($a, $aAnchor->getDeclarationCouple());
 
         $bValue = $b->getValue();
-        self::assertInstanceOf(ValueNode::class, $bValue);
         $aliases = array_values(array_filter(
             $bValue->getChildren(),
             static fn ($n): bool => $n instanceof AliasNode,

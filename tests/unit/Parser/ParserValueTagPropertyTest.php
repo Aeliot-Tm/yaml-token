@@ -30,15 +30,15 @@ use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Parser::class)]
-#[UsesClass(Lexer::class)]
-#[UsesClass(StreamNode::class)]
 #[UsesClass(DocumentNode::class)]
 #[UsesClass(KeyValueCoupleNode::class)]
-#[UsesClass(ValueNode::class)]
-#[UsesClass(TagPropertyNode::class)]
-#[UsesClass(TagNode::class)]
-#[UsesClass(TagBodyNode::class)]
+#[UsesClass(Lexer::class)]
 #[UsesClass(ScalarNode::class)]
+#[UsesClass(StreamNode::class)]
+#[UsesClass(TagBodyNode::class)]
+#[UsesClass(TagNode::class)]
+#[UsesClass(TagPropertyNode::class)]
+#[UsesClass(ValueNode::class)]
 final class ParserValueTagPropertyTest extends TestCase
 {
     public function testBindsSecondaryTagToMappingValue(): void
@@ -48,7 +48,6 @@ key: !!str value
 YAML));
 
         $value = $couple->getValue();
-        self::assertInstanceOf(ValueNode::class, $value);
         $tag = $value->getTagProperty();
         self::assertInstanceOf(TagPropertyNode::class, $tag);
 
@@ -70,7 +69,6 @@ key: !local value
 YAML));
 
         $value = $couple->getValue();
-        self::assertInstanceOf(ValueNode::class, $value);
         $tag = $value->getTagProperty();
         self::assertInstanceOf(TagPropertyNode::class, $tag);
 
@@ -88,7 +86,6 @@ key: !<tag:yaml.org,2002:str> value
 YAML));
 
         $value = $couple->getValue();
-        self::assertInstanceOf(ValueNode::class, $value);
         $tag = $value->getTagProperty();
         self::assertInstanceOf(TagPropertyNode::class, $tag);
 
@@ -106,7 +103,6 @@ key: ! value
 YAML));
 
         $value = $couple->getValue();
-        self::assertInstanceOf(ValueNode::class, $value);
         $tag = $value->getTagProperty();
         self::assertInstanceOf(TagPropertyNode::class, $tag);
         self::assertTrue($tag->isNonSpecific());
@@ -123,18 +119,6 @@ key: !!str !local value
 YAML);
     }
 
-    private function getOnlyDocument(StreamNode $stream): DocumentNode
-    {
-        $documents = array_values(array_filter(
-            $stream->getChildren(),
-            static fn ($n): bool => $n instanceof DocumentNode,
-        ));
-
-        self::assertCount(1, $documents);
-
-        return $documents[0];
-    }
-
     private function getOnlyCouple(StreamNode $stream): KeyValueCoupleNode
     {
         $document = $this->getOnlyDocument($stream);
@@ -146,5 +130,17 @@ YAML);
         self::assertCount(1, $couples);
 
         return $couples[0];
+    }
+
+    private function getOnlyDocument(StreamNode $stream): DocumentNode
+    {
+        $documents = array_values(array_filter(
+            $stream->getChildren(),
+            static fn ($n): bool => $n instanceof DocumentNode,
+        ));
+
+        self::assertCount(1, $documents);
+
+        return $documents[0];
     }
 }
