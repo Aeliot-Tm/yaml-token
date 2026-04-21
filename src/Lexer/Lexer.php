@@ -237,14 +237,6 @@ final class Lexer
             return;
         }
 
-        // DIRECTIVE_YAML (%YAML ...) — split into parts in {@see tokenizeYamlDirectiveLine} when applicable
-        if ($this->match($harvester, '%YAML')) {
-            $directive = '%YAML'.$this->readUntilNewline($harvester);
-            $harvester->stream->addToken(new Token(TokenType::DIRECTIVE_YAML, $directive, $startLine, $startColumn));
-
-            return;
-        }
-
         // DIRECTIVE_TAG (%TAG ...) — split into parts in {@see tokenizeTagDirectiveLine} when applicable
         if ($this->match($harvester, '%TAG')) {
             $directive = '%TAG'.$this->readUntilNewline($harvester);
@@ -520,28 +512,9 @@ final class Lexer
         return $result;
     }
 
-    /**
-     * Split `%YAML` lines into `DIRECTIVE_YAML`, `DIRECTIVE_YAML_VERSION` when the keyword is followed by horizontal
-     * whitespace, `:`, or a digit (version). Otherwise the whole line suffix stays on `DIRECTIVE_YAML` (see
-     * {@see readToken}).
-     */
     private function shouldTokenizeYamlDirectiveAsParts(Harvester $harvester): bool
     {
-        if ($harvester->cursor->position + 5 > $harvester->length) {
-            return false;
-        }
-        if ('%YAML' !== substr($harvester->input, $harvester->cursor->position, 5)) {
-            return false;
-        }
-        if ($harvester->cursor->position + 5 >= $harvester->length) {
-            return false;
-        }
-        $after = $harvester->input[$harvester->cursor->position + 5];
-        if (\in_array($after, self::CHARS_HORIZONTAL_WHITESPACE, true) || ':' === $after) {
-            return true;
-        }
-
-        return ctype_digit($after);
+        return '%YAML' === substr($harvester->input, $harvester->cursor->position, 5);
     }
 
     private function tokenizeYamlDirectiveLine(Harvester $harvester): void
@@ -577,21 +550,8 @@ final class Lexer
         $versionLine = $harvester->cursor->line;
         $versionColumn = $harvester->cursor->column;
         $version = $this->readYamlDirectiveVersion($harvester);
-        $harvester->stream->addToken(new Token(TokenType::DIRECTIVE_YAML_VERSION, $version, $versionLine, $versionColumn));
-
-        if ($harvester->cursor->position < $harvester->length && \in_array($harvester->input[$harvester->cursor->position], self::CHARS_HORIZONTAL_WHITESPACE, true)) {
-            $wsLine = $harvester->cursor->line;
-            $wsColumn = $harvester->cursor->column;
-            $ws = $this->readWhitespace($harvester);
-            $harvester->stream->addToken(new Token(TokenType::WHITESPACE, $ws, $wsLine, $wsColumn));
-        }
-
-        if ($harvester->cursor->position < $harvester->length && '#' === $harvester->input[$harvester->cursor->position] && $this->isCommentStart($harvester)) {
-            $commentLine = $harvester->cursor->line;
-            $commentColumn = $harvester->cursor->column;
-            $this->advance($harvester);
-            $comment = '#'.$this->readUntilNewline($harvester);
-            $harvester->stream->addToken(new Token(TokenType::COMMENT, $comment, $commentLine, $commentColumn));
+        if ('' !== $version) {
+            $harvester->stream->addToken(new Token(TokenType::DIRECTIVE_YAML_VERSION, $version, $versionLine, $versionColumn));
         }
     }
 
