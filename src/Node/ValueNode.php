@@ -19,6 +19,7 @@ class ValueNode extends AbstractNode
     private ?BlockMappingNode $blockMapping = null;
     private ?BlockSequenceNode $blockSequence = null;
     private ?ScalarNode $scalar = null;
+    private ?TagPropertyNode $tagProperty = null;
 
     public function addChild(Node $child): void
     {
@@ -36,6 +37,10 @@ class ValueNode extends AbstractNode
 
         if ($child instanceof ScalarNode) {
             $this->scalar = $child;
+        }
+
+        if ($child instanceof TagPropertyNode) {
+            $this->tagProperty = $child;
         }
 
         parent::addChild($child);
@@ -59,5 +64,10 @@ class ValueNode extends AbstractNode
     public function getBlockSequence(): ?BlockSequenceNode
     {
         return $this->blockSequence;
+    }
+
+    public function getTagProperty(): ?TagPropertyNode
+    {
+        return $this->tagProperty;
     }
 }

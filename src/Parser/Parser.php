@@ -41,10 +41,12 @@ use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\SequenceEntryNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\SyntaxTokenNode;
+use Aeliot\YamlToken\Node\TagBodyNode;
 use Aeliot\YamlToken\Node\TagDirectiveHandleNode;
 use Aeliot\YamlToken\Node\TagDirectiveNode;
 use Aeliot\YamlToken\Node\TagDirectivePrefixNode;
 use Aeliot\YamlToken\Node\TagNode;
+use Aeliot\YamlToken\Node\TagPropertyNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 use Aeliot\YamlToken\Node\YamlDirectiveNode;
@@ -149,6 +151,64 @@ final class Parser
         }
     }
 
+    private function collectValueProperties(Harvester $harvester, ValueNode $valueNode): void
+    {
+        $tagProperty = null;
+
+        while (!$harvester->tokens->isEnd()) {
+            $token = $harvester->tokens->current();
+            if (TokenType::WHITESPACE === $token->type) {
+                $valueNode->addChild(new WhitespaceNode($token));
+                $harvester->tokens->advance();
+                continue;
+            }
+
+            if (TokenType::ANCHOR === $token->type) {
+                $valueNode->addChild(new AnchorNode($token));
+                $harvester->tokens->advance();
+                continue;
+            }
+
+            if (TokenType::TAG_BODY === $token->type) {
+                throw new \LogicException('Tag body without tag handle');
+            }
+
+            if (\in_array($token->type, [
+                TokenType::TAG_HANDLE_NAMED,
+                TokenType::TAG_HANDLE_PRIMARY,
+                TokenType::TAG_HANDLE_SECONDARY,
+                TokenType::TAG_HANDLE_VERBATIM,
+                TokenType::TAG_NON_SPECIFIC,
+            ], true)) {
+                if (null !== $tagProperty) {
+                    throw new \LogicException('Only one tag property is supported per value node');
+                }
+
+                $tagProperty = new TagPropertyNode();
+                $tagProperty->addChild(new TagNode($token));
+                $valueNode->addChild($tagProperty);
+                $harvester->tokens->advance();
+
+                if (\in_array($token->type, [TokenType::TAG_HANDLE_VERBATIM, TokenType::TAG_NON_SPECIFIC], true)) {
+                    continue;
+                }
+
+                $this->collectTypes($harvester, [TokenType::WHITESPACE], $valueNode);
+
+                $body = $harvester->tokens->current();
+                if (TokenType::TAG_BODY !== $body?->type) {
+                    throw new \LogicException('Tag body expected');
+                }
+
+                $tagProperty->addChild(new TagBodyNode($body));
+                $harvester->tokens->advance();
+                continue;
+            }
+
+            break;
+        }
+    }
+
     private function createSimpleNode(Token $token): Node
     {
         return match ($token->type) {
@@ -160,6 +220,7 @@ final class Parser
             TokenType::LITERAL_BLOCK_SCALAR_INDICATOR => new BlockScalarIndicatorNode($token),
             TokenType::INDENTATION => new IndentationNode($token),
             TokenType::NEWLINE => new NewLineNode($token),
+            TokenType::TAG_BODY => new TagBodyNode($token),
             TokenType::TAG_HANDLE_NAMED,
             TokenType::TAG_HANDLE_PRIMARY,
             TokenType::TAG_HANDLE_SECONDARY,
@@ -688,14 +749,7 @@ final class Parser
     {
         $valueNode = new ValueNode();
 
-        $this->collectTypes($harvester, [
-            TokenType::ANCHOR,
-            TokenType::TAG_HANDLE_NAMED,
-            TokenType::TAG_HANDLE_PRIMARY,
-            TokenType::TAG_HANDLE_SECONDARY,
-            TokenType::TAG_HANDLE_VERBATIM,
-            TokenType::WHITESPACE,
-        ], $valueNode);
+        $this->collectValueProperties($harvester, $valueNode);
 
         if ($anchor = $valueNode->getAnchor()) {
             $harvester->registry->anchors[$anchor->getName()] = $anchor;
