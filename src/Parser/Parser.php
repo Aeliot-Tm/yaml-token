@@ -41,6 +41,9 @@ use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\SequenceEntryNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\SyntaxTokenNode;
+use Aeliot\YamlToken\Node\TagDirectiveHandleNode;
+use Aeliot\YamlToken\Node\TagDirectiveNode;
+use Aeliot\YamlToken\Node\TagDirectivePrefixNode;
 use Aeliot\YamlToken\Node\TagNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
@@ -395,7 +398,10 @@ final class Parser
                 continue;
             }
 
-            // TODO: handle DIRECTIVE_TAG
+            if (TokenType::DIRECTIVE_TAG === $token->type) {
+                $document->addChild($this->parseTagDirective($harvester));
+                continue;
+            }
 
             if (TokenType::COMMENT === $token->type) {
                 $document->addChild(new CommentNode($token));
@@ -628,6 +634,54 @@ final class Parser
         $this->parseDocuments($harvester, $stream);
 
         return $stream;
+    }
+
+    private function parseTagDirective(Harvester $harvester): TagDirectiveNode
+    {
+        $token = $harvester->tokens->current();
+        if (TokenType::DIRECTIVE_TAG !== $token?->type) {
+            throw new \LogicException('Expected DIRECTIVE_TAG token');
+        }
+
+        $tagDirectiveNode = new TagDirectiveNode($token);
+        $harvester->tokens->advance();
+
+        $seenHandle = false;
+        while (true) {
+            $token = $harvester->tokens->current();
+            if (null === $token) {
+                throw new \LogicException('Unexpected end of token stream: TAG directive handle and prefix are required');
+            }
+
+            if (TokenType::WHITESPACE === $token->type) {
+                $tagDirectiveNode->addChild($this->createSimpleNode($token));
+                $harvester->tokens->advance();
+                continue;
+            }
+
+            if (TokenType::DIRECTIVE_TAG_HANDLE === $token->type) {
+                $seenHandle = true;
+                $tagDirectiveNode->addChild(new TagDirectiveHandleNode($token));
+                $harvester->tokens->advance();
+                continue;
+            }
+
+            if (TokenType::DIRECTIVE_TAG_PREFIX === $token->type) {
+                if (!$seenHandle) {
+                    throw new \LogicException('Expected TAG directive handle before prefix');
+                }
+                $tagDirectiveNode->addChild(new TagDirectivePrefixNode($token));
+                $harvester->tokens->advance();
+
+                return $tagDirectiveNode;
+            }
+
+            if (\in_array($token->type, [TokenType::COMMENT, TokenType::NEWLINE], true)) {
+                throw new \LogicException('Expected TAG directive handle and prefix before newline or comment');
+            }
+
+            throw new \LogicException(\sprintf('Unexpected token in TAG directive: %s', $token->type->value));
+        }
     }
 
     private function parseValue(Harvester $harvester, int $parentIndentLen): ValueNode
