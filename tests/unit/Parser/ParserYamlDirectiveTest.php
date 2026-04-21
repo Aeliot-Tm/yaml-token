@@ -1,0 +1,135 @@
+<?php
+
+declare(strict_types=1);
+
+/*
+ * This file is part of the YAML Token project.
+ *
+ * (c) Anatoliy Melnikov <5785276@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
+namespace Aeliot\YamlToken\Test\Unit\Parser;
+
+use Aeliot\YamlToken\Node\DocumentNode;
+use Aeliot\YamlToken\Node\DocumentStartNode;
+use Aeliot\YamlToken\Node\KeyValueCoupleNode;
+use Aeliot\YamlToken\Node\StreamNode;
+use Aeliot\YamlToken\Node\YamlDirectiveNode;
+use Aeliot\YamlToken\Node\YamlDirectiveVersionNode;
+use Aeliot\YamlToken\Parser\Parser;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\UsesClass;
+use PHPUnit\Framework\TestCase;
+
+#[CoversClass(Parser::class)]
+#[UsesClass(StreamNode::class)]
+#[UsesClass(DocumentNode::class)]
+#[UsesClass(YamlDirectiveNode::class)]
+#[UsesClass(YamlDirectiveVersionNode::class)]
+final class ParserYamlDirectiveTest extends TestCase
+{
+    /**
+     * @return array<array<string>>
+     */
+    public static function getDataForTestThrowsAtEndOfFile(): array
+    {
+        return [['%YAML'], ['%YAML:'], ['%YAML '], ['%YAML : ']];
+    }
+
+    /**
+     * @return array<array<string>>
+     */
+    public static function getDataForTestWhenNoVersion(): array
+    {
+        return [["%YAML\n"], ["%YAML # no version\n"]];
+    }
+
+    public function testParsesYamlDirectiveWithColonSeparator(): void
+    {
+        $yaml = file_get_contents(__DIR__.'/../../fixture/spec/1.0/directive_4.3.2.yaml');
+        self::assertNotFalse($yaml);
+
+        $stream = (new Parser())->parse($yaml);
+        $documents = $this->getDocumentNodes($stream);
+        self::assertNotEmpty($documents);
+
+        $first = $documents[0];
+        $directive = $first->getChildren()[0];
+        self::assertInstanceOf(YamlDirectiveNode::class, $directive);
+        self::assertSame('%YAML', $directive->getKeywordToken()->text);
+        $versionNodes = array_values(array_filter(
+            $directive->getChildren(),
+            static fn ($n): bool => $n instanceof YamlDirectiveVersionNode,
+        ));
+        self::assertCount(1, $versionNodes);
+        self::assertSame('1.0', $versionNodes[0]->getKeywordToken()->text);
+    }
+
+    public function testParsesYamlDirectiveWithSpaceSeparator(): void
+    {
+        $yaml = file_get_contents(__DIR__.'/../../fixture/spec/1.2.2/directive_6.8.yaml');
+        self::assertNotFalse($yaml);
+
+        $stream = (new Parser())->parse($yaml);
+        $documents = $this->getDocumentNodes($stream);
+        self::assertGreaterThanOrEqual(2, \count($documents));
+
+        $first = $documents[0];
+        $children = $first->getChildren();
+        self::assertNotEmpty($children);
+        self::assertInstanceOf(YamlDirectiveNode::class, $children[0]);
+        $directive = $children[0];
+        self::assertSame('%YAML', $directive->getToken()->text);
+        $versionNodes = array_values(array_filter(
+            $directive->getChildren(),
+            static fn ($n): bool => $n instanceof YamlDirectiveVersionNode,
+        ));
+        self::assertCount(1, $versionNodes);
+        self::assertSame('1.2', $versionNodes[0]->getKeywordToken()->text);
+
+        $second = $documents[1];
+        $secondChildren = $second->getChildren();
+        self::assertNotEmpty($secondChildren);
+        self::assertInstanceOf(DocumentStartNode::class, $secondChildren[0]);
+
+        $couples = array_values(array_filter(
+            $secondChildren,
+            static fn ($n): bool => $n instanceof KeyValueCoupleNode,
+        ));
+        self::assertCount(1, $couples);
+        self::assertSame('key', $couples[0]->getKey()->getName()->getToken()->text);
+    }
+
+    #[DataProvider('getDataForTestWhenNoVersion')]
+    public function testThrowsWhenNoVersion(string $yaml): void
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Expected YAML directive version before newline or comment');
+
+        (new Parser())->parse($yaml);
+    }
+
+    #[DataProvider('getDataForTestThrowsAtEndOfFile')]
+    public function testThrowsAtEndOfFile(string $yaml): void
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Unexpected end of token stream: YAML directive version is required');
+
+        (new Parser())->parse($yaml);
+    }
+
+    /**
+     * @return list<DocumentNode>
+     */
+    private function getDocumentNodes(StreamNode $stream): array
+    {
+        return array_values(array_filter(
+            $stream->getChildren(),
+            static fn ($n): bool => $n instanceof DocumentNode,
+        ));
+    }
+}

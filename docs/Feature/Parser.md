@@ -7,6 +7,7 @@ The parser builds a tree of `Node` objects from the lexer `TokenStream`: stream,
 ## Technical details
 
 - Entry points: [`Parser::parse`](../../src/Parser/Parser.php) (lexes input), [`Parser::parseStream`](../../src/Parser/Parser.php) for an existing `TokenStream`.
+- `%YAML` directive: built as [`YamlDirectiveNode`](../../src/Node/YamlDirectiveNode.php) with the `DIRECTIVE_YAML` keyword token and child nodes for optional horizontal whitespace, optional `VALUE_INDICATOR` (`:`), and required `DIRECTIVE_YAML_VERSION` (as [`YamlDirectiveVersionNode`](../../src/Node/YamlDirectiveVersionNode.php)). Horizontal whitespace and comments after the version token stay at document level (same loop as other layout). If a newline or comment appears before a version token, or the token stream ends before a version token, the parser throws [`LogicException`](../../src/Parser/Parser.php).
 - Collections:
   - Block mapping: `key:` followed by an indented block of key/value couples (`BlockMappingNode`).
   - Block sequence: `key:` followed by an indented list of `-` entries (`BlockSequenceNode` with `SequenceEntryNode` children).

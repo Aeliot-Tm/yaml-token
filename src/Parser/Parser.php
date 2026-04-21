@@ -44,6 +44,8 @@ use Aeliot\YamlToken\Node\SyntaxTokenNode;
 use Aeliot\YamlToken\Node\TagNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
+use Aeliot\YamlToken\Node\YamlDirectiveNode;
+use Aeliot\YamlToken\Node\YamlDirectiveVersionNode;
 use Aeliot\YamlToken\Parser\Dto\Harvester;
 use Aeliot\YamlToken\Parser\Dto\ParseRegistry;
 use Aeliot\YamlToken\Parser\Dto\ParseState;
@@ -162,6 +164,7 @@ final class Parser
             TokenType::SEQUENCE_ENTRY,
             TokenType::VALUE_INDICATOR => new SyntaxTokenNode($token),
             TokenType::WHITESPACE => new WhitespaceNode($token),
+            TokenType::DIRECTIVE_YAML_VERSION => new YamlDirectiveVersionNode($token),
             default => throw new \DomainException(\sprintf('Not configured node for token type: %s', $token->type->value)),
         };
     }
@@ -396,7 +399,12 @@ final class Parser
                 continue;
             }
 
-            // TODO: handel DIRECTIVE_YAML & DIRECTIVE_TAG
+            if (TokenType::DIRECTIVE_YAML === $token->type) {
+                $document->addChild($this->parseYamlDirective($harvester));
+                continue;
+            }
+
+            // TODO: handle DIRECTIVE_TAG
 
             if (TokenType::COMMENT === $token->type) {
                 $document->addChild(new CommentNode($token));
@@ -699,6 +707,43 @@ final class Parser
         }
 
         return $blockSequence;
+    }
+
+    private function parseYamlDirective(Harvester $harvester): YamlDirectiveNode
+    {
+        $token = $harvester->tokens->current();
+        if (null === $token || TokenType::DIRECTIVE_YAML !== $token->type) {
+            throw new \LogicException('Expected DIRECTIVE_YAML token');
+        }
+
+        $yamlDirectiveNode = new YamlDirectiveNode($token);
+        $harvester->tokens->advance();
+
+        while (true) {
+            $token = $harvester->tokens->current();
+            if (null === $token) {
+                throw new \LogicException('Unexpected end of token stream: YAML directive version is required');
+            }
+
+            if (\in_array($token->type, [TokenType::WHITESPACE, TokenType::VALUE_INDICATOR], true)) {
+                $yamlDirectiveNode->addChild($this->createSimpleNode($token));
+                $harvester->tokens->advance();
+                continue;
+            }
+
+            if (TokenType::DIRECTIVE_YAML_VERSION === $token->type) {
+                $yamlDirectiveNode->addChild($this->createSimpleNode($token));
+                $harvester->tokens->advance();
+
+                return $yamlDirectiveNode;
+            }
+
+            if (\in_array($token->type, [TokenType::COMMENT, TokenType::NEWLINE], true)) {
+                throw new \LogicException('Expected YAML directive version before newline or comment');
+            }
+
+            throw new \LogicException(\sprintf('Unexpected token in YAML directive: %s', $token->type->value));
+        }
     }
 
     private function postProcessKeyValueCouple(Harvester $harvester, KeyValueCoupleNode $couple): void
