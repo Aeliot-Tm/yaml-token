@@ -22,6 +22,7 @@ use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\SequenceEntryNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\ValueNode;
+use Aeliot\YamlToken\Parser\Exception\IndentationInvalidException;
 use Aeliot\YamlToken\Parser\Parser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -79,7 +80,7 @@ YAML);
 
     public function testThrowsWhenSequenceIndentationIsGreaterThanBaseIndent(): void
     {
-        $this->expectException(\LogicException::class);
+        $this->expectException(IndentationInvalidException::class);
         $this->expectExceptionMessageMatches('/Unexpected indentation/i');
 
         (new Parser())->parse(<<<'YAML'
@@ -92,7 +93,7 @@ YAML);
 
     public function testThrowsWhenSequenceIndentationIsLessThanBaseIndent(): void
     {
-        $this->expectException(\LogicException::class);
+        $this->expectException(IndentationInvalidException::class);
         $this->expectExceptionMessageMatches('/Unexpected indentation/i');
 
         (new Parser())->parse(<<<'YAML'

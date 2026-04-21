@@ -23,6 +23,7 @@ use Aeliot\YamlToken\Node\MergeInstructionNode;
 use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\ValueNode;
+use Aeliot\YamlToken\Parser\Exception\AnchorUndefinedException;
 use Aeliot\YamlToken\Parser\Parser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -79,7 +80,7 @@ YAML);
 
     public function testThrowsOnUndefinedAliasInMergeInstruction(): void
     {
-        $this->expectException(\LogicException::class);
+        $this->expectException(AnchorUndefinedException::class);
         $this->expectExceptionMessageMatches('/Undefined alias/i');
 
         (new Parser())->parse(<<<'YAML'

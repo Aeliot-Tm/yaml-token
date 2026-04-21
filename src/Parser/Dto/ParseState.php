@@ -13,6 +13,10 @@ declare(strict_types=1);
 
 namespace Aeliot\YamlToken\Parser\Dto;
 
+use Aeliot\YamlToken\Parser\Exception\IndentationInvalidException;
+use Aeliot\YamlToken\Parser\Exception\IndentationOverrideException;
+use Aeliot\YamlToken\Parser\Exception\IndentationUndefinedException;
+
 final class ParseState
 {
     public ?int $indentStepLen = null;
@@ -24,12 +28,12 @@ final class ParseState
 
     public function registerIndentStepLen(int $indentLen): void
     {
-        if ($indentLen <= 0) {
-            throw new \LogicException('Indent length must be positive');
+        if (null !== $this->indentStepLen) {
+            throw new IndentationOverrideException('Indent step length is already registered');
         }
 
-        if (null !== $this->indentStepLen) {
-            throw new \LogicException('Indent step length is already registered');
+        if ($indentLen <= 0) {
+            throw new IndentationInvalidException('Indent length must be positive');
         }
 
         $this->indentStepLen = $indentLen;
@@ -37,16 +41,16 @@ final class ParseState
 
     public function assertIndentLenIsValid(int $indentLen): void
     {
-        if ($indentLen <= 0) {
-            throw new \LogicException('Indent length must be positive');
+        if (null === $this->indentStepLen) {
+            throw new IndentationUndefinedException('Indent step length is not registered yet');
         }
 
-        if (null === $this->indentStepLen) {
-            throw new \LogicException('Indent step length is not registered yet');
+        if ($indentLen <= 0) {
+            throw new IndentationInvalidException('Indent length must be positive');
         }
 
         if (0 !== ($indentLen % $this->indentStepLen)) {
-            throw new \LogicException(\sprintf('Indentation must be multiple of %d, got %d', $this->indentStepLen, $indentLen));
+            throw new IndentationInvalidException(\sprintf('Indentation must be multiple of %d, got %d', $this->indentStepLen, $indentLen));
         }
     }
 }

@@ -23,6 +23,7 @@ use Aeliot\YamlToken\Node\TagBodyNode;
 use Aeliot\YamlToken\Node\TagNode;
 use Aeliot\YamlToken\Node\TagPropertyNode;
 use Aeliot\YamlToken\Node\ValueNode;
+use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
 use Aeliot\YamlToken\Parser\Parser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -114,7 +115,7 @@ YAML));
 
     public function testThrowsWhenTwoTagsAreSpecifiedForSameValue(): void
     {
-        $this->expectException(\LogicException::class);
+        $this->expectException(UnexpectedStateException::class);
         $this->expectExceptionMessageMatches('/Only one tag property/i');
 
         (new Parser())->parse(<<<'YAML'

@@ -19,6 +19,8 @@ use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\YamlDirectiveNode;
 use Aeliot\YamlToken\Node\YamlDirectiveVersionNode;
+use Aeliot\YamlToken\Parser\Exception\UnexpectedEndException;
+use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Parser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -107,7 +109,7 @@ final class ParserYamlDirectiveTest extends TestCase
     #[DataProvider('getDataForTestWhenNoVersion')]
     public function testThrowsWhenNoVersion(string $yaml): void
     {
-        $this->expectException(\LogicException::class);
+        $this->expectException(UnexpectedTokenException::class);
         $this->expectExceptionMessage('Expected YAML directive version before newline or comment');
 
         (new Parser())->parse($yaml);
@@ -116,7 +118,7 @@ final class ParserYamlDirectiveTest extends TestCase
     #[DataProvider('getDataForTestThrowsAtEndOfFile')]
     public function testThrowsAtEndOfFile(string $yaml): void
     {
-        $this->expectException(\LogicException::class);
+        $this->expectException(UnexpectedEndException::class);
         $this->expectExceptionMessage('Unexpected end of token stream: YAML directive version is required');
 
         (new Parser())->parse($yaml);

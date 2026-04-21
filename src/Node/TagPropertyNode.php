@@ -50,6 +50,6 @@ final class TagPropertyNode extends AbstractNode
 
     public function isNonSpecific(): bool
     {
-        return $this->handle?->getToken()?->type === TokenType::TAG_NON_SPECIFIC;
+        return TokenType::TAG_NON_SPECIFIC === $this->handle?->getToken()?->type;
     }
 }
