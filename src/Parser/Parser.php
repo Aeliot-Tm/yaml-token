@@ -15,6 +15,7 @@ namespace Aeliot\YamlToken\Parser;
 
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Lexer\Lexer;
+use Aeliot\YamlToken\Node\AliasNode;
 use Aeliot\YamlToken\Node\AnchorNode;
 use Aeliot\YamlToken\Node\BlockMappingNode;
 use Aeliot\YamlToken\Node\BlockScalarChompingIndicatorNode;
@@ -33,6 +34,7 @@ use Aeliot\YamlToken\Node\FlowSequenceNode;
 use Aeliot\YamlToken\Node\IndentationNode;
 use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
+use Aeliot\YamlToken\Node\MergeInstructionNode;
 use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Node\ScalarNode;
@@ -60,6 +62,50 @@ final class Parser
     public function parse(string $input): StreamNode
     {
         return $this->parseStream((new Lexer())->tokenize($input));
+    }
+
+    /**
+     * @return list<AliasNode>
+     */
+    private function collectMergeAliases(ValueNode $value): array
+    {
+        $directAliases = array_values(array_filter(
+            $value->getChildren(),
+            static fn (Node $n): bool => $n instanceof AliasNode,
+        ));
+        if ($directAliases) {
+            /* @var list<AliasNode> $directAliases */
+            return $directAliases;
+        }
+
+        $flowSequence = null;
+        foreach ($value->getChildren() as $child) {
+            if ($child instanceof FlowSequenceNode) {
+                $flowSequence = $child;
+                break;
+            }
+        }
+        if (null === $flowSequence) {
+            throw new \LogicException('Merge value must be an alias or a flow sequence of aliases');
+        }
+
+        $aliases = [];
+        foreach ($flowSequence->getEntries() as $entry) {
+            if (!$entry instanceof ValueNode) {
+                throw new \LogicException('Flow sequence entry must be a value node');
+            }
+
+            $entryAliases = array_values(array_filter(
+                $entry->getChildren(),
+                static fn (Node $n): bool => $n instanceof AliasNode,
+            ));
+            if (1 !== \count($entryAliases)) {
+                throw new \LogicException('Each merge sequence entry must contain exactly one alias');
+            }
+            $aliases[] = $entryAliases[0];
+        }
+
+        return $aliases;
     }
 
     /**
@@ -147,7 +193,7 @@ final class Parser
             $harvester->tokens->setPosition($harvester->tokens->getPosition() - 1);
         }
 
-        if (!$token->type->isScalar()) {
+        if (!$token->type->isScalar() && !$token->type->isMergeIndicator()) {
             throw new \LogicException('Key scalar expected');
         }
 
@@ -164,7 +210,7 @@ final class Parser
             $token = $harvester->tokens->peek(1);
         }
 
-        if (TokenType::EXPLICIT_KEY_INDICATOR === $token->type) {
+        if (TokenType::EXPLICIT_KEY_INDICATOR === $token->type || $token->type->isMergeIndicator()) {
             return true;
         }
 
@@ -210,12 +256,18 @@ final class Parser
                 continue;
             }
 
+            if (TokenType::MERGE_INDICATOR === $token->type) {
+                $flowMappingNode->addChild($this->parseMergeInstructionAtCurrentPosition($harvester));
+                continue;
+            }
+
             $keyValueCouple = new KeyValueCoupleNode();
             $flowMappingNode->addChild($keyValueCouple);
 
             $keyValueCouple->setKey($this->getKeyNode($harvester));
             $this->collectTypes($harvester, [TokenType::VALUE_INDICATOR, TokenType::WHITESPACE], $keyValueCouple);
             $keyValueCouple->setValue($this->parseValue($harvester, 0));
+            $this->postProcessKeyValueCouple($harvester, $keyValueCouple);
         }
 
         $token = $harvester->tokens->current();
@@ -270,6 +322,28 @@ final class Parser
         $this->collectSpaceAndComments($harvester, $flowSequenceNode);
 
         return $flowSequenceNode;
+    }
+
+    private function parseMergeInstructionAtCurrentPosition(Harvester $harvester): MergeInstructionNode
+    {
+        $token = $harvester->tokens->current();
+        if (TokenType::MERGE_INDICATOR !== $token?->type) {
+            throw new \LogicException('There is no expected MERGE_INDICATOR token');
+        }
+        $harvester->tokens->advance();
+
+        $mergeInstruction = new MergeInstructionNode();
+
+        $tmp = new KeyValueCoupleNode();
+        $this->collectTypes($harvester, [TokenType::VALUE_INDICATOR, TokenType::WHITESPACE], $tmp);
+        $tmp->setValue($this->parseValue($harvester, 0));
+
+        $aliases = $this->collectMergeAliases($tmp->getValue());
+        foreach ($aliases as $alias) {
+            $mergeInstruction->addAlias($alias);
+        }
+
+        return $mergeInstruction;
     }
 
     private function parseStream(TokenStream $tokens): StreamNode
@@ -392,6 +466,7 @@ final class Parser
         $keyValueCouple->setKey($this->getKeyNode($harvester));
         $this->collectTypes($harvester, [TokenType::VALUE_INDICATOR, TokenType::WHITESPACE], $keyValueCouple);
         $keyValueCouple->setValue($this->parseValue($harvester, $indentLen));
+        $this->postProcessKeyValueCouple($harvester, $keyValueCouple);
     }
 
     private function parseValue(Harvester $harvester, int $parentIndentLen): ValueNode
@@ -444,6 +519,16 @@ final class Parser
             $valueNode->addChild($this->parseIndentedBlockValue($harvester, $parentIndentLen));
         } elseif ($token->type->isScalar()) {
             $valueNode->addChild(new ScalarNode($token));
+            $harvester->tokens->advance();
+        } elseif (TokenType::ALIAS === $token->type) {
+            $aliasNode = new AliasNode($token);
+            $aliasName = $aliasNode->getName();
+            $anchor = $harvester->registry->anchors[$aliasName] ?? null;
+            if (null === $anchor) {
+                throw new \LogicException(\sprintf('Undefined alias "%s"', $aliasName));
+            }
+            $aliasNode->setAnchor($anchor);
+            $valueNode->addChild($aliasNode);
             $harvester->tokens->advance();
         } elseif (TokenType::SEQUENCE_ENTRY === $token->type) {
             $valueNode->addChild($this->parseBlockSequenceValue($harvester, $parentIndentLen));
@@ -512,7 +597,7 @@ final class Parser
             }
 
             if (TokenType::INDENTATION !== $token->type) {
-                throw new \LogicException('Indentation expected while parsing block mapping value');
+                break;
             }
 
             $indentLen = \strlen($token->text);
@@ -540,6 +625,12 @@ final class Parser
             }
 
             $previousCoupleIndentLen = $indentLen;
+            $tokenAfterIndent = $harvester->tokens->peek(1);
+            if (TokenType::MERGE_INDICATOR === $tokenAfterIndent?->type) {
+                $harvester->tokens->advance(); // skip indentation
+                $blockMapping->addChild($this->parseMergeInstructionAtCurrentPosition($harvester));
+                continue;
+            }
             $this->parseKeyValueCoupleAtCurrentPosition($harvester, $blockMapping, $indentLen);
         }
 
@@ -608,5 +699,15 @@ final class Parser
         }
 
         return $blockSequence;
+    }
+
+    private function postProcessKeyValueCouple(Harvester $harvester, KeyValueCoupleNode $couple): void
+    {
+        $valueNode = $couple->getValue();
+        $anchor = $valueNode->getAnchor();
+        if (null !== $anchor) {
+            $anchor->setDeclarationCouple($couple);
+            $harvester->registry->anchors[$anchor->getName()] = $anchor;
+        }
     }
 }

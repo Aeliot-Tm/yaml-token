@@ -15,23 +15,23 @@ namespace Aeliot\YamlToken\Node;
 
 use Aeliot\YamlToken\Token\Token;
 
-class AnchorNode extends AbstractNode
+class AliasNode extends AbstractNode
 {
-    private ?KeyValueCoupleNode $declarationCouple = null;
+    private ?AnchorNode $anchor = null;
 
     public function __construct(
-        private Token $token,
+        private readonly Token $token,
     ) {
     }
 
-    public function getDeclarationCouple(): ?KeyValueCoupleNode
+    public function getAnchor(): ?AnchorNode
     {
-        return $this->declarationCouple;
+        return $this->anchor;
     }
 
-    public function setDeclarationCouple(KeyValueCoupleNode $couple): void
+    public function setAnchor(AnchorNode $anchor): void
     {
-        $this->declarationCouple = $couple;
+        $this->anchor = $anchor;
     }
 
     public function getName(): string

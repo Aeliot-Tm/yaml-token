@@ -71,6 +71,11 @@ enum TokenType: string
         self::LITERAL_BLOCK_SCALAR_INDICATOR,
     ];
 
+    public function isMergeIndicator(): bool
+    {
+        return self::MERGE_INDICATOR === $this;
+    }
+
     public function isScalar(): bool
     {
         return \in_array($this, [
