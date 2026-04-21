@@ -234,6 +234,130 @@ final class Parser
         return TokenType::SEQUENCE_ENTRY === $token?->type;
     }
 
+    private function parseBlockMappingValue(Harvester $harvester, int $parentIndentLen): BlockMappingNode
+    {
+        $blockMapping = new BlockMappingNode();
+
+        $baseIndentLen = null;
+        $previousCoupleIndentLen = null;
+
+        while (!$harvester->tokens->isEnd()) {
+            $this->collectTypes($harvester, [
+                TokenType::NEWLINE,
+                TokenType::COMMENT,
+                TokenType::WHITESPACE,
+            ], $blockMapping);
+
+            $token = $harvester->tokens->current();
+            if (null === $token) {
+                break;
+            }
+
+            if (TokenType::INDENTATION !== $token->type) {
+                break;
+            }
+
+            $indentLen = \strlen($token->text);
+            if ($indentLen > 0) {
+                if (!$harvester->state->isIndentLenRegistered()) {
+                    $harvester->state->registerIndentStepLen($indentLen);
+                }
+                $harvester->state->assertIndentLenIsValid($indentLen);
+            }
+
+            if ($indentLen <= $parentIndentLen) {
+                break;
+            }
+
+            if (null === $baseIndentLen) {
+                $baseIndentLen = $indentLen;
+            } elseif ($indentLen < $baseIndentLen) {
+                throw new \LogicException(\sprintf('Unexpected indentation %d while base indentation is %d', $indentLen, $baseIndentLen));
+            } elseif ($indentLen > $baseIndentLen && $previousCoupleIndentLen === $baseIndentLen) {
+                throw new \LogicException(\sprintf('Unexpected indentation %d for next key/value couple; expected %d', $indentLen, $baseIndentLen));
+            }
+
+            if (false === $this->isKeyValueCoupleStart($harvester)) {
+                throw new \LogicException('Key/value couple expected while parsing block mapping value');
+            }
+
+            $previousCoupleIndentLen = $indentLen;
+            $tokenAfterIndent = $harvester->tokens->peek(1);
+            if (TokenType::MERGE_INDICATOR === $tokenAfterIndent?->type) {
+                $harvester->tokens->advance(); // skip indentation
+                $blockMapping->addChild($this->parseMergeInstructionAtCurrentPosition($harvester));
+                continue;
+            }
+            $this->parseKeyValueCoupleAtCurrentPosition($harvester, $blockMapping, $indentLen);
+        }
+
+        if (null === $baseIndentLen) {
+            throw new \LogicException('Empty block mapping value is not supported');
+        }
+
+        return $blockMapping;
+    }
+
+    private function parseBlockSequenceValue(Harvester $harvester, int $parentIndentLen): BlockSequenceNode
+    {
+        $blockSequence = new BlockSequenceNode();
+
+        $baseIndentLen = null;
+
+        while (!$harvester->tokens->isEnd()) {
+            $this->collectTypes($harvester, [
+                TokenType::NEWLINE,
+                TokenType::COMMENT,
+                TokenType::WHITESPACE,
+            ], $blockSequence);
+
+            $token = $harvester->tokens->current();
+            if (null === $token) {
+                break;
+            }
+
+            if (TokenType::INDENTATION !== $token->type) {
+                break;
+            }
+
+            $indentLen = \strlen($token->text);
+            if ($indentLen > 0) {
+                if (!$harvester->state->isIndentLenRegistered()) {
+                    $harvester->state->registerIndentStepLen($indentLen);
+                }
+                $harvester->state->assertIndentLenIsValid($indentLen);
+            }
+
+            if ($indentLen <= $parentIndentLen) {
+                break;
+            }
+
+            if (null === $baseIndentLen) {
+                $baseIndentLen = $indentLen;
+            } elseif ($indentLen !== $baseIndentLen) {
+                throw new \LogicException(\sprintf('Unexpected indentation %d while base indentation is %d', $indentLen, $baseIndentLen));
+            }
+
+            if (false === $this->isSequenceStart($harvester)) {
+                throw new \LogicException('Sequence entry expected while parsing block sequence value');
+            }
+
+            $sequenceEntry = new SequenceEntryNode();
+            $blockSequence->addChild($sequenceEntry);
+            $sequenceEntry->addChild(new IndentationNode($token));
+            $harvester->tokens->advance();
+
+            $this->collectTypes($harvester, [TokenType::SEQUENCE_ENTRY, TokenType::WHITESPACE], $sequenceEntry);
+            $sequenceEntry->setValue($this->parseValue($harvester, $indentLen));
+        }
+
+        if (null === $baseIndentLen) {
+            throw new \LogicException('Empty block sequence value is not supported');
+        }
+
+        return $blockSequence;
+    }
+
     private function parseFlowMapping(Harvester $harvester): FlowMappingNode
     {
         $flowMappingNode = new FlowMappingNode();
@@ -583,130 +707,6 @@ final class Parser
         ], $valueNode);
 
         return $valueNode;
-    }
-
-    private function parseBlockMappingValue(Harvester $harvester, int $parentIndentLen): BlockMappingNode
-    {
-        $blockMapping = new BlockMappingNode();
-
-        $baseIndentLen = null;
-        $previousCoupleIndentLen = null;
-
-        while (!$harvester->tokens->isEnd()) {
-            $this->collectTypes($harvester, [
-                TokenType::NEWLINE,
-                TokenType::COMMENT,
-                TokenType::WHITESPACE,
-            ], $blockMapping);
-
-            $token = $harvester->tokens->current();
-            if (null === $token) {
-                break;
-            }
-
-            if (TokenType::INDENTATION !== $token->type) {
-                break;
-            }
-
-            $indentLen = \strlen($token->text);
-            if ($indentLen > 0) {
-                if (!$harvester->state->isIndentLenRegistered()) {
-                    $harvester->state->registerIndentStepLen($indentLen);
-                }
-                $harvester->state->assertIndentLenIsValid($indentLen);
-            }
-
-            if ($indentLen <= $parentIndentLen) {
-                break;
-            }
-
-            if (null === $baseIndentLen) {
-                $baseIndentLen = $indentLen;
-            } elseif ($indentLen < $baseIndentLen) {
-                throw new \LogicException(\sprintf('Unexpected indentation %d while base indentation is %d', $indentLen, $baseIndentLen));
-            } elseif ($indentLen > $baseIndentLen && $previousCoupleIndentLen === $baseIndentLen) {
-                throw new \LogicException(\sprintf('Unexpected indentation %d for next key/value couple; expected %d', $indentLen, $baseIndentLen));
-            }
-
-            if (false === $this->isKeyValueCoupleStart($harvester)) {
-                throw new \LogicException('Key/value couple expected while parsing block mapping value');
-            }
-
-            $previousCoupleIndentLen = $indentLen;
-            $tokenAfterIndent = $harvester->tokens->peek(1);
-            if (TokenType::MERGE_INDICATOR === $tokenAfterIndent?->type) {
-                $harvester->tokens->advance(); // skip indentation
-                $blockMapping->addChild($this->parseMergeInstructionAtCurrentPosition($harvester));
-                continue;
-            }
-            $this->parseKeyValueCoupleAtCurrentPosition($harvester, $blockMapping, $indentLen);
-        }
-
-        if (null === $baseIndentLen) {
-            throw new \LogicException('Empty block mapping value is not supported');
-        }
-
-        return $blockMapping;
-    }
-
-    private function parseBlockSequenceValue(Harvester $harvester, int $parentIndentLen): BlockSequenceNode
-    {
-        $blockSequence = new BlockSequenceNode();
-
-        $baseIndentLen = null;
-
-        while (!$harvester->tokens->isEnd()) {
-            $this->collectTypes($harvester, [
-                TokenType::NEWLINE,
-                TokenType::COMMENT,
-                TokenType::WHITESPACE,
-            ], $blockSequence);
-
-            $token = $harvester->tokens->current();
-            if (null === $token) {
-                break;
-            }
-
-            if (TokenType::INDENTATION !== $token->type) {
-                break;
-            }
-
-            $indentLen = \strlen($token->text);
-            if ($indentLen > 0) {
-                if (!$harvester->state->isIndentLenRegistered()) {
-                    $harvester->state->registerIndentStepLen($indentLen);
-                }
-                $harvester->state->assertIndentLenIsValid($indentLen);
-            }
-
-            if ($indentLen <= $parentIndentLen) {
-                break;
-            }
-
-            if (null === $baseIndentLen) {
-                $baseIndentLen = $indentLen;
-            } elseif ($indentLen !== $baseIndentLen) {
-                throw new \LogicException(\sprintf('Unexpected indentation %d while base indentation is %d', $indentLen, $baseIndentLen));
-            }
-
-            if (false === $this->isSequenceStart($harvester)) {
-                throw new \LogicException('Sequence entry expected while parsing block sequence value');
-            }
-
-            $sequenceEntry = new SequenceEntryNode();
-            $blockSequence->addChild($sequenceEntry);
-            $sequenceEntry->addChild(new IndentationNode($token));
-            $harvester->tokens->advance();
-
-            $this->collectTypes($harvester, [TokenType::SEQUENCE_ENTRY, TokenType::WHITESPACE], $sequenceEntry);
-            $sequenceEntry->setValue($this->parseValue($harvester, $indentLen));
-        }
-
-        if (null === $baseIndentLen) {
-            throw new \LogicException('Empty block sequence value is not supported');
-        }
-
-        return $blockSequence;
     }
 
     private function parseYamlDirective(Harvester $harvester): YamlDirectiveNode
