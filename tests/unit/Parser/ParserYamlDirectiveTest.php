@@ -106,6 +106,23 @@ final class ParserYamlDirectiveTest extends TestCase
         self::assertSame('key', $couples[0]->getKey()->getName()->getToken()->text);
     }
 
+    public function testParsesMultipleYamlDirectivesWithTrailingComment(): void
+    {
+        $stream = (new Parser())->parse(<<<'YAML'
+%YAML 1.2 # ok
+%YAML 1.2
+YAML);
+
+        $documents = $this->getDocumentNodes($stream);
+        self::assertCount(1, $documents);
+
+        $directives = array_values(array_filter(
+            $documents[0]->getChildren(),
+            static fn ($n): bool => $n instanceof YamlDirectiveNode,
+        ));
+        self::assertCount(2, $directives);
+    }
+
     #[DataProvider('getDataForTestWhenNoVersion')]
     public function testThrowsWhenNoVersion(string $yaml): void
     {
