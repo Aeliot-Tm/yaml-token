@@ -15,14 +15,14 @@ namespace Aeliot\YamlToken\Node;
 
 class SequenceEntryNode extends AbstractNode
 {
-    private Node $value;
+    private ValueNode $value;
 
-    public function getValue(): Node
+    public function getValue(): ValueNode
     {
         return $this->value;
     }
 
-    public function setValue(Node $node): void
+    public function setValue(ValueNode $node): void
     {
         $this->value = $node;
         $this->addChild($node);
