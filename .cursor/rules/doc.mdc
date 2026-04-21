@@ -26,7 +26,9 @@ When creating new documentation files:
      Format: `- [Description](../docs/Architecture/[FileName].md)` (Markdown links format).
    - After creating a new Feature documentation file, add a link to it in section `2. Features:` above.
      Format: `- [Description](../docs/Feature/[FileName].md)` (Markdown links format).
-   - Use relative paths from this file starting with `../docs/` (from perspective of root directory it is `.cursor/docs`).
+   - Use paths relative to THIS file (`.cursor/rules/doc.mdc`) for all links in this document.
+     Since this file is located in `.cursor/rules/`, links to the documentation in `.cursor/docs/` must start with `../docs/`
+     (e.g. `../docs/Feature/Parser.md` or `../docs/Architecture/Foo.md`).
    - Keep entries in alphabetical order by description for better organization.
 
 IMPORTANT: You MUST NOT create links from user's documents to `.cursor` rules! Keep them totally separated.
