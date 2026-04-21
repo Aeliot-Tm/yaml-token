@@ -327,6 +327,35 @@ final class Parser
         return $flowSequenceNode;
     }
 
+    private function parseIndentedBlockValue(Harvester $harvester, int $parentIndentLen): Node
+    {
+        $token = $harvester->tokens->current();
+        if (TokenType::NEWLINE !== $token?->type) {
+            throw new \LogicException('Expected NEWLINE while parsing indented block value');
+        }
+
+        $indent = $harvester->tokens->peek(1);
+        if (null === $indent || TokenType::INDENTATION !== $indent->type) {
+            $harvester->tokens->advance();
+
+            return new ScalarNode(new Token(TokenType::EMPTY_SCALAR, '', $token->line, $token->column));
+        }
+
+        $indentLen = \strlen($indent->text);
+        if ($indentLen <= $parentIndentLen) {
+            $harvester->tokens->advance();
+
+            return new ScalarNode(new Token(TokenType::EMPTY_SCALAR, '', $token->line, $token->column));
+        }
+
+        $afterIndent = $harvester->tokens->peek(2);
+        if (TokenType::SEQUENCE_ENTRY === $afterIndent?->type) {
+            return $this->parseBlockSequenceValue($harvester, $parentIndentLen);
+        }
+
+        return $this->parseBlockMappingValue($harvester, $parentIndentLen);
+    }
+
     private function parseMergeInstructionAtCurrentPosition(Harvester $harvester): MergeInstructionNode
     {
         $token = $harvester->tokens->current();
@@ -554,35 +583,6 @@ final class Parser
         ], $valueNode);
 
         return $valueNode;
-    }
-
-    private function parseIndentedBlockValue(Harvester $harvester, int $parentIndentLen): Node
-    {
-        $token = $harvester->tokens->current();
-        if (TokenType::NEWLINE !== $token?->type) {
-            throw new \LogicException('Expected NEWLINE while parsing indented block value');
-        }
-
-        $indent = $harvester->tokens->peek(1);
-        if (null === $indent || TokenType::INDENTATION !== $indent->type) {
-            $harvester->tokens->advance();
-
-            return new ScalarNode(new Token(TokenType::EMPTY_SCALAR, '', $token->line, $token->column));
-        }
-
-        $indentLen = \strlen($indent->text);
-        if ($indentLen <= $parentIndentLen) {
-            $harvester->tokens->advance();
-
-            return new ScalarNode(new Token(TokenType::EMPTY_SCALAR, '', $token->line, $token->column));
-        }
-
-        $afterIndent = $harvester->tokens->peek(2);
-        if (TokenType::SEQUENCE_ENTRY === $afterIndent?->type) {
-            return $this->parseBlockSequenceValue($harvester, $parentIndentLen);
-        }
-
-        return $this->parseBlockMappingValue($harvester, $parentIndentLen);
     }
 
     private function parseBlockMappingValue(Harvester $harvester, int $parentIndentLen): BlockMappingNode
