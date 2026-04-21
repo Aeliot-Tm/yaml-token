@@ -358,6 +358,95 @@ final class Parser
         return $blockSequence;
     }
 
+    private function parseDocuments(Harvester $harvester, StreamNode $stream): void
+    {
+        $document = new DocumentNode();
+        while (!$harvester->tokens->isEnd()) {
+            $token = $harvester->tokens->current();
+
+            if (TokenType::DOCUMENT_START === $token->type) {
+                if ($document->getChildren()) {
+                    $stream->addChild($document);
+                    $document = new DocumentNode();
+                }
+
+                $document->addChild(new DocumentStartNode($token));
+                $stream->addChild($document);
+                $harvester->tokens->advance();
+                continue;
+            }
+
+            if (TokenType::DOCUMENT_END === $token->type) {
+                $document->addChild(new DocumentEndNode($token));
+                $stream->addChild($document);
+                $document = new DocumentNode();
+                $harvester->tokens->advance();
+                continue;
+            }
+
+            if (TokenType::DIRECTIVE === $token->type) {
+                $document->addChild(new DirectiveNode($token));
+                $harvester->tokens->advance();
+                continue;
+            }
+
+            if (TokenType::DIRECTIVE_YAML === $token->type) {
+                $document->addChild($this->parseYamlDirective($harvester));
+                continue;
+            }
+
+            // TODO: handle DIRECTIVE_TAG
+
+            if (TokenType::COMMENT === $token->type) {
+                $document->addChild(new CommentNode($token));
+                $harvester->tokens->advance();
+                continue;
+            }
+
+            if (TokenType::NEWLINE === $token->type) {
+                $document->addChild(new NewLineNode($token));
+                $harvester->tokens->advance();
+                continue;
+            }
+
+            if (TokenType::INDENTATION === $token->type && TokenType::COMMENT === $harvester->tokens->peek(1)?->type) {
+                $document->addChild(new IndentationNode($token));
+                $harvester->tokens->advance();
+                continue;
+            }
+
+            if ($this->isSequenceStart($harvester)) {
+                $sequenceEntry = new SequenceEntryNode();
+                $document->addChild($sequenceEntry);
+
+                if (TokenType::INDENTATION === $token->type) {
+                    $sequenceEntry->addChild(new IndentationNode($token));
+                    $harvester->tokens->advance();
+                }
+
+                $this->collectTypes($harvester, [TokenType::SEQUENCE_ENTRY, TokenType::WHITESPACE], $sequenceEntry);
+                $sequenceEntry->setValue($this->parseValue($harvester, 0));
+                continue;
+            }
+
+            if ($this->isKeyValueCoupleStart($harvester)) {
+                $indentLen = 0;
+                if (TokenType::INDENTATION === $token->type) {
+                    $indentLen = \strlen($token->text);
+                }
+
+                $this->parseKeyValueCoupleAtCurrentPosition($harvester, $document, $indentLen);
+                continue;
+            }
+
+            throw new \LogicException('Unexpected type');
+        }
+
+        if ($document->getChildren()) {
+            $stream->addChild($document);
+        }
+    }
+
     private function parseFlowMapping(Harvester $harvester): FlowMappingNode
     {
         $flowMappingNode = new FlowMappingNode();
@@ -521,95 +610,6 @@ final class Parser
         }
 
         return $mergeInstruction;
-    }
-
-    private function parseDocuments(Harvester $harvester, StreamNode $stream): void
-    {
-        $document = new DocumentNode();
-        while (!$harvester->tokens->isEnd()) {
-            $token = $harvester->tokens->current();
-
-            if (TokenType::DOCUMENT_START === $token->type) {
-                if ($document->getChildren()) {
-                    $stream->addChild($document);
-                    $document = new DocumentNode();
-                }
-
-                $document->addChild(new DocumentStartNode($token));
-                $stream->addChild($document);
-                $harvester->tokens->advance();
-                continue;
-            }
-
-            if (TokenType::DOCUMENT_END === $token->type) {
-                $document->addChild(new DocumentEndNode($token));
-                $stream->addChild($document);
-                $document = new DocumentNode();
-                $harvester->tokens->advance();
-                continue;
-            }
-
-            if (TokenType::DIRECTIVE === $token->type) {
-                $document->addChild(new DirectiveNode($token));
-                $harvester->tokens->advance();
-                continue;
-            }
-
-            if (TokenType::DIRECTIVE_YAML === $token->type) {
-                $document->addChild($this->parseYamlDirective($harvester));
-                continue;
-            }
-
-            // TODO: handle DIRECTIVE_TAG
-
-            if (TokenType::COMMENT === $token->type) {
-                $document->addChild(new CommentNode($token));
-                $harvester->tokens->advance();
-                continue;
-            }
-
-            if (TokenType::NEWLINE === $token->type) {
-                $document->addChild(new NewLineNode($token));
-                $harvester->tokens->advance();
-                continue;
-            }
-
-            if (TokenType::INDENTATION === $token->type && TokenType::COMMENT === $harvester->tokens->peek(1)?->type) {
-                $document->addChild(new IndentationNode($token));
-                $harvester->tokens->advance();
-                continue;
-            }
-
-            if ($this->isSequenceStart($harvester)) {
-                $sequenceEntry = new SequenceEntryNode();
-                $document->addChild($sequenceEntry);
-
-                if (TokenType::INDENTATION === $token->type) {
-                    $sequenceEntry->addChild(new IndentationNode($token));
-                    $harvester->tokens->advance();
-                }
-
-                $this->collectTypes($harvester, [TokenType::SEQUENCE_ENTRY, TokenType::WHITESPACE], $sequenceEntry);
-                $sequenceEntry->setValue($this->parseValue($harvester, 0));
-                continue;
-            }
-
-            if ($this->isKeyValueCoupleStart($harvester)) {
-                $indentLen = 0;
-                if (TokenType::INDENTATION === $token->type) {
-                    $indentLen = \strlen($token->text);
-                }
-
-                $this->parseKeyValueCoupleAtCurrentPosition($harvester, $document, $indentLen);
-                continue;
-            }
-
-            throw new \LogicException('Unexpected type');
-        }
-
-        if ($document->getChildren()) {
-            $stream->addChild($document);
-        }
     }
 
     private function parseStream(TokenStream $tokens): StreamNode
