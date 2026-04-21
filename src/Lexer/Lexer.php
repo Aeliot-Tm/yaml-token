@@ -237,14 +237,6 @@ final class Lexer
             return;
         }
 
-        // DIRECTIVE_TAG (%TAG ...) — split into parts in {@see tokenizeTagDirectiveLine} when applicable
-        if ($this->match($harvester, '%TAG')) {
-            $directive = '%TAG'.$this->readUntilNewline($harvester);
-            $harvester->stream->addToken(new Token(TokenType::DIRECTIVE_TAG, $directive, $startLine, $startColumn));
-
-            return;
-        }
-
         // DIRECTIVE (%... for other directives)
         if ('%' === $char) {
             $directive = $this->readUntilNewline($harvester);
@@ -628,21 +620,6 @@ final class Lexer
         $prefixColumn = $harvester->cursor->column;
         $prefix = $this->readTagDirectivePrefix($harvester);
         $harvester->stream->addToken(new Token(TokenType::DIRECTIVE_TAG_PREFIX, $prefix, $prefixLine, $prefixColumn));
-
-        if ($harvester->cursor->position < $harvester->length && \in_array($harvester->input[$harvester->cursor->position], self::CHARS_HORIZONTAL_WHITESPACE, true)) {
-            $wsLine = $harvester->cursor->line;
-            $wsColumn = $harvester->cursor->column;
-            $ws = $this->readWhitespace($harvester);
-            $harvester->stream->addToken(new Token(TokenType::WHITESPACE, $ws, $wsLine, $wsColumn));
-        }
-
-        if ($harvester->cursor->position < $harvester->length && '#' === $harvester->input[$harvester->cursor->position] && $this->isCommentStart($harvester)) {
-            $commentLine = $harvester->cursor->line;
-            $commentColumn = $harvester->cursor->column;
-            $this->advance($harvester);
-            $comment = '#'.$this->readUntilNewline($harvester);
-            $harvester->stream->addToken(new Token(TokenType::COMMENT, $comment, $commentLine, $commentColumn));
-        }
     }
 
     private function readTagDirectiveHandle(Harvester $harvester): string
