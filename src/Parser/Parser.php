@@ -110,6 +110,11 @@ final class Parser
         return $aliases;
     }
 
+    private function collectSpaceAndComments(Harvester $harvester, Node $root): void
+    {
+        $this->collectTypes($harvester, self::TOKEN_TYPES_SPASE_AND_COMMENT, $root);
+    }
+
     /**
      * @param TokenType[] $types
      */
@@ -139,11 +144,6 @@ final class Parser
             $root->addChild($this->createSimpleNode($token));
             $harvester->tokens->advance();
         }
-    }
-
-    private function collectSpaceAndComments(Harvester $harvester, Node $root): void
-    {
-        $this->collectTypes($harvester, self::TOKEN_TYPES_SPASE_AND_COMMENT, $root);
     }
 
     private function createSimpleNode(Token $token): Node
