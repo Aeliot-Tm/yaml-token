@@ -740,6 +740,12 @@ final class Parser
                 $tagDirectiveNode->addChild(new TagDirectivePrefixNode($token));
                 $harvester->tokens->advance();
 
+                $this->collectTypes($harvester, [
+                    TokenType::WHITESPACE,
+                    TokenType::COMMENT,
+                    TokenType::NEWLINE,
+                ], $tagDirectiveNode);
+
                 return $tagDirectiveNode;
             }
 
@@ -848,6 +854,12 @@ final class Parser
             if (TokenType::DIRECTIVE_YAML_VERSION === $token->type) {
                 $yamlDirectiveNode->addChild($this->createSimpleNode($token));
                 $harvester->tokens->advance();
+
+                $this->collectTypes($harvester, [
+                    TokenType::WHITESPACE,
+                    TokenType::COMMENT,
+                    TokenType::NEWLINE,
+                ], $yamlDirectiveNode);
 
                 return $yamlDirectiveNode;
             }
