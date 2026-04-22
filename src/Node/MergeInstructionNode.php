@@ -23,7 +23,6 @@ class MergeInstructionNode extends AbstractNode
     public function addAlias(AliasNode $alias): void
     {
         $this->aliases[] = $alias;
-        $this->addChild($alias);
     }
 
     /**

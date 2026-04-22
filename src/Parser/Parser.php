@@ -508,9 +508,6 @@ final class Parser
                 ? $harvester->tokens->peek(1)
                 : $token;
             if (TokenType::MERGE_INDICATOR === $mergeCandidate?->type) {
-                if (TokenType::INDENTATION === $token->type) {
-                    $harvester->tokens->advance(); // skip indentation
-                }
                 $blockMapping->addChild($this->parseMergeInstructionAtCurrentPosition($harvester));
                 continue;
             }
@@ -1043,22 +1040,25 @@ final class Parser
 
     private function parseMergeInstructionAtCurrentPosition(Harvester $harvester): MergeInstructionNode
     {
+        $mergeInstruction = new MergeInstructionNode();
+
         $token = $harvester->tokens->current();
+        if (TokenType::INDENTATION === $token?->type) {
+            $mergeInstruction->addChild(new IndentationNode($token));
+            $harvester->tokens->advance();
+            $token = $harvester->tokens->current();
+        }
+
         if (TokenType::MERGE_INDICATOR !== $token?->type) {
             throw new UnexpectedTokenException(\sprintf('There is no expected MERGE_INDICATOR token, but %s given', $token?->type->value ?? '_nothing_'));
         }
+        $mergeInstruction->addChild(new SyntaxTokenNode($token));
         $harvester->tokens->advance();
 
-        $mergeInstruction = new MergeInstructionNode();
+        $this->collectTypes($harvester, [TokenType::VALUE_INDICATOR, TokenType::WHITESPACE], $mergeInstruction);
 
-        $tmp = new KeyValueCoupleNode();
-        $this->collectTypes($harvester, [TokenType::VALUE_INDICATOR, TokenType::WHITESPACE], $tmp);
-        $tmp->setValue($this->parseValue($harvester, 0));
-
-        $value = $tmp->getValue();
-        if (null === $value) {
-            throw new UnexpectedStateException('Merge instruction must have a value');
-        }
+        $value = $this->parseValue($harvester, 0);
+        $mergeInstruction->addChild($value);
 
         $aliases = $this->collectMergeAliases($value);
         foreach ($aliases as $alias) {
