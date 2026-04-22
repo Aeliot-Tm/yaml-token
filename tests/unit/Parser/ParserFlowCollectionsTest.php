@@ -88,6 +88,56 @@ YAML);
         self::assertSame('2', $this->getScalarValueText($flowCouples[1]));
     }
 
+    public function testParsesFlowSequenceWithTrailingCommaFromMinimalFixture(): void
+    {
+        $path = __DIR__.'/../../fixture/spec/1.2.2/flow-sequence-trailing-comma_7.4.1.yaml';
+        $raw = str_replace(["\r\n", "\r"], "\n", (string) file_get_contents($path));
+        $stream = (new Parser())->parse('k: '.rtrim($raw));
+
+        $couple = $this->getOnlyCouple($stream);
+        $value = $couple->getValue();
+
+        $flows = array_values(array_filter(
+            $value->getChildren(),
+            static fn ($n): bool => $n instanceof FlowSequenceNode,
+        ));
+        self::assertCount(1, $flows);
+
+        $entries = array_values(array_filter(
+            $flows[0]->getEntries(),
+            static fn ($n): bool => $n instanceof ValueNode,
+        ));
+        self::assertCount(3, $entries);
+        self::assertSame('a', $entries[0]->getScalar()?->getToken()->text);
+        self::assertSame('b', $entries[1]->getScalar()?->getToken()->text);
+        self::assertSame('c', $entries[2]->getScalar()?->getToken()->text);
+    }
+
+    public function testParsesFlowMappingWithTrailingCommaFromMinimalFixture(): void
+    {
+        $path = __DIR__.'/../../fixture/spec/1.2.2/flow-mapping-trailing-comma_7.4.2.yaml';
+        $raw = str_replace(["\r\n", "\r"], "\n", (string) file_get_contents($path));
+        $stream = (new Parser())->parse('k: '.rtrim($raw));
+
+        $couple = $this->getOnlyCouple($stream);
+        $value = $couple->getValue();
+
+        $flows = array_values(array_filter(
+            $value->getChildren(),
+            static fn ($n): bool => $n instanceof FlowMappingNode,
+        ));
+        self::assertCount(1, $flows);
+
+        $flowCouples = array_values(array_filter(
+            $flows[0]->getChildren(),
+            static fn ($n): bool => $n instanceof KeyValueCoupleNode,
+        ));
+        self::assertCount(2, $flowCouples);
+        self::assertSame(['a', 'b'], array_map(fn (KeyValueCoupleNode $c): string => $this->getKeyText($c), $flowCouples));
+        self::assertSame('1', $this->getScalarValueText($flowCouples[0]));
+        self::assertSame('2', $this->getScalarValueText($flowCouples[1]));
+    }
+
     private function getKeyText(KeyValueCoupleNode $couple): string
     {
         return $couple->getKey()->getName()->getToken()->text;
