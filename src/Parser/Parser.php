@@ -244,7 +244,24 @@ final class Parser
         return new SyntaxTokenNode($token);
     }
 
-    private function getKeyNode(Harvester $harvester): KeyNode
+    private function tryConsumeFlowMappingValueIndicator(Harvester $harvester, KeyValueCoupleNode $couple): bool
+    {
+        $this->collectTypes($harvester, [TokenType::WHITESPACE], $couple);
+
+        $token = $harvester->tokens->current();
+        if (null === $token || TokenType::VALUE_INDICATOR !== $token->type) {
+            return false;
+        }
+
+        $couple->setMappingValueIndicator(new SyntaxTokenNode($token));
+        $harvester->tokens->advance();
+
+        $this->collectTypes($harvester, [TokenType::WHITESPACE], $couple);
+
+        return true;
+    }
+
+    private function getKeyNode(Harvester $harvester, bool $allowEmptyImplicitKey): KeyNode
     {
         $keyNode = new KeyNode();
         $token = $harvester->tokens->current();
@@ -262,11 +279,18 @@ final class Parser
         }
 
         if (TokenType::VALUE_INDICATOR === $token->type) {
-            $token = new Token(TokenType::EMPTY_SCALAR, '', $token->line, $token->column);
-            $harvester->tokens->setPosition($harvester->tokens->getPosition() - 1);
+            if (!$allowEmptyImplicitKey && null === $keyNode->getExplicitKeyIndicatorNode()) {
+                throw new UnexpectedTokenException('Empty implicit key is not allowed in this context');
+            }
+
+            return $keyNode;
         }
 
         if (!$token->type->isScalar() && !$token->type->isMergeIndicator()) {
+            if (null !== $keyNode->getExplicitKeyIndicatorNode()) {
+                return $keyNode;
+            }
+
             throw new UnexpectedTokenException(\sprintf('Key scalar expected, but %s given', $token->type->value));
         }
 
@@ -593,9 +617,16 @@ final class Parser
             $keyValueCouple = new KeyValueCoupleNode();
             $flowMappingNode->addChild($keyValueCouple);
 
-            $keyValueCouple->setKey($this->getKeyNode($harvester));
-            $this->collectTypes($harvester, [TokenType::VALUE_INDICATOR, TokenType::WHITESPACE], $keyValueCouple);
-            $keyValueCouple->setValue($this->parseValue($harvester, 0));
+            $keyValueCouple->setKey($this->getKeyNode($harvester, true));
+
+            if ($this->tryConsumeFlowMappingValueIndicator($harvester, $keyValueCouple)) {
+                $token = $harvester->tokens->current();
+                if (null === $token || \in_array($token->type, [TokenType::FLOW_ENTRY, TokenType::FLOW_MAPPING_END], true)) {
+                    $keyValueCouple->setValue(new ValueNode());
+                } else {
+                    $keyValueCouple->setValue($this->parseValue($harvester, 0));
+                }
+            }
             $this->postProcessKeyValueCouple($harvester, $keyValueCouple);
         }
 
@@ -653,7 +684,7 @@ final class Parser
         return $flowSequenceNode;
     }
 
-    private function parseIndentedBlockValue(Harvester $harvester, int $parentIndentLen): Node
+    private function parseIndentedBlockValue(Harvester $harvester, int $parentIndentLen): ?Node
     {
         $token = $harvester->tokens->current();
         if (TokenType::NEWLINE !== $token?->type) {
@@ -664,14 +695,14 @@ final class Parser
         if (null === $indent || TokenType::INDENTATION !== $indent->type) {
             $harvester->tokens->advance();
 
-            return new ScalarNode(new Token(TokenType::EMPTY_SCALAR, '', $token->line, $token->column));
+            return null;
         }
 
         $indentLen = \strlen($indent->text);
         if ($indentLen <= $parentIndentLen) {
             $harvester->tokens->advance();
 
-            return new ScalarNode(new Token(TokenType::EMPTY_SCALAR, '', $token->line, $token->column));
+            return null;
         }
 
         $afterIndent = $harvester->tokens->peek(2);
@@ -697,7 +728,7 @@ final class Parser
             $harvester->tokens->advance();
         }
 
-        $keyValueCouple->setKey($this->getKeyNode($harvester));
+        $keyValueCouple->setKey($this->getKeyNode($harvester, false));
         $this->collectTypes($harvester, [TokenType::VALUE_INDICATOR, TokenType::WHITESPACE], $keyValueCouple);
         $keyValueCouple->setValue($this->parseValue($harvester, $indentLen));
         $this->postProcessKeyValueCouple($harvester, $keyValueCouple);
@@ -717,7 +748,12 @@ final class Parser
         $this->collectTypes($harvester, [TokenType::VALUE_INDICATOR, TokenType::WHITESPACE], $tmp);
         $tmp->setValue($this->parseValue($harvester, 0));
 
-        $aliases = $this->collectMergeAliases($tmp->getValue());
+        $value = $tmp->getValue();
+        if (null === $value) {
+            throw new UnexpectedStateException('Merge instruction must have a value');
+        }
+
+        $aliases = $this->collectMergeAliases($value);
         foreach ($aliases as $alias) {
             $mergeInstruction->addAlias($alias);
         }
@@ -809,8 +845,6 @@ final class Parser
 
         $token = $harvester->tokens->current();
         if (null === $token) {
-            $valueNode->addChild(new ScalarNode(new Token(TokenType::EMPTY_SCALAR, '', 1, 1)));
-
             return $valueNode;
         }
         if (\in_array($token->type, TokenType::BLOCK_SCALAR_INDICATORS, true)) {
@@ -837,7 +871,10 @@ final class Parser
             $valueNode->addChild(new ScalarNode($token));
             $harvester->tokens->advance();
         } elseif (TokenType::NEWLINE === $token->type) {
-            $valueNode->addChild($this->parseIndentedBlockValue($harvester, $parentIndentLen));
+            $indented = $this->parseIndentedBlockValue($harvester, $parentIndentLen);
+            if (null !== $indented) {
+                $valueNode->addChild($indented);
+            }
         } elseif ($token->type->isScalar()) {
             $valueNode->addChild(new ScalarNode($token));
             $harvester->tokens->advance();
@@ -915,7 +952,7 @@ final class Parser
     private function postProcessKeyValueCouple(Harvester $harvester, KeyValueCoupleNode $couple): void
     {
         $valueNode = $couple->getValue();
-        $anchor = $valueNode->getAnchor();
+        $anchor = $valueNode?->getAnchor();
         if (null !== $anchor) {
             $anchor->setDeclarationCouple($couple);
             $harvester->registry->anchors[$anchor->getName()] = $anchor;

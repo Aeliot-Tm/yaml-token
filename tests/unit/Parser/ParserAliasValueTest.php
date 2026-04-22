@@ -50,12 +50,14 @@ YAML);
         [$a, $b] = $couples;
 
         $aValue = $a->getValue();
+        self::assertNotNull($aValue);
         $aAnchor = $aValue->getAnchor();
         self::assertInstanceOf(AnchorNode::class, $aAnchor);
         self::assertSame('A', $aAnchor->getName());
         self::assertSame($a, $aAnchor->getDeclarationCouple());
 
         $bValue = $b->getValue();
+        self::assertNotNull($bValue);
         $aliases = array_values(array_filter(
             $bValue->getChildren(),
             static fn ($n): bool => $n instanceof AliasNode,

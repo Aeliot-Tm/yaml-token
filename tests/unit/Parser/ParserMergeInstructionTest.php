@@ -58,6 +58,7 @@ YAML);
 
         $b = $rootCouples[1];
         $bValue = $b->getValue();
+        self::assertNotNull($bValue);
         $bMapping = $this->getBlockMapping($bValue);
 
         $merge = $this->getOnlyMergeInstruction($bMapping);
@@ -106,6 +107,7 @@ YAML);
         [, $a2, $b] = $rootCouples;
 
         $bValue = $b->getValue();
+        self::assertNotNull($bValue);
         $bMapping = $this->getBlockMapping($bValue);
         $merge = $this->getOnlyMergeInstruction($bMapping);
         $aliases = $merge->getAliases();
@@ -127,7 +129,7 @@ YAML);
 
     private function getKeyText(KeyValueCoupleNode $couple): string
     {
-        return $couple->getKey()->getName()->getToken()->text;
+        return (string) $couple->getKey()->getName()?->getToken()->text;
     }
 
     /**
@@ -171,6 +173,7 @@ YAML);
     private function getScalarValueText(KeyValueCoupleNode $couple): string
     {
         $valueNode = $couple->getValue();
+        self::assertNotNull($valueNode);
         $scalar = $valueNode->getScalar();
         self::assertInstanceOf(ScalarNode::class, $scalar);
 

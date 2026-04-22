@@ -50,6 +50,7 @@ YAML);
         self::assertSame('levelA', $this->getKeyText($rootCouples[0]));
 
         $levelAValue = $rootCouples[0]->getValue();
+        self::assertNotNull($levelAValue);
         $levelAMapping = $levelAValue->getBlockMapping();
         self::assertInstanceOf(BlockMappingNode::class, $levelAMapping);
 
@@ -58,6 +59,7 @@ YAML);
         self::assertSame('levelB', $this->getKeyText($levelACouples[0]));
 
         $levelBValue = $levelACouples[0]->getValue();
+        self::assertNotNull($levelBValue);
         $levelBMapping = $levelBValue->getBlockMapping();
         self::assertInstanceOf(BlockMappingNode::class, $levelBMapping);
 
@@ -82,14 +84,17 @@ YAML);
         self::assertSame('levelA', $this->getKeyText($rootCouples[0]));
 
         $levelAValue = $rootCouples[0]->getValue();
+        self::assertNotNull($levelAValue);
         $levelB = $this->getKeyValueCouples($this->getBlockMapping($levelAValue))[0];
         self::assertSame('levelB', $this->getKeyText($levelB));
 
         $levelBValue = $levelB->getValue();
+        self::assertNotNull($levelBValue);
         $levelC = $this->getKeyValueCouples($this->getBlockMapping($levelBValue))[0];
         self::assertSame('levelC', $this->getKeyText($levelC));
 
         $levelCValue = $levelC->getValue();
+        self::assertNotNull($levelCValue);
         $props = $this->getKeyValueCouples($this->getBlockMapping($levelCValue));
         self::assertCount(2, $props);
         self::assertSame(['propA', 'propB'], array_map(fn (KeyValueCoupleNode $c): string => $this->getKeyText($c), $props));
@@ -115,18 +120,21 @@ YAML);
         self::assertSame('levelA', $this->getKeyText($rootCouples[0]));
 
         $levelAValue = $rootCouples[0]->getValue();
+        self::assertNotNull($levelAValue);
         $levelACouples = $this->getKeyValueCouples($this->getBlockMapping($levelAValue));
         self::assertCount(2, $levelACouples);
         self::assertSame(['levelB', 'levelE'], array_map(fn (KeyValueCoupleNode $c): string => $this->getKeyText($c), $levelACouples));
         self::assertSame('valueE', $this->getScalarValueText($levelACouples[1]));
 
         $levelBValue = $levelACouples[0]->getValue();
+        self::assertNotNull($levelBValue);
         $levelBCouples = $this->getKeyValueCouples($this->getBlockMapping($levelBValue));
         self::assertCount(2, $levelBCouples);
         self::assertSame(['levelC', 'levelD'], array_map(fn (KeyValueCoupleNode $c): string => $this->getKeyText($c), $levelBCouples));
         self::assertSame('valueD', $this->getScalarValueText($levelBCouples[1]));
 
         $levelCValue = $levelBCouples[0]->getValue();
+        self::assertNotNull($levelCValue);
         $props = $this->getKeyValueCouples($this->getBlockMapping($levelCValue));
         self::assertCount(2, $props);
         self::assertSame(['propA', 'propB'], array_map(fn (KeyValueCoupleNode $c): string => $this->getKeyText($c), $props));
@@ -169,7 +177,7 @@ YAML);
 
     private function getKeyText(KeyValueCoupleNode $couple): string
     {
-        return $couple->getKey()->getName()->getToken()->text;
+        return (string) $couple->getKey()->getName()?->getToken()->text;
     }
 
     /**
@@ -200,6 +208,7 @@ YAML);
     private function getScalarValueText(KeyValueCoupleNode $couple): string
     {
         $valueNode = $couple->getValue();
+        self::assertNotNull($valueNode);
         $scalar = $valueNode->getScalar();
         self::assertInstanceOf(ScalarNode::class, $scalar);
 

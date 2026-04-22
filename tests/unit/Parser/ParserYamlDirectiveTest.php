@@ -103,7 +103,7 @@ final class ParserYamlDirectiveTest extends TestCase
             static fn ($n): bool => $n instanceof KeyValueCoupleNode,
         ));
         self::assertCount(1, $couples);
-        self::assertSame('key', $couples[0]->getKey()->getName()->getToken()->text);
+        self::assertSame('key', $couples[0]->getKey()->getName()?->getToken()->text);
     }
 
     public function testParsesMultipleYamlDirectivesWithTrailingComment(): void

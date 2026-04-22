@@ -16,7 +16,7 @@ namespace Aeliot\YamlToken\Node;
 class KeyNode extends AbstractNode
 {
     private ?ExplicitKeyIndicatorNode $explicitKeyIndicatorNode = null;
-    private ScalarNode $name;
+    private ?ScalarNode $name = null;
 
     public function getExplicitKeyIndicatorNode(): ?ExplicitKeyIndicatorNode
     {
@@ -35,8 +35,13 @@ class KeyNode extends AbstractNode
         $this->addChild($node);
     }
 
-    public function getName(): ScalarNode
+    public function getName(): ?ScalarNode
     {
         return $this->name;
+    }
+
+    public function isEmpty(): bool
+    {
+        return null === $this->name;
     }
 }

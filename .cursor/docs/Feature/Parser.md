@@ -4,6 +4,17 @@
 
 The parser builds a tree of `Node` objects from the lexer `TokenStream`: stream, documents, block and flow collections, scalars, and layout (comments, indentation, newlines, structural tokens).
 
+## Source round-trip and empty nodes
+
+This project preserves the original source text by keeping all lexed tokens (including layout tokens like whitespace, newlines and comments) in the node tree. The YAML emitter then reconstructs the source by concatenating `TokenHolderInterface::getToken()->text` for all nodes.
+
+Because of this, the parser must not invent tokens that did not exist in the original input.
+
+- **Round-trip invariant**: emitting a parsed stream must reproduce the original input byte-for-byte.
+- **Empty node invariant**: YAML “empty nodes” are represented structurally, not by synthetic tokens.
+  - If a key or value is empty in YAML grammar, the corresponding node reference is `null` (absence).
+  - If a value is syntactically present (e.g. `:` is present) but its content is empty (`e-node`), the parser keeps a `ValueNode` instance whose content is empty (`ValueNode::isEmpty()`).
+
 ## Technical details
 
 - Entry points: [`Parser::parse`](../../src/Parser/Parser.php) (lexes input), [`Parser::parseStream`](../../src/Parser/Parser.php) for an existing `TokenStream`.

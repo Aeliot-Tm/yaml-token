@@ -48,6 +48,7 @@ key: !!str value
 YAML));
 
         $value = $couple->getValue();
+        self::assertNotNull($value);
         $tag = $value->getTagProperty();
         self::assertInstanceOf(TagPropertyNode::class, $tag);
 
@@ -69,6 +70,7 @@ key: !local value
 YAML));
 
         $value = $couple->getValue();
+        self::assertNotNull($value);
         $tag = $value->getTagProperty();
         self::assertInstanceOf(TagPropertyNode::class, $tag);
 
@@ -86,6 +88,7 @@ key: !<tag:yaml.org,2002:str> value
 YAML));
 
         $value = $couple->getValue();
+        self::assertNotNull($value);
         $tag = $value->getTagProperty();
         self::assertInstanceOf(TagPropertyNode::class, $tag);
 
@@ -103,6 +106,7 @@ key: ! value
 YAML));
 
         $value = $couple->getValue();
+        self::assertNotNull($value);
         $tag = $value->getTagProperty();
         self::assertInstanceOf(TagPropertyNode::class, $tag);
         self::assertTrue($tag->isNonSpecific());

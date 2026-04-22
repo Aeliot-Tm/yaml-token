@@ -56,11 +56,13 @@ YAML);
         self::assertSame('levelA', $this->getKeyText($rootCouples[0]));
 
         $levelAValue = $rootCouples[0]->getValue();
+        self::assertNotNull($levelAValue);
         $levelACouples = $this->getKeyValueCouples($this->getBlockMapping($levelAValue));
         self::assertCount(2, $levelACouples);
         self::assertSame(['levelB', 'levelC'], array_map(fn (KeyValueCoupleNode $c): string => $this->getKeyText($c), $levelACouples));
 
         $levelBValue = $levelACouples[0]->getValue();
+        self::assertNotNull($levelBValue);
         $seq = $levelBValue->getBlockSequence();
         self::assertInstanceOf(BlockSequenceNode::class, $seq);
 
@@ -73,9 +75,9 @@ YAML);
         self::assertSame('valueB', $this->getSequenceScalarText($entries[1]));
 
         $levelCValue = $levelACouples[1]->getValue();
+        self::assertNotNull($levelCValue);
         $levelCScalar = $levelCValue->getScalar();
-        self::assertInstanceOf(ScalarNode::class, $levelCScalar);
-        self::assertSame('', $levelCScalar->getToken()->text);
+        self::assertNull($levelCScalar);
     }
 
     public function testThrowsWhenSequenceIndentationIsGreaterThanBaseIndent(): void
@@ -114,7 +116,7 @@ YAML);
 
     private function getKeyText(KeyValueCoupleNode $couple): string
     {
-        return $couple->getKey()->getName()->getToken()->text;
+        return (string) $couple->getKey()->getName()?->getToken()->text;
     }
 
     /**

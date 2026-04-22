@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Aeliot\YamlToken\Test\Unit\Parser;
 
+use Aeliot\YamlToken\Emitter\YamlEmitter;
 use Aeliot\YamlToken\Lexer\Lexer;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\FlowMappingNode;
@@ -32,6 +33,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(FlowSequenceNode::class)]
 #[UsesClass(KeyValueCoupleNode::class)]
 #[UsesClass(Lexer::class)]
+#[UsesClass(YamlEmitter::class)]
 #[UsesClass(ScalarNode::class)]
 #[UsesClass(StreamNode::class)]
 #[UsesClass(ValueNode::class)]
@@ -45,6 +47,7 @@ YAML);
 
         $couple = $this->getOnlyCouple($stream);
         $value = $couple->getValue();
+        self::assertNotNull($value);
 
         $flows = array_values(array_filter(
             $value->getChildren(),
@@ -69,6 +72,7 @@ YAML);
 
         $couple = $this->getOnlyCouple($stream);
         $value = $couple->getValue();
+        self::assertNotNull($value);
 
         $flows = array_values(array_filter(
             $value->getChildren(),
@@ -96,6 +100,7 @@ YAML);
 
         $couple = $this->getOnlyCouple($stream);
         $value = $couple->getValue();
+        self::assertNotNull($value);
 
         $flows = array_values(array_filter(
             $value->getChildren(),
@@ -121,6 +126,7 @@ YAML);
 
         $couple = $this->getOnlyCouple($stream);
         $value = $couple->getValue();
+        self::assertNotNull($value);
 
         $flows = array_values(array_filter(
             $value->getChildren(),
@@ -138,9 +144,45 @@ YAML);
         self::assertSame('2', $this->getScalarValueText($flowCouples[1]));
     }
 
+    public function testParsesFlowEmptyKeyFromMinimalFixture(): void
+    {
+        $path = __DIR__.'/../../fixture/spec/1.2.2/flow-empty-key_7.4.2.yaml';
+        $raw = str_replace(["\r\n", "\r"], "\n", (string) file_get_contents($path));
+
+        $source = 'k: '.rtrim($raw);
+        $stream = (new Parser())->parse($source);
+        self::assertSame($source, (new YamlEmitter())->emit($stream));
+
+        $couple = $this->getOnlyCouple($stream);
+        $value = $couple->getValue();
+        self::assertNotNull($value);
+
+        $flows = array_values(array_filter(
+            $value->getChildren(),
+            static fn ($n): bool => $n instanceof FlowMappingNode,
+        ));
+        self::assertCount(1, $flows);
+
+        $flowCouples = array_values(array_filter(
+            $flows[0]->getChildren(),
+            static fn ($n): bool => $n instanceof KeyValueCoupleNode,
+        ));
+        self::assertCount(2, $flowCouples);
+
+        self::assertSame('foo', $flowCouples[0]->getKey()->getName()?->getToken()->text);
+        self::assertNotNull($flowCouples[0]->getMappingValueIndicator());
+        self::assertNotNull($flowCouples[0]->getValue());
+        self::assertTrue($flowCouples[0]->getValue()->isEmpty());
+
+        self::assertTrue($flowCouples[1]->getKey()->isEmpty());
+        self::assertNotNull($flowCouples[1]->getKey()->getExplicitKeyIndicatorNode());
+        self::assertNotNull($flowCouples[1]->getMappingValueIndicator());
+        self::assertSame('bar', $this->getScalarValueText($flowCouples[1]));
+    }
+
     private function getKeyText(KeyValueCoupleNode $couple): string
     {
-        return $couple->getKey()->getName()->getToken()->text;
+        return (string) $couple->getKey()->getName()?->getToken()->text;
     }
 
     private function getOnlyCouple(StreamNode $stream): KeyValueCoupleNode
@@ -163,6 +205,7 @@ YAML);
     private function getScalarValueText(KeyValueCoupleNode $couple): string
     {
         $valueNode = $couple->getValue();
+        self::assertNotNull($valueNode);
         $scalar = $valueNode->getScalar();
         self::assertInstanceOf(ScalarNode::class, $scalar);
 

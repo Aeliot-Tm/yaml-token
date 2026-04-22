@@ -18,7 +18,8 @@ class KeyValueCoupleNode extends AbstractNode
     private ?IndentationNode $indentation = null;
     private KeyNode $key;
     private ?MergeInstructionNode $mergeInstruction = null;
-    private ValueNode $value;
+    private ?SyntaxTokenNode $mappingValueIndicator = null;
+    private ?ValueNode $value = null;
 
     public function getIndentation(): ?IndentationNode
     {
@@ -53,7 +54,18 @@ class KeyValueCoupleNode extends AbstractNode
         $this->addChild($node);
     }
 
-    public function getValue(): ValueNode
+    public function getMappingValueIndicator(): ?SyntaxTokenNode
+    {
+        return $this->mappingValueIndicator;
+    }
+
+    public function setMappingValueIndicator(SyntaxTokenNode $node): void
+    {
+        $this->mappingValueIndicator = $node;
+        $this->addChild($node);
+    }
+
+    public function getValue(): ?ValueNode
     {
         return $this->value;
     }

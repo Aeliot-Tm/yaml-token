@@ -30,7 +30,6 @@ enum TokenType: string
     case DOCUMENT_START = 'DOCUMENT_START';
     case DOCUMENT_END = 'DOCUMENT_END';
     case DOUBLE_QUOTED_SCALAR = 'DOUBLE_QUOTED_SCALAR';
-    case EMPTY_SCALAR = 'EMPTY_SCALAR';
     case EXPLICIT_KEY_INDICATOR = 'EXPLICIT_KEY_INDICATOR';
     case FLOW_ENTRY = 'FLOW_ENTRY';
     case FLOW_MAPPING_END = 'FLOW_MAPPING_END';
@@ -71,7 +70,6 @@ enum TokenType: string
     {
         return \in_array($this, [
             self::DOUBLE_QUOTED_SCALAR,
-            self::EMPTY_SCALAR,
             self::FOLDED_BLOCK_SCALAR,
             self::LITERAL_BLOCK_SCALAR,
             self::PLAIN_SCALAR,
