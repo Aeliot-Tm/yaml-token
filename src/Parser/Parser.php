@@ -215,6 +215,37 @@ final class Parser
         }
     }
 
+    /**
+     * Consumes one SEQUENCE_ENTRY token followed by any number of
+     * directly adjacent WHITESPACE tokens. Returns the total length
+     * in characters (always >= 1). Per YAML 1.2.2 §8.2.1 this
+     * combined length is considered part of the indentation of the
+     * nested (compact) block collection.
+     */
+    private function consumeSequenceEntryIndicatorAndSpaces(Harvester $harvester, Node $target): int
+    {
+        $token = $harvester->tokens->current();
+        if (TokenType::SEQUENCE_ENTRY !== $token?->type) {
+            throw new UnexpectedTokenException(\sprintf('SEQUENCE_ENTRY expected, but %s given', $token?->type->value ?? '_nothing_'));
+        }
+
+        $target->addChild(new SyntaxTokenNode($token));
+        $harvester->tokens->advance();
+        $consumed = \strlen($token->text);
+
+        while (true) {
+            $next = $harvester->tokens->current();
+            if (TokenType::WHITESPACE !== $next?->type) {
+                break;
+            }
+            $target->addChild(new WhitespaceNode($next));
+            $consumed += \strlen($next->text);
+            $harvester->tokens->advance();
+        }
+
+        return $consumed;
+    }
+
     private function createSimpleNode(Token $token): Node
     {
         return match ($token->type) {
@@ -310,32 +341,6 @@ final class Parser
         return TokenType::FLOW_MAPPING_START === $token?->type;
     }
 
-    /**
-     * Implicit YAML-key form of a single-pair flow-sequence entry
-     * (YAML 1.2.2 §7.4.1 rule [139], §7.4.2 rules [150]–[152]):
-     * the entry starts with a scalar implicit key and continues with ':'
-     * on the same line, optionally separated by s-separate-in-line (WHITESPACE).
-     */
-    private function isFlowPairStart(Harvester $harvester): bool
-    {
-        $token = $harvester->tokens->current();
-        if (null === $token || !$token->type->isScalar()) {
-            return false;
-        }
-
-        $offset = 1;
-        while (true) {
-            $peeked = $harvester->tokens->peek($offset);
-            if (null === $peeked) {
-                return false;
-            }
-            if (TokenType::WHITESPACE !== $peeked->type) {
-                return TokenType::VALUE_INDICATOR === $peeked->type;
-            }
-            ++$offset;
-        }
-    }
-
     private function isFlowSequenceStart(Harvester $harvester): bool
     {
         $token = $harvester->tokens->current();
@@ -362,6 +367,33 @@ final class Parser
             TokenType::SINGLE_QUOTED_SCALAR,
             TokenType::PLAIN_SCALAR,
         ], true);
+    }
+
+    /**
+     * Implicit YAML key detector (YAML 1.2.2 rule [154] ns-s-implicit-yaml-key):
+     * current token is a scalar and the next non-WHITESPACE token on the same
+     * logical position is ':' (VALUE_INDICATOR). Used both for
+     *  - flow-pair entry inside a flow-sequence (§7.4.1 [139], §7.4.2 [152]);
+     *  - compact block-mapping entry inside a block sequence entry (§8.2.1 [185], §8.2.2 [195]).
+     */
+    private function isScalarFollowedByValueIndicator(Harvester $harvester): bool
+    {
+        $token = $harvester->tokens->current();
+        if (null === $token || !$token->type->isScalar()) {
+            return false;
+        }
+
+        $offset = 1;
+        while (true) {
+            $peeked = $harvester->tokens->peek($offset);
+            if (null === $peeked) {
+                return false;
+            }
+            if (TokenType::WHITESPACE !== $peeked->type) {
+                return TokenType::VALUE_INDICATOR === $peeked->type;
+            }
+            ++$offset;
+        }
     }
 
     private function isSequenceStart(Harvester $harvester): bool
@@ -487,8 +519,8 @@ final class Parser
             $sequenceEntry->addChild(new IndentationNode($token));
             $harvester->tokens->advance();
 
-            $this->collectTypes($harvester, [TokenType::SEQUENCE_ENTRY, TokenType::WHITESPACE], $sequenceEntry);
-            $sequenceEntry->setValue($this->parseValue($harvester, $indentLen));
+            $compactIndent = $indentLen + $this->consumeSequenceEntryIndicatorAndSpaces($harvester, $sequenceEntry);
+            $sequenceEntry->setValue($this->parseSequenceEntryValue($harvester, $indentLen, $compactIndent));
         }
 
         if (null === $baseIndentLen) {
@@ -496,6 +528,45 @@ final class Parser
         }
 
         return $blockSequence;
+    }
+
+    /**
+     * YAML 1.2.2 §8.2.2 rule [195] ns-l-compact-mapping(n):
+     *   ns-l-block-map-entry(n) ( s-indent(n) ns-l-block-map-entry(n) )*
+     *
+     * The first entry is parsed at the current stream position (no leading
+     * INDENTATION token — the caller has already consumed '-' and its
+     * trailing spaces so we sit directly on the key). Subsequent entries
+     * require an INDENTATION token whose length equals $indentLen.
+     */
+    private function parseCompactBlockMapping(Harvester $harvester, int $indentLen): BlockMappingNode
+    {
+        $blockMapping = new BlockMappingNode();
+
+        $this->parseKeyValueCoupleAtCurrentPosition($harvester, $blockMapping, $indentLen);
+
+        while (!$harvester->tokens->isEnd()) {
+            $this->collectTypes($harvester, [
+                TokenType::NEWLINE,
+                TokenType::COMMENT,
+                TokenType::WHITESPACE,
+            ], $blockMapping);
+
+            $token = $harvester->tokens->current();
+            if (null === $token || TokenType::INDENTATION !== $token->type) {
+                break;
+            }
+            if (\strlen($token->text) !== $indentLen) {
+                break;
+            }
+            if (!$this->isKeyValueCoupleStart($harvester)) {
+                break;
+            }
+
+            $this->parseKeyValueCoupleAtCurrentPosition($harvester, $blockMapping, $indentLen);
+        }
+
+        return $blockMapping;
     }
 
     private function parseDocuments(Harvester $harvester, StreamNode $stream): void
@@ -562,13 +633,15 @@ final class Parser
                 $sequenceEntry = new SequenceEntryNode();
                 $document->addChild($sequenceEntry);
 
+                $leadingIndent = 0;
                 if (TokenType::INDENTATION === $token->type) {
                     $sequenceEntry->addChild(new IndentationNode($token));
+                    $leadingIndent = \strlen($token->text);
                     $harvester->tokens->advance();
                 }
 
-                $this->collectTypes($harvester, [TokenType::SEQUENCE_ENTRY, TokenType::WHITESPACE], $sequenceEntry);
-                $sequenceEntry->setValue($this->parseValue($harvester, 0));
+                $compactIndent = $leadingIndent + $this->consumeSequenceEntryIndicatorAndSpaces($harvester, $sequenceEntry);
+                $sequenceEntry->setValue($this->parseSequenceEntryValue($harvester, $leadingIndent, $compactIndent));
                 continue;
             }
 
@@ -714,7 +787,7 @@ final class Parser
      * Parses a single flow-sequence entry.
      *
      * Per YAML 1.2.2 §7.4.1 rule [139], an entry is either a flow-node or a flow-pair.
-     * Flow-pair (the compact single-pair mapping) is recognized via {@see isFlowPairStart()}
+     * Flow-pair (the compact single-pair mapping) is recognized via {@see isScalarFollowedByValueIndicator()}
      * and built using the same helpers as {@see parseFlowMapping()} so that whitespace
      * tokens between the key and ':' end up attached to the KeyValueCoupleNode
      * (matching c-ns-flow-map-separate-value, rule [152]).
@@ -725,7 +798,7 @@ final class Parser
      */
     private function parseFlowSequenceEntry(Harvester $harvester): Node
     {
-        if (!$this->isFlowPairStart($harvester)) {
+        if (!$this->isScalarFollowedByValueIndicator($harvester)) {
             return $this->parseValue($harvester, 0);
         }
 
@@ -821,6 +894,29 @@ final class Parser
         }
 
         return $mergeInstruction;
+    }
+
+    /**
+     * YAML 1.2.2 §8.2.1 rule [185] s-l+block-indented(n,c): decides between
+     *  - a compact in-line block mapping (rule [195] ns-l-compact-mapping),
+     *    when the entry content starts with an implicit YAML key;
+     *  - a generic block / flow / scalar node (delegated to {@see parseValue()}).
+     *
+     * $compactIndent is the column of the entry's first content character,
+     * i.e. (indent of '-') + length('-') + length of WHITESPACE tokens
+     * that follow '-'. Per §8.2.1 this length defines the indentation
+     * of the nested compact collection.
+     */
+    private function parseSequenceEntryValue(Harvester $harvester, int $parentIndentLen, int $compactIndent): ValueNode
+    {
+        if ($this->isScalarFollowedByValueIndicator($harvester)) {
+            $valueNode = new ValueNode();
+            $valueNode->addChild($this->parseCompactBlockMapping($harvester, $compactIndent));
+
+            return $valueNode;
+        }
+
+        return $this->parseValue($harvester, $parentIndentLen);
     }
 
     private function parseStream(TokenStream $tokens): StreamNode
