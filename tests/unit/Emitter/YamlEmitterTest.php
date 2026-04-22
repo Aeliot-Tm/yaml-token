@@ -77,37 +77,11 @@ final class YamlEmitterTest extends TestCase
         return realpath(__DIR__.'/../../fixture/spec') ?: __DIR__.'/../../fixture/spec';
     }
 
-    private static function isEmitterRoundTripNotYetVerbatim(string $fixtureId): bool
-    {
-        return
-            str_contains($fixtureId, 'merge-key_')
-            // Empty scalars: blank line before continuation; key-only; multiple adjacent keys; etc.
-            || str_contains($fixtureId, 'empty-scalar')
-            || str_contains($fixtureId, 'plain-multiline')
-        ;
-    }
-
     #[DataProvider('getDataForTestEmitsOriginalYaml')]
     public function testEmitsOriginalYaml(string $fixture): void
     {
         $yaml = file_get_contents($fixture);
-        self::assertNotFalse($yaml);
-
-        try {
-            $stream = (new Parser())->parse($yaml);
-        } catch (\Throwable $e) {
-            self::markTestSkipped('Parser error: '.$e->getMessage().' on '.$this->getRelativePathFromRoot($e->getFile()).':'.$e->getLine());
-        }
-
-        if (self::isEmitterRoundTripNotYetVerbatim(self::getFixtureDataSetName(self::getSpecRoot(), $fixture))) {
-            self::markTestSkipped('Emitter does not yet reproduce this fixture text verbatim (whitespace, merge key, or multiline plain).');
-        }
-
+        $stream = (new Parser())->parse(file_get_contents($fixture));
         self::assertSame($yaml, (new YamlEmitter())->emit($stream));
-    }
-
-    private function getRelativePathFromRoot(string $pathname): string
-    {
-        return preg_replace('~^'.\dirname(__DIR__, 3).'/~', '', $pathname);
     }
 }
