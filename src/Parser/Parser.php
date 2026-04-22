@@ -569,6 +569,56 @@ final class Parser
         return $blockMapping;
     }
 
+    /**
+     * YAML 1.2.2 §8.2.1 rule [186] ns-l-compact-sequence(n):
+     *   c-l-block-seq-entry(n) ( s-indent(n) c-l-block-seq-entry(n) )*
+     *
+     * The first entry is parsed at the current stream position (no leading
+     * INDENTATION token — the caller has already consumed the enclosing
+     * indicator, e.g. '-', '?' or ':' together with its trailing spaces,
+     * so we sit directly on the nested '-'). Subsequent entries require
+     * an INDENTATION token whose length equals $indentLen — the column
+     * (0-based) of the first '-', i.e. the value of n in rule [186].
+     */
+    private function parseCompactBlockSequence(Harvester $harvester, int $indentLen): BlockSequenceNode
+    {
+        $blockSequence = new BlockSequenceNode();
+
+        $firstEntry = new SequenceEntryNode();
+        $blockSequence->addChild($firstEntry);
+        $firstCompactIndent = $indentLen + $this->consumeSequenceEntryIndicatorAndSpaces($harvester, $firstEntry);
+        $firstEntry->setValue($this->parseSequenceEntryValue($harvester, $indentLen, $firstCompactIndent));
+
+        while (!$harvester->tokens->isEnd()) {
+            $this->collectTypes($harvester, [
+                TokenType::NEWLINE,
+                TokenType::COMMENT,
+                TokenType::WHITESPACE,
+            ], $blockSequence);
+
+            $token = $harvester->tokens->current();
+            if (null === $token || TokenType::INDENTATION !== $token->type) {
+                break;
+            }
+            if (\strlen($token->text) !== $indentLen) {
+                break;
+            }
+            if (!$this->isSequenceStart($harvester)) {
+                break;
+            }
+
+            $sequenceEntry = new SequenceEntryNode();
+            $blockSequence->addChild($sequenceEntry);
+            $sequenceEntry->addChild(new IndentationNode($token));
+            $harvester->tokens->advance();
+
+            $compactIndent = $indentLen + $this->consumeSequenceEntryIndicatorAndSpaces($harvester, $sequenceEntry);
+            $sequenceEntry->setValue($this->parseSequenceEntryValue($harvester, $indentLen, $compactIndent));
+        }
+
+        return $blockSequence;
+    }
+
     private function parseDocuments(Harvester $harvester, StreamNode $stream): void
     {
         $document = new DocumentNode();
@@ -905,6 +955,9 @@ final class Parser
      * YAML 1.2.2 §8.2.1 rule [185] s-l+block-indented(n,c): decides between
      *  - a compact in-line block mapping (rule [195] ns-l-compact-mapping),
      *    when the entry content starts with an implicit YAML key;
+     *  - a compact in-line block sequence (rule [186] ns-l-compact-sequence),
+     *    when the entry content starts with another '-' on the same line
+     *    (Example 8.15);
      *  - a generic block / flow / scalar node (delegated to {@see parseValue()}).
      *
      * $compactIndent is the column of the entry's first content character,
@@ -917,6 +970,13 @@ final class Parser
         if ($this->isScalarFollowedByValueIndicator($harvester)) {
             $valueNode = new ValueNode();
             $valueNode->addChild($this->parseCompactBlockMapping($harvester, $compactIndent));
+
+            return $valueNode;
+        }
+
+        if (TokenType::SEQUENCE_ENTRY === $harvester->tokens->current()?->type) {
+            $valueNode = new ValueNode();
+            $valueNode->addChild($this->parseCompactBlockSequence($harvester, $compactIndent));
 
             return $valueNode;
         }
@@ -1052,7 +1112,7 @@ final class Parser
             $valueNode->addChild($aliasNode);
             $harvester->tokens->advance();
         } elseif (TokenType::SEQUENCE_ENTRY === $token->type) {
-            $valueNode->addChild($this->parseBlockSequenceValue($harvester, $parentIndentLen));
+            $valueNode->addChild($this->parseCompactBlockSequence($harvester, $token->column - 1));
         } elseif (TokenType::FLOW_SEQUENCE_START === $token->type) {
             $valueNode->addChild($this->parseFlowSequence($harvester));
         } elseif (TokenType::FLOW_MAPPING_START === $token->type) {
