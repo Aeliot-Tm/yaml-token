@@ -276,6 +276,16 @@ final class Parser
         return $keyNode;
     }
 
+    private function isFlowSequenceStart(Harvester $harvester): bool
+    {
+        $token = $harvester->tokens->current();
+        if (TokenType::INDENTATION === $token->type) {
+            $token = $harvester->tokens->peek(1);
+        }
+
+        return TokenType::FLOW_SEQUENCE_START === $token?->type;
+    }
+
     private function isKeyValueCoupleStart(Harvester $harvester): bool
     {
         $token = $harvester->tokens->current();
@@ -509,6 +519,16 @@ final class Parser
                 }
 
                 $this->parseKeyValueCoupleAtCurrentPosition($harvester, $document, $indentLen);
+                continue;
+            }
+
+            if ($this->isFlowSequenceStart($harvester)) {
+                if (TokenType::INDENTATION === $token->type) {
+                    $document->addChild(new IndentationNode($token));
+                    $harvester->tokens->advance();
+                }
+
+                $document->addChild($this->parseFlowSequence($harvester));
                 continue;
             }
 
