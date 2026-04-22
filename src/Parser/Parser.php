@@ -390,13 +390,13 @@ final class Parser
         }
 
         return null !== $token && \in_array($token->type, [
-                TokenType::ANCHOR,
-                TokenType::TAG_HANDLE_NAMED,
-                TokenType::TAG_HANDLE_PRIMARY,
-                TokenType::TAG_HANDLE_SECONDARY,
-                TokenType::TAG_HANDLE_VERBATIM,
-                TokenType::TAG_NON_SPECIFIC,
-            ], true);
+            TokenType::ANCHOR,
+            TokenType::TAG_HANDLE_NAMED,
+            TokenType::TAG_HANDLE_PRIMARY,
+            TokenType::TAG_HANDLE_SECONDARY,
+            TokenType::TAG_HANDLE_VERBATIM,
+            TokenType::TAG_NON_SPECIFIC,
+        ], true);
     }
 
     /**
@@ -721,6 +721,14 @@ final class Parser
 
             if (TokenType::INDENTATION === $token->type && TokenType::COMMENT === $harvester->tokens->peek(1)?->type) {
                 $document->addChild(new IndentationNode($token));
+                $harvester->tokens->advance();
+                continue;
+            }
+
+            // YAML 1.2.2 §6.6 Comments: "Comments must be separated from other tokens by white space characters."
+            // Handles `s-separate-in-line` between a preceding token on the same line (e.g. DOCUMENT_START/END) and a trailing comment.
+            if (TokenType::WHITESPACE === $token->type && TokenType::COMMENT === $harvester->tokens->peek(1)?->type) {
+                $document->addChild(new WhitespaceNode($token));
                 $harvester->tokens->advance();
                 continue;
             }
