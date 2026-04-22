@@ -58,19 +58,10 @@ final class YamlEmitterTest extends TestCase
      */
     private static function getSortedYamlPaths(string $root): array
     {
-        if (!is_dir($root)) {
-            return [];
-        }
-
         $paths = [];
-        $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($root, \FilesystemIterator::SKIP_DOTS),
-        );
+        $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($root, \FilesystemIterator::SKIP_DOTS));
         foreach ($iterator as $file) {
-            if (!$file instanceof \SplFileInfo || !$file->isFile()) {
-                continue;
-            }
-            if (!str_ends_with($file->getFilename(), '.yaml')) {
+            if (!$file instanceof \SplFileInfo || !$file->isFile() || !str_ends_with($file->getFilename(), '.yaml')) {
                 continue;
             }
             $paths[] = $file->getPathname();
