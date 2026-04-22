@@ -21,7 +21,7 @@ class TagDirectiveNode extends AbstractNode
     private TagDirectivePrefixNode $prefixNode;
 
     public function __construct(
-        private Token $keywordToken,
+        private Token $token,
     ) {
     }
 
@@ -37,9 +37,9 @@ class TagDirectiveNode extends AbstractNode
         parent::addChild($child);
     }
 
-    public function getKeywordToken(): Token
+    public function getToken(): Token
     {
-        return $this->keywordToken;
+        return $this->token;
     }
 
     public function getHandleNode(): TagDirectiveHandleNode

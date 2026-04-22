@@ -63,7 +63,7 @@ final class ParserTagDirectiveTest extends TestCase
             static fn ($n): bool => $n instanceof TagDirectiveNode,
         ));
         self::assertCount(1, $directives);
-        self::assertSame('%TAG', $directives[0]->getKeywordToken()->text);
+        self::assertSame('%TAG', $directives[0]->getToken()->text);
         self::assertSame($expectedHandle, $directives[0]->getHandle());
         self::assertSame($expectedPrefix, $directives[0]->getPrefix());
     }
