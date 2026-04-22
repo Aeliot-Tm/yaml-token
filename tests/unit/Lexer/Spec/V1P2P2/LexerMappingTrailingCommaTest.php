@@ -27,7 +27,7 @@ final class LexerMappingTrailingCommaTest extends LexerMappingTestCase
 {
     public static function getDataForTestMapping(): iterable
     {
-        yield [[
+        yield 'trailing_comma_in_flow_sequence' => [[
             [
                 'type' => TokenType::FLOW_SEQUENCE_START,
                 'text' => '[',
@@ -77,6 +77,70 @@ final class LexerMappingTrailingCommaTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.2.2/trailing-comma_7.4.1.yaml'];
+        ], __DIR__.'/../../../../fixture/spec/1.2.2/flow-sequence-trailing-comma_7.4.1.yaml'];
+
+        yield 'trailing_comma_in_flow_mapping' => [[
+            [
+                'type' => TokenType::FLOW_MAPPING_START,
+                'text' => '{',
+            ],
+            [
+                'type' => TokenType::PLAIN_SCALAR,
+                'text' => 'a',
+            ],
+            [
+                'type' => TokenType::VALUE_INDICATOR,
+                'text' => ':',
+            ],
+            [
+                'type' => TokenType::WHITESPACE,
+                'text' => ' ',
+            ],
+            [
+                'type' => TokenType::PLAIN_SCALAR,
+                'text' => '1',
+            ],
+            [
+                'type' => TokenType::FLOW_ENTRY,
+                'text' => ',',
+            ],
+            [
+                'type' => TokenType::WHITESPACE,
+                'text' => ' ',
+            ],
+            [
+                'type' => TokenType::PLAIN_SCALAR,
+                'text' => 'b',
+            ],
+            [
+                'type' => TokenType::VALUE_INDICATOR,
+                'text' => ':',
+            ],
+            [
+                'type' => TokenType::WHITESPACE,
+                'text' => ' ',
+            ],
+            [
+                'type' => TokenType::PLAIN_SCALAR,
+                'text' => '2',
+            ],
+            [
+                'type' => TokenType::FLOW_ENTRY,
+                'text' => ',',
+            ],
+            [
+                'type' => TokenType::WHITESPACE,
+                'text' => ' ',
+            ],
+            [
+                'type' => TokenType::FLOW_MAPPING_END,
+                'text' => '}',
+            ],
+            [
+                'type' => TokenType::NEWLINE,
+                'text' => '
+',
+            ],
+        ], __DIR__.'/../../../../fixture/spec/1.2.2/flow-mapping-trailing-comma_7.4.2.yaml'];
     }
 }

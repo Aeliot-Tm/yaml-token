@@ -56,11 +56,11 @@ tests/fixture/spec/
 ├── 1.1.yaml
 ├── 1.1/                   # 68 minimal examples
 ├── 1.2.0.yaml
-├── 1.2.0/                 # 65 minimal examples
+├── 1.2.0/                 # 66 minimal examples
 ├── 1.2.1.yaml
-├── 1.2.1/                 # 65 minimal examples (identical to 1.2.0/)
+├── 1.2.1/                 # 66 minimal examples (identical to 1.2.0/)
 ├── 1.2.2.yaml
-└── 1.2.2/                 # 65 minimal examples (identical to 1.2.0/)
+└── 1.2.2/                 # 66 minimal examples (identical to 1.2.0/)
 ```
 
 ### Common files (present in every version)
@@ -72,7 +72,7 @@ has version-specific syntax (e.g. `boolean.yaml`, `integer.yaml`, `double-quoted
 |---|---|
 | Documents | `bare-document`, `document-start`, `document-end`, `multi-document` |
 | Block collections | `block-sequence`, `block-mapping`, `compact-nested`, `complex-key`, `sequence-entry-types` |
-| Flow collections | `flow-sequence`, `flow-mapping`, `trailing-comma`, `flow-empty-key`, `flow-omitted-value`, `single-pair-flow`, `explicit-flow-pair`, `implicit-key` |
+| Flow collections | `flow-sequence`, `flow-mapping`, `flow-sequence-trailing-comma`, `flow-mapping-trailing-comma`, `flow-empty-key`, `flow-omitted-value`, `single-pair-flow`, `explicit-flow-pair`, `implicit-key` |
 | Plain scalars | `plain-scalar`, `plain-multiline`, `plain-special-chars` |
 | Single-quoted | `single-quoted`, `single-quoted-escape`, `single-quoted-multiline` |
 | Double-quoted | `double-quoted`, `double-quoted-empty-line`, `double-quoted-escapes`, `double-quoted-escaped-newline`, `double-quoted-multiline`, `double-quoted-unicode` |

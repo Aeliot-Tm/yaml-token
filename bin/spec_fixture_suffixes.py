@@ -181,7 +181,8 @@ def choose_primary_section(version: str, filename_base: str, title_index: dict[s
         return _section_by_title(version, title_index, "Flow Mappings")
 
     if filename_base in (
-        "trailing-comma",
+        "flow-sequence-trailing-comma",
+        "flow-mapping-trailing-comma",
         "flow-empty-key",
         "flow-omitted-value",
         "single-pair-flow",
@@ -199,7 +200,7 @@ def choose_primary_section(version: str, filename_base: str, title_index: dict[s
         if version == "1.1":
             return _section_by_title(version, title_index, "Flow Mappings")
         # 1.2.x
-        if filename_base in ("trailing-comma",):
+        if filename_base in ("flow-sequence-trailing-comma",):
             return _section_by_title(version, title_index, "Flow Sequences")
         return _section_by_title(version, title_index, "Flow Mappings")
 
