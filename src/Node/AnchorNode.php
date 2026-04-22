@@ -15,7 +15,7 @@ namespace Aeliot\YamlToken\Node;
 
 use Aeliot\YamlToken\Token\Token;
 
-class AnchorNode extends AbstractNode
+class AnchorNode extends AbstractNode implements TokenHolderInterface
 {
     private ?KeyValueCoupleNode $declarationCouple = null;
 

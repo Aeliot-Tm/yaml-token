@@ -15,7 +15,7 @@ namespace Aeliot\YamlToken\Node;
 
 use Aeliot\YamlToken\Token\Token;
 
-class YamlDirectiveNode extends AbstractNode
+class YamlDirectiveNode extends AbstractNode implements TokenHolderInterface
 {
     private YamlDirectiveVersionNode $versionNode;
 

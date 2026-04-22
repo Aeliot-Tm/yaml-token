@@ -15,15 +15,7 @@ namespace Aeliot\YamlToken\Node;
 
 use Aeliot\YamlToken\Token\Token;
 
-class DocumentEndNode extends AbstractNode implements TokenHolderInterface
+interface TokenHolderInterface
 {
-    public function __construct(
-        private Token $token,
-    ) {
-    }
-
-    public function getToken(): Token
-    {
-        return $this->token;
-    }
+    public function getToken(): Token;
 }

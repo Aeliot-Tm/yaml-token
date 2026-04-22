@@ -15,7 +15,7 @@ namespace Aeliot\YamlToken\Node;
 
 use Aeliot\YamlToken\Token\Token;
 
-class WhitespaceNode extends AbstractNode
+class WhitespaceNode extends AbstractNode implements TokenHolderInterface
 {
     public function __construct(
         private readonly Token $token,

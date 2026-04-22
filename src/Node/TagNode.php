@@ -15,7 +15,7 @@ namespace Aeliot\YamlToken\Node;
 
 use Aeliot\YamlToken\Token\Token;
 
-class TagNode extends AbstractNode
+class TagNode extends AbstractNode implements TokenHolderInterface
 {
     public function __construct(
         private Token $token,

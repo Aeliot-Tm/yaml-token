@@ -19,7 +19,7 @@ use Aeliot\YamlToken\Token\Token;
  * Wraps a structural token (e.g. VALUE_INDICATOR, EXPLICIT_KEY_INDICATOR, SEQUENCE_ENTRY, flow brackets, FLOW_ENTRY)
  * so entry nodes contain only Node instances.
  */
-class SyntaxTokenNode extends AbstractNode
+class SyntaxTokenNode extends AbstractNode implements TokenHolderInterface
 {
     public function __construct(
         private readonly Token $token,

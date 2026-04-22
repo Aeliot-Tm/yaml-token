@@ -15,7 +15,7 @@ namespace Aeliot\YamlToken\Node;
 
 use Aeliot\YamlToken\Token\Token;
 
-class TagDirectiveNode extends AbstractNode
+class TagDirectiveNode extends AbstractNode implements TokenHolderInterface
 {
     private TagDirectiveHandleNode $handleNode;
     private TagDirectivePrefixNode $prefixNode;

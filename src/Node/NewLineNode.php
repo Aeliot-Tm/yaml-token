@@ -15,7 +15,7 @@ namespace Aeliot\YamlToken\Node;
 
 use Aeliot\YamlToken\Token\Token;
 
-class NewLineNode extends AbstractNode
+class NewLineNode extends AbstractNode implements TokenHolderInterface
 {
     public function __construct(
         private Token $token,

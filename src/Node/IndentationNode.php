@@ -15,7 +15,7 @@ namespace Aeliot\YamlToken\Node;
 
 use Aeliot\YamlToken\Token\Token;
 
-class IndentationNode extends AbstractNode
+class IndentationNode extends AbstractNode implements TokenHolderInterface
 {
     public function __construct(
         private Token $token,
