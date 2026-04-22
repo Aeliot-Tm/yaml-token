@@ -310,6 +310,32 @@ final class Parser
         return TokenType::FLOW_MAPPING_START === $token?->type;
     }
 
+    /**
+     * Implicit YAML-key form of a single-pair flow-sequence entry
+     * (YAML 1.2.2 §7.4.1 rule [139], §7.4.2 rules [150]–[152]):
+     * the entry starts with a scalar implicit key and continues with ':'
+     * on the same line, optionally separated by s-separate-in-line (WHITESPACE).
+     */
+    private function isFlowPairStart(Harvester $harvester): bool
+    {
+        $token = $harvester->tokens->current();
+        if (null === $token || !$token->type->isScalar()) {
+            return false;
+        }
+
+        $offset = 1;
+        while (true) {
+            $peeked = $harvester->tokens->peek($offset);
+            if (null === $peeked) {
+                return false;
+            }
+            if (TokenType::WHITESPACE !== $peeked->type) {
+                return TokenType::VALUE_INDICATOR === $peeked->type;
+            }
+            ++$offset;
+        }
+    }
+
     private function isFlowSequenceStart(Harvester $harvester): bool
     {
         $token = $harvester->tokens->current();
@@ -668,7 +694,7 @@ final class Parser
                 continue;
             }
 
-            $flowSequenceNode->addChild($this->parseValue($harvester, 0));
+            $flowSequenceNode->addChild($this->parseFlowSequenceEntry($harvester));
         }
 
         $token = $harvester->tokens->current();
@@ -682,6 +708,42 @@ final class Parser
         $this->collectSpaceAndComments($harvester, $flowSequenceNode);
 
         return $flowSequenceNode;
+    }
+
+    /**
+     * Parses a single flow-sequence entry.
+     *
+     * Per YAML 1.2.2 §7.4.1 rule [139], an entry is either a flow-node or a flow-pair.
+     * Flow-pair (the compact single-pair mapping) is recognized via {@see isFlowPairStart()}
+     * and built using the same helpers as {@see parseFlowMapping()} so that whitespace
+     * tokens between the key and ':' end up attached to the KeyValueCoupleNode
+     * (matching c-ns-flow-map-separate-value, rule [152]).
+     *
+     * Only the implicit YAML-key form is covered in this scope:
+     * explicit '?' form (Example 7.20), empty implicit key and
+     * JSON-key adjacent value (Example 7.21) are out of scope.
+     */
+    private function parseFlowSequenceEntry(Harvester $harvester): Node
+    {
+        if (!$this->isFlowPairStart($harvester)) {
+            return $this->parseValue($harvester, 0);
+        }
+
+        $couple = new KeyValueCoupleNode();
+        $couple->setKey($this->getKeyNode($harvester, false));
+
+        $this->tryConsumeFlowMappingValueIndicator($harvester, $couple);
+
+        $next = $harvester->tokens->current();
+        if (null === $next || \in_array($next->type, [TokenType::FLOW_ENTRY, TokenType::FLOW_SEQUENCE_END], true)) {
+            $couple->setValue(new ValueNode());
+        } else {
+            $couple->setValue($this->parseValue($harvester, 0));
+        }
+
+        $this->postProcessKeyValueCouple($harvester, $couple);
+
+        return $couple;
     }
 
     private function parseIndentedBlockValue(Harvester $harvester, int $parentIndentLen): ?Node
