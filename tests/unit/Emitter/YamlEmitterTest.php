@@ -88,12 +88,12 @@ final class YamlEmitterTest extends TestCase
 
     private static function isEmitterRoundTripNotYetVerbatim(string $fixtureId): bool
     {
-        return (
+        return
             str_contains($fixtureId, 'merge-key_')
             // Empty scalars: blank line before continuation; key-only; multiple adjacent keys; etc.
             || str_contains($fixtureId, 'empty-scalar')
             || str_contains($fixtureId, 'plain-multiline')
-        );
+        ;
     }
 
     #[DataProvider('getDataForTestEmitsOriginalYaml')]
@@ -105,7 +105,7 @@ final class YamlEmitterTest extends TestCase
         try {
             $stream = (new Parser())->parse($yaml);
         } catch (\Throwable $e) {
-            self::markTestSkipped('Parser error: '.$e->getMessage(). ' on '.$this->getRelativePathFromRoot($e->getFile()).':'.$e->getLine());
+            self::markTestSkipped('Parser error: '.$e->getMessage().' on '.$this->getRelativePathFromRoot($e->getFile()).':'.$e->getLine());
         }
 
         if (self::isEmitterRoundTripNotYetVerbatim(self::getFixtureDataSetName(self::getSpecRoot(), $fixture))) {
@@ -117,6 +117,6 @@ final class YamlEmitterTest extends TestCase
 
     private function getRelativePathFromRoot(string $pathname): string
     {
-        return preg_replace('~^'.dirname(__DIR__, 3).'/~', '', $pathname);
+        return preg_replace('~^'.\dirname(__DIR__, 3).'/~', '', $pathname);
     }
 }
