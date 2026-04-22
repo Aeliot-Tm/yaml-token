@@ -953,7 +953,7 @@ final class Parser
         return $couple;
     }
 
-    private function parseIndentedBlockValue(Harvester $harvester, int $parentIndentLen): ?Node
+    private function parseIndentedBlockValue(Harvester $harvester, ValueNode $valueNode, int $parentIndentLen): void
     {
         $token = $harvester->tokens->current();
         if (TokenType::NEWLINE !== $token?->type) {
@@ -962,39 +962,62 @@ final class Parser
 
         $next = $harvester->tokens->peek(1);
         if (null === $next) {
-            return null;
+            return;
         }
 
         if (TokenType::INDENTATION === $next->type) {
             $indentLen = \strlen($next->text);
             if ($indentLen <= $parentIndentLen) {
-                return null;
+                return;
             }
 
             $afterIndent = $harvester->tokens->peek(2);
             if (TokenType::SEQUENCE_ENTRY === $afterIndent?->type) {
-                return $this->parseBlockSequenceValue($harvester, $parentIndentLen);
+                $valueNode->addChild($this->parseBlockSequenceValue($harvester, $parentIndentLen));
+
+                return;
             }
 
-            return $this->parseBlockMappingValue($harvester, $parentIndentLen);
+            // YAML 1.2.2 §8.2.3 / rule [197] s-l+flow-in-block: a block mapping value
+            // may hold a flow node placed on the next line, indented by at least n+1.
+            if (
+                TokenType::FLOW_SEQUENCE_START === $afterIndent?->type
+                || TokenType::FLOW_MAPPING_START === $afterIndent?->type
+            ) {
+                $valueNode->addChild(new NewLineNode($token));
+                $harvester->tokens->advance();
+                $valueNode->addChild(new IndentationNode($next));
+                $harvester->tokens->advance();
+                $valueNode->addChild(
+                    TokenType::FLOW_SEQUENCE_START === $afterIndent->type
+                        ? $this->parseFlowSequence($harvester)
+                        : $this->parseFlowMapping($harvester),
+                );
+
+                return;
+            }
+
+            $valueNode->addChild($this->parseBlockMappingValue($harvester, $parentIndentLen));
+
+            return;
         }
 
         // Column-0 block collection (no leading INDENTATION token) — only
         // accepted at bare document root (n = -1 per YAML 1.2.2 rule [211]).
         if ($parentIndentLen < 0) {
             if (TokenType::SEQUENCE_ENTRY === $next->type) {
-                return $this->parseBlockSequenceValue($harvester, $parentIndentLen);
+                $valueNode->addChild($this->parseBlockSequenceValue($harvester, $parentIndentLen));
+
+                return;
             }
             if (
                 TokenType::EXPLICIT_KEY_INDICATOR === $next->type
                 || TokenType::MERGE_INDICATOR === $next->type
                 || $next->type->isScalar()
             ) {
-                return $this->parseBlockMappingValue($harvester, $parentIndentLen);
+                $valueNode->addChild($this->parseBlockMappingValue($harvester, $parentIndentLen));
             }
         }
-
-        return null;
     }
 
     private function parseKeyValueCoupleAtCurrentPosition(Harvester $harvester, Node $root, int $indentLen): void
@@ -1180,6 +1203,14 @@ final class Parser
             $valueNode->addChild(new NewLineNode($token));
             $harvester->tokens->advance();
 
+            // YAML 1.2.2 §8.1.1.1: with an explicit indentation indicator (|N, >N, |N-, >N+, ...),
+            // the body may start with leading spaces that are part of the content but surface
+            // to the parser as a separate INDENTATION token before the scalar payload.
+            if (TokenType::INDENTATION === $harvester->tokens->current()?->type) {
+                $valueNode->addChild(new IndentationNode($harvester->tokens->current()));
+                $harvester->tokens->advance();
+            }
+
             $token = $harvester->tokens->current();
             if (!$token->type->isScalar()) {
                 throw new UnexpectedTokenException(\sprintf('Scalar expected, but %s given', $token->type->value));
@@ -1187,11 +1218,31 @@ final class Parser
 
             $valueNode->addChild(new ScalarNode($token));
             $harvester->tokens->advance();
-        } elseif (TokenType::NEWLINE === $token->type) {
-            $indented = $this->parseIndentedBlockValue($harvester, $parentIndentLen);
-            if (null !== $indented) {
-                $valueNode->addChild($indented);
+
+            // YAML 1.2.2 §8.1.1.2 / rule [166]-[168] l-chomped-empty(n,t):
+            // trailing "empty" indented lines belong to the block scalar and must be
+            // consumed here (even with strip chomping they are excluded from content but
+            // still consumed from the token stream).
+            while (true) {
+                $newLineToken = $harvester->tokens->current();
+                if (TokenType::NEWLINE !== $newLineToken?->type) {
+                    break;
+                }
+                $indentationToken = $harvester->tokens->peek(1);
+                if (TokenType::INDENTATION !== $indentationToken?->type) {
+                    break;
+                }
+                $afterIndentation = $harvester->tokens->peek(2);
+                if (null !== $afterIndentation && TokenType::NEWLINE !== $afterIndentation->type) {
+                    break;
+                }
+                $valueNode->addChild(new NewLineNode($newLineToken));
+                $harvester->tokens->advance();
+                $valueNode->addChild(new IndentationNode($indentationToken));
+                $harvester->tokens->advance();
             }
+        } elseif (TokenType::NEWLINE === $token->type) {
+            $this->parseIndentedBlockValue($harvester, $valueNode, $parentIndentLen);
         } elseif ($token->type->isScalar()) {
             $valueNode->addChild(new ScalarNode($token));
             $harvester->tokens->advance();
