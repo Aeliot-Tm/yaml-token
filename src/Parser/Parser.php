@@ -203,7 +203,7 @@ final class Parser
 
                 $body = $harvester->tokens->current();
                 if (TokenType::TAG_BODY !== $body?->type) {
-                    throw new UnexpectedTokenException('Tag body expected');
+                    throw new UnexpectedTokenException(\sprintf('Tag body expected, but %s given', $body?->type->value ?? '_nothing_'));
                 }
 
                 $tagProperty->addChild(new TagBodyNode($body));
@@ -267,7 +267,7 @@ final class Parser
         }
 
         if (!$token->type->isScalar() && !$token->type->isMergeIndicator()) {
-            throw new UnexpectedTokenException('Key scalar expected');
+            throw new UnexpectedTokenException(\sprintf('Key scalar expected, but %s given', $token->type->value));
         }
 
         $keyNode->setName(new ScalarNode($token));
@@ -348,7 +348,7 @@ final class Parser
             }
 
             if (false === $this->isKeyValueCoupleStart($harvester)) {
-                throw new UnexpectedTokenException('Key/value couple expected while parsing block mapping value');
+                throw new UnexpectedTokenException(\sprintf('Key/value couple expected while parsing block mapping value, but %s given', $harvester->tokens->current()?->type->value ?? '_nothing_'));
             }
 
             $previousCoupleIndentLen = $indentLen;
@@ -409,7 +409,7 @@ final class Parser
             }
 
             if (false === $this->isSequenceStart($harvester)) {
-                throw new UnexpectedTokenException('Sequence entry expected while parsing block sequence value');
+                throw new UnexpectedTokenException(\sprintf('Sequence entry expected while parsing block sequence value, but %s given', $harvester->tokens->current()?->type->value ?? '_nothing_'));
             }
 
             $sequenceEntry = new SequenceEntryNode();
@@ -512,7 +512,7 @@ final class Parser
                 continue;
             }
 
-            throw new UnexpectedTokenException('Unexpected type');
+            throw new UnexpectedTokenException(\sprintf('Unexpected type: %s', $token->type->value));
         }
 
         if ($document->getChildren()) {
@@ -525,7 +525,7 @@ final class Parser
         $flowMappingNode = new FlowMappingNode();
         $token = $harvester->tokens->current();
         if (TokenType::FLOW_MAPPING_START !== $token?->type) {
-            throw new UnexpectedTokenException('There is no expected FLOW_MAPPING_START token');
+            throw new UnexpectedTokenException(\sprintf('There is no expected FLOW_MAPPING_START token, but %s given', $token?->type->value ?? '_nothing_'));
         }
 
         $flowMappingNode->addChild(new SyntaxTokenNode($token));
@@ -561,7 +561,7 @@ final class Parser
 
         $token = $harvester->tokens->current();
         if (TokenType::FLOW_MAPPING_END !== $token?->type) {
-            throw new UnexpectedTokenException('There is no expected FLOW_MAPPING_END token');
+            throw new UnexpectedTokenException(\sprintf('There is no expected FLOW_MAPPING_END token, but %s given', $token?->type->value ?? '_nothing_'));
         }
 
         $flowMappingNode->addChild(new SyntaxTokenNode($token));
@@ -578,7 +578,7 @@ final class Parser
 
         $token = $harvester->tokens->current();
         if (TokenType::FLOW_SEQUENCE_START !== $token?->type) {
-            throw new UnexpectedTokenException('There is no expected FLOW_SEQUENCE_START token');
+            throw new UnexpectedTokenException(\sprintf('There is no expected FLOW_SEQUENCE_START token, but %s given', $token?->type->value ?? '_nothing_'));
         }
 
         $flowSequenceNode->addChild($this->createSyntaxTokenNode($token));
@@ -602,7 +602,7 @@ final class Parser
 
         $token = $harvester->tokens->current();
         if (TokenType::FLOW_SEQUENCE_END !== $token?->type) {
-            throw new UnexpectedTokenException('There is no expected FLOW_SEQUENCE_END token');
+            throw new UnexpectedTokenException(\sprintf('There is no expected FLOW_SEQUENCE_END token, but %s given', $token?->type->value ?? '_nothing_'));
         }
 
         $flowSequenceNode->addChild($this->createSyntaxTokenNode($token));
@@ -617,7 +617,7 @@ final class Parser
     {
         $token = $harvester->tokens->current();
         if (TokenType::NEWLINE !== $token?->type) {
-            throw new UnexpectedTokenException('Expected NEWLINE while parsing indented block value');
+            throw new UnexpectedTokenException(\sprintf('Expected NEWLINE while parsing indented block value, but %s given', $token?->type->value ?? '_nothing_'));
         }
 
         $indent = $harvester->tokens->peek(1);
@@ -667,7 +667,7 @@ final class Parser
     {
         $token = $harvester->tokens->current();
         if (TokenType::MERGE_INDICATOR !== $token?->type) {
-            throw new UnexpectedTokenException('There is no expected MERGE_INDICATOR token');
+            throw new UnexpectedTokenException(\sprintf('There is no expected MERGE_INDICATOR token, but %s given', $token?->type->value ?? '_nothing_'));
         }
         $harvester->tokens->advance();
 
@@ -707,7 +707,7 @@ final class Parser
     {
         $token = $harvester->tokens->current();
         if (TokenType::DIRECTIVE_TAG !== $token?->type) {
-            throw new UnexpectedTokenException('Expected DIRECTIVE_TAG token');
+            throw new UnexpectedTokenException(\sprintf('Expected DIRECTIVE_TAG token, but %s given', $token?->type->value ?? '_nothing_'));
         }
 
         $tagDirectiveNode = new TagDirectiveNode($token);
@@ -750,7 +750,7 @@ final class Parser
             }
 
             if (\in_array($token->type, [TokenType::COMMENT, TokenType::NEWLINE], true)) {
-                throw new UnexpectedTokenException('Expected TAG directive handle and prefix before newline or comment');
+                throw new UnexpectedTokenException(\sprintf('Expected TAG directive handle and prefix before newline or comment, but %s given', $token->type->value));
             }
 
             throw new UnexpectedTokenException(\sprintf('Unexpected token in TAG directive: %s', $token->type->value));
@@ -784,14 +784,14 @@ final class Parser
             }
 
             if (TokenType::NEWLINE !== $token->type) {
-                throw new UnexpectedTokenException('Unexpected newline');
+                throw new UnexpectedTokenException(\sprintf('Unexpected newline, but %s given', $token->type->value));
             }
             $valueNode->addChild(new NewLineNode($token));
             $harvester->tokens->advance();
 
             $token = $harvester->tokens->current();
             if (!$token->type->isScalar()) {
-                throw new UnexpectedTokenException('Scalar expected');
+                throw new UnexpectedTokenException(\sprintf('Scalar expected, but %s given', $token->type->value));
             }
 
             $valueNode->addChild(new ScalarNode($token));
@@ -818,7 +818,7 @@ final class Parser
         } elseif (TokenType::FLOW_MAPPING_START === $token->type) {
             $valueNode->addChild($this->parseFlowMapping($harvester));
         } else {
-            throw new UnexpectedTokenException('Unexpected type while parsing of value');
+            throw new UnexpectedTokenException(\sprintf('Unexpected type while parsing of value: %s', $token->type->value));
         }
 
         $this->collectTypes($harvester, [
@@ -832,8 +832,8 @@ final class Parser
     private function parseYamlDirective(Harvester $harvester): YamlDirectiveNode
     {
         $token = $harvester->tokens->current();
-        if (null === $token || TokenType::DIRECTIVE_YAML !== $token->type) {
-            throw new UnexpectedTokenException('Expected DIRECTIVE_YAML token');
+        if (TokenType::DIRECTIVE_YAML !== $token?->type) {
+            throw new UnexpectedTokenException(\sprintf('Expected DIRECTIVE_YAML token, but %s given', $token?->type->value ?? '_nothing_'));
         }
 
         $yamlDirectiveNode = new YamlDirectiveNode($token);
@@ -865,7 +865,7 @@ final class Parser
             }
 
             if (\in_array($token->type, [TokenType::COMMENT, TokenType::NEWLINE], true)) {
-                throw new UnexpectedTokenException('Expected YAML directive version before newline or comment');
+                throw new UnexpectedTokenException(\sprintf('Expected YAML directive version before newline or comment, but %s given', $token->type->value));
             }
 
             throw new UnexpectedTokenException(\sprintf('Unexpected token in YAML directive: %s', $token->type->value));
