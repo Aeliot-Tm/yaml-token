@@ -317,6 +317,21 @@ final class Parser
             return $keyNode;
         }
 
+        if (
+            null !== $keyNode->getExplicitKeyIndicatorNode()
+            && TokenType::SEQUENCE_ENTRY === $token->type
+        ) {
+            // YAML 1.2.2 §8.2.2 rule [190] c-l-block-map-explicit-key(n):
+            //   "?" s-l+block-indented(n, BLOCK-OUT)
+            // Compact in-line form where '-' directly follows "? " on the
+            // same line (Example 8.17). The nested block-sequence body
+            // becomes a child of the KeyNode so the emitter preserves the
+            // original text verbatim.
+            $keyNode->addChild($this->parseCompactBlockSequence($harvester, $token->column - 1));
+
+            return $keyNode;
+        }
+
         if (!$token->type->isScalar() && !$token->type->isMergeIndicator()) {
             if (null !== $keyNode->getExplicitKeyIndicatorNode()) {
                 return $keyNode;
