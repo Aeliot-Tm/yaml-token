@@ -787,23 +787,28 @@ final class Parser
      * Parses a single flow-sequence entry.
      *
      * Per YAML 1.2.2 §7.4.1 rule [139], an entry is either a flow-node or a flow-pair.
-     * Flow-pair (the compact single-pair mapping) is recognized via {@see isScalarFollowedByValueIndicator()}
-     * and built using the same helpers as {@see parseFlowMapping()} so that whitespace
-     * tokens between the key and ':' end up attached to the KeyValueCoupleNode
-     * (matching c-ns-flow-map-separate-value, rule [152]).
+     * Both alternatives of rule [150] ns-flow-pair(n,c) are supported:
+     *  - explicit form starting with '?' (Example 7.20), which per the prose
+     *    above [150] has the same syntax as ns-flow-map-explicit-entry [143]
+     *    and therefore permits an empty key and/or an empty value (e-node);
+     *  - implicit YAML-key form, detected via {@see isScalarFollowedByValueIndicator()}.
      *
-     * Only the implicit YAML-key form is covered in this scope:
-     * explicit '?' form (Example 7.20), empty implicit key and
-     * JSON-key adjacent value (Example 7.21) are out of scope.
+     * Both paths build the couple using the same helpers as {@see parseFlowMapping()}
+     * so that whitespace tokens between the key and ':' end up attached to the
+     * KeyValueCoupleNode (matching c-ns-flow-map-separate-value, rule [148]).
+     *
+     * The JSON-key adjacent value form (Example 7.21, rule [153]) is still out of scope.
      */
     private function parseFlowSequenceEntry(Harvester $harvester): Node
     {
-        if (!$this->isScalarFollowedByValueIndicator($harvester)) {
+        $isExplicitKeyPair = TokenType::EXPLICIT_KEY_INDICATOR === $harvester->tokens->current()?->type;
+
+        if (!$isExplicitKeyPair && !$this->isScalarFollowedByValueIndicator($harvester)) {
             return $this->parseValue($harvester, 0);
         }
 
         $couple = new KeyValueCoupleNode();
-        $couple->setKey($this->getKeyNode($harvester, false));
+        $couple->setKey($this->getKeyNode($harvester, $isExplicitKeyPair));
 
         $this->tryConsumeFlowMappingValueIndicator($harvester, $couple);
 
