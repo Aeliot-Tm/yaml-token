@@ -370,6 +370,36 @@ final class Parser
     }
 
     /**
+     * YAML 1.2.2 §8.2 rule [200] s-l+block-collection(n,c): before the block
+     * sequence or block mapping body a node may carry c-ns-properties(n+1,c)
+     * (tag and/or anchor, rule [96]) — optionally on their own line. At the
+     * bare document root this is reached via rule [211] l-bare-document ::=
+     * s-l+block-node(-1, block-in) (§9.1.3) → [196] → [198] → [200].
+     *
+     * Detects such a node-property prefix at the document root by peeking past
+     * a possible leading INDENTATION token.
+     */
+    private function isNodePropertyAtDocumentRoot(Harvester $harvester): bool
+    {
+        $token = $harvester->tokens->current();
+        if (null === $token) {
+            return false;
+        }
+        if (TokenType::INDENTATION === $token->type) {
+            $token = $harvester->tokens->peek(1);
+        }
+
+        return null !== $token && \in_array($token->type, [
+                TokenType::ANCHOR,
+                TokenType::TAG_HANDLE_NAMED,
+                TokenType::TAG_HANDLE_PRIMARY,
+                TokenType::TAG_HANDLE_SECONDARY,
+                TokenType::TAG_HANDLE_VERBATIM,
+                TokenType::TAG_NON_SPECIFIC,
+            ], true);
+    }
+
+    /**
      * Implicit YAML key detector (YAML 1.2.2 rule [154] ns-s-implicit-yaml-key):
      * current token is a scalar and the next non-WHITESPACE token on the same
      * logical position is ':' (VALUE_INDICATOR). Used both for
@@ -425,11 +455,16 @@ final class Parser
                 break;
             }
 
-            if (TokenType::INDENTATION !== $token->type) {
+            // Column-0 entries (bare document root, parent indent n = -1 per rule [211])
+            // do not have an INDENTATION token emitted by the lexer.
+            if (TokenType::INDENTATION === $token->type) {
+                $indentLen = \strlen($token->text);
+            } elseif ($parentIndentLen < 0 && $this->isKeyValueCoupleStart($harvester)) {
+                $indentLen = 0;
+            } else {
                 break;
             }
 
-            $indentLen = \strlen($token->text);
             if ($indentLen > 0) {
                 if (!$harvester->state->isIndentLenRegistered()) {
                     $harvester->state->registerIndentStepLen($indentLen);
@@ -454,9 +489,13 @@ final class Parser
             }
 
             $previousCoupleIndentLen = $indentLen;
-            $tokenAfterIndent = $harvester->tokens->peek(1);
-            if (TokenType::MERGE_INDICATOR === $tokenAfterIndent?->type) {
-                $harvester->tokens->advance(); // skip indentation
+            $mergeCandidate = TokenType::INDENTATION === $token->type
+                ? $harvester->tokens->peek(1)
+                : $token;
+            if (TokenType::MERGE_INDICATOR === $mergeCandidate?->type) {
+                if (TokenType::INDENTATION === $token->type) {
+                    $harvester->tokens->advance(); // skip indentation
+                }
                 $blockMapping->addChild($this->parseMergeInstructionAtCurrentPosition($harvester));
                 continue;
             }
@@ -488,11 +527,16 @@ final class Parser
                 break;
             }
 
-            if (TokenType::INDENTATION !== $token->type) {
+            // Column-0 entries (bare document root, parent indent n = -1 per rule [211])
+            // do not have an INDENTATION token emitted by the lexer.
+            if (TokenType::INDENTATION === $token->type) {
+                $indentLen = \strlen($token->text);
+            } elseif ($parentIndentLen < 0 && TokenType::SEQUENCE_ENTRY === $token->type) {
+                $indentLen = 0;
+            } else {
                 break;
             }
 
-            $indentLen = \strlen($token->text);
             if ($indentLen > 0) {
                 if (!$harvester->state->isIndentLenRegistered()) {
                     $harvester->state->registerIndentStepLen($indentLen);
@@ -516,8 +560,10 @@ final class Parser
 
             $sequenceEntry = new SequenceEntryNode();
             $blockSequence->addChild($sequenceEntry);
-            $sequenceEntry->addChild(new IndentationNode($token));
-            $harvester->tokens->advance();
+            if (TokenType::INDENTATION === $token->type) {
+                $sequenceEntry->addChild(new IndentationNode($token));
+                $harvester->tokens->advance();
+            }
 
             $compactIndent = $indentLen + $this->consumeSequenceEntryIndicatorAndSpaces($harvester, $sequenceEntry);
             $sequenceEntry->setValue($this->parseSequenceEntryValue($harvester, $indentLen, $compactIndent));
@@ -705,6 +751,16 @@ final class Parser
                 continue;
             }
 
+            if ($this->isNodePropertyAtDocumentRoot($harvester)) {
+                if (TokenType::INDENTATION === $token->type) {
+                    $document->addChild(new IndentationNode($token));
+                    $harvester->tokens->advance();
+                }
+
+                $document->addChild($this->parseValue($harvester, -1));
+                continue;
+            }
+
             if ($this->isFlowMappingStart($harvester)) {
                 if (TokenType::INDENTATION === $token->type) {
                     $document->addChild(new IndentationNode($token));
@@ -881,26 +937,41 @@ final class Parser
             throw new UnexpectedTokenException(\sprintf('Expected NEWLINE while parsing indented block value, but %s given', $token?->type->value ?? '_nothing_'));
         }
 
-        $indent = $harvester->tokens->peek(1);
-        if (null === $indent || TokenType::INDENTATION !== $indent->type) {
-            $harvester->tokens->advance();
-
+        $next = $harvester->tokens->peek(1);
+        if (null === $next) {
             return null;
         }
 
-        $indentLen = \strlen($indent->text);
-        if ($indentLen <= $parentIndentLen) {
-            $harvester->tokens->advance();
+        if (TokenType::INDENTATION === $next->type) {
+            $indentLen = \strlen($next->text);
+            if ($indentLen <= $parentIndentLen) {
+                return null;
+            }
 
-            return null;
+            $afterIndent = $harvester->tokens->peek(2);
+            if (TokenType::SEQUENCE_ENTRY === $afterIndent?->type) {
+                return $this->parseBlockSequenceValue($harvester, $parentIndentLen);
+            }
+
+            return $this->parseBlockMappingValue($harvester, $parentIndentLen);
         }
 
-        $afterIndent = $harvester->tokens->peek(2);
-        if (TokenType::SEQUENCE_ENTRY === $afterIndent?->type) {
-            return $this->parseBlockSequenceValue($harvester, $parentIndentLen);
+        // Column-0 block collection (no leading INDENTATION token) — only
+        // accepted at bare document root (n = -1 per YAML 1.2.2 rule [211]).
+        if ($parentIndentLen < 0) {
+            if (TokenType::SEQUENCE_ENTRY === $next->type) {
+                return $this->parseBlockSequenceValue($harvester, $parentIndentLen);
+            }
+            if (
+                TokenType::EXPLICIT_KEY_INDICATOR === $next->type
+                || TokenType::MERGE_INDICATOR === $next->type
+                || $next->type->isScalar()
+            ) {
+                return $this->parseBlockMappingValue($harvester, $parentIndentLen);
+            }
         }
 
-        return $this->parseBlockMappingValue($harvester, $parentIndentLen);
+        return null;
     }
 
     private function parseKeyValueCoupleAtCurrentPosition(Harvester $harvester, Node $root, int $indentLen): void
