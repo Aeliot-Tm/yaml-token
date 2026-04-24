@@ -70,7 +70,6 @@ final class Parser
 {
     private const TOKEN_TYPES_SPASE_AND_COMMENT = [
         TokenType::COMMENT,
-        TokenType::INDENTATION,
         TokenType::NEWLINE,
         TokenType::WHITESPACE,
     ];

@@ -1,0 +1,12 @@
+---
+# Minimal excerpt reproducing issue 'unexpected indentation' after the bumped token FLOW_SEQUENCE_START
+# (two-space indent). YamlToken Parser throws:
+# IndentationInvalidException (Unexpected indentation 2 while base indentation is 6).
+root:
+  level1A:
+    level2A: value
+    thisValueRestartsBaseIndentation: [ value ]
+    level2B:
+      level3A: value
+
+  level1B: value
