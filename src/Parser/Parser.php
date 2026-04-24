@@ -1023,18 +1023,21 @@ final class Parser
             throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Expected NEWLINE while parsing indented block value, but %s given', $token?->type->value ?? '_nothing_'), $harvester->tokens));
         }
 
-        $next = $harvester->tokens->peek(1);
-        if (null === $next) {
+        // YAML 1.2.2 §6.6: look past any l-empty / l-comment lines to find the
+        // first significant content. Otherwise, a comment-only line indented
+        // deeper than the key (e.g. "first:\n    # comment") is mistaken for
+        // the value's content and triggers "Empty block mapping value".
+        $head = $this->peekFirstSignificantBlockHead($harvester);
+        if (null === $head) {
             return;
         }
+        [$indentLen, $afterIndent] = $head;
 
-        if (TokenType::INDENTATION === $next->type) {
-            $indentLen = \strlen($next->text);
+        if ($indentLen > 0) {
             if ($indentLen <= $parentIndentLen) {
                 return;
             }
 
-            $afterIndent = $harvester->tokens->peek(2);
             if (TokenType::SEQUENCE_ENTRY === $afterIndent?->type) {
                 $valueNode->addChild($this->parseBlockSequenceValue($harvester, $parentIndentLen));
 
@@ -1043,14 +1046,30 @@ final class Parser
 
             // YAML 1.2.2 §8.2.3 / rule [197] s-l+flow-in-block: a block mapping value
             // may hold a flow node placed on the next line, indented by at least n+1.
+            // Per rule [81] s-separate-lines(n) → [79] s-l-comments → l-comment*,
+            // any number of l-empty / l-comment lines (including column-0 comments,
+            // see [78] l-comment + [66] s-separate-in-line) may sit between the ':'
+            // and the flow node.
             if (
                 TokenType::FLOW_SEQUENCE_START === $afterIndent?->type
                 || TokenType::FLOW_MAPPING_START === $afterIndent?->type
             ) {
                 $valueNode->addChild(new NewLineNode($token));
                 $harvester->tokens->advance();
-                $valueNode->addChild(new IndentationNode($next));
+                $this->collectTypes($harvester, [
+                    TokenType::COMMENT,
+                    TokenType::NEWLINE,
+                    TokenType::WHITESPACE,
+                ], $valueNode);
+                $this->collectInsignificantIndentationLines($harvester, $valueNode);
+
+                $indentationToken = $harvester->tokens->current();
+                if (TokenType::INDENTATION !== $indentationToken?->type) {
+                    throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Expected INDENTATION before flow node, but %s given', $indentationToken?->type->value ?? '_nothing_'), $harvester->tokens));
+                }
+                $valueNode->addChild(new IndentationNode($indentationToken));
                 $harvester->tokens->advance();
+
                 $valueNode->addChild(
                     TokenType::FLOW_SEQUENCE_START === $afterIndent->type
                         ? $this->parseFlowSequence($harvester)
@@ -1067,16 +1086,16 @@ final class Parser
 
         // Column-0 block collection (no leading INDENTATION token) — only
         // accepted at bare document root (n = -1 per YAML 1.2.2 rule [211]).
-        if ($parentIndentLen < 0) {
-            if (TokenType::SEQUENCE_ENTRY === $next->type) {
+        if ($parentIndentLen < 0 && null !== $afterIndent) {
+            if (TokenType::SEQUENCE_ENTRY === $afterIndent->type) {
                 $valueNode->addChild($this->parseBlockSequenceValue($harvester, $parentIndentLen));
 
                 return;
             }
             if (
-                TokenType::EXPLICIT_KEY_INDICATOR === $next->type
-                || TokenType::MERGE_INDICATOR === $next->type
-                || $next->type->isScalar()
+                TokenType::EXPLICIT_KEY_INDICATOR === $afterIndent->type
+                || TokenType::MERGE_INDICATOR === $afterIndent->type
+                || $afterIndent->type->isScalar()
             ) {
                 $valueNode->addChild($this->parseBlockMappingValue($harvester, $parentIndentLen));
             }
@@ -1380,6 +1399,60 @@ final class Parser
             }
 
             throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Unexpected token in YAML directive: %s', $token->type->value), $token));
+        }
+    }
+
+    /**
+     * Look-ahead from the current token (expected NEWLINE) through any number
+     * of l-empty / l-comment lines (per YAML 1.2.2 §6.6) to find the first
+     * line that carries significant content. Used by parseIndentedBlockValue
+     * to decide whether the value of a `key:` is empty or holds a nested
+     * block / column-0 collection — without prematurely consuming any tokens.
+     *
+     * A line is considered insignificant when it consists exclusively of
+     * WHITESPACE / COMMENT tokens (optionally prefixed by an INDENTATION
+     * token) and is terminated by NEWLINE or end-of-stream. Both indented
+     * comment lines (`    # ...`) and column-0 comment lines (`# ...`) are
+     * skipped, since the lexer omits the leading INDENTATION token only
+     * for the latter.
+     *
+     * @return array{int, Token}|null Tuple of [indentLen, significantToken] pointing
+     *                                at the first significant line:
+     *                                - indentLen is the byte-length of that line's
+     *                                leading INDENTATION token (0 for column-0 lines);
+     *                                - significantToken is the first non-WHITESPACE/COMMENT
+     *                                token of that line.
+     *                                Returns null if the stream ends with only insignificant lines.
+     */
+    private function peekFirstSignificantBlockHead(Harvester $harvester): ?array
+    {
+        $offset = 1;
+        while (true) {
+            $token = $harvester->tokens->peek($offset);
+            if (null === $token) {
+                return null;
+            }
+
+            if (TokenType::NEWLINE === $token->type) {
+                ++$offset;
+                continue;
+            }
+
+            $hasIndentation = TokenType::INDENTATION === $token->type;
+            $indentLen = $hasIndentation ? \strlen($token->text) : 0;
+            $probe = $hasIndentation ? $offset + 1 : $offset;
+
+            while (true) {
+                $candidate = $harvester->tokens->peek($probe);
+                if (null === $candidate || TokenType::NEWLINE === $candidate->type) {
+                    $offset = null === $candidate ? $probe : $probe + 1;
+                    continue 2;
+                }
+                if (TokenType::COMMENT !== $candidate->type && TokenType::WHITESPACE !== $candidate->type) {
+                    return [$indentLen, $candidate];
+                }
+                ++$probe;
+            }
         }
     }
 

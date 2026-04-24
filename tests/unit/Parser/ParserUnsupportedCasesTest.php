@@ -21,17 +21,6 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(Parser::class)]
 final class ParserUnsupportedCasesTest extends TestCase
 {
-    public function testThrowsWhenBlockMappingValueContainsNoCouples(): void
-    {
-        $this->expectException(UnexpectedStateException::class);
-        $this->expectExceptionMessage('Empty block mapping value is not supported');
-
-        (new Parser())->parse(<<<'YAML'
-a:
-  # only comments, no key/value
-YAML);
-    }
-
     public function testThrowsWhenMergeValueIsNotAliasOrFlowSequenceOfAliases(): void
     {
         $this->expectException(UnexpectedStateException::class);
