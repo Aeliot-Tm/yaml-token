@@ -81,7 +81,7 @@ final class YamlEmitterTest extends TestCase
     public function testEmitsOriginalYaml(string $fixture): void
     {
         $yaml = file_get_contents($fixture);
-        $stream = (new Parser())->parse(file_get_contents($fixture));
+        $stream = (new Parser())->parse($yaml);
         self::assertSame($yaml, (new YamlEmitter())->emit($stream));
     }
 }
