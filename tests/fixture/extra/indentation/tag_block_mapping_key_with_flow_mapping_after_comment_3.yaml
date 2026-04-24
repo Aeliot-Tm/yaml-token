@@ -1,0 +1,7 @@
+root:
+  tagged:
+    !localTag child:
+        # comment 1
+        # comment 2
+        # comment 3
+      next: {a: v, b: v}

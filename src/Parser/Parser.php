@@ -257,6 +257,58 @@ final class Parser
         }
     }
 
+    private function collectKeyProperties(Harvester $harvester, KeyNode $keyNode): void
+    {
+        $tagProperty = null;
+
+        while (!$harvester->tokens->isEnd()) {
+            $token = $harvester->tokens->current();
+            if (TokenType::WHITESPACE === $token->type) {
+                $keyNode->addChild(new WhitespaceNode($token));
+                $harvester->tokens->advance();
+                continue;
+            }
+
+            if (TokenType::ANCHOR === $token->type) {
+                $keyNode->addChild(new AnchorNode($token));
+                $harvester->tokens->advance();
+                continue;
+            }
+
+            if (TokenType::TAG_BODY === $token->type) {
+                throw new UnexpectedTokenException($this->appendTokenLocation('Tag body without tag handle', $token));
+            }
+
+            if ($this->isNodePropertyToken($token)) {
+                if (null !== $tagProperty) {
+                    throw new UnexpectedStateException($this->appendTokenLocation('Only one tag property is supported per key node', $token));
+                }
+
+                $tagProperty = new TagPropertyNode();
+                $tagProperty->addChild(new TagNode($token));
+                $keyNode->addChild($tagProperty);
+                $harvester->tokens->advance();
+
+                if (\in_array($token->type, [TokenType::TAG_HANDLE_VERBATIM, TokenType::TAG_NON_SPECIFIC], true)) {
+                    continue;
+                }
+
+                $this->collectTypes($harvester, [TokenType::WHITESPACE], $keyNode);
+
+                $body = $harvester->tokens->current();
+                if (TokenType::TAG_BODY !== $body?->type) {
+                    throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Tag body expected, but %s given', $body?->type->value ?? '_nothing_'), $harvester->tokens));
+                }
+
+                $tagProperty->addChild(new TagBodyNode($body));
+                $harvester->tokens->advance();
+                continue;
+            }
+
+            break;
+        }
+    }
+
     /**
      * Consumes one SEQUENCE_ENTRY token followed by any number of
      * directly adjacent WHITESPACE tokens. Returns the total length
@@ -337,6 +389,7 @@ final class Parser
     private function getKeyNode(Harvester $harvester, bool $allowEmptyImplicitKey): KeyNode
     {
         $keyNode = new KeyNode();
+        $this->collectKeyProperties($harvester, $keyNode);
         $token = $harvester->tokens->current();
 
         if (TokenType::EXPLICIT_KEY_INDICATOR === $token->type) {
@@ -450,6 +503,20 @@ final class Parser
         ], true);
     }
 
+    private function isKeyValueCoupleStartAllowingNodeProperties(Harvester $harvester): bool
+    {
+        $token = $harvester->tokens->current();
+        if (TokenType::INDENTATION === $token->type) {
+            $token = $harvester->tokens->peek(1);
+        }
+
+        if ($this->isNodePropertyToken($token)) {
+            return true;
+        }
+
+        return $this->isKeyValueCoupleStart($harvester);
+    }
+
     /**
      * YAML 1.2.2 §8.2 rule [200] s-l+block-collection(n,c): before the block
      * sequence or block mapping body a node may carry c-ns-properties(n+1,c)
@@ -471,6 +538,22 @@ final class Parser
         }
 
         return null !== $token && \in_array($token->type, [
+            TokenType::ANCHOR,
+            TokenType::TAG_HANDLE_NAMED,
+            TokenType::TAG_HANDLE_PRIMARY,
+            TokenType::TAG_HANDLE_SECONDARY,
+            TokenType::TAG_HANDLE_VERBATIM,
+            TokenType::TAG_NON_SPECIFIC,
+        ], true);
+    }
+
+    private function isNodePropertyToken(?Token $token): bool
+    {
+        if (null === $token) {
+            return false;
+        }
+
+        return \in_array($token->type, [
             TokenType::ANCHOR,
             TokenType::TAG_HANDLE_NAMED,
             TokenType::TAG_HANDLE_PRIMARY,
@@ -564,7 +647,7 @@ final class Parser
                 throw new IndentationInvalidException($this->appendTokenLocation(\sprintf('Unexpected indentation %d for next key/value couple; expected %d', $indentLen, $baseIndentLen), $token));
             }
 
-            if (false === $this->isKeyValueCoupleStart($harvester)) {
+            if (false === $this->isKeyValueCoupleStartAllowingNodeProperties($harvester)) {
                 throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Key/value couple expected while parsing block mapping value, but %s given', $harvester->tokens->current()?->type->value ?? '_nothing_'), $token));
             }
 
@@ -682,7 +765,7 @@ final class Parser
             if (\strlen($token->text) !== $indentLen) {
                 break;
             }
-            if (!$this->isKeyValueCoupleStart($harvester)) {
+            if (!$this->isKeyValueCoupleStartAllowingNodeProperties($harvester)) {
                 break;
             }
 
@@ -1031,14 +1114,50 @@ final class Parser
         if (null === $head) {
             return;
         }
-        [$indentLen, $afterIndent] = $head;
+        [$indentLen, $afterIndent, $afterIndentOffset] = $head;
 
         if ($indentLen > 0) {
             if ($indentLen <= $parentIndentLen) {
                 return;
             }
 
-            if (TokenType::SEQUENCE_ENTRY === $afterIndent?->type) {
+            // YAML 1.2.2 §8.2 rule [200] s-l+block-collection(n,c): a node may
+            // have c-ns-properties(n+1,c) (tag and/or anchor), optionally on their
+            // own line, before the actual collection body.
+            //
+            // If the first significant line starts with node properties and the line
+            // ends immediately after them, treat it as value properties. Otherwise,
+            // it's a tagged/anchored key in a nested block mapping.
+            if ($this->isNodePropertyToken($afterIndent) && $this->isNodePropertiesOnlyLine($harvester, $afterIndentOffset)) {
+                $valueNode->addChild(new NewLineNode($token));
+                $harvester->tokens->advance();
+                $this->collectTypes($harvester, [
+                    TokenType::COMMENT,
+                    TokenType::NEWLINE,
+                    TokenType::WHITESPACE,
+                ], $valueNode);
+                $this->collectInsignificantIndentationLines($harvester, $valueNode);
+
+                $indentationToken = $harvester->tokens->current();
+                if (null === $indentationToken || TokenType::INDENTATION !== $indentationToken->type) {
+                    throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Expected INDENTATION before node properties, but %s given', $indentationToken?->type->value ?? '_nothing_'), $harvester->tokens));
+                }
+                $valueNode->addChild(new IndentationNode($indentationToken));
+                $harvester->tokens->advance();
+
+                $this->collectValueProperties($harvester, $valueNode);
+
+                $next = $harvester->tokens->current();
+                if (null === $next || TokenType::NEWLINE !== $next->type) {
+                    throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Expected NEWLINE after node properties, but %s given', $next?->type->value ?? '_nothing_'), $harvester->tokens));
+                }
+
+                $this->parseIndentedBlockValue($harvester, $valueNode, $parentIndentLen);
+
+                return;
+            }
+
+            if (TokenType::SEQUENCE_ENTRY === $afterIndent->type) {
                 $valueNode->addChild($this->parseBlockSequenceValue($harvester, $parentIndentLen));
 
                 return;
@@ -1051,8 +1170,8 @@ final class Parser
             // see [78] l-comment + [66] s-separate-in-line) may sit between the ':'
             // and the flow node.
             if (
-                TokenType::FLOW_SEQUENCE_START === $afterIndent?->type
-                || TokenType::FLOW_MAPPING_START === $afterIndent?->type
+                TokenType::FLOW_SEQUENCE_START === $afterIndent->type
+                || TokenType::FLOW_MAPPING_START === $afterIndent->type
             ) {
                 $valueNode->addChild(new NewLineNode($token));
                 $harvester->tokens->advance();
@@ -1064,7 +1183,7 @@ final class Parser
                 $this->collectInsignificantIndentationLines($harvester, $valueNode);
 
                 $indentationToken = $harvester->tokens->current();
-                if (TokenType::INDENTATION !== $indentationToken?->type) {
+                if (null === $indentationToken || TokenType::INDENTATION !== $indentationToken->type) {
                     throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Expected INDENTATION before flow node, but %s given', $indentationToken?->type->value ?? '_nothing_'), $harvester->tokens));
                 }
                 $valueNode->addChild(new IndentationNode($indentationToken));
@@ -1086,7 +1205,7 @@ final class Parser
 
         // Column-0 block collection (no leading INDENTATION token) — only
         // accepted at bare document root (n = -1 per YAML 1.2.2 rule [211]).
-        if ($parentIndentLen < 0 && null !== $afterIndent) {
+        if ($parentIndentLen < 0) {
             if (TokenType::SEQUENCE_ENTRY === $afterIndent->type) {
                 $valueNode->addChild($this->parseBlockSequenceValue($harvester, $parentIndentLen));
 
@@ -1416,12 +1535,13 @@ final class Parser
      * skipped, since the lexer omits the leading INDENTATION token only
      * for the latter.
      *
-     * @return array{int, Token}|null Tuple of [indentLen, significantToken] pointing
+     * @return array{int, Token, int}|null Tuple of [indentLen, significantToken, offset] pointing
      *                                at the first significant line:
      *                                - indentLen is the byte-length of that line's
      *                                leading INDENTATION token (0 for column-0 lines);
      *                                - significantToken is the first non-WHITESPACE/COMMENT
      *                                token of that line.
+     *                                - offset is the TokenStreamProxy peek offset of significantToken.
      *                                Returns null if the stream ends with only insignificant lines.
      */
     private function peekFirstSignificantBlockHead(Harvester $harvester): ?array
@@ -1449,10 +1569,66 @@ final class Parser
                     continue 2;
                 }
                 if (TokenType::COMMENT !== $candidate->type && TokenType::WHITESPACE !== $candidate->type) {
-                    return [$indentLen, $candidate];
+                    return [$indentLen, $candidate, $probe];
                 }
                 ++$probe;
             }
+        }
+    }
+
+    /**
+     * @param int $offset Offset to the first non-WHITESPACE/COMMENT token of the line
+     */
+    private function isNodePropertiesOnlyLine(Harvester $harvester, int $offset): bool
+    {
+        $i = $offset;
+        $seenTag = false;
+
+        while (true) {
+            $token = $harvester->tokens->peek($i);
+            if (null === $token) {
+                return true;
+            }
+            if (TokenType::NEWLINE === $token->type) {
+                return true;
+            }
+            if (TokenType::WHITESPACE === $token->type || TokenType::COMMENT === $token->type) {
+                ++$i;
+                continue;
+            }
+
+            if (TokenType::ANCHOR === $token->type) {
+                ++$i;
+                continue;
+            }
+
+            if (TokenType::TAG_BODY === $token->type) {
+                return false;
+            }
+
+            if ($this->isNodePropertyToken($token)) {
+                if ($seenTag) {
+                    return false;
+                }
+                $seenTag = true;
+                ++$i;
+
+                if (\in_array($token->type, [TokenType::TAG_HANDLE_VERBATIM, TokenType::TAG_NON_SPECIFIC], true)) {
+                    continue;
+                }
+
+                while (TokenType::WHITESPACE === $harvester->tokens->peek($i)?->type) {
+                    ++$i;
+                }
+
+                if (TokenType::TAG_BODY !== $harvester->tokens->peek($i)?->type) {
+                    return false;
+                }
+                ++$i;
+                continue;
+            }
+
+            return false;
         }
     }
 

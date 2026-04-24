@@ -1,0 +1,4 @@
+root:
+  tagged:
+    !localTag child:
+      next: value

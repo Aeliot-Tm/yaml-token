@@ -15,6 +15,7 @@ namespace Aeliot\YamlToken\Test\Unit\Parser;
 
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Lexer\Lexer;
+use Aeliot\YamlToken\Node\BlockMappingNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\ScalarNode;
@@ -123,6 +124,23 @@ key: !!str !local value
 YAML);
     }
 
+    public function testBindsTagOnOwnLineToIndentedBlockMappingValue(): void
+    {
+        $stream = (new Parser())->parse(<<<'YAML'
+root:
+  tagged:
+    !localTag
+      child: value
+YAML);
+
+        $rootCouple = $this->getOnlyCouple($stream);
+        $rootValue = $rootCouple->getValue();
+        self::assertNotNull($rootValue);
+
+        $rootMapping = $this->getFirstChildOfType($rootValue, BlockMappingNode::class);
+        self::assertInstanceOf(BlockMappingNode::class, $rootMapping);
+    }
+
     private function getOnlyCouple(StreamNode $stream): KeyValueCoupleNode
     {
         $document = $this->getOnlyDocument($stream);
@@ -134,6 +152,24 @@ YAML);
         self::assertCount(1, $couples);
 
         return $couples[0];
+    }
+
+    /**
+     * @template T of object
+     *
+     * @param class-string<T> $class
+     *
+     * @return T|null
+     */
+    private function getFirstChildOfType(ValueNode $value, string $class): ?object
+    {
+        foreach ($value->getChildren() as $child) {
+            if ($child instanceof $class) {
+                return $child;
+            }
+        }
+
+        return null;
     }
 
     private function getOnlyDocument(StreamNode $stream): DocumentNode
