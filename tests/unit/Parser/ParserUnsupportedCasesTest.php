@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Aeliot\YamlToken\Test\Unit\Parser;
 
 use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
-use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Parser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -24,8 +23,8 @@ final class ParserUnsupportedCasesTest extends TestCase
 {
     public function testThrowsWhenBlockMappingValueContainsNoCouples(): void
     {
-        $this->expectException(UnexpectedTokenException::class);
-        $this->expectExceptionMessageMatches('/^Key\\/value couple expected while parsing block mapping value/');
+        $this->expectException(UnexpectedStateException::class);
+        $this->expectExceptionMessage('Empty block mapping value is not supported');
 
         (new Parser())->parse(<<<'YAML'
 a:

@@ -1,6 +1,5 @@
 ---
 root:
   first: 1
-     
+     	# a comment
   second: 2
-

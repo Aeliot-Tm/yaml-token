@@ -100,6 +100,26 @@ final class Parser
     }
 
     /**
+     * Consume one or more consecutive l-empty / l-comment lines whose
+     * leading INDENTATION must not contribute to the surrounding block's
+     * s-indent(n). Tokens are still attached to $root verbatim so the
+     * emitter can reproduce the original text.
+     */
+    private function collectInsignificantIndentationLines(Harvester $harvester, Node $root): void
+    {
+        while ($this->isInsignificantIndentationLine($harvester)) {
+            $token = $harvester->tokens->current();
+            $root->addChild(new IndentationNode($token));
+            $harvester->tokens->advance();
+            $this->collectTypes($harvester, [
+                TokenType::COMMENT,
+                TokenType::NEWLINE,
+                TokenType::WHITESPACE,
+            ], $root);
+        }
+    }
+
+    /**
      * @return list<AliasNode>
      */
     private function collectMergeAliases(ValueNode $value): array
@@ -388,6 +408,30 @@ final class Parser
         return TokenType::FLOW_SEQUENCE_START === $token?->type;
     }
 
+    /**
+     * YAML 1.2.2 §6.4 / §6.6: detects a line that is either entirely empty
+     * (l-empty) or contains only a comment (l-comment), possibly with
+     * leading whitespace. Such a line's leading INDENTATION token is part
+     * of s-separate-in-line, not of block s-indent(n), and must not be
+     * registered as the document's indent step nor validated against it.
+     */
+    private function isInsignificantIndentationLine(Harvester $harvester): bool
+    {
+        if (TokenType::INDENTATION !== $harvester->tokens->current()?->type) {
+            return false;
+        }
+
+        for ($offset = 1;; ++$offset) {
+            $token = $harvester->tokens->peek($offset);
+            if (null === $token || TokenType::NEWLINE === $token->type) {
+                return true;
+            }
+            if (TokenType::COMMENT !== $token->type && TokenType::WHITESPACE !== $token->type) {
+                return false;
+            }
+        }
+    }
+
     private function isKeyValueCoupleStart(Harvester $harvester): bool
     {
         $token = $harvester->tokens->current();
@@ -486,6 +530,7 @@ final class Parser
                 TokenType::COMMENT,
                 TokenType::WHITESPACE,
             ], $blockMapping);
+            $this->collectInsignificantIndentationLines($harvester, $blockMapping);
 
             $token = $harvester->tokens->current();
             if (null === $token) {
@@ -553,6 +598,7 @@ final class Parser
                 TokenType::COMMENT,
                 TokenType::WHITESPACE,
             ], $blockSequence);
+            $this->collectInsignificantIndentationLines($harvester, $blockSequence);
 
             $token = $harvester->tokens->current();
             if (null === $token) {
@@ -627,6 +673,7 @@ final class Parser
                 TokenType::COMMENT,
                 TokenType::WHITESPACE,
             ], $blockMapping);
+            $this->collectInsignificantIndentationLines($harvester, $blockMapping);
 
             $token = $harvester->tokens->current();
             if (null === $token || TokenType::INDENTATION !== $token->type) {
@@ -671,6 +718,7 @@ final class Parser
                 TokenType::COMMENT,
                 TokenType::WHITESPACE,
             ], $blockSequence);
+            $this->collectInsignificantIndentationLines($harvester, $blockSequence);
 
             $token = $harvester->tokens->current();
             if (null === $token || TokenType::INDENTATION !== $token->type) {
