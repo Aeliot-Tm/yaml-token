@@ -1,0 +1,207 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+/*
+ * This file is part of the YAML Token project.
+ *
+ * (c) Anatoliy Melnikov <5785276@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
+use Aeliot\YamlToken\Emitter\YamlEmitter;
+use Aeliot\YamlToken\Parser\Parser;
+
+require_once (static function (): string {
+    if (Phar::running()) {
+        return __DIR__.'/../vendor/autoload.php';
+    }
+
+    if (isset($GLOBALS['_composer_autoload_path'])) {
+        return $GLOBALS['_composer_autoload_path'];
+    }
+
+    $paths = [
+        __DIR__.'/../vendor/autoload.php',
+        __DIR__.'/../../vendor/autoload.php',
+        __DIR__.'/../../../vendor/autoload.php',
+        __DIR__.'/../../../../vendor/autoload.php',
+    ];
+
+    foreach ($paths as $path) {
+        if (file_exists($path)) {
+            return realpath($path);
+        }
+    }
+
+    throw new RuntimeException('Cannot find autoloader');
+})();
+
+/**
+ * @return array{debug: bool, extList: string}
+ */
+function getOptions(): array
+{
+    $opt = getopt('', ['debug', 'ext:']);
+
+    return [
+        'debug' => array_key_exists('debug', $opt),
+        'extList' => (string) ($opt['ext'] ?? 'yaml,yml'),
+    ];
+}
+
+/**
+ * @return list<string>
+ */
+function getRootsFromArgv(): array
+{
+    $argv = $GLOBALS['argv'] ?? [];
+    $countArgs = count($argv);
+    $roots = [];
+    for ($i = 1; $i < $countArgs; ++$i) {
+        $arg = (string) $argv[$i];
+
+        if ('--debug' === $arg) {
+            continue;
+        }
+
+        if (str_starts_with($arg, '--ext=')) {
+            continue;
+        }
+
+        if ('--ext' === $arg) {
+            ++$i;
+            continue;
+        }
+
+        if (str_starts_with($arg, '-')) {
+            continue;
+        }
+
+        $roots[] = $arg;
+    }
+
+    return $roots;
+}
+
+function iteratePaths(): Generator
+{
+    foreach (getRootsFromArgv() as $root) {
+        $root = trim($root);
+        if ('' === $root) {
+            continue;
+        }
+        if (is_file($root)) {
+            yield $root;
+            continue;
+        }
+
+        if (!is_dir($root)) {
+            continue;
+        }
+
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator(
+                $root,
+                FilesystemIterator::CURRENT_AS_PATHNAME | FilesystemIterator::SKIP_DOTS,
+            ),
+        );
+        foreach ($iterator as $file) {
+            yield $file;
+        }
+    }
+
+    if (stream_isatty(\STDIN)) {
+        return;
+    }
+
+    $read = [\STDIN];
+    $write = null;
+    $except = null;
+    if (0 === stream_select($read, $write, $except, 0)) {
+        return;
+    }
+
+    while (false !== ($root = fgets(\STDIN))) {
+        $root = trim($root);
+        if ('' === $root) {
+            continue;
+        }
+
+        if (is_file($root)) {
+            yield $root;
+            continue;
+        }
+
+        if (!is_dir($root)) {
+            continue;
+        }
+
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator(
+                $root,
+                FilesystemIterator::CURRENT_AS_PATHNAME | FilesystemIterator::SKIP_DOTS,
+            ),
+        );
+        foreach ($iterator as $file) {
+            yield $file;
+        }
+    }
+}
+
+/**
+ * @return string[]
+ */
+function getPaths(string $extList): array
+{
+    $allowed = array_fill_keys(array_values(array_filter(array_map(
+        static fn (string $e): string => strtolower(trim(ltrim($e, '.'))),
+        explode(',', $extList),
+    ))), true);
+
+    $paths = [];
+    foreach (iteratePaths() as $path) {
+        if (!is_file($path)) {
+            continue;
+        }
+
+        $ext = strtolower((string) pathinfo($path, \PATHINFO_EXTENSION));
+        if (isset($allowed[$ext])) {
+            $paths[] = $path;
+        }
+    }
+
+    sort($paths, \SORT_STRING);
+
+    return array_values(array_unique($paths));
+}
+
+$parser = new Parser();
+$emitter = new YamlEmitter();
+
+$options = getOptions();
+$paths = getPaths($options['extList']);
+
+if ($options['debug']) {
+    fwrite(\STDOUT, sprintf("Found %d files\n", count($paths)));
+}
+
+foreach ($paths as $path) {
+    if ($options['debug']) {
+        fwrite(\STDOUT, sprintf("Parse: %s\n", $path));
+    }
+
+    $input = file_get_contents($path);
+    if (false === $input) {
+        throw new RuntimeException(sprintf('Cannot read file: %s', $path));
+    }
+
+    $emitter->emit($parser->parse($input));
+}
+
+if ($options['debug']) {
+    fwrite(\STDOUT, "Finished\n");
+}

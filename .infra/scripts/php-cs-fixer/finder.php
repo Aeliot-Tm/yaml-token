@@ -20,4 +20,5 @@ return $finder = (new PhpCsFixer\Finder())
         '.infra/scripts/composer-unused/config.php',
         '.infra/scripts/php-cs-fixer/config.php',
         '.infra/scripts/php-cs-fixer/finder.php',
+        'bin/rebuild',
     ]);
