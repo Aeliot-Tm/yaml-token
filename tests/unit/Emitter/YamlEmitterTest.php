@@ -33,9 +33,10 @@ final class YamlEmitterTest extends TestCase
      */
     public static function getDataForTestEmitsOriginalYaml(): iterable
     {
-        $specRoot = self::getSpecRoot();
-        foreach (self::getSortedYamlPaths($specRoot) as $path) {
-            yield self::getFixtureDataSetName($specRoot, $path) => [$path];
+        foreach (self::getSpecRoot() as $specRoot) {
+            foreach (self::getSortedYamlPaths($specRoot) as $path) {
+                yield self::getFixtureDataSetName($specRoot, $path) => [$path];
+            }
         }
     }
 
@@ -72,9 +73,12 @@ final class YamlEmitterTest extends TestCase
         return $paths;
     }
 
-    private static function getSpecRoot(): string
+    private static function getSpecRoot(): \Generator
     {
-        return realpath(__DIR__.'/../../fixture/spec') ?: __DIR__.'/../../fixture/spec';
+        foreach (['extra', 'spec'] as $name) {
+            $path = __DIR__.'/../../fixture/'.$name;
+            yield realpath($path) ?: $path;
+        }
     }
 
     #[DataProvider('getDataForTestEmitsOriginalYaml')]
