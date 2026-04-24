@@ -127,7 +127,7 @@ YAML);
     public function testThrowsWhenNoVersion(string $yaml): void
     {
         $this->expectException(UnexpectedTokenException::class);
-        $this->expectExceptionMessage('Expected YAML directive version before newline or comment');
+        $this->expectExceptionMessageMatches('/^Expected YAML directive version before newline or comment/');
 
         (new Parser())->parse($yaml);
     }
@@ -136,7 +136,7 @@ YAML);
     public function testThrowsAtEndOfFile(string $yaml): void
     {
         $this->expectException(UnexpectedEndException::class);
-        $this->expectExceptionMessage('Unexpected end of token stream: YAML directive version is required');
+        $this->expectExceptionMessageMatches('/^Unexpected end of token stream: YAML directive version is required/');
 
         (new Parser())->parse($yaml);
     }

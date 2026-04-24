@@ -26,7 +26,7 @@ final class ParserAdditionalNegativeCasesTest extends TestCase
     public function testThrowsWhenFlowMappingIsNotClosed(): void
     {
         $this->expectException(UnexpectedTokenException::class);
-        $this->expectExceptionMessage('There is no expected FLOW_MAPPING_END token');
+        $this->expectExceptionMessageMatches('/^There is no expected FLOW_MAPPING_END token/');
 
         (new Parser())->parse(<<<'YAML'
 key: {a: 1
@@ -36,7 +36,7 @@ YAML);
     public function testThrowsWhenFlowSequenceIsNotClosed(): void
     {
         $this->expectException(UnexpectedTokenException::class);
-        $this->expectExceptionMessage('There is no expected FLOW_SEQUENCE_END token');
+        $this->expectExceptionMessageMatches('/^There is no expected FLOW_SEQUENCE_END token/');
 
         (new Parser())->parse(<<<'YAML'
 key: [a, b
@@ -46,7 +46,7 @@ YAML);
     public function testThrowsWhenFlowKeyIsNotScalar(): void
     {
         $this->expectException(UnexpectedTokenException::class);
-        $this->expectExceptionMessage('Key scalar expected');
+        $this->expectExceptionMessageMatches('/^Key scalar expected/');
 
         (new Parser())->parse(<<<'YAML'
 key: {[a, b]: c}
@@ -79,7 +79,7 @@ YAML);
     public function testThrowsWhenBlockSequenceHasNonSequenceEntryAtSameIndent(): void
     {
         $this->expectException(UnexpectedTokenException::class);
-        $this->expectExceptionMessage('Sequence entry expected while parsing block sequence value');
+        $this->expectExceptionMessageMatches('/^Sequence entry expected while parsing block sequence value/');
 
         (new Parser())->parse(<<<'YAML'
 a:

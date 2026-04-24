@@ -25,7 +25,7 @@ final class ParserUnsupportedCasesTest extends TestCase
     public function testThrowsWhenBlockMappingValueContainsNoCouples(): void
     {
         $this->expectException(UnexpectedTokenException::class);
-        $this->expectExceptionMessage('Key/value couple expected while parsing block mapping value');
+        $this->expectExceptionMessageMatches('/^Key\\/value couple expected while parsing block mapping value/');
 
         (new Parser())->parse(<<<'YAML'
 a:
