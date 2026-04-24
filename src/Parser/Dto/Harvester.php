@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Aeliot\YamlToken\Parser\Dto;
 
 use Aeliot\YamlToken\Node\StreamNode;
-use Aeliot\YamlToken\Token\TokenStream;
 
 final class Harvester
 {
@@ -22,7 +21,7 @@ final class Harvester
     public ParseState $state;
     public StreamNode $stream;
 
-    public function __construct(public readonly TokenStream $tokens)
+    public function __construct(public readonly TokenStreamProxy $tokens)
     {
     }
 }

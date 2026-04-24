@@ -54,6 +54,7 @@ use Aeliot\YamlToken\Node\YamlDirectiveVersionNode;
 use Aeliot\YamlToken\Parser\Dto\Harvester;
 use Aeliot\YamlToken\Parser\Dto\ParseRegistry;
 use Aeliot\YamlToken\Parser\Dto\ParseState;
+use Aeliot\YamlToken\Parser\Dto\TokenStreamProxy;
 use Aeliot\YamlToken\Parser\Exception\AnchorUndefinedException;
 use Aeliot\YamlToken\Parser\Exception\IndentationInvalidException;
 use Aeliot\YamlToken\Parser\Exception\IndentationOverrideException;
@@ -79,10 +80,12 @@ final class Parser
         return $this->parseStream((new Lexer())->tokenize($input));
     }
 
-    private function appendTokenLocation(string $message, ?Token $token): string
+    private function appendTokenLocation(string $message, Token|TokenStreamProxy $tokens): string
     {
-        if ($token) {
-            $message .= \sprintf(' in line %d column %d', $token->line, $token->column);
+        $line = $tokens instanceof Token ? $tokens->line : $tokens->getLine();
+        $column = $tokens instanceof Token ? $tokens->column : $tokens->getColumn();
+        if (null !== $line && null !== $column) {
+            $message .= \sprintf(' in line %d column %d', $line, $column);
         }
 
         return $message;
@@ -93,7 +96,7 @@ final class Parser
         try {
             $harvester->state->assertIndentLenIsValid($indentLen);
         } catch (IndentationInvalidException|IndentationUndefinedException $e) {
-            $this->wrapParseStateIndentationException($e, $harvester->tokens->current() ?? $this->getLastKnownToken($harvester->tokens));
+            $this->wrapParseStateIndentationException($e, $harvester->tokens);
         }
     }
 
@@ -196,7 +199,7 @@ final class Parser
             }
 
             if (TokenType::TAG_BODY === $token->type) {
-                throw new UnexpectedTokenException($this->appendTokenLocation('Tag body without tag handle', $token));
+                throw new UnexpectedTokenException($this->appendTokenLocation('Tag body without tag handle', $harvester->tokens));
             }
 
             if (\in_array($token->type, [
@@ -207,7 +210,7 @@ final class Parser
                 TokenType::TAG_NON_SPECIFIC,
             ], true)) {
                 if (null !== $tagProperty) {
-                    throw new UnexpectedStateException($this->appendTokenLocation('Only one tag property is supported per value node', $token));
+                    throw new UnexpectedStateException($this->appendTokenLocation('Only one tag property is supported per value node', $harvester->tokens));
                 }
 
                 $tagProperty = new TagPropertyNode();
@@ -223,7 +226,7 @@ final class Parser
 
                 $body = $harvester->tokens->current();
                 if (TokenType::TAG_BODY !== $body?->type) {
-                    throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Tag body expected, but %s given', $body?->type->value ?? '_nothing_'), $body ?? $this->getLastKnownToken($harvester->tokens)));
+                    throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Tag body expected, but %s given', $body?->type->value ?? '_nothing_'), $harvester->tokens));
                 }
 
                 $tagProperty->addChild(new TagBodyNode($body));
@@ -246,7 +249,7 @@ final class Parser
     {
         $token = $harvester->tokens->current();
         if (TokenType::SEQUENCE_ENTRY !== $token?->type) {
-            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('SEQUENCE_ENTRY expected, but %s given', $token?->type->value ?? '_nothing_'), $token));
+            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('SEQUENCE_ENTRY expected, but %s given', $token?->type->value ?? '_nothing_'), $harvester->tokens));
         }
 
         $target->addChild(new SyntaxTokenNode($token));
@@ -331,7 +334,7 @@ final class Parser
 
         if (TokenType::VALUE_INDICATOR === $token->type) {
             if (!$allowEmptyImplicitKey && null === $keyNode->getExplicitKeyIndicatorNode()) {
-                throw new UnexpectedTokenException($this->appendTokenLocation('Empty implicit key is not allowed in this context', $token));
+                throw new UnexpectedTokenException($this->appendTokenLocation('Empty implicit key is not allowed in this context', $harvester->tokens));
             }
 
             return $keyNode;
@@ -357,20 +360,13 @@ final class Parser
                 return $keyNode;
             }
 
-            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Key scalar expected, but %s given', $token->type->value), $token));
+            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Key scalar expected, but %s given', $token->type->value), $harvester->tokens));
         }
 
         $keyNode->setName(new ScalarNode($token));
         $harvester->tokens->advance();
 
         return $keyNode;
-    }
-
-    private function getLastKnownToken(TokenStream $tokens): ?Token
-    {
-        $position = $tokens->getPosition();
-
-        return $position > 0 ? $tokens->peek(-1) : null;
     }
 
     private function isFlowMappingStart(Harvester $harvester): bool
@@ -519,13 +515,13 @@ final class Parser
             if (null === $baseIndentLen) {
                 $baseIndentLen = $indentLen;
             } elseif ($indentLen < $baseIndentLen) {
-                throw new IndentationInvalidException($this->appendTokenLocation(\sprintf('Unexpected indentation %d while base indentation is %d', $indentLen, $baseIndentLen), $token));
+                throw new IndentationInvalidException($this->appendTokenLocation(\sprintf('Unexpected indentation %d while base indentation is %d', $indentLen, $baseIndentLen), $harvester->tokens));
             } elseif ($indentLen > $baseIndentLen && $previousCoupleIndentLen === $baseIndentLen) {
-                throw new IndentationInvalidException($this->appendTokenLocation(\sprintf('Unexpected indentation %d for next key/value couple; expected %d', $indentLen, $baseIndentLen), $token));
+                throw new IndentationInvalidException($this->appendTokenLocation(\sprintf('Unexpected indentation %d for next key/value couple; expected %d', $indentLen, $baseIndentLen), $harvester->tokens));
             }
 
             if (false === $this->isKeyValueCoupleStart($harvester)) {
-                throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Key/value couple expected while parsing block mapping value, but %s given', $harvester->tokens->current()?->type->value ?? '_nothing_'), $token));
+                throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Key/value couple expected while parsing block mapping value, but %s given', $harvester->tokens->current()?->type->value ?? '_nothing_'), $harvester->tokens));
             }
 
             $previousCoupleIndentLen = $indentLen;
@@ -586,11 +582,11 @@ final class Parser
             if (null === $baseIndentLen) {
                 $baseIndentLen = $indentLen;
             } elseif ($indentLen !== $baseIndentLen) {
-                throw new IndentationInvalidException($this->appendTokenLocation(\sprintf('Unexpected indentation %d while base indentation is %d', $indentLen, $baseIndentLen), $token));
+                throw new IndentationInvalidException($this->appendTokenLocation(\sprintf('Unexpected indentation %d while base indentation is %d', $indentLen, $baseIndentLen), $harvester->tokens));
             }
 
             if (false === $this->isSequenceStart($harvester)) {
-                throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Sequence entry expected while parsing block sequence value, but %s given', $harvester->tokens->current()?->type->value ?? '_nothing_'), $token));
+                throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Sequence entry expected while parsing block sequence value, but %s given', $harvester->tokens->current()?->type->value ?? '_nothing_'), $harvester->tokens));
             }
 
             $sequenceEntry = new SequenceEntryNode();
@@ -824,7 +820,7 @@ final class Parser
                 continue;
             }
 
-            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Unexpected type: %s', $token->type->value), $token));
+            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Unexpected type: %s', $token->type->value), $harvester->tokens));
         }
 
         if ($document->getChildren()) {
@@ -837,7 +833,7 @@ final class Parser
         $flowMappingNode = new FlowMappingNode();
         $token = $harvester->tokens->current();
         if (TokenType::FLOW_MAPPING_START !== $token?->type) {
-            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('There is no expected FLOW_MAPPING_START token, but %s given', $token?->type->value ?? '_nothing_'), $token));
+            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('There is no expected FLOW_MAPPING_START token, but %s given', $token?->type->value ?? '_nothing_'), $harvester->tokens));
         }
 
         $flowMappingNode->addChild(new SyntaxTokenNode($token));
@@ -880,7 +876,7 @@ final class Parser
 
         $token = $harvester->tokens->current();
         if (TokenType::FLOW_MAPPING_END !== $token?->type) {
-            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('There is no expected FLOW_MAPPING_END token, but %s given', $token?->type->value ?? '_nothing_'), $token));
+            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('There is no expected FLOW_MAPPING_END token, but %s given', $token?->type->value ?? '_nothing_'), $harvester->tokens));
         }
 
         $flowMappingNode->addChild(new SyntaxTokenNode($token));
@@ -897,7 +893,7 @@ final class Parser
 
         $token = $harvester->tokens->current();
         if (TokenType::FLOW_SEQUENCE_START !== $token?->type) {
-            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('There is no expected FLOW_SEQUENCE_START token, but %s given', $token?->type->value ?? '_nothing_'), $token));
+            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('There is no expected FLOW_SEQUENCE_START token, but %s given', $token?->type->value ?? '_nothing_'), $harvester->tokens));
         }
 
         $flowSequenceNode->addChild($this->createSyntaxTokenNode($token));
@@ -921,7 +917,7 @@ final class Parser
 
         $token = $harvester->tokens->current();
         if (TokenType::FLOW_SEQUENCE_END !== $token?->type) {
-            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('There is no expected FLOW_SEQUENCE_END token, but %s given', $token?->type->value ?? '_nothing_'), $token));
+            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('There is no expected FLOW_SEQUENCE_END token, but %s given', $token?->type->value ?? '_nothing_'), $harvester->tokens));
         }
 
         $flowSequenceNode->addChild($this->createSyntaxTokenNode($token));
@@ -977,7 +973,7 @@ final class Parser
     {
         $token = $harvester->tokens->current();
         if (TokenType::NEWLINE !== $token?->type) {
-            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Expected NEWLINE while parsing indented block value, but %s given', $token?->type->value ?? '_nothing_'), $token));
+            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Expected NEWLINE while parsing indented block value, but %s given', $token?->type->value ?? '_nothing_'), $harvester->tokens));
         }
 
         $next = $harvester->tokens->peek(1);
@@ -1044,7 +1040,7 @@ final class Parser
     {
         $token = $harvester->tokens->current();
         if (null === $token) {
-            throw new UnexpectedEndException($this->appendTokenLocation('Unexpected end of stream while parsing key/value couple', $this->getLastKnownToken($harvester->tokens)));
+            throw new UnexpectedEndException($this->appendTokenLocation('Unexpected end of stream while parsing key/value couple', $harvester->tokens));
         }
 
         $keyValueCouple = new KeyValueCoupleNode();
@@ -1073,7 +1069,7 @@ final class Parser
         }
 
         if (TokenType::MERGE_INDICATOR !== $token?->type) {
-            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('There is no expected MERGE_INDICATOR token, but %s given', $token?->type->value ?? '_nothing_'), $token));
+            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('There is no expected MERGE_INDICATOR token, but %s given', $token?->type->value ?? '_nothing_'), $harvester->tokens));
         }
         $mergeInstruction->addChild(new SyntaxTokenNode($token));
         $harvester->tokens->advance();
@@ -1126,7 +1122,7 @@ final class Parser
 
     private function parseStream(TokenStream $tokens): StreamNode
     {
-        $harvester = new Harvester($tokens);
+        $harvester = new Harvester(new TokenStreamProxy($tokens));
         $harvester->registry = new ParseRegistry();
         $harvester->state = new ParseState();
         $harvester->stream = $stream = new StreamNode();
@@ -1146,7 +1142,7 @@ final class Parser
     {
         $token = $harvester->tokens->current();
         if (TokenType::DIRECTIVE_TAG !== $token?->type) {
-            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Expected DIRECTIVE_TAG token, but %s given', $token?->type->value ?? '_nothing_'), $token));
+            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Expected DIRECTIVE_TAG token, but %s given', $token?->type->value ?? '_nothing_'), $harvester->tokens));
         }
 
         $tagDirectiveNode = new TagDirectiveNode($token);
@@ -1156,7 +1152,7 @@ final class Parser
         while (true) {
             $token = $harvester->tokens->current();
             if (null === $token) {
-                throw new UnexpectedEndException($this->appendTokenLocation('Unexpected end of token stream: TAG directive handle and prefix are required', $this->getLastKnownToken($harvester->tokens)));
+                throw new UnexpectedEndException($this->appendTokenLocation('Unexpected end of token stream: TAG directive handle and prefix are required', $harvester->tokens));
             }
 
             if (TokenType::WHITESPACE === $token->type) {
@@ -1189,10 +1185,10 @@ final class Parser
             }
 
             if (\in_array($token->type, [TokenType::COMMENT, TokenType::NEWLINE], true)) {
-                throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Expected TAG directive handle and prefix before newline or comment, but %s given', $token->type->value), $token));
+                throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Expected TAG directive handle and prefix before newline or comment, but %s given', $token->type->value), $harvester->tokens));
             }
 
-            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Unexpected token in TAG directive: %s', $token->type->value), $token));
+            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Unexpected token in TAG directive: %s', $token->type->value), $harvester->tokens));
         }
     }
 
@@ -1221,7 +1217,7 @@ final class Parser
             }
 
             if (TokenType::NEWLINE !== $token->type) {
-                throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Unexpected newline, but %s given', $token->type->value), $token));
+                throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Unexpected newline, but %s given', $token->type->value), $harvester->tokens));
             }
             $valueNode->addChild(new NewLineNode($token));
             $harvester->tokens->advance();
@@ -1236,7 +1232,7 @@ final class Parser
 
             $token = $harvester->tokens->current();
             if (!$token->type->isScalar()) {
-                throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Scalar expected, but %s given', $token->type->value), $token));
+                throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Scalar expected, but %s given', $token->type->value), $harvester->tokens));
             }
 
             $valueNode->addChild(new ScalarNode($token));
@@ -1274,7 +1270,7 @@ final class Parser
             $aliasName = $aliasNode->getName();
             $anchor = $harvester->registry->anchors[$aliasName] ?? null;
             if (null === $anchor) {
-                throw new AnchorUndefinedException($this->appendTokenLocation(\sprintf('Undefined alias "%s"', $aliasName), $token));
+                throw new AnchorUndefinedException($this->appendTokenLocation(\sprintf('Undefined alias "%s"', $aliasName), $harvester->tokens));
             }
             $aliasNode->setAnchor($anchor);
             $valueNode->addChild($aliasNode);
@@ -1286,7 +1282,7 @@ final class Parser
         } elseif (TokenType::FLOW_MAPPING_START === $token->type) {
             $valueNode->addChild($this->parseFlowMapping($harvester));
         } else {
-            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Unexpected type while parsing of value: %s', $token->type->value), $token));
+            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Unexpected type while parsing of value: %s', $token->type->value), $harvester->tokens));
         }
 
         $this->collectTypes($harvester, [
@@ -1301,7 +1297,7 @@ final class Parser
     {
         $token = $harvester->tokens->current();
         if (TokenType::DIRECTIVE_YAML !== $token?->type) {
-            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Expected DIRECTIVE_YAML token, but %s given', $token?->type->value ?? '_nothing_'), $token));
+            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Expected DIRECTIVE_YAML token, but %s given', $token?->type->value ?? '_nothing_'), $harvester->tokens));
         }
 
         $yamlDirectiveNode = new YamlDirectiveNode($token);
@@ -1310,7 +1306,7 @@ final class Parser
         while (true) {
             $token = $harvester->tokens->current();
             if (null === $token) {
-                throw new UnexpectedEndException($this->appendTokenLocation('Unexpected end of token stream: YAML directive version is required', $this->getLastKnownToken($harvester->tokens)));
+                throw new UnexpectedEndException($this->appendTokenLocation('Unexpected end of token stream: YAML directive version is required', $harvester->tokens));
             }
 
             if (\in_array($token->type, [TokenType::WHITESPACE, TokenType::VALUE_INDICATOR], true)) {
@@ -1336,7 +1332,7 @@ final class Parser
                 throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Expected YAML directive version before newline or comment, but %s given', $token->type->value), $token));
             }
 
-            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Unexpected token in YAML directive: %s', $token->type->value), $token));
+            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Unexpected token in YAML directive: %s', $token->type->value), $harvester->tokens));
         }
     }
 
@@ -1359,12 +1355,12 @@ final class Parser
         try {
             $harvester->state->registerIndentStepLen($indentLen);
         } catch (IndentationInvalidException|IndentationOverrideException $e) {
-            $this->wrapParseStateIndentationException($e, $harvester->tokens->current() ?? $this->getLastKnownToken($harvester->tokens));
+            $this->wrapParseStateIndentationException($e, $harvester->tokens);
         }
     }
 
-    private function wrapParseStateIndentationException(\Exception $previous, ?Token $token): void
+    private function wrapParseStateIndentationException(\Exception $previous, TokenStreamProxy $tokens): void
     {
-        throw new ($previous::class)($this->appendTokenLocation($previous->getMessage(), $token), (int) $previous->getCode(), $previous);
+        throw new ($previous::class)($this->appendTokenLocation($previous->getMessage(), $tokens), (int) $previous->getCode(), $previous);
     }
 }
