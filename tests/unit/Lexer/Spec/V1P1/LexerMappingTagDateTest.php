@@ -46,7 +46,7 @@ final class LexerMappingTagDateTest extends LexerMappingTestCase
             ],
             [
                 'type' => TokenType::TAG_BODY,
-                'text' => 'example.com,2000/^t',
+                'text' => 'example.com,2000/timesheet',
             ],
             [
                 'type' => TokenType::WHITESPACE,
@@ -79,7 +79,7 @@ final class LexerMappingTagDateTest extends LexerMappingTestCase
             ],
             [
                 'type' => TokenType::TAG_BODY,
-                'text' => 'example.com,2000-01/^t',
+                'text' => 'example.com,2000-01/timesheet',
             ],
             [
                 'type' => TokenType::WHITESPACE,
@@ -112,7 +112,7 @@ final class LexerMappingTagDateTest extends LexerMappingTestCase
             ],
             [
                 'type' => TokenType::TAG_BODY,
-                'text' => 'example.com,2000-01-01/^t',
+                'text' => 'example.com,2000-01-01/timesheet',
             ],
             [
                 'type' => TokenType::WHITESPACE,
