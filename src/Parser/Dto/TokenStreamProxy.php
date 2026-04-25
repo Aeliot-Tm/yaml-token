@@ -28,6 +28,9 @@ final class TokenStreamProxy
 
     private ?Token $lastObserved = null;
 
+    /**
+     * @param array<int, mixed> $arguments
+     */
     public function __call(string $name, array $arguments): mixed
     {
         return $this->inner->{$name}(...$arguments);
