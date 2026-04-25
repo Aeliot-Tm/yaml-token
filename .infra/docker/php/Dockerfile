@@ -7,7 +7,7 @@ ARG COMPOSER_ALLOW_SUPERUSER=1
 ARG COMPOSER_NO_INTERACTION=1
 ARG COMPOSER_VERSION=2.7.6
 ARG DEBIAN_FRONTEND=noninteractive
-ARG DOCKER_PHP_DEPS='gnupg libxml2-dev libzip-dev unzip'
+ARG DOCKER_PHP_DEPS='gnupg libxml2-dev libzip-dev python3 yamllint unzip'
 ARG XDEBUG_VERSION=3.4.7
 
 RUN set -xe; \

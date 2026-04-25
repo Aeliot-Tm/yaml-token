@@ -1,0 +1,25 @@
+extends: default
+
+rules:
+  # We use yamllint primarily as a YAML validity gate for fixtures,
+  # not as a style enforcer.
+  braces: disable
+  brackets: disable
+  colons: disable
+  commas: disable
+  comments: disable
+  comments-indentation: disable
+  document-end: disable
+  document-start: disable
+  empty-lines: disable
+  hyphens: disable
+  indentation: disable
+  key-ordering: disable
+  line-length: disable
+  new-line-at-end-of-file: disable
+  quoted-strings: disable
+  trailing-spaces: disable
+  truthy: disable
+
+  # Keep a real semantic rule enabled.
+  key-duplicates: enable
