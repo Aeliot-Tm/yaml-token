@@ -5,6 +5,13 @@ globs: tests/fixture/**
 
 # Test Fixtures
 
-When working with specification-related fixtures in `tests/fixture/spec/`,
-read [Specification Cover Fixtures Structure](../docs/Feature/SpecificationCoverFixtures.md)
-for the full directory layout, version-specific file mapping, and modification rules.
+When working with anything under `tests/fixture/`, read
+[Fixtures Structure](../docs/Architecture/FixturesStructure.md) first to
+choose the correct sub-folder (`spec/`, `spec_extra/`, `edge_cases/`,
+`edge_cases_extra/`).
+
+When working with specification-related fixtures in `tests/fixture/spec/`
+or `tests/fixture/spec_extra/`, also read
+[Specification Cover Fixtures Structure](../docs/Feature/SpecificationCoverFixtures.md)
+for the full directory layout, version-specific file mapping, and
+modification rules.
