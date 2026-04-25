@@ -52,7 +52,7 @@ final class ParserYamlDirectiveTest extends TestCase
 
     public function testParsesYamlDirectiveWithColonSeparator(): void
     {
-        $yaml = file_get_contents(__DIR__.'/../../fixture/spec/1.0/directive_4.3.2.yaml');
+        $yaml = file_get_contents(__DIR__.'/../../fixture/spec_extra/1.0/directive_4.3.2.yaml');
         self::assertNotFalse($yaml);
 
         $stream = (new Parser())->parse($yaml);

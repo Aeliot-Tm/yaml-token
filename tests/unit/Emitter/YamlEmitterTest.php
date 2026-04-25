@@ -75,7 +75,7 @@ final class YamlEmitterTest extends TestCase
 
     private static function getSpecRoot(): \Generator
     {
-        foreach (['edge_cases', 'spec'] as $name) {
+        foreach (['edge_cases', 'edge_cases_extra', 'spec', 'spec_extra'] as $name) {
             $path = __DIR__.'/../../fixture/'.$name;
             yield realpath($path) ?: $path;
         }

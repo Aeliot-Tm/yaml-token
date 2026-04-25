@@ -77,6 +77,6 @@ final class LexerMappingFlowWithUrlTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.0/flow-with-url.yaml'];
+        ], __DIR__.'/../../../../fixture/spec_extra/1.0/flow-with-url.yaml'];
     }
 }

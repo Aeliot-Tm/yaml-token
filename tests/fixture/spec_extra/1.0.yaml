@@ -1,0 +1,23 @@
+# YAML 1.0 Specification Fixture (extra)
+# Parts extracted from `tests/fixture/spec/1.0.yaml` because yamllint (PyYAML)
+# rejects some YAML 1.0-specific constructs.
+#
+# This file intentionally contains constructs that are valid for YAML 1.0
+# but are not accepted by yamllint, so it must not be included in yamllint checks.
+
+# Document A: YAML 1.0 directive with colon separator
+%YAML:1.0
+---
+key: value
+...
+
+# Document B: \^ escape (YAML 1.0 only)
+---
+caret_escape: "\^"
+...
+
+# Document C: caret-based tag prefixing
+---
+tag_prefix_root: !example.com,2000/^base tagged value
+tag_using_prefix: !^derived prefixed value
+...

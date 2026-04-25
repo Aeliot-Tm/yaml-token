@@ -7,8 +7,7 @@ bare_document:
   first: bare document in stream
   without: document start marker
 ...
-# Document 2: Directives - 1.0 uses %YAML:1.0 (colon separator)
-%YAML:1.0
+# Document 2:
 ---
 # Comments
 key: value
@@ -86,8 +85,6 @@ literal_chomping_clipped_empty_lines: |-
 
 # Full escape sequences available in 1.0
 escapes_full: "\0 \a \b \e \f \n \r \t \v \\ \_ \N \L \P \U00000041"
-# \^ escape - unique to 1.0, removed in 1.1 (literal ^ character)
-caret_escape: "\^"
 # Escaped newline - line fold in double-quoted scalar
 escaped_newline: "folded to space,\
   or preserved\t"
@@ -159,10 +156,6 @@ binary: !binary |
  R0lGODlhDAAMAIQAAP//9/X
  17unp5WZmZgAAAOfn515eXv
  Pz7Y6OjuDg4J+fn5OTk6enp
-
-# ^ tag prefix - sets URI prefix for subsequent !^ tags (removed in 1.1, replaced by %TAG)
-tag_prefix_root: !example.com,2000/^base tagged value
-tag_using_prefix: !^derived prefixed value
 
 # Complex mapping key
 complex_key:

@@ -91,7 +91,7 @@ Files that exist only in certain versions because the feature was added or remov
 | `directive-tag` | — | yes | yes | `%TAG` added in 1.1 |
 | `directive-reserved` | — | — | yes | `%FOO` reserved directives, 1.2 only |
 | `caret-escape` | yes | — | — | `\^` escape, removed in 1.1 |
-| `tag-prefix-caret` | yes | — | — | `!domain/^type` + `!^name`, removed in 1.1 |
+| `tag-prefix-caret` | yes (in `spec_extra/`) | — | — | `!domain/^type` + `!^name`, removed in 1.1; not lintable by yamllint |
 | `tag-application` | yes | — | — | `!!custom` as application tag (1.0 convention) |
 | `tag-local` | — | yes | yes | `!custom` as local tag (1.1+ convention) |
 | `tag-verbatim` | — | yes | yes | `!<tag:...>` verbatim tags, added in 1.1 |

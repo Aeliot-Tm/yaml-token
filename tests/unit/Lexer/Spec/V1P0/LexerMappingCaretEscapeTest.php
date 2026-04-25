@@ -49,6 +49,6 @@ final class LexerMappingCaretEscapeTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.0/caret-escape_4.6.9.yaml'];
+        ], __DIR__.'/../../../../fixture/spec_extra/1.0/caret-escape_4.6.9.yaml'];
     }
 }
