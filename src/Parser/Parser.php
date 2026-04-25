@@ -1536,13 +1536,13 @@ final class Parser
      * for the latter.
      *
      * @return array{int, Token, int}|null Tuple of [indentLen, significantToken, offset] pointing
-     *                                at the first significant line:
-     *                                - indentLen is the byte-length of that line's
-     *                                leading INDENTATION token (0 for column-0 lines);
-     *                                - significantToken is the first non-WHITESPACE/COMMENT
-     *                                token of that line.
-     *                                - offset is the TokenStreamProxy peek offset of significantToken.
-     *                                Returns null if the stream ends with only insignificant lines.
+     *                                     at the first significant line:
+     *                                     - indentLen is the byte-length of that line's
+     *                                     leading INDENTATION token (0 for column-0 lines);
+     *                                     - significantToken is the first non-WHITESPACE/COMMENT
+     *                                     token of that line.
+     *                                     - offset is the TokenStreamProxy peek offset of significantToken.
+     *                                     Returns null if the stream ends with only insignificant lines.
      */
     private function peekFirstSignificantBlockHead(Harvester $harvester): ?array
     {
