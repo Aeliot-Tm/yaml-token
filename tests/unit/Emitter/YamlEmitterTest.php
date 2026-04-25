@@ -33,18 +33,18 @@ final class YamlEmitterTest extends TestCase
      */
     public static function getDataForTestEmitsOriginalYaml(): iterable
     {
+        $fixtureRoot = realpath(__DIR__.'/../../fixture') ?: __DIR__.'/../../fixture';
         foreach (self::getSpecRoot() as $specRoot) {
             foreach (self::getSortedYamlPaths($specRoot) as $path) {
-                yield self::getFixtureDataSetName($specRoot, $path) => [$path];
+                yield self::getFixtureDataSetName($fixtureRoot, $path) => [$path];
             }
         }
     }
 
-    private static function getFixtureDataSetName(string $specRoot, string $path): string
+    private static function getFixtureDataSetName(string $fixtureRoot, string $path): string
     {
-        $root = realpath($specRoot) ?: $specRoot;
         $real = realpath($path) ?: $path;
-        $prefix = $root.\DIRECTORY_SEPARATOR;
+        $prefix = $fixtureRoot.\DIRECTORY_SEPARATOR;
         if (str_starts_with($real, $prefix)) {
             $relative = substr($real, \strlen($prefix));
         } else {
