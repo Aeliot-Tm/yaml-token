@@ -204,11 +204,14 @@ sequence_entry_types:
     - two
   - one: two
 
-# Plain scalars starting with : ? -
+# Plain scalars starting with : ? - and containing flow indicators in block context
 plain_special_starters:
   - ::vector
   - -123
   - https://example.com/foo#bar
+  - ${VAR}
+  - foo, bar
+  - a{b}c
 
 # Integers - octal without 0o prefix in 1.1, sexagesimal supported
 integer_canonical: 12345

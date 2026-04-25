@@ -50,11 +50,6 @@ final class Lexer
     /**
      * @var list<string>
      */
-    private const CHARS_PLAIN_SCALAR_STOP = [...self::CHARS_LINE_BREAK, ',', ']', '}'];
-
-    /**
-     * @var list<string>
-     */
     private const CHARS_WHITESPACE = [...self::CHARS_HORIZONTAL_WHITESPACE, ...self::CHARS_LINE_BREAK];
 
     /**
@@ -245,12 +240,26 @@ final class Lexer
             return;
         }
 
-        // FLOW indicators
+        // FLOW indicators. "{" and "[" always open a flow context. "}", "]" and "," act as
+        // structural tokens only inside an open flow context; in block context they are valid
+        // plain-scalar content (YAML 1.2 §7.3.3) and must fall through to the plain-scalar reader.
         if (isset(self::FLOW_INDICATOR_TOKEN_TYPES[$char])) {
-            $this->advance($harvester);
-            $harvester->stream->addToken(new Token(self::FLOW_INDICATOR_TOKEN_TYPES[$char], $char, $startLine, $startColumn));
+            if ('{' === $char || '[' === $char) {
+                $this->advance($harvester);
+                ++$harvester->cursor->flowDepth;
+                $harvester->stream->addToken(new Token(self::FLOW_INDICATOR_TOKEN_TYPES[$char], $char, $startLine, $startColumn));
 
-            return;
+                return;
+            }
+            if ($harvester->cursor->flowDepth > 0) {
+                $this->advance($harvester);
+                if ('}' === $char || ']' === $char) {
+                    --$harvester->cursor->flowDepth;
+                }
+                $harvester->stream->addToken(new Token(self::FLOW_INDICATOR_TOKEN_TYPES[$char], $char, $startLine, $startColumn));
+
+                return;
+            }
         }
 
         // DOUBLE_QUOTED_SCALAR
@@ -1193,6 +1202,7 @@ final class Lexer
     private function readPlainScalar(Harvester $harvester): string
     {
         $result = '';
+        $inFlow = $harvester->cursor->flowDepth > 0;
         while ($harvester->cursor->position < $harvester->length) {
             $char = $harvester->input[$harvester->cursor->position];
             if (':' === $char && $this->isMappingValue($harvester)) {
@@ -1204,7 +1214,7 @@ final class Lexer
             if ('#' === $char && $this->isCommentStart($harvester)) {
                 break;
             }
-            if ((']' === $char || '}' === $char) && '' !== $result) {
+            if ($inFlow && (']' === $char || '}' === $char) && '' !== $result) {
                 $nextChar = $this->getNextChar($harvester);
                 if (null === $nextChar
                     || \in_array($nextChar, self::CHARS_WHITESPACE, true)
@@ -1218,7 +1228,10 @@ final class Lexer
             if (('[' === $char || '{' === $char) && '' === $result) {
                 break;
             }
-            if (\in_array($char, self::CHARS_PLAIN_SCALAR_STOP, true)) {
+            if (\in_array($char, self::CHARS_LINE_BREAK, true)) {
+                break;
+            }
+            if ($inFlow && \in_array($char, [',', ']', '}'], true)) {
                 break;
             }
             if (\in_array($char, self::CHARS_HORIZONTAL_WHITESPACE, true)) {
@@ -1229,7 +1242,7 @@ final class Lexer
                 if ($peek >= $harvester->length
                     || \in_array($harvester->input[$peek], self::CHARS_LINE_BREAK, true)
                     || '#' === $harvester->input[$peek]
-                    || \in_array($harvester->input[$peek], [',', ']', '}', '[', '{'], true)) {
+                    || ($inFlow && \in_array($harvester->input[$peek], [',', ']', '}', '[', '{'], true))) {
                     break;
                 }
             }

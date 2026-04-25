@@ -79,6 +79,57 @@ final class LexerMappingPlainSpecialCharsTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
+            [
+                'type' => TokenType::SEQUENCE_ENTRY,
+                'text' => '-',
+            ],
+            [
+                'type' => TokenType::WHITESPACE,
+                'text' => ' ',
+            ],
+            [
+                'type' => TokenType::PLAIN_SCALAR,
+                'text' => '${VAR}',
+            ],
+            [
+                'type' => TokenType::NEWLINE,
+                'text' => '
+',
+            ],
+            [
+                'type' => TokenType::SEQUENCE_ENTRY,
+                'text' => '-',
+            ],
+            [
+                'type' => TokenType::WHITESPACE,
+                'text' => ' ',
+            ],
+            [
+                'type' => TokenType::PLAIN_SCALAR,
+                'text' => 'foo, bar',
+            ],
+            [
+                'type' => TokenType::NEWLINE,
+                'text' => '
+',
+            ],
+            [
+                'type' => TokenType::SEQUENCE_ENTRY,
+                'text' => '-',
+            ],
+            [
+                'type' => TokenType::WHITESPACE,
+                'text' => ' ',
+            ],
+            [
+                'type' => TokenType::PLAIN_SCALAR,
+                'text' => 'a{b}c',
+            ],
+            [
+                'type' => TokenType::NEWLINE,
+                'text' => '
+',
+            ],
         ], __DIR__.'/../../../../fixture/spec/1.0/plain-special-chars_4.6.11.yaml'];
     }
 }

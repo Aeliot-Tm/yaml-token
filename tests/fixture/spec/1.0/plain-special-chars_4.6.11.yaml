@@ -1,3 +1,6 @@
 - ::vector
 - -123
 - https://example.com/foo#bar
+- ${VAR}
+- foo, bar
+- a{b}c

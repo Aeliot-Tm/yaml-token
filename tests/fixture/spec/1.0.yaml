@@ -179,11 +179,14 @@ sequence_entry_types:
     - two
   - one: two
 
-# Plain scalars
+# Plain scalars (incl. flow indicators in block context)
 plain_special_starters:
   - ::vector
   - -123
   - https://example.com/foo#bar
+  - ${VAR}
+  - foo, bar
+  - a{b}c
 
 # Integers - octal 014 (no 0o prefix in 1.0), sexagesimal supported
 integer_canonical: 12345

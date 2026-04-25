@@ -206,11 +206,14 @@ sequence_entry_types:
     - two
   - one: two
 
-# Plain scalars starting with : ? - (Example 7.10)
+# Plain scalars starting with : ? - (Example 7.10) and containing flow indicators in block context (Section 7.3.3)
 plain_special_starters:
   - ::vector
   - -123
   - https://example.com/foo#bar
+  - ${VAR}
+  - foo, bar
+  - a{b}c
 # Non-specific tag ! (Example 6.28)
 non_specific_tag: ! 12
 # Integers (JSON schema)
