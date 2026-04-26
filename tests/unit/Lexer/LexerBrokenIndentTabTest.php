@@ -61,9 +61,7 @@ final class LexerBrokenIndentTabTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ],
-            __DIR__.'/../../fixture/invalid/indent_after_directive.yaml'
-        ];
+        ], __DIR__.'/../../fixture/invalid/indent_after_directive.yaml'];
 
         yield 'spaces tab trailing spaces' => [[
             [
@@ -119,9 +117,7 @@ final class LexerBrokenIndentTabTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ],
-            __DIR__.'/../../fixture/invalid/indent_spaces_then_tab.yaml'
-        ];
+        ], __DIR__.'/../../fixture/invalid/indent_spaces_then_tab.yaml'];
 
         yield 'tab at column 1' => [[
             [
@@ -145,9 +141,7 @@ final class LexerBrokenIndentTabTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ],
-            __DIR__.'/../../fixture/invalid/indent_tab_only.yaml'
-        ];
+        ], __DIR__.'/../../fixture/invalid/indent_tab_only.yaml'];
 
         yield 'two tabs' => [[
             [
@@ -171,8 +165,6 @@ final class LexerBrokenIndentTabTest extends LexerMappingTestCase
                 'text' => '
 ',
             ],
-        ],
-            __DIR__.'/../../fixture/invalid/indent_tabs_only.yaml'
-        ];
+        ], __DIR__.'/../../fixture/invalid/indent_tabs_only.yaml'];
     }
 }
