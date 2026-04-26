@@ -1404,6 +1404,8 @@ final class Parser
             $harvester->registry->anchors[$anchor->getName()] = $anchor;
         }
 
+        $this->collectTypes($harvester, [TokenType::WHITESPACE, TokenType::COMMENT], $valueNode);
+
         $token = $harvester->tokens->current();
         if (null === $token) {
             return $valueNode;

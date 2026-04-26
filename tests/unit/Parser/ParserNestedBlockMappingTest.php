@@ -69,6 +69,34 @@ YAML);
         self::assertSame('valueA', $this->getScalarValueText($levelBCouples[0]));
     }
 
+    public function testParsesNestedBlockMappingWhenParentValueHasInlineComment(): void
+    {
+        $stream = (new Parser())->parse(<<<'YAML'
+levelA:
+  levelB: # just a comment
+    propA: valueA
+YAML);
+
+        $document = $this->getOnlyDocument($stream);
+        $rootCouples = $this->getKeyValueCouples($document);
+        self::assertCount(1, $rootCouples);
+        self::assertSame('levelA', $this->getKeyText($rootCouples[0]));
+
+        $levelAValue = $rootCouples[0]->getValue();
+        self::assertNotNull($levelAValue);
+        $levelACouples = $this->getKeyValueCouples($this->getBlockMapping($levelAValue));
+        self::assertCount(1, $levelACouples);
+        self::assertSame('levelB', $this->getKeyText($levelACouples[0]));
+
+        $levelBValue = $levelACouples[0]->getValue();
+        self::assertNotNull($levelBValue);
+        $levelBMapping = $this->getBlockMapping($levelBValue);
+        $levelBCouples = $this->getKeyValueCouples($levelBMapping);
+        self::assertCount(1, $levelBCouples);
+        self::assertSame('propA', $this->getKeyText($levelBCouples[0]));
+        self::assertSame('valueA', $this->getScalarValueText($levelBCouples[0]));
+    }
+
     public function testParsesNestedBlockMappingFourLevels(): void
     {
         $stream = (new Parser())->parse(<<<'YAML'
