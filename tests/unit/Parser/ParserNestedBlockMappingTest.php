@@ -142,16 +142,16 @@ YAML);
         self::assertSame('valueB', $this->getScalarValueText($props[1]));
     }
 
-    public function testThrowsOnIndentNotMultipleOfFirstIndent(): void
+    public function testThrowsOnInconsistentSiblingIndentationInNestedBlockMapping(): void
     {
         $this->expectException(IndentationInvalidException::class);
-        $this->expectExceptionMessageMatches('/Indentation must be multiple of/i');
+        $this->expectExceptionMessageMatches('/Unexpected indentation/i');
 
         (new Parser())->parse(<<<'YAML'
 levelA:
   levelB:
-   levelC:
-    propA: valueA
+   propA: valueA
+    propB: valueB
 YAML);
     }
 

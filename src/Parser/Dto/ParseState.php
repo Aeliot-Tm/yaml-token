@@ -15,7 +15,6 @@ namespace Aeliot\YamlToken\Parser\Dto;
 
 use Aeliot\YamlToken\Parser\Exception\IndentationInvalidException;
 use Aeliot\YamlToken\Parser\Exception\IndentationOverrideException;
-use Aeliot\YamlToken\Parser\Exception\IndentationUndefinedException;
 
 final class ParseState
 {
@@ -42,15 +41,14 @@ final class ParseState
     public function assertIndentLenIsValid(int $indentLen): void
     {
         if (null === $this->indentStepLen) {
-            throw new IndentationUndefinedException('Indent step length is not registered yet');
+            // YAML does not prescribe a global indentation step size.
+            // The parser validates indentation consistency locally (per block collection),
+            // so the step length may remain undefined in some edge cases.
+            return;
         }
 
         if ($indentLen <= 0) {
             throw new IndentationInvalidException('Indent length must be positive');
-        }
-
-        if (0 !== ($indentLen % $this->indentStepLen)) {
-            throw new IndentationInvalidException(\sprintf('Indentation must be multiple of %d, got %d', $this->indentStepLen, $indentLen));
         }
     }
 }
