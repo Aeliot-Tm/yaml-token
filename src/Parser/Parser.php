@@ -547,6 +547,19 @@ final class Parser
         ], true);
     }
 
+    private function isBlockScalarStartAtDocumentRoot(Harvester $harvester): bool
+    {
+        $token = $harvester->tokens->current();
+        if (null === $token) {
+            return false;
+        }
+        if (TokenType::INDENTATION === $token->type) {
+            $token = $harvester->tokens->peek(1);
+        }
+
+        return null !== $token && \in_array($token->type, TokenType::BLOCK_SCALAR_INDICATORS, true);
+    }
+
     private function isNodePropertyToken(?Token $token): bool
     {
         if (null === $token) {
@@ -894,6 +907,16 @@ final class Parser
             if (TokenType::WHITESPACE === $token->type && TokenType::COMMENT === $harvester->tokens->peek(1)?->type) {
                 $document->addChild(new WhitespaceNode($token));
                 $harvester->tokens->advance();
+                continue;
+            }
+
+            if ($this->isBlockScalarStartAtDocumentRoot($harvester)) {
+                if (TokenType::INDENTATION === $token->type) {
+                    $document->addChild(new IndentationNode($token));
+                    $harvester->tokens->advance();
+                }
+
+                $document->addChild($this->parseValue($harvester, -1));
                 continue;
             }
 
