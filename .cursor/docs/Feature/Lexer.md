@@ -61,7 +61,10 @@ The rules below describe the practical behavior relied upon by lexer unit tests.
 - **Structural indicators with lookahead**:
   - `-` is `SEQUENCE_ENTRY` only when followed by whitespace or end of input
   - `?` is `EXPLICIT_KEY_INDICATOR` only when followed by whitespace or end of input
-  - `:` is `VALUE_INDICATOR` only when followed by whitespace, `#`, `[`, `{`, `"`, `'`, or end of input
+  - `:` is `VALUE_INDICATOR` only when followed by whitespace or end of input;
+    inside a flow collection (`flowDepth > 0`), additionally when followed by a c-flow-indicator (`,`, `[`, `]`, `{`, `}`).
+    In block context any other character right after `:` keeps it as part of a plain scalar
+    (per YAML 1.2.2 §7.3.3 rule [130] `ns-plain-char(c)`), so e.g. `:{`, `:[`, `:"`, `:'`, `:#` are valid scalar content
   - `<<` is `MERGE_INDICATOR` (YAML 1.1 merge key) only when followed by optional horizontal whitespace
     and the same `:` lookahead as for `VALUE_INDICATOR`; otherwise plain scalar `<` / `<<`… is tokenized as `PLAIN_SCALAR`
 - **Anchors, aliases, tags**:

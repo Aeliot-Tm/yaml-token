@@ -1,0 +1,4 @@
+level1:
+  level2A:
+    level3: escaped_json "{\"level1\":{\"level2\":\"\"}}"
+  level2B: value

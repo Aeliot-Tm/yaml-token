@@ -33,6 +33,14 @@ final class Lexer
     private const CHARS_BLOCK_SCALAR_START = [...self::CHARS_WHITESPACE, '+', '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 
     /**
+     * YAML 1.2.2 §6.3 / rule [23] c-flow-indicator. Used to disambiguate plain scalars in flow context
+     * where rule [129] ns-plain-safe-in forbids these chars right after a ':'.
+     *
+     * @var list<string>
+     */
+    private const CHARS_FLOW_INDICATORS = [',', '[', ']', '{', '}'];
+
+    /**
      * @var list<string>
      */
     private const CHARS_HORIZONTAL_WHITESPACE = [' ', "\t"];
@@ -41,11 +49,6 @@ final class Lexer
      * @var list<string>
      */
     private const CHARS_LINE_BREAK = ["\n", "\r"];
-
-    /**
-     * @var list<string>
-     */
-    private const CHARS_MAPPING_VALUE_SUFFIX = [...self::CHARS_WHITESPACE, '#', '[', '{', '"', "'"];
 
     /**
      * @var list<string>
@@ -718,7 +721,14 @@ final class Lexer
 
     /**
      * ':' introduces a mapping value when the byte at $colonPosition is ':' and the following byte, if any,
-     * matches {@see self::CHARS_MAPPING_VALUE_SUFFIX} or end of input.
+     * is end of input, a whitespace, or — only inside a flow collection — a c-flow-indicator
+     * (',', '[', ']', '{', '}').
+     *
+     * Rationale: per YAML 1.2.2 §7.3.3 rule [130] ns-plain-char(c), a ':' inside a plain scalar may be
+     * followed by any ns-plain-safe(c) char. In block context (rule [128] ns-plain-safe-out = ns-char),
+     * that includes every non-whitespace char, so e.g. ":{", ":[", ':"', ":'", ":#" must stay part of
+     * the scalar. In flow context (rule [129] ns-plain-safe-in = ns-char - c-flow-indicator), the
+     * c-flow-indicator chars terminate the scalar and ':' becomes a value indicator.
      */
     private function isColonMappingValueIndicator(Harvester $harvester, int $colonPosition): bool
     {
@@ -729,8 +739,13 @@ final class Lexer
         if ($afterColon >= $harvester->length) {
             return true;
         }
+        $next = $harvester->input[$afterColon];
+        if (\in_array($next, self::CHARS_WHITESPACE, true)) {
+            return true;
+        }
 
-        return \in_array($harvester->input[$afterColon], self::CHARS_MAPPING_VALUE_SUFFIX, true);
+        return $harvester->cursor->flowDepth > 0
+            && \in_array($next, self::CHARS_FLOW_INDICATORS, true);
     }
 
     /**
