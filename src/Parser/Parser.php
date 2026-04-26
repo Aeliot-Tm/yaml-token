@@ -427,6 +427,32 @@ final class Parser
             return $keyNode;
         }
 
+        if (TokenType::FLOW_MAPPING_START === $token->type) {
+            $keyNode->addChild($this->parseFlowMapping($harvester));
+
+            return $keyNode;
+        }
+
+        if (TokenType::FLOW_SEQUENCE_START === $token->type) {
+            $keyNode->addChild($this->parseFlowSequence($harvester));
+
+            return $keyNode;
+        }
+
+        if (TokenType::ALIAS === $token->type) {
+            $aliasNode = new AliasNode($token);
+            $aliasName = $aliasNode->getName();
+            $anchor = $harvester->registry->anchors[$aliasName] ?? null;
+            if (null === $anchor) {
+                throw new AnchorUndefinedException($this->appendTokenLocation(\sprintf('Undefined alias "%s"', $aliasName), $token));
+            }
+            $aliasNode->setAnchor($anchor);
+            $keyNode->addChild($aliasNode);
+            $harvester->tokens->advance();
+
+            return $keyNode;
+        }
+
         if (!$token->type->isScalar() && !$token->type->isMergeIndicator()) {
             if (null !== $keyNode->getExplicitKeyIndicatorNode()) {
                 return $keyNode;
