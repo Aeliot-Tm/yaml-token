@@ -402,6 +402,12 @@ final class Parser
                 $harvester->tokens->advance();
                 $token = $harvester->tokens->current();
             }
+
+            // YAML 1.2.2 §8.2.2 c-l-block-map-explicit-key(n) uses
+            // s-l+block-indented(n, BLOCK-OUT) which allows node properties
+            // (anchor/tag) after the '?' indicator.
+            $this->collectKeyProperties($harvester, $keyNode);
+            $token = $harvester->tokens->current();
         }
 
         if (TokenType::VALUE_INDICATOR === $token->type) {
@@ -518,7 +524,12 @@ final class Parser
             $token = $harvester->tokens->peek(1);
         }
 
-        if (TokenType::EXPLICIT_KEY_INDICATOR === $token->type || $token->type->isMergeIndicator()) {
+        if (
+            TokenType::EXPLICIT_KEY_INDICATOR === $token->type
+            || TokenType::ALIAS === $token->type
+            || TokenType::VALUE_INDICATOR === $token->type
+            || $token->type->isMergeIndicator()
+        ) {
             return true;
         }
 
@@ -946,6 +957,11 @@ final class Parser
                 continue;
             }
 
+            if (TokenType::ALIAS === $token->type) {
+                $document->addChild($this->parseValue($harvester, -1));
+                continue;
+            }
+
             if ($this->isSequenceStart($harvester)) {
                 $sequenceEntry = new SequenceEntryNode();
                 $document->addChild($sequenceEntry);
@@ -1042,6 +1058,12 @@ final class Parser
 
             $keyValueCouple = new KeyValueCoupleNode();
             $flowMappingNode->addChild($keyValueCouple);
+
+            // Keep flow-mapping keys limited to scalars for now (project constraint),
+            // so inputs like `{[a, b]: c}` remain a hard error (covered by tests).
+            if (TokenType::FLOW_SEQUENCE_START === $token->type) {
+                throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Key scalar expected, but %s given', $token->type->value), $token));
+            }
 
             $keyValueCouple->setKey($this->getKeyNode($harvester, true));
 
@@ -1297,12 +1319,50 @@ final class Parser
         $keyValueCouple = new KeyValueCoupleNode();
         $root->addChild($keyValueCouple);
 
+        $entryIndentLen = 0;
         if (TokenType::INDENTATION === $token->type) {
+            $entryIndentLen = \strlen($token->text);
             $keyValueCouple->setIndentation(new IndentationNode($token));
             $harvester->tokens->advance();
         }
 
-        $keyValueCouple->setKey($this->getKeyNode($harvester, false));
+        $keyValueCouple->setKey($this->getKeyNode($harvester, true));
+
+        // YAML 1.2.2 explicit block mapping entry may put ':' on the next line:
+        //   ? key
+        //   : value
+        // When that happens, treat the NEWLINE and any empty/comment lines as part
+        // of this couple so the upcoming VALUE_INDICATOR is consumed here.
+        $afterKey = $harvester->tokens->current();
+        if (
+            null !== $afterKey
+            && null !== $keyValueCouple->getKey()->getExplicitKeyIndicatorNode()
+        ) {
+            $this->collectTypes($harvester, [TokenType::WHITESPACE], $keyValueCouple);
+            $afterKey = $harvester->tokens->current();
+
+            if (null === $afterKey || TokenType::NEWLINE !== $afterKey->type) {
+                // Compact in-line explicit entry ("? key : value") or other forms
+                // are handled by the regular VALUE_INDICATOR consumption below.
+                $afterKey = null;
+            }
+        }
+
+        if (null !== $afterKey && TokenType::NEWLINE === $afterKey->type) {
+            $head = $this->peekFirstSignificantBlockHead($harvester);
+            if (null !== $head) {
+                [$headIndentLen, $significantToken] = $head;
+                if (TokenType::VALUE_INDICATOR === $significantToken->type && $headIndentLen === $entryIndentLen) {
+                    $this->collectTypes($harvester, [
+                        TokenType::COMMENT,
+                        TokenType::INDENTATION,
+                        TokenType::NEWLINE,
+                        TokenType::WHITESPACE,
+                    ], $keyValueCouple);
+                }
+            }
+        }
+
         $this->collectTypes($harvester, [TokenType::VALUE_INDICATOR, TokenType::WHITESPACE], $keyValueCouple);
         $keyValueCouple->setValue($this->parseValue($harvester, $indentLen));
         $this->postProcessKeyValueCouple($harvester, $keyValueCouple);
@@ -1354,7 +1414,32 @@ final class Parser
      */
     private function parseSequenceEntryValue(Harvester $harvester, int $parentIndentLen, int $compactIndent): ValueNode
     {
-        if ($this->isScalarFollowedByValueIndicator($harvester)) {
+        $token = $harvester->tokens->current();
+        $nodePropertiesFollowedByValueIndicator = false;
+        if (null !== $token && $this->isNodePropertyToken($token)) {
+            $offset = 0;
+            while (true) {
+                $peeked = $harvester->tokens->peek($offset);
+                if (null === $peeked || TokenType::NEWLINE === $peeked->type) {
+                    break;
+                }
+                if (TokenType::VALUE_INDICATOR === $peeked->type) {
+                    $nodePropertiesFollowedByValueIndicator = true;
+                    break;
+                }
+                if ($this->isNodePropertyToken($peeked) || TokenType::WHITESPACE === $peeked->type) {
+                    ++$offset;
+                    continue;
+                }
+                break;
+            }
+        }
+
+        if (
+            $this->isScalarFollowedByValueIndicator($harvester)
+            || TokenType::VALUE_INDICATOR === $token?->type
+            || $nodePropertiesFollowedByValueIndicator
+        ) {
             $valueNode = new ValueNode();
             $valueNode->addChild($this->parseCompactBlockMapping($harvester, $compactIndent));
 
@@ -1739,9 +1824,21 @@ final class Parser
 
     private function postProcessKeyValueCouple(Harvester $harvester, KeyValueCoupleNode $couple): void
     {
+        $anchors = [];
+
         $valueNode = $couple->getValue();
-        $anchor = $valueNode?->getAnchor();
-        if (null !== $anchor) {
+        $valueAnchor = $valueNode?->getAnchor();
+        if (null !== $valueAnchor) {
+            $anchors[] = $valueAnchor;
+        }
+
+        foreach ($couple->getKey()->getChildren() as $child) {
+            if ($child instanceof AnchorNode) {
+                $anchors[] = $child;
+            }
+        }
+
+        foreach ($anchors as $anchor) {
             $anchor->setDeclarationCouple($couple);
             $harvester->registry->anchors[$anchor->getName()] = $anchor;
         }

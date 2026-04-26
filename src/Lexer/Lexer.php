@@ -25,7 +25,7 @@ final class Lexer
     /**
      * @var list<string>
      */
-    private const CHARS_ANCHOR_OR_TAG_FORBIDDEN = [...self::CHARS_WHITESPACE, '[', ']', '{', '}', ',', ':', '#', "\0"];
+    private const CHARS_ANCHOR_OR_TAG_FORBIDDEN = [...self::CHARS_WHITESPACE, '[', ']', '{', '}', ',', '#', "\0"];
 
     /**
      * @var list<string>
@@ -1233,7 +1233,7 @@ final class Lexer
                 $nextChar = $this->getNextChar($harvester);
                 if (null === $nextChar
                     || \in_array($nextChar, self::CHARS_WHITESPACE, true)
-                    || \in_array($nextChar, [',', ']', '}', "\n", "\r"], true)) {
+                    || \in_array($nextChar, [',', ':', ']', '}', "\n", "\r"], true)) {
                     break;
                 }
                 $result .= $this->consumeCodePoint($harvester);
