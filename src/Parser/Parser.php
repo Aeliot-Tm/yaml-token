@@ -669,7 +669,7 @@ final class Parser
         return $blockMapping;
     }
 
-    private function parseBlockSequenceValue(Harvester $harvester, int $parentIndentLen): BlockSequenceNode
+    private function parseBlockSequenceValue(Harvester $harvester, int $parentIndentLen, bool $allowNonSequenceAtBaseIndentAsTerminator = false): BlockSequenceNode
     {
         $blockSequence = new BlockSequenceNode();
 
@@ -714,6 +714,9 @@ final class Parser
             }
 
             if (false === $this->isSequenceStart($harvester)) {
+                if ($allowNonSequenceAtBaseIndentAsTerminator && $indentLen === $baseIndentLen) {
+                    break;
+                }
                 throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Sequence entry expected while parsing block sequence value, but %s given', $harvester->tokens->current()?->type->value ?? '_nothing_'), $token));
             }
 
@@ -1117,6 +1120,20 @@ final class Parser
         [$indentLen, $afterIndent, $afterIndentOffset] = $head;
 
         if ($indentLen > 0) {
+            // YAML 1.2.2 §8.2.1 "indentless sequences":
+            // a block mapping value may be a block sequence whose entries start at the same
+            // indentation level as the mapping key (common in Kubernetes manifests):
+            //
+            //   key:
+            //   - item
+            //
+            // Here $indentLen equals $parentIndentLen (indentation of the key line).
+            if ($indentLen === $parentIndentLen && TokenType::SEQUENCE_ENTRY === $afterIndent->type) {
+                $valueNode->addChild($this->parseBlockSequenceValue($harvester, $parentIndentLen - 1, true));
+
+                return;
+            }
+
             if ($indentLen <= $parentIndentLen) {
                 return;
             }
