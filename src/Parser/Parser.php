@@ -1450,6 +1450,43 @@ final class Parser
         } elseif ($token->type->isScalar()) {
             $valueNode->addChild(new ScalarNode($token));
             $harvester->tokens->advance();
+
+            // YAML 1.2.2 §7.3.3 / §8.1.1: plain scalars in block context may span multiple lines.
+            // The lexer emits them as a sequence of:
+            //   PLAIN_SCALAR NEWLINE INDENTATION PLAIN_SCALAR ...
+            // When such a continuation line is indented deeper than the parent node indentation,
+            // it belongs to the same scalar (not to the surrounding block collection).
+            if (TokenType::PLAIN_SCALAR === $token->type) {
+                while (TokenType::NEWLINE === $harvester->tokens->current()?->type) {
+                    $newLine = $harvester->tokens->current();
+                    $indentation = $harvester->tokens->peek(1);
+                    $afterIndent = $harvester->tokens->peek(2);
+                    if (TokenType::INDENTATION !== $indentation?->type || !$afterIndent?->type->isScalar()) {
+                        break;
+                    }
+
+                    $indentLen = \strlen($indentation->text);
+                    if ($indentLen <= $parentIndentLen) {
+                        break;
+                    }
+
+                    // Do not steal a nested block mapping entry key (implicit YAML key).
+                    $offset = 3;
+                    while (TokenType::WHITESPACE === $harvester->tokens->peek($offset)?->type) {
+                        ++$offset;
+                    }
+                    if (TokenType::VALUE_INDICATOR === $harvester->tokens->peek($offset)?->type) {
+                        break;
+                    }
+
+                    $valueNode->addChild(new NewLineNode($newLine));
+                    $harvester->tokens->advance();
+                    $valueNode->addChild(new IndentationNode($indentation));
+                    $harvester->tokens->advance();
+                    $valueNode->addChild(new ScalarNode($afterIndent));
+                    $harvester->tokens->advance();
+                }
+            }
         } elseif (TokenType::ALIAS === $token->type) {
             $aliasNode = new AliasNode($token);
             $aliasName = $aliasNode->getName();
