@@ -37,7 +37,7 @@ final class ParserAliasesInExplicitBlockMappingTest extends TestCase
 {
     public function testResolvesAliasToAnchorDeclaredOnExplicitKey(): void
     {
-        $input = (string) file_get_contents(__DIR__.'/../../../fixture/edge_cases_extra/aliases-in-explicit-block-mapping.yaml');
+        $input = (string) file_get_contents(__DIR__.'/../../../fixture/edge_cases_extra/aliases_in_explicit_block_mapping.yaml');
         self::assertNotSame('', $input);
 
         $stream = (new Parser())->parse($input);

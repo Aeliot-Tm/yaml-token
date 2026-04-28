@@ -92,6 +92,6 @@ final class LexerAliasesInExplicitBlockMappingTest extends LexerMappingTestCase
                 'type' => TokenType::NEWLINE,
                 'text' => "\n",
             ],
-        ], __DIR__.'/../../../fixture/edge_cases_extra/aliases-in-explicit-block-mapping.yaml'];
+        ], __DIR__.'/../../../fixture/edge_cases_extra/aliases_in_explicit_block_mapping.yaml'];
     }
 }
