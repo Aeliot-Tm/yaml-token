@@ -59,7 +59,7 @@ final class ParserAliasesInExplicitBlockMappingTest extends TestCase
             }
         }
         self::assertInstanceOf(AnchorNode::class, $declaredAnchor);
-        /** @var AnchorNode $declaredAnchor */
+        /* @var AnchorNode $declaredAnchor */
         self::assertSame('a', $declaredAnchor->getName());
         self::assertSame($explicitKeyCouple, $declaredAnchor->getDeclarationCouple());
 
@@ -72,7 +72,7 @@ final class ParserAliasesInExplicitBlockMappingTest extends TestCase
             $value->getChildren(),
             static fn ($n): bool => $n instanceof AliasNode,
         ));
-        /** @var list<AliasNode> $aliases */
+        /* @var list<AliasNode> $aliases */
         self::assertCount(1, $aliases);
         self::assertSame('a', $aliases[0]->getName());
         self::assertSame($declaredAnchor, $aliases[0]->getAnchor());
@@ -100,4 +100,3 @@ final class ParserAliasesInExplicitBlockMappingTest extends TestCase
         return $documents[0];
     }
 }
-
