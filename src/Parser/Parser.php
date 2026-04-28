@@ -933,6 +933,13 @@ final class Parser
                 continue;
             }
 
+            // Preserve trailing spaces on otherwise blank lines: whitespace before NEWLINE is not structural.
+            if (TokenType::WHITESPACE === $token->type && TokenType::NEWLINE === $harvester->tokens->peek(1)?->type) {
+                $document->addChild(new WhitespaceNode($token));
+                $harvester->tokens->advance();
+                continue;
+            }
+
             if (TokenType::INDENTATION === $token->type && TokenType::COMMENT === $harvester->tokens->peek(1)?->type) {
                 $document->addChild(new IndentationNode($token));
                 $harvester->tokens->advance();

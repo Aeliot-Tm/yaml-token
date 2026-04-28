@@ -11,7 +11,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace Aeliot\YamlToken\Test\Unit\Lexer\Spec\V1P2P0;
+namespace Aeliot\YamlToken\Test\Unit\Lexer\EdgeCases;
 
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Lexer\Lexer;
@@ -23,109 +23,14 @@ use PHPUnit\Framework\Attributes\UsesClass;
 #[CoversClass(Lexer::class)]
 #[UsesClass(Token::class)]
 #[UsesClass(TokenType::class)]
-final class LexerMappingBlockScalarStripEdgeCasesTest extends LexerMappingTestCase
+final class LexerBlankLineInLiteralBlockScalarTest extends LexerMappingTestCase
 {
     public static function getDataForTestMapping(): iterable
     {
-        yield 'indented_empty_tail' => [[
+        yield [[
             [
                 'type' => TokenType::PLAIN_SCALAR,
-                'text' => 'key',
-            ],
-            [
-                'type' => TokenType::VALUE_INDICATOR,
-                'text' => ':',
-            ],
-            [
-                'type' => TokenType::WHITESPACE,
-                'text' => ' ',
-            ],
-            [
-                'type' => TokenType::FOLDED_BLOCK_SCALAR_INDICATOR,
-                'text' => '>',
-            ],
-            [
-                'type' => TokenType::BLOCK_SCALAR_CHOMPING_INDICATOR,
-                'text' => '-',
-            ],
-            [
-                'type' => TokenType::NEWLINE,
-                'text' => "\n",
-            ],
-            [
-                'type' => TokenType::FOLDED_BLOCK_SCALAR,
-                'text' => '  one',
-            ],
-            [
-                'type' => TokenType::NEWLINE,
-                'text' => "\n",
-            ],
-            [
-                'type' => TokenType::WHITESPACE,
-                'text' => '  ',
-            ],
-            [
-                'type' => TokenType::NEWLINE,
-                'text' => "\n",
-            ],
-            [
-                'type' => TokenType::WHITESPACE,
-                'text' => '  ',
-            ],
-            [
-                'type' => TokenType::NEWLINE,
-                'text' => "\n",
-            ],
-            [
-                'type' => TokenType::WHITESPACE,
-                'text' => '  ',
-            ],
-            [
-                'type' => TokenType::NEWLINE,
-                'text' => "\n",
-            ],
-        ], __DIR__.'/../../../../fixture/spec/1.2.0/folded-strip-indented-empty-tail_8.1.3.yaml'];
-
-        yield 'then_sibling_key' => [[
-            [
-                'type' => TokenType::PLAIN_SCALAR,
-                'text' => 'key1',
-            ],
-            [
-                'type' => TokenType::VALUE_INDICATOR,
-                'text' => ':',
-            ],
-            [
-                'type' => TokenType::WHITESPACE,
-                'text' => ' ',
-            ],
-            [
-                'type' => TokenType::FOLDED_BLOCK_SCALAR_INDICATOR,
-                'text' => '>',
-            ],
-            [
-                'type' => TokenType::BLOCK_SCALAR_CHOMPING_INDICATOR,
-                'text' => '-',
-            ],
-            [
-                'type' => TokenType::NEWLINE,
-                'text' => "\n",
-            ],
-            [
-                'type' => TokenType::FOLDED_BLOCK_SCALAR,
-                'text' => '  body',
-            ],
-            [
-                'type' => TokenType::NEWLINE,
-                'text' => "\n",
-            ],
-            [
-                'type' => TokenType::NEWLINE,
-                'text' => "\n",
-            ],
-            [
-                'type' => TokenType::PLAIN_SCALAR,
-                'text' => 'key2',
+                'text' => 'foo',
             ],
             [
                 'type' => TokenType::VALUE_INDICATOR,
@@ -137,12 +42,68 @@ final class LexerMappingBlockScalarStripEdgeCasesTest extends LexerMappingTestCa
             ],
             [
                 'type' => TokenType::PLAIN_SCALAR,
-                'text' => 'x',
+                'text' => '1',
             ],
             [
                 'type' => TokenType::NEWLINE,
                 'text' => "\n",
             ],
-        ], __DIR__.'/../../../../fixture/spec/1.2.0/folded-strip-then-sibling-key_8.1.3.yaml'];
+            [
+                'type' => TokenType::NEWLINE,
+                'text' => "\n",
+            ],
+            [
+                'type' => TokenType::PLAIN_SCALAR,
+                'text' => 'bar',
+            ],
+            [
+                'type' => TokenType::VALUE_INDICATOR,
+                'text' => ':',
+            ],
+            [
+                'type' => TokenType::WHITESPACE,
+                'text' => ' ',
+            ],
+            [
+                'type' => TokenType::PLAIN_SCALAR,
+                'text' => '2',
+            ],
+            [
+                'type' => TokenType::NEWLINE,
+                'text' => "\n",
+            ],
+            [
+                'type' => TokenType::WHITESPACE,
+                'text' => '    ',
+            ],
+            [
+                'type' => TokenType::NEWLINE,
+                'text' => "\n",
+            ],
+            [
+                'type' => TokenType::PLAIN_SCALAR,
+                'text' => 'text',
+            ],
+            [
+                'type' => TokenType::VALUE_INDICATOR,
+                'text' => ':',
+            ],
+            [
+                'type' => TokenType::WHITESPACE,
+                'text' => ' ',
+            ],
+            [
+                'type' => TokenType::LITERAL_BLOCK_SCALAR_INDICATOR,
+                'text' => '|',
+            ],
+            [
+                'type' => TokenType::NEWLINE,
+                'text' => "\n",
+            ],
+            [
+                'type' => TokenType::LITERAL_BLOCK_SCALAR,
+                'text' => "  a\n    \n  b\n\n  c\n \n  d\n",
+            ],
+        ], __DIR__.'/../../../fixture/edge_cases/blank_line_in_literal_block_scalar.yaml'];
     }
 }

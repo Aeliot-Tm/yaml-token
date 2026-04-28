@@ -61,7 +61,7 @@ final class LexerMappingBlockScalarStripEdgeCasesTest extends LexerMappingTestCa
                 'text' => "\n",
             ],
             [
-                'type' => TokenType::INDENTATION,
+                'type' => TokenType::WHITESPACE,
                 'text' => '  ',
             ],
             [
@@ -69,7 +69,7 @@ final class LexerMappingBlockScalarStripEdgeCasesTest extends LexerMappingTestCa
                 'text' => "\n",
             ],
             [
-                'type' => TokenType::INDENTATION,
+                'type' => TokenType::WHITESPACE,
                 'text' => '  ',
             ],
             [
@@ -77,7 +77,7 @@ final class LexerMappingBlockScalarStripEdgeCasesTest extends LexerMappingTestCa
                 'text' => "\n",
             ],
             [
-                'type' => TokenType::INDENTATION,
+                'type' => TokenType::WHITESPACE,
                 'text' => '  ',
             ],
             [

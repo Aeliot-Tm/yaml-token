@@ -189,6 +189,14 @@ final class Lexer
         if (1 === $harvester->cursor->column && ' ' === $char) {
             $indent = $this->readIndentation($harvester);
             if ('' !== $indent) {
+                // Blank lines may contain spaces; they must not create structural INDENTATION tokens.
+                if ($harvester->cursor->position >= $harvester->length
+                    || \in_array($harvester->input[$harvester->cursor->position], self::CHARS_LINE_BREAK, true)) {
+                    $harvester->stream->addToken(new Token(TokenType::WHITESPACE, $indent, $startLine, $startColumn));
+
+                    return;
+                }
+
                 $harvester->stream->addToken(new Token(TokenType::INDENTATION, $indent, $startLine, $startColumn));
 
                 return;
