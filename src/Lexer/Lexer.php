@@ -263,6 +263,154 @@ final class Lexer
         return $harvester->input[$next];
     }
 
+    private function isAnchorChar(string $char): bool
+    {
+        return !\in_array($char, self::CHARS_ANCHOR_OR_TAG_FORBIDDEN, true);
+    }
+
+    private function isBlockScalarStart(Harvester $harvester): bool
+    {
+        $nextChar = $this->getNextChar($harvester);
+        if (null === $nextChar) {
+            return true;
+        }
+
+        return \in_array($nextChar, self::CHARS_BLOCK_SCALAR_START, true);
+    }
+
+    /**
+     * ':' introduces a mapping value when the byte at $colonPosition is ':' and the following byte, if any,
+     * is end of input, a whitespace, or — only inside a flow collection — a c-flow-indicator
+     * (',', '[', ']', '{', '}').
+     *
+     * Rationale: per YAML 1.2.2 §7.3.3 rule [130] ns-plain-char(c), a ':' inside a plain scalar may be
+     * followed by any ns-plain-safe(c) char. In block context (rule [128] ns-plain-safe-out = ns-char),
+     * that includes every non-whitespace char, so e.g. ":{", ":[", ':"', ":'", ":#" must stay part of
+     * the scalar. In flow context (rule [129] ns-plain-safe-in = ns-char - c-flow-indicator), the
+     * c-flow-indicator chars terminate the scalar and ':' becomes a value indicator.
+     */
+    private function isColonMappingValueIndicator(Harvester $harvester, int $colonPosition): bool
+    {
+        if ($colonPosition >= $harvester->length || ':' !== $harvester->input[$colonPosition]) {
+            return false;
+        }
+        $afterColon = $colonPosition + 1;
+        if ($afterColon >= $harvester->length) {
+            return true;
+        }
+        $next = $harvester->input[$afterColon];
+        if (\in_array($next, self::CHARS_WHITESPACE, true)) {
+            return true;
+        }
+
+        return $harvester->cursor->flowDepth > 0
+            && \in_array($next, self::CHARS_FLOW_INDICATORS, true);
+    }
+
+    /**
+     * In YAML, "#" starts a comment only when separated from other tokens by whitespace.
+     */
+    private function isCommentStart(Harvester $harvester): bool
+    {
+        if ($harvester->cursor->position >= $harvester->length) {
+            return false;
+        }
+        if ('#' !== $harvester->input[$harvester->cursor->position]) {
+            return false;
+        }
+        if (0 === $harvester->cursor->position) {
+            return true;
+        }
+
+        return \in_array($harvester->input[$harvester->cursor->position - 1], self::CHARS_WHITESPACE, true);
+    }
+
+    private function isMappingKey(Harvester $harvester): bool
+    {
+        $nextChar = $this->getNextChar($harvester);
+        if (null === $nextChar) {
+            return true;
+        }
+
+        return \in_array($nextChar, self::CHARS_WHITESPACE, true);
+    }
+
+    private function isMappingValue(Harvester $harvester): bool
+    {
+        return $this->isColonMappingValueIndicator($harvester, $harvester->cursor->position);
+    }
+
+    /**
+     * Plain sequence «<<» for the YAML 1.1 merge key: only when followed by optional horizontal whitespace and ':' as a value indicator.
+     */
+    private function isMergeKeyPlainSequence(Harvester $harvester): bool
+    {
+        if ($harvester->cursor->position + 2 > $harvester->length) {
+            return false;
+        }
+        if ('<' !== $harvester->input[$harvester->cursor->position] || '<' !== $harvester->input[$harvester->cursor->position + 1]) {
+            return false;
+        }
+        $pos = $harvester->cursor->position + 2;
+        while ($pos < $harvester->length && \in_array($harvester->input[$pos], self::CHARS_HORIZONTAL_WHITESPACE, true)) {
+            ++$pos;
+        }
+        if ($pos >= $harvester->length) {
+            return false;
+        }
+
+        return $this->isColonMappingValueIndicator($harvester, $pos);
+    }
+
+    private function isSequenceEntry(Harvester $harvester): bool
+    {
+        $nextChar = $this->getNextChar($harvester);
+        if (null === $nextChar) {
+            return true;
+        }
+
+        return \in_array($nextChar, self::CHARS_WHITESPACE, true);
+    }
+
+    private function isTagChar(string $char): bool
+    {
+        return !\in_array($char, self::CHARS_ANCHOR_OR_TAG_FORBIDDEN, true);
+    }
+
+    private function isTagHandleNameChar(string $char): bool
+    {
+        if ('-' === $char) {
+            return true;
+        }
+        if ($char >= '0' && $char <= '9') {
+            return true;
+        }
+        if ($char >= 'A' && $char <= 'Z') {
+            return true;
+        }
+        if ($char >= 'a' && $char <= 'z') {
+            return true;
+        }
+
+        return false;
+    }
+
+    private function match(Harvester $harvester, string $str): bool
+    {
+        $len = \strlen($str);
+        if ($harvester->cursor->position + $len > $harvester->length) {
+            return false;
+        }
+        if (substr($harvester->input, $harvester->cursor->position, $len) !== $str) {
+            return false;
+        }
+        for ($i = 0; $i < $len; ++$i) {
+            $this->advance($harvester);
+        }
+
+        return true;
+    }
+
     /**
      * Lines starting at column 1 without leading spaces have logical indent 0; sibling mapping keys at the
      * root close multiline-plain continuation when indentation does not exceed the key line indent.
@@ -575,22 +723,6 @@ final class Lexer
         $harvester->stream->addToken(new Token(TokenType::UNRECOGNIZED, $text, $startLine, $startColumn));
     }
 
-    private function match(Harvester $harvester, string $str): bool
-    {
-        $len = \strlen($str);
-        if ($harvester->cursor->position + $len > $harvester->length) {
-            return false;
-        }
-        if (substr($harvester->input, $harvester->cursor->position, $len) !== $str) {
-            return false;
-        }
-        for ($i = 0; $i < $len; ++$i) {
-            $this->advance($harvester);
-        }
-
-        return true;
-    }
-
     private function readIndentation(Harvester $harvester): string
     {
         $result = '';
@@ -814,100 +946,6 @@ final class Lexer
         return $result;
     }
 
-    private function isSequenceEntry(Harvester $harvester): bool
-    {
-        $nextChar = $this->getNextChar($harvester);
-        if (null === $nextChar) {
-            return true;
-        }
-
-        return \in_array($nextChar, self::CHARS_WHITESPACE, true);
-    }
-
-    private function isMappingKey(Harvester $harvester): bool
-    {
-        $nextChar = $this->getNextChar($harvester);
-        if (null === $nextChar) {
-            return true;
-        }
-
-        return \in_array($nextChar, self::CHARS_WHITESPACE, true);
-    }
-
-    private function isMappingValue(Harvester $harvester): bool
-    {
-        return $this->isColonMappingValueIndicator($harvester, $harvester->cursor->position);
-    }
-
-    /**
-     * ':' introduces a mapping value when the byte at $colonPosition is ':' and the following byte, if any,
-     * is end of input, a whitespace, or — only inside a flow collection — a c-flow-indicator
-     * (',', '[', ']', '{', '}').
-     *
-     * Rationale: per YAML 1.2.2 §7.3.3 rule [130] ns-plain-char(c), a ':' inside a plain scalar may be
-     * followed by any ns-plain-safe(c) char. In block context (rule [128] ns-plain-safe-out = ns-char),
-     * that includes every non-whitespace char, so e.g. ":{", ":[", ':"', ":'", ":#" must stay part of
-     * the scalar. In flow context (rule [129] ns-plain-safe-in = ns-char - c-flow-indicator), the
-     * c-flow-indicator chars terminate the scalar and ':' becomes a value indicator.
-     */
-    private function isColonMappingValueIndicator(Harvester $harvester, int $colonPosition): bool
-    {
-        if ($colonPosition >= $harvester->length || ':' !== $harvester->input[$colonPosition]) {
-            return false;
-        }
-        $afterColon = $colonPosition + 1;
-        if ($afterColon >= $harvester->length) {
-            return true;
-        }
-        $next = $harvester->input[$afterColon];
-        if (\in_array($next, self::CHARS_WHITESPACE, true)) {
-            return true;
-        }
-
-        return $harvester->cursor->flowDepth > 0
-            && \in_array($next, self::CHARS_FLOW_INDICATORS, true);
-    }
-
-    /**
-     * Plain sequence «<<» for the YAML 1.1 merge key: only when followed by optional horizontal whitespace and ':' as a value indicator.
-     */
-    private function isMergeKeyPlainSequence(Harvester $harvester): bool
-    {
-        if ($harvester->cursor->position + 2 > $harvester->length) {
-            return false;
-        }
-        if ('<' !== $harvester->input[$harvester->cursor->position] || '<' !== $harvester->input[$harvester->cursor->position + 1]) {
-            return false;
-        }
-        $pos = $harvester->cursor->position + 2;
-        while ($pos < $harvester->length && \in_array($harvester->input[$pos], self::CHARS_HORIZONTAL_WHITESPACE, true)) {
-            ++$pos;
-        }
-        if ($pos >= $harvester->length) {
-            return false;
-        }
-
-        return $this->isColonMappingValueIndicator($harvester, $pos);
-    }
-
-    /**
-     * In YAML, "#" starts a comment only when separated from other tokens by whitespace.
-     */
-    private function isCommentStart(Harvester $harvester): bool
-    {
-        if ($harvester->cursor->position >= $harvester->length) {
-            return false;
-        }
-        if ('#' !== $harvester->input[$harvester->cursor->position]) {
-            return false;
-        }
-        if (0 === $harvester->cursor->position) {
-            return true;
-        }
-
-        return \in_array($harvester->input[$harvester->cursor->position - 1], self::CHARS_WHITESPACE, true);
-    }
-
     private function readAnchorOrAlias(Harvester $harvester): string
     {
         $result = '';
@@ -922,11 +960,6 @@ final class Lexer
         }
 
         return $result;
-    }
-
-    private function isAnchorChar(string $char): bool
-    {
-        return !\in_array($char, self::CHARS_ANCHOR_OR_TAG_FORBIDDEN, true);
     }
 
     /**
@@ -1013,24 +1046,6 @@ final class Lexer
         $harvester->stream->addToken(new Token(TokenType::TAG_BODY, $suffix, $suffixLine, $suffixColumn));
     }
 
-    private function isTagHandleNameChar(string $char): bool
-    {
-        if ('-' === $char) {
-            return true;
-        }
-        if ($char >= '0' && $char <= '9') {
-            return true;
-        }
-        if ($char >= 'A' && $char <= 'Z') {
-            return true;
-        }
-        if ($char >= 'a' && $char <= 'z') {
-            return true;
-        }
-
-        return false;
-    }
-
     private function readTagShorthandSuffix(Harvester $harvester): string
     {
         $result = '';
@@ -1069,11 +1084,6 @@ final class Lexer
         }
 
         return true;
-    }
-
-    private function isTagChar(string $char): bool
-    {
-        return !\in_array($char, self::CHARS_ANCHOR_OR_TAG_FORBIDDEN, true);
     }
 
     private function readDoubleQuotedScalar(Harvester $harvester): string
@@ -1117,16 +1127,6 @@ final class Lexer
         }
 
         return $result;
-    }
-
-    private function isBlockScalarStart(Harvester $harvester): bool
-    {
-        $nextChar = $this->getNextChar($harvester);
-        if (null === $nextChar) {
-            return true;
-        }
-
-        return \in_array($nextChar, self::CHARS_BLOCK_SCALAR_START, true);
     }
 
     private function readBlockScalarBody(Harvester $harvester): string
