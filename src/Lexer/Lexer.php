@@ -882,179 +882,6 @@ final class Lexer
         return '%YAML' === substr($harvester->input, $harvester->cursor->position, 5);
     }
 
-    private function tokenizeYamlDirectiveLine(Harvester $harvester): void
-    {
-        $directiveYamlLine = $harvester->cursor->line;
-        $directiveYamlColumn = $harvester->cursor->column;
-        if (!$this->match($harvester, '%YAML')) {
-            return;
-        }
-        $harvester->stream->addToken(new Token(TokenType::DIRECTIVE_YAML, '%YAML', $directiveYamlLine, $directiveYamlColumn));
-
-        if ($harvester->cursor->position < $harvester->length && \in_array($harvester->input[$harvester->cursor->position], self::CHARS_HORIZONTAL_WHITESPACE, true)) {
-            $wsLine = $harvester->cursor->line;
-            $wsColumn = $harvester->cursor->column;
-            $ws = $this->readWhitespace($harvester);
-            $harvester->stream->addToken(new Token(TokenType::WHITESPACE, $ws, $wsLine, $wsColumn));
-        }
-
-        if ($harvester->cursor->position < $harvester->length && ':' === $harvester->input[$harvester->cursor->position]) {
-            $colonLine = $harvester->cursor->line;
-            $colonColumn = $harvester->cursor->column;
-            $this->advance($harvester);
-            $harvester->stream->addToken(new Token(TokenType::VALUE_INDICATOR, ':', $colonLine, $colonColumn));
-        }
-
-        if ($harvester->cursor->position < $harvester->length && \in_array($harvester->input[$harvester->cursor->position], self::CHARS_HORIZONTAL_WHITESPACE, true)) {
-            $wsLine = $harvester->cursor->line;
-            $wsColumn = $harvester->cursor->column;
-            $ws = $this->readWhitespace($harvester);
-            $harvester->stream->addToken(new Token(TokenType::WHITESPACE, $ws, $wsLine, $wsColumn));
-        }
-
-        $versionLine = $harvester->cursor->line;
-        $versionColumn = $harvester->cursor->column;
-        $version = $this->readYamlDirectiveVersion($harvester);
-        if ('' !== $version) {
-            $harvester->stream->addToken(new Token(TokenType::DIRECTIVE_YAML_VERSION, $version, $versionLine, $versionColumn));
-        }
-    }
-
-    private function readYamlDirectiveVersion(Harvester $harvester): string
-    {
-        $result = '';
-        while ($harvester->cursor->position < $harvester->length) {
-            $c = $harvester->input[$harvester->cursor->position];
-            if (\in_array($c, self::CHARS_LINE_BREAK, true)) {
-                break;
-            }
-            if (\in_array($c, self::CHARS_HORIZONTAL_WHITESPACE, true)) {
-                break;
-            }
-            if ('#' === $c && $this->isCommentStart($harvester)) {
-                break;
-            }
-            $result .= $this->consumeCodePoint($harvester);
-        }
-
-        return $result;
-    }
-
-    /**
-     * Split `%TAG` lines into `DIRECTIVE_TAG`, `DIRECTIVE_TAG_HANDLE`, `DIRECTIVE_TAG_PREFIX` only when the keyword
-     * is followed by a handle (starts with `!`) or horizontal whitespace / EOF — not when followed immediately by a
-     * line break (whole-line token as before).
-     */
-    private function shouldTokenizeTagDirectiveAsParts(Harvester $harvester): bool
-    {
-        if ($harvester->cursor->position + 4 > $harvester->length) {
-            return false;
-        }
-        if ('%TAG' !== substr($harvester->input, $harvester->cursor->position, 4)) {
-            return false;
-        }
-        if ($harvester->cursor->position + 4 >= $harvester->length) {
-            return true;
-        }
-        $after = $harvester->input[$harvester->cursor->position + 4];
-
-        return \in_array($after, self::CHARS_HORIZONTAL_WHITESPACE, true) || '!' === $after;
-    }
-
-    private function tokenizeTagDirectiveLine(Harvester $harvester): void
-    {
-        $directiveTagLine = $harvester->cursor->line;
-        $directiveTagColumn = $harvester->cursor->column;
-        if (!$this->match($harvester, '%TAG')) {
-            return;
-        }
-        $harvester->stream->addToken(new Token(TokenType::DIRECTIVE_TAG, '%TAG', $directiveTagLine, $directiveTagColumn));
-
-        if ($harvester->cursor->position < $harvester->length && \in_array($harvester->input[$harvester->cursor->position], self::CHARS_HORIZONTAL_WHITESPACE, true)) {
-            $wsLine = $harvester->cursor->line;
-            $wsColumn = $harvester->cursor->column;
-            $ws = $this->readWhitespace($harvester);
-            $harvester->stream->addToken(new Token(TokenType::WHITESPACE, $ws, $wsLine, $wsColumn));
-        }
-
-        $handleLine = $harvester->cursor->line;
-        $handleColumn = $harvester->cursor->column;
-        $handle = $this->readTagDirectiveHandle($harvester);
-        $harvester->stream->addToken(new Token(TokenType::DIRECTIVE_TAG_HANDLE, $handle, $handleLine, $handleColumn));
-
-        if ($harvester->cursor->position < $harvester->length && \in_array($harvester->input[$harvester->cursor->position], self::CHARS_HORIZONTAL_WHITESPACE, true)) {
-            $wsLine = $harvester->cursor->line;
-            $wsColumn = $harvester->cursor->column;
-            $ws = $this->readWhitespace($harvester);
-            $harvester->stream->addToken(new Token(TokenType::WHITESPACE, $ws, $wsLine, $wsColumn));
-        }
-
-        $prefixLine = $harvester->cursor->line;
-        $prefixColumn = $harvester->cursor->column;
-        $prefix = $this->readTagDirectivePrefix($harvester);
-        $harvester->stream->addToken(new Token(TokenType::DIRECTIVE_TAG_PREFIX, $prefix, $prefixLine, $prefixColumn));
-    }
-
-    private function readTagDirectiveHandle(Harvester $harvester): string
-    {
-        if ($harvester->cursor->position >= $harvester->length || '!' !== $harvester->input[$harvester->cursor->position]) {
-            return '';
-        }
-        $this->advance($harvester);
-        if ($harvester->cursor->position < $harvester->length && '!' === $harvester->input[$harvester->cursor->position]) {
-            $this->advance($harvester);
-
-            return '!!';
-        }
-        if ($harvester->cursor->position >= $harvester->length || \in_array($harvester->input[$harvester->cursor->position], self::CHARS_HORIZONTAL_WHITESPACE, true)) {
-            return '!';
-        }
-        $savedPosition = $harvester->cursor->position;
-        $savedLine = $harvester->cursor->line;
-        $savedColumn = $harvester->cursor->column;
-        $middle = '';
-        while ($harvester->cursor->position < $harvester->length) {
-            $c = $harvester->input[$harvester->cursor->position];
-            if ('!' === $c) {
-                $this->advance($harvester);
-
-                return '!'.$middle.'!';
-            }
-            if (\in_array($c, self::CHARS_HORIZONTAL_WHITESPACE, true)) {
-                break;
-            }
-            if (!$this->isTagChar($c)) {
-                break;
-            }
-            $middle .= $this->consumeCodePoint($harvester);
-        }
-        $harvester->cursor->position = $savedPosition;
-        $harvester->cursor->line = $savedLine;
-        $harvester->cursor->column = $savedColumn;
-
-        return '!';
-    }
-
-    private function readTagDirectivePrefix(Harvester $harvester): string
-    {
-        $result = '';
-        while ($harvester->cursor->position < $harvester->length) {
-            $c = $harvester->input[$harvester->cursor->position];
-            if (\in_array($c, self::CHARS_LINE_BREAK, true)) {
-                break;
-            }
-            if (\in_array($c, self::CHARS_HORIZONTAL_WHITESPACE, true)) {
-                break;
-            }
-            if ('#' === $c && $this->isCommentStart($harvester)) {
-                break;
-            }
-            $result .= $this->consumeCodePoint($harvester);
-        }
-
-        return $result;
-    }
-
     /**
      * Explicit tag property at a node: `!<...>` verbatim, shorthand (`!`, `!!`, `!name!`) + suffix, or non-specific `!`.
      * Tokens are appended to {@see Harvester::$stream}. Does not apply to `%TAG` directive lines (handled in {@see tokenizeTagDirectiveLine}).
@@ -1137,6 +964,179 @@ final class Lexer
 
         $harvester->stream->addToken(new Token(TokenType::TAG_HANDLE_PRIMARY, '!', $bangLine, $bangColumn));
         $harvester->stream->addToken(new Token(TokenType::TAG_BODY, $suffix, $suffixLine, $suffixColumn));
+    }
+
+    private function tokenizeTagDirectiveLine(Harvester $harvester): void
+    {
+        $directiveTagLine = $harvester->cursor->line;
+        $directiveTagColumn = $harvester->cursor->column;
+        if (!$this->match($harvester, '%TAG')) {
+            return;
+        }
+        $harvester->stream->addToken(new Token(TokenType::DIRECTIVE_TAG, '%TAG', $directiveTagLine, $directiveTagColumn));
+
+        if ($harvester->cursor->position < $harvester->length && \in_array($harvester->input[$harvester->cursor->position], self::CHARS_HORIZONTAL_WHITESPACE, true)) {
+            $wsLine = $harvester->cursor->line;
+            $wsColumn = $harvester->cursor->column;
+            $ws = $this->readWhitespace($harvester);
+            $harvester->stream->addToken(new Token(TokenType::WHITESPACE, $ws, $wsLine, $wsColumn));
+        }
+
+        $handleLine = $harvester->cursor->line;
+        $handleColumn = $harvester->cursor->column;
+        $handle = $this->readTagDirectiveHandle($harvester);
+        $harvester->stream->addToken(new Token(TokenType::DIRECTIVE_TAG_HANDLE, $handle, $handleLine, $handleColumn));
+
+        if ($harvester->cursor->position < $harvester->length && \in_array($harvester->input[$harvester->cursor->position], self::CHARS_HORIZONTAL_WHITESPACE, true)) {
+            $wsLine = $harvester->cursor->line;
+            $wsColumn = $harvester->cursor->column;
+            $ws = $this->readWhitespace($harvester);
+            $harvester->stream->addToken(new Token(TokenType::WHITESPACE, $ws, $wsLine, $wsColumn));
+        }
+
+        $prefixLine = $harvester->cursor->line;
+        $prefixColumn = $harvester->cursor->column;
+        $prefix = $this->readTagDirectivePrefix($harvester);
+        $harvester->stream->addToken(new Token(TokenType::DIRECTIVE_TAG_PREFIX, $prefix, $prefixLine, $prefixColumn));
+    }
+
+    private function tokenizeYamlDirectiveLine(Harvester $harvester): void
+    {
+        $directiveYamlLine = $harvester->cursor->line;
+        $directiveYamlColumn = $harvester->cursor->column;
+        if (!$this->match($harvester, '%YAML')) {
+            return;
+        }
+        $harvester->stream->addToken(new Token(TokenType::DIRECTIVE_YAML, '%YAML', $directiveYamlLine, $directiveYamlColumn));
+
+        if ($harvester->cursor->position < $harvester->length && \in_array($harvester->input[$harvester->cursor->position], self::CHARS_HORIZONTAL_WHITESPACE, true)) {
+            $wsLine = $harvester->cursor->line;
+            $wsColumn = $harvester->cursor->column;
+            $ws = $this->readWhitespace($harvester);
+            $harvester->stream->addToken(new Token(TokenType::WHITESPACE, $ws, $wsLine, $wsColumn));
+        }
+
+        if ($harvester->cursor->position < $harvester->length && ':' === $harvester->input[$harvester->cursor->position]) {
+            $colonLine = $harvester->cursor->line;
+            $colonColumn = $harvester->cursor->column;
+            $this->advance($harvester);
+            $harvester->stream->addToken(new Token(TokenType::VALUE_INDICATOR, ':', $colonLine, $colonColumn));
+        }
+
+        if ($harvester->cursor->position < $harvester->length && \in_array($harvester->input[$harvester->cursor->position], self::CHARS_HORIZONTAL_WHITESPACE, true)) {
+            $wsLine = $harvester->cursor->line;
+            $wsColumn = $harvester->cursor->column;
+            $ws = $this->readWhitespace($harvester);
+            $harvester->stream->addToken(new Token(TokenType::WHITESPACE, $ws, $wsLine, $wsColumn));
+        }
+
+        $versionLine = $harvester->cursor->line;
+        $versionColumn = $harvester->cursor->column;
+        $version = $this->readYamlDirectiveVersion($harvester);
+        if ('' !== $version) {
+            $harvester->stream->addToken(new Token(TokenType::DIRECTIVE_YAML_VERSION, $version, $versionLine, $versionColumn));
+        }
+    }
+
+    private function readYamlDirectiveVersion(Harvester $harvester): string
+    {
+        $result = '';
+        while ($harvester->cursor->position < $harvester->length) {
+            $c = $harvester->input[$harvester->cursor->position];
+            if (\in_array($c, self::CHARS_LINE_BREAK, true)) {
+                break;
+            }
+            if (\in_array($c, self::CHARS_HORIZONTAL_WHITESPACE, true)) {
+                break;
+            }
+            if ('#' === $c && $this->isCommentStart($harvester)) {
+                break;
+            }
+            $result .= $this->consumeCodePoint($harvester);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Split `%TAG` lines into `DIRECTIVE_TAG`, `DIRECTIVE_TAG_HANDLE`, `DIRECTIVE_TAG_PREFIX` only when the keyword
+     * is followed by a handle (starts with `!`) or horizontal whitespace / EOF — not when followed immediately by a
+     * line break (whole-line token as before).
+     */
+    private function shouldTokenizeTagDirectiveAsParts(Harvester $harvester): bool
+    {
+        if ($harvester->cursor->position + 4 > $harvester->length) {
+            return false;
+        }
+        if ('%TAG' !== substr($harvester->input, $harvester->cursor->position, 4)) {
+            return false;
+        }
+        if ($harvester->cursor->position + 4 >= $harvester->length) {
+            return true;
+        }
+        $after = $harvester->input[$harvester->cursor->position + 4];
+
+        return \in_array($after, self::CHARS_HORIZONTAL_WHITESPACE, true) || '!' === $after;
+    }
+
+    private function readTagDirectiveHandle(Harvester $harvester): string
+    {
+        if ($harvester->cursor->position >= $harvester->length || '!' !== $harvester->input[$harvester->cursor->position]) {
+            return '';
+        }
+        $this->advance($harvester);
+        if ($harvester->cursor->position < $harvester->length && '!' === $harvester->input[$harvester->cursor->position]) {
+            $this->advance($harvester);
+
+            return '!!';
+        }
+        if ($harvester->cursor->position >= $harvester->length || \in_array($harvester->input[$harvester->cursor->position], self::CHARS_HORIZONTAL_WHITESPACE, true)) {
+            return '!';
+        }
+        $savedPosition = $harvester->cursor->position;
+        $savedLine = $harvester->cursor->line;
+        $savedColumn = $harvester->cursor->column;
+        $middle = '';
+        while ($harvester->cursor->position < $harvester->length) {
+            $c = $harvester->input[$harvester->cursor->position];
+            if ('!' === $c) {
+                $this->advance($harvester);
+
+                return '!'.$middle.'!';
+            }
+            if (\in_array($c, self::CHARS_HORIZONTAL_WHITESPACE, true)) {
+                break;
+            }
+            if (!$this->isTagChar($c)) {
+                break;
+            }
+            $middle .= $this->consumeCodePoint($harvester);
+        }
+        $harvester->cursor->position = $savedPosition;
+        $harvester->cursor->line = $savedLine;
+        $harvester->cursor->column = $savedColumn;
+
+        return '!';
+    }
+
+    private function readTagDirectivePrefix(Harvester $harvester): string
+    {
+        $result = '';
+        while ($harvester->cursor->position < $harvester->length) {
+            $c = $harvester->input[$harvester->cursor->position];
+            if (\in_array($c, self::CHARS_LINE_BREAK, true)) {
+                break;
+            }
+            if (\in_array($c, self::CHARS_HORIZONTAL_WHITESPACE, true)) {
+                break;
+            }
+            if ('#' === $c && $this->isCommentStart($harvester)) {
+                break;
+            }
+            $result .= $this->consumeCodePoint($harvester);
+        }
+
+        return $result;
     }
 
     private function readDoubleQuotedScalar(Harvester $harvester): string
