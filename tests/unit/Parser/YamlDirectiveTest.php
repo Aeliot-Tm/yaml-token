@@ -126,20 +126,20 @@ YAML);
         self::assertSame('key', $name->getToken()->text);
     }
 
-    #[DataProvider('getDataForTestWhenNoVersion')]
-    public function testThrowsWhenNoVersion(string $yaml): void
-    {
-        $this->expectException(UnexpectedTokenException::class);
-        $this->expectExceptionMessageMatches('/^Expected YAML directive version before newline or comment/');
-
-        (new Parser())->parse($yaml);
-    }
-
     #[DataProvider('getDataForTestThrowsAtEndOfFile')]
     public function testThrowsAtEndOfFile(string $yaml): void
     {
         $this->expectException(UnexpectedEndException::class);
         $this->expectExceptionMessageMatches('/^Unexpected end of token stream: YAML directive version is required/');
+
+        (new Parser())->parse($yaml);
+    }
+
+    #[DataProvider('getDataForTestWhenNoVersion')]
+    public function testThrowsWhenNoVersion(string $yaml): void
+    {
+        $this->expectException(UnexpectedTokenException::class);
+        $this->expectExceptionMessageMatches('/^Expected YAML directive version before newline or comment/');
 
         (new Parser())->parse($yaml);
     }

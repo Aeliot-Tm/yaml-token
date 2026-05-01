@@ -29,15 +29,15 @@ class KeyNode extends AbstractNode
         $this->addChild($node);
     }
 
+    public function getName(): ?Node
+    {
+        return $this->name;
+    }
+
     public function setName(Node $node): void
     {
         $this->name = $node;
         $this->addChild($node);
-    }
-
-    public function getName(): ?Node
-    {
-        return $this->name;
     }
 
     public function isEmpty(): bool

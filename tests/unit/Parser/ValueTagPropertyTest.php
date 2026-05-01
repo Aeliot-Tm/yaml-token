@@ -42,7 +42,6 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(ValueNode::class)]
 final class ValueTagPropertyTest extends TestCase
 {
-
     public function testBindsNonSpecificTagToMappingValue(): void
     {
         $couple = $this->getOnlyCouple((new Parser())->parse(<<<'YAML'
@@ -55,6 +54,24 @@ YAML));
         self::assertInstanceOf(TagPropertyNode::class, $tag);
         self::assertTrue($tag->isNonSpecific());
         self::assertNull($tag->getBodyNode());
+    }
+
+    public function testBindsPrimaryTagToMappingValue(): void
+    {
+        $couple = $this->getOnlyCouple((new Parser())->parse(<<<'YAML'
+key: !local value
+YAML));
+
+        $value = $couple->getValue();
+        self::assertNotNull($value);
+        $tag = $value->getTagProperty();
+        self::assertInstanceOf(TagPropertyNode::class, $tag);
+
+        $handle = $tag->getHandle();
+        self::assertInstanceOf(TagNode::class, $handle);
+        self::assertSame(TokenType::TAG_HANDLE_PRIMARY, $handle->getToken()->type);
+        self::assertSame('local', $tag->getBody());
+        self::assertFalse($tag->isNonSpecific());
     }
 
     public function testBindsSecondaryTagToMappingValue(): void
@@ -79,22 +96,21 @@ YAML));
         self::assertSame('value', $scalar->getToken()->text);
     }
 
-    public function testBindsPrimaryTagToMappingValue(): void
+    public function testBindsTagOnOwnLineToIndentedBlockMappingValue(): void
     {
-        $couple = $this->getOnlyCouple((new Parser())->parse(<<<'YAML'
-key: !local value
-YAML));
+        $stream = (new Parser())->parse(<<<'YAML'
+root:
+  tagged:
+    !localTag
+      child: value
+YAML);
 
-        $value = $couple->getValue();
-        self::assertNotNull($value);
-        $tag = $value->getTagProperty();
-        self::assertInstanceOf(TagPropertyNode::class, $tag);
+        $rootCouple = $this->getOnlyCouple($stream);
+        $rootValue = $rootCouple->getValue();
+        self::assertNotNull($rootValue);
 
-        $handle = $tag->getHandle();
-        self::assertInstanceOf(TagNode::class, $handle);
-        self::assertSame(TokenType::TAG_HANDLE_PRIMARY, $handle->getToken()->type);
-        self::assertSame('local', $tag->getBody());
-        self::assertFalse($tag->isNonSpecific());
+        $rootMapping = $this->getFirstChildOfType($rootValue, BlockMappingNode::class);
+        self::assertInstanceOf(BlockMappingNode::class, $rootMapping);
     }
 
     public function testBindsVerbatimTagToMappingValue(): void
@@ -123,23 +139,6 @@ YAML));
         (new Parser())->parse(<<<'YAML'
 key: !!str !local value
 YAML);
-    }
-
-    public function testBindsTagOnOwnLineToIndentedBlockMappingValue(): void
-    {
-        $stream = (new Parser())->parse(<<<'YAML'
-root:
-  tagged:
-    !localTag
-      child: value
-YAML);
-
-        $rootCouple = $this->getOnlyCouple($stream);
-        $rootValue = $rootCouple->getValue();
-        self::assertNotNull($rootValue);
-
-        $rootMapping = $this->getFirstChildOfType($rootValue, BlockMappingNode::class);
-        self::assertInstanceOf(BlockMappingNode::class, $rootMapping);
     }
 
     /**

@@ -372,6 +372,11 @@ final class Lexer
         return \in_array($nextChar, self::CHARS_WHITESPACE, true);
     }
 
+    private function isTagChar(string $char): bool
+    {
+        return !\in_array($char, self::CHARS_ANCHOR_OR_TAG_FORBIDDEN, true);
+    }
+
     /**
      * After "!", comma + four ASCII digits begin the registration date in global tag shorthand (YAML 1.0 style).
      */
@@ -387,11 +392,6 @@ final class Lexer
         }
 
         return true;
-    }
-
-    private function isTagChar(string $char): bool
-    {
-        return !\in_array($char, self::CHARS_ANCHOR_OR_TAG_FORBIDDEN, true);
     }
 
     private function isTagHandleNameChar(string $char): bool
@@ -486,13 +486,6 @@ final class Lexer
         }
 
         return $result;
-    }
-
-    private function resetBlockMappingPlainState(Cursor $cursor): void
-    {
-        $cursor->blockMappingKeyIndent = null;
-        $cursor->awaitingBlockPlainContinuation = false;
-        $cursor->suppressExplicitTagForBang = false;
     }
 
     private function readBlockScalarBody(Harvester $harvester): string
@@ -1035,6 +1028,20 @@ final class Lexer
         $harvester->stream->addToken(new Token(TokenType::UNRECOGNIZED, $text, $startLine, $startColumn));
     }
 
+    private function readUntilNewline(Harvester $harvester): string
+    {
+        $result = '';
+        while ($harvester->cursor->position < $harvester->length) {
+            $char = $harvester->input[$harvester->cursor->position];
+            if (\in_array($char, self::CHARS_LINE_BREAK, true)) {
+                break;
+            }
+            $result .= $this->consumeCodePoint($harvester);
+        }
+
+        return $result;
+    }
+
     private function readWhitespace(Harvester $harvester): string
     {
         $result = '';
@@ -1045,20 +1052,6 @@ final class Lexer
             } else {
                 break;
             }
-        }
-
-        return $result;
-    }
-
-    private function readUntilNewline(Harvester $harvester): string
-    {
-        $result = '';
-        while ($harvester->cursor->position < $harvester->length) {
-            $char = $harvester->input[$harvester->cursor->position];
-            if (\in_array($char, self::CHARS_LINE_BREAK, true)) {
-                break;
-            }
-            $result .= $this->consumeCodePoint($harvester);
         }
 
         return $result;
@@ -1082,6 +1075,13 @@ final class Lexer
         }
 
         return $result;
+    }
+
+    private function resetBlockMappingPlainState(Cursor $cursor): void
+    {
+        $cursor->blockMappingKeyIndent = null;
+        $cursor->awaitingBlockPlainContinuation = false;
+        $cursor->suppressExplicitTagForBang = false;
     }
 
     /**

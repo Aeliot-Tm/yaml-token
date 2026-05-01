@@ -81,11 +81,6 @@ class ValueNode extends AbstractNode
         return $this->anchor;
     }
 
-    public function getScalar(): ?ScalarNode
-    {
-        return $this->scalar;
-    }
-
     public function getBlockMapping(): ?BlockMappingNode
     {
         return $this->blockMapping;
@@ -109,6 +104,11 @@ class ValueNode extends AbstractNode
     public function getMultilinePlainScalar(): ?MultilinePlainScalarNode
     {
         return $this->multilinePlainScalar;
+    }
+
+    public function getScalar(): ?ScalarNode
+    {
+        return $this->scalar;
     }
 
     public function getTagProperty(): ?TagPropertyNode

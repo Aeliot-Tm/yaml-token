@@ -36,6 +36,39 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(ValueNode::class)]
 final class NestedBlockMappingTest extends TestCase
 {
+    public function testParsesNestedBlockMappingFourLevels(): void
+    {
+        $stream = (new Parser())->parse(<<<'YAML'
+levelA:
+  levelB:
+    levelC:
+      propA: valueA
+      propB: valueB
+YAML);
+
+        $document = $this->getOnlyDocument($stream);
+        $rootCouples = $this->getKeyValueCouples($document);
+        self::assertSame('levelA', $this->getKeyText($rootCouples[0]));
+
+        $levelAValue = $rootCouples[0]->getValue();
+        self::assertNotNull($levelAValue);
+        $levelB = $this->getKeyValueCouples($this->getBlockMapping($levelAValue))[0];
+        self::assertSame('levelB', $this->getKeyText($levelB));
+
+        $levelBValue = $levelB->getValue();
+        self::assertNotNull($levelBValue);
+        $levelC = $this->getKeyValueCouples($this->getBlockMapping($levelBValue))[0];
+        self::assertSame('levelC', $this->getKeyText($levelC));
+
+        $levelCValue = $levelC->getValue();
+        self::assertNotNull($levelCValue);
+        $props = $this->getKeyValueCouples($this->getBlockMapping($levelCValue));
+        self::assertCount(2, $props);
+        self::assertSame(['propA', 'propB'], array_map(fn (KeyValueCoupleNode $c): string => $this->getKeyText($c), $props));
+        self::assertSame('valueA', $this->getScalarValueText($props[0]));
+        self::assertSame('valueB', $this->getScalarValueText($props[1]));
+    }
+
     public function testParsesNestedBlockMappingTwoLevels(): void
     {
         $stream = (new Parser())->parse(<<<'YAML'
@@ -95,39 +128,6 @@ YAML);
         self::assertCount(1, $levelBCouples);
         self::assertSame('propA', $this->getKeyText($levelBCouples[0]));
         self::assertSame('valueA', $this->getScalarValueText($levelBCouples[0]));
-    }
-
-    public function testParsesNestedBlockMappingFourLevels(): void
-    {
-        $stream = (new Parser())->parse(<<<'YAML'
-levelA:
-  levelB:
-    levelC:
-      propA: valueA
-      propB: valueB
-YAML);
-
-        $document = $this->getOnlyDocument($stream);
-        $rootCouples = $this->getKeyValueCouples($document);
-        self::assertSame('levelA', $this->getKeyText($rootCouples[0]));
-
-        $levelAValue = $rootCouples[0]->getValue();
-        self::assertNotNull($levelAValue);
-        $levelB = $this->getKeyValueCouples($this->getBlockMapping($levelAValue))[0];
-        self::assertSame('levelB', $this->getKeyText($levelB));
-
-        $levelBValue = $levelB->getValue();
-        self::assertNotNull($levelBValue);
-        $levelC = $this->getKeyValueCouples($this->getBlockMapping($levelBValue))[0];
-        self::assertSame('levelC', $this->getKeyText($levelC));
-
-        $levelCValue = $levelC->getValue();
-        self::assertNotNull($levelCValue);
-        $props = $this->getKeyValueCouples($this->getBlockMapping($levelCValue));
-        self::assertCount(2, $props);
-        self::assertSame(['propA', 'propB'], array_map(fn (KeyValueCoupleNode $c): string => $this->getKeyText($c), $props));
-        self::assertSame('valueA', $this->getScalarValueText($props[0]));
-        self::assertSame('valueB', $this->getScalarValueText($props[1]));
     }
 
     public function testParsesNestedBlockMappingWithSiblingNodesAtDifferentLevels(): void

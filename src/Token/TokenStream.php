@@ -22,6 +22,11 @@ final class TokenStream
      */
     private array $tokens = [];
 
+    public function addToken(Token $token): void
+    {
+        $this->tokens[] = $token;
+    }
+
     public function advance(): ?Token
     {
         $token = $this->current();
@@ -48,11 +53,6 @@ final class TokenStream
     public function getTokens(): array
     {
         return $this->tokens;
-    }
-
-    public function addToken(Token $token): void
-    {
-        $this->tokens[] = $token;
     }
 
     public function isEnd(): bool
