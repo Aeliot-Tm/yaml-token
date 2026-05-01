@@ -6,9 +6,9 @@ by YAML specification version. The `tests/fixture/` root is reserved for other
 
 ## Covering Fixtures
 
-Files `<version>.yaml` in `tests/fixture/spec/` are **covering fixtures** —
-single files that contain all syntactic elements of a given YAML specification version
-in one document stream. They are used as a compact reference and for full-coverage smoke testing.
+Files `<version>.yaml` in `tests/fixture/spec/` are **covering fixtures** — single files
+that contain all syntactic elements of a given YAML specification version in one document
+stream. They are used as a compact reference and for full-coverage smoke testing.
 
 - `1.0.yaml` — YAML 1.0 (2004-01-29)
 - `1.1.yaml` — YAML 1.1 (2005-01-18)
@@ -29,20 +29,23 @@ Minimal example files use the format:
 `<feature>_<section>.yaml`
 
 - `<feature>`: a stable, self-descriptive feature name (e.g. `explicit-flow-pair`, `folded-block`, `directive-tag`).
-- `<section>`: the **primary section number** of the official YAML specification for the matching `<version>`
-  that most directly defines the syntax being exercised (e.g. `4.5.2`, `9.1.1`, `8.2.1`).
+- `<section>`: the **primary section number** of the official YAML specification
+  for the matching `<version>` that most directly defines the syntax being exercised
+  (e.g. `4.5.2`, `9.1.1`, `8.2.1`).
 
-When a fixture relates to multiple places in the spec (common for cross-cutting rules like indentation, separation, or comments),
-the suffix should still contain a single number: pick the section that **introduces/defines the construct under test**,
+When a fixture relates to multiple places in the spec (common for cross-cutting rules
+like indentation, separation, or comments), the suffix should still contain a single number:
+pick the section that **introduces/defines the construct under test**,
 not a tangential section that merely mentions it.
 
 Notes:
 
-- The section suffix is version-specific. The same `<feature>` can map to different `<section>` numbers across YAML 1.0, 1.1 and 1.2.x
-  because the specification structure and numbering differs.
+- The section suffix is version-specific. The same `<feature>` can map to different `<section>`
+  numbers across YAML 1.0, 1.1 and 1.2.x because the specification structure and numbering differs.
 - The `1.2.0/`, `1.2.1/`, `1.2.2/` directories must remain identical; therefore, section suffixes
   and file names in these directories must be kept identical as well.
-- If a file is renamed, update all test references that point to it (many tests use string paths to `tests/fixture/spec/<version>/...`).
+- If a file is renamed, update all test references that point to it (many tests use string paths
+  to `tests/fixture/spec/<version>/...`).
 
 To (re)generate and apply these renames consistently, use `bin/spec_fixture_suffixes.py`
 (it performs renames via `git mv` and rewrites test references).
