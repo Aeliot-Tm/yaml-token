@@ -20,6 +20,20 @@ final class ParseState
 {
     public ?int $indentStepLen = null;
 
+    public function assertIndentLenIsValid(int $indentLen): void
+    {
+        if (null === $this->indentStepLen) {
+            // YAML does not prescribe a global indentation step size.
+            // The parser validates indentation consistency locally (per block collection),
+            // so the step length may remain undefined in some edge cases.
+            return;
+        }
+
+        if ($indentLen <= 0) {
+            throw new IndentationInvalidException('Indent length must be positive');
+        }
+    }
+
     public function isIndentLenRegistered(): bool
     {
         return null !== $this->indentStepLen;
@@ -36,19 +50,5 @@ final class ParseState
         }
 
         $this->indentStepLen = $indentLen;
-    }
-
-    public function assertIndentLenIsValid(int $indentLen): void
-    {
-        if (null === $this->indentStepLen) {
-            // YAML does not prescribe a global indentation step size.
-            // The parser validates indentation consistency locally (per block collection),
-            // so the step length may remain undefined in some edge cases.
-            return;
-        }
-
-        if ($indentLen <= 0) {
-            throw new IndentationInvalidException('Indent length must be positive');
-        }
     }
 }

@@ -27,6 +27,28 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(Parser::class)]
 final class ComplexMappingKeysTest extends TestCase
 {
+    public function testParsesBlockMappingAsExplicitKeyOnNextLine(): void
+    {
+        $source = "? \n  a: b\n: c\n";
+        $stream = (new Parser())->parse($source);
+        self::assertSame($source, (new YamlEmitter())->emit($stream));
+
+        $couple = $this->getOnlyDocumentCouple($stream);
+        self::assertFalse($couple->getKey()->isEmpty());
+
+        self::assertInstanceOf(BlockMappingNode::class, $couple->getKey()->getName());
+    }
+
+    public function testParsesBlockSequenceAsExplicitKeyOnNextLine(): void
+    {
+        $source = "? \n  - a\n  - b\n: c\n";
+        $stream = (new Parser())->parse($source);
+        self::assertSame($source, (new YamlEmitter())->emit($stream));
+
+        $couple = $this->getOnlyDocumentCouple($stream);
+        self::assertFalse($couple->getKey()->isEmpty());
+    }
+
     public function testParsesFlowSequenceKeyInFlowMapping(): void
     {
         $source = "root: { &a [a, &b b]: *b, *a : [c, *b, d]}\n";
@@ -52,28 +74,6 @@ final class ComplexMappingKeysTest extends TestCase
         self::assertFalse($couples[0]->getKey()->isEmpty());
 
         self::assertInstanceOf(FlowSequenceNode::class, $couples[0]->getKey()->getName());
-    }
-
-    public function testParsesBlockSequenceAsExplicitKeyOnNextLine(): void
-    {
-        $source = "? \n  - a\n  - b\n: c\n";
-        $stream = (new Parser())->parse($source);
-        self::assertSame($source, (new YamlEmitter())->emit($stream));
-
-        $couple = $this->getOnlyDocumentCouple($stream);
-        self::assertFalse($couple->getKey()->isEmpty());
-    }
-
-    public function testParsesBlockMappingAsExplicitKeyOnNextLine(): void
-    {
-        $source = "? \n  a: b\n: c\n";
-        $stream = (new Parser())->parse($source);
-        self::assertSame($source, (new YamlEmitter())->emit($stream));
-
-        $couple = $this->getOnlyDocumentCouple($stream);
-        self::assertFalse($couple->getKey()->isEmpty());
-
-        self::assertInstanceOf(BlockMappingNode::class, $couple->getKey()->getName());
     }
 
     private function getOnlyDocumentCouple(StreamNode $stream): KeyValueCoupleNode

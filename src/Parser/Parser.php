@@ -614,6 +614,62 @@ final class Parser
         ], true);
     }
 
+    /**
+     * @param int $offset Offset to the first non-WHITESPACE/COMMENT token of the line
+     */
+    private function isNodePropertiesOnlyLine(Harvester $harvester, int $offset): bool
+    {
+        $i = $offset;
+        $seenTag = false;
+
+        while (true) {
+            $token = $harvester->tokens->peek($i);
+            if (null === $token) {
+                return true;
+            }
+            if (TokenType::NEWLINE === $token->type) {
+                return true;
+            }
+            if (TokenType::WHITESPACE === $token->type || TokenType::COMMENT === $token->type) {
+                ++$i;
+                continue;
+            }
+
+            if (TokenType::ANCHOR === $token->type) {
+                ++$i;
+                continue;
+            }
+
+            if (TokenType::TAG_BODY === $token->type) {
+                return false;
+            }
+
+            if ($this->isNodePropertyToken($token)) {
+                if ($seenTag) {
+                    return false;
+                }
+                $seenTag = true;
+                ++$i;
+
+                if (\in_array($token->type, [TokenType::TAG_HANDLE_VERBATIM, TokenType::TAG_NON_SPECIFIC], true)) {
+                    continue;
+                }
+
+                while (TokenType::WHITESPACE === $harvester->tokens->peek($i)?->type) {
+                    ++$i;
+                }
+
+                if (TokenType::TAG_BODY !== $harvester->tokens->peek($i)?->type) {
+                    return false;
+                }
+                ++$i;
+                continue;
+            }
+
+            return false;
+        }
+    }
+
     private function isBlockScalarStartAtDocumentRoot(Harvester $harvester): bool
     {
         $token = $harvester->tokens->current();
@@ -1805,62 +1861,6 @@ final class Parser
                 }
                 ++$probe;
             }
-        }
-    }
-
-    /**
-     * @param int $offset Offset to the first non-WHITESPACE/COMMENT token of the line
-     */
-    private function isNodePropertiesOnlyLine(Harvester $harvester, int $offset): bool
-    {
-        $i = $offset;
-        $seenTag = false;
-
-        while (true) {
-            $token = $harvester->tokens->peek($i);
-            if (null === $token) {
-                return true;
-            }
-            if (TokenType::NEWLINE === $token->type) {
-                return true;
-            }
-            if (TokenType::WHITESPACE === $token->type || TokenType::COMMENT === $token->type) {
-                ++$i;
-                continue;
-            }
-
-            if (TokenType::ANCHOR === $token->type) {
-                ++$i;
-                continue;
-            }
-
-            if (TokenType::TAG_BODY === $token->type) {
-                return false;
-            }
-
-            if ($this->isNodePropertyToken($token)) {
-                if ($seenTag) {
-                    return false;
-                }
-                $seenTag = true;
-                ++$i;
-
-                if (\in_array($token->type, [TokenType::TAG_HANDLE_VERBATIM, TokenType::TAG_NON_SPECIFIC], true)) {
-                    continue;
-                }
-
-                while (TokenType::WHITESPACE === $harvester->tokens->peek($i)?->type) {
-                    ++$i;
-                }
-
-                if (TokenType::TAG_BODY !== $harvester->tokens->peek($i)?->type) {
-                    return false;
-                }
-                ++$i;
-                continue;
-            }
-
-            return false;
         }
     }
 

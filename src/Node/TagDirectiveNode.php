@@ -37,9 +37,9 @@ class TagDirectiveNode extends AbstractNode implements TokenHolderInterface
         parent::addChild($child);
     }
 
-    public function getToken(): Token
+    public function getHandle(): string
     {
-        return $this->token;
+        return $this->handleNode->getHandle();
     }
 
     public function getHandleNode(): TagDirectiveHandleNode
@@ -47,18 +47,18 @@ class TagDirectiveNode extends AbstractNode implements TokenHolderInterface
         return $this->handleNode;
     }
 
+    public function getPrefix(): string
+    {
+        return $this->prefixNode->getPrefix();
+    }
+
     public function getPrefixNode(): TagDirectivePrefixNode
     {
         return $this->prefixNode;
     }
 
-    public function getHandle(): string
+    public function getToken(): Token
     {
-        return $this->handleNode->getHandle();
-    }
-
-    public function getPrefix(): string
-    {
-        return $this->prefixNode->getPrefix();
+        return $this->token;
     }
 }

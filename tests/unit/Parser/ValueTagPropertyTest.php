@@ -42,6 +42,21 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(ValueNode::class)]
 final class ValueTagPropertyTest extends TestCase
 {
+
+    public function testBindsNonSpecificTagToMappingValue(): void
+    {
+        $couple = $this->getOnlyCouple((new Parser())->parse(<<<'YAML'
+key: ! value
+YAML));
+
+        $value = $couple->getValue();
+        self::assertNotNull($value);
+        $tag = $value->getTagProperty();
+        self::assertInstanceOf(TagPropertyNode::class, $tag);
+        self::assertTrue($tag->isNonSpecific());
+        self::assertNull($tag->getBodyNode());
+    }
+
     public function testBindsSecondaryTagToMappingValue(): void
     {
         $couple = $this->getOnlyCouple((new Parser())->parse(<<<'YAML'
@@ -100,20 +115,6 @@ YAML));
         self::assertFalse($tag->isNonSpecific());
     }
 
-    public function testBindsNonSpecificTagToMappingValue(): void
-    {
-        $couple = $this->getOnlyCouple((new Parser())->parse(<<<'YAML'
-key: ! value
-YAML));
-
-        $value = $couple->getValue();
-        self::assertNotNull($value);
-        $tag = $value->getTagProperty();
-        self::assertInstanceOf(TagPropertyNode::class, $tag);
-        self::assertTrue($tag->isNonSpecific());
-        self::assertNull($tag->getBodyNode());
-    }
-
     public function testThrowsWhenTwoTagsAreSpecifiedForSameValue(): void
     {
         $this->expectException(UnexpectedStateException::class);
@@ -141,19 +142,6 @@ YAML);
         self::assertInstanceOf(BlockMappingNode::class, $rootMapping);
     }
 
-    private function getOnlyCouple(StreamNode $stream): KeyValueCoupleNode
-    {
-        $document = $this->getOnlyDocument($stream);
-        $couples = array_values(array_filter(
-            $document->getChildren(),
-            static fn ($n): bool => $n instanceof KeyValueCoupleNode,
-        ));
-
-        self::assertCount(1, $couples);
-
-        return $couples[0];
-    }
-
     /**
      * @template T of object
      *
@@ -170,6 +158,19 @@ YAML);
         }
 
         return null;
+    }
+
+    private function getOnlyCouple(StreamNode $stream): KeyValueCoupleNode
+    {
+        $document = $this->getOnlyDocument($stream);
+        $couples = array_values(array_filter(
+            $document->getChildren(),
+            static fn ($n): bool => $n instanceof KeyValueCoupleNode,
+        ));
+
+        self::assertCount(1, $couples);
+
+        return $couples[0];
     }
 
     private function getOnlyDocument(StreamNode $stream): DocumentNode

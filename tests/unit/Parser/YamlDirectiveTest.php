@@ -51,6 +51,23 @@ final class YamlDirectiveTest extends TestCase
         return [["%YAML\n"], ["%YAML # no version\n"]];
     }
 
+    public function testParsesMultipleYamlDirectivesWithTrailingComment(): void
+    {
+        $stream = (new Parser())->parse(<<<'YAML'
+%YAML 1.2 # ok
+%YAML 1.2
+YAML);
+
+        $documents = $this->getDocumentNodes($stream);
+        self::assertCount(1, $documents);
+
+        $directives = array_values(array_filter(
+            $documents[0]->getChildren(),
+            static fn ($n): bool => $n instanceof YamlDirectiveNode,
+        ));
+        self::assertCount(2, $directives);
+    }
+
     public function testParsesYamlDirectiveWithColonSeparator(): void
     {
         $yaml = file_get_contents(__DIR__.'/../../fixture/spec_extra/1.0/directive_4.3.2.yaml');
@@ -107,23 +124,6 @@ final class YamlDirectiveTest extends TestCase
         $name = $couples[0]->getKey()->getName();
         self::assertInstanceOf(ScalarNode::class, $name);
         self::assertSame('key', $name->getToken()->text);
-    }
-
-    public function testParsesMultipleYamlDirectivesWithTrailingComment(): void
-    {
-        $stream = (new Parser())->parse(<<<'YAML'
-%YAML 1.2 # ok
-%YAML 1.2
-YAML);
-
-        $documents = $this->getDocumentNodes($stream);
-        self::assertCount(1, $documents);
-
-        $directives = array_values(array_filter(
-            $documents[0]->getChildren(),
-            static fn ($n): bool => $n instanceof YamlDirectiveNode,
-        ));
-        self::assertCount(2, $directives);
     }
 
     #[DataProvider('getDataForTestWhenNoVersion')]

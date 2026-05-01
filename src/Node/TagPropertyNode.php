@@ -33,9 +33,9 @@ final class TagPropertyNode extends AbstractNode
         parent::addChild($child);
     }
 
-    public function getHandle(): ?TagNode
+    public function getBody(): ?string
     {
-        return $this->handle;
+        return $this->body?->getBody();
     }
 
     public function getBodyNode(): ?TagBodyNode
@@ -43,9 +43,9 @@ final class TagPropertyNode extends AbstractNode
         return $this->body;
     }
 
-    public function getBody(): ?string
+    public function getHandle(): ?TagNode
     {
-        return $this->body?->getBody();
+        return $this->handle;
     }
 
     public function isNonSpecific(): bool

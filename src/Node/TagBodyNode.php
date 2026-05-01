@@ -22,13 +22,13 @@ class TagBodyNode extends AbstractNode implements TokenHolderInterface
     ) {
     }
 
-    public function getToken(): Token
-    {
-        return $this->token;
-    }
-
     public function getBody(): string
     {
         return $this->token->text;
+    }
+
+    public function getToken(): Token
+    {
+        return $this->token;
     }
 }

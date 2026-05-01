@@ -55,18 +55,6 @@ final class IndentLessSequenceWithScalarTest extends TestCase
         self::assertSame('value', $scalar->getToken()->text);
     }
 
-    private function getOnlyDocument(StreamNode $stream): DocumentNode
-    {
-        $documents = array_values(array_filter(
-            $stream->getChildren(),
-            static fn ($n): bool => $n instanceof DocumentNode,
-        ));
-
-        self::assertCount(1, $documents);
-
-        return $documents[0];
-    }
-
     /**
      * @return KeyValueCoupleNode[]
      */
@@ -80,5 +68,17 @@ final class IndentLessSequenceWithScalarTest extends TestCase
             $children,
             static fn ($n): bool => $n instanceof KeyValueCoupleNode,
         ));
+    }
+
+    private function getOnlyDocument(StreamNode $stream): DocumentNode
+    {
+        $documents = array_values(array_filter(
+            $stream->getChildren(),
+            static fn ($n): bool => $n instanceof DocumentNode,
+        ));
+
+        self::assertCount(1, $documents);
+
+        return $documents[0];
     }
 }

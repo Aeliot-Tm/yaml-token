@@ -22,13 +22,13 @@ class TagDirectivePrefixNode extends AbstractNode implements TokenHolderInterfac
     ) {
     }
 
-    public function getToken(): Token
-    {
-        return $this->token;
-    }
-
     public function getPrefix(): string
     {
         return $this->token->text;
+    }
+
+    public function getToken(): Token
+    {
+        return $this->token;
     }
 }

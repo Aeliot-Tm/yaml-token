@@ -22,13 +22,13 @@ class TagDirectiveHandleNode extends AbstractNode implements TokenHolderInterfac
     ) {
     }
 
-    public function getToken(): Token
-    {
-        return $this->token;
-    }
-
     public function getHandle(): string
     {
         return $this->token->text;
+    }
+
+    public function getToken(): Token
+    {
+        return $this->token;
     }
 }
