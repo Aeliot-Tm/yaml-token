@@ -112,8 +112,7 @@ The rules below describe the practical behavior relied upon by lexer unit tests.
   (regenerate with `composer lexer-expectations` or `php bin/dev/generate-lexer-expectations.php`).
   [`LexerMappingTestCase`](../../../tests/unit/Lexer/LexerMappingTestCase.php) runs the same check against
   the snapshot when `tests/lexer_expectations/<same-relative-path>.php` exists (e.g. not for `tests/fixture/invalid/`).
-- **Mapping tests**: `tests/unit/Lexer/Spec/*` must assert token sequences exactly (`TokenType` + `text`),
-  including `INDENTATION`, `WHITESPACE`, and `NEWLINE`.
+  Handwritten subclasses remain only for YAML under `tests/fixture/invalid/` (no generated snapshots).
 - **Broken / invalid indent (tabs in indent)**: minimal samples in `tests/fixture/invalid/`;
   `LexerBrokenIndentTabTest` asserts the split above.
 - **Example 6.5 (YAML 1.2 spec §6.4 empty lines)**: minimal files `double-quoted-empty-line.yaml`
