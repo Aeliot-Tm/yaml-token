@@ -568,36 +568,6 @@ final class Parser
     }
 
     /**
-     * YAML 1.2.2 §8.2 rule [200] s-l+block-collection(n,c): before the block
-     * sequence or block mapping body a node may carry c-ns-properties(n+1,c)
-     * (tag and/or anchor, rule [96]) — optionally on their own line. At the
-     * bare document root this is reached via rule [211] l-bare-document ::=
-     * s-l+block-node(-1, block-in) (§9.1.3) → [196] → [198] → [200].
-     *
-     * Detects such a node-property prefix at the document root by peeking past
-     * a possible leading INDENTATION token.
-     */
-    private function isNodePropertyAtDocumentRoot(Harvester $harvester): bool
-    {
-        $token = $harvester->tokens->current();
-        if (null === $token) {
-            return false;
-        }
-        if (TokenType::INDENTATION === $token->type) {
-            $token = $harvester->tokens->peek(1);
-        }
-
-        return null !== $token && \in_array($token->type, [
-            TokenType::ANCHOR,
-            TokenType::TAG_HANDLE_NAMED,
-            TokenType::TAG_HANDLE_PRIMARY,
-            TokenType::TAG_HANDLE_SECONDARY,
-            TokenType::TAG_HANDLE_VERBATIM,
-            TokenType::TAG_NON_SPECIFIC,
-        ], true);
-    }
-
-    /**
      * @param int $offset Offset to the first non-WHITESPACE/COMMENT token of the line
      */
     private function isNodePropertiesOnlyLine(Harvester $harvester, int $offset): bool
@@ -651,6 +621,36 @@ final class Parser
 
             return false;
         }
+    }
+
+    /**
+     * YAML 1.2.2 §8.2 rule [200] s-l+block-collection(n,c): before the block
+     * sequence or block mapping body a node may carry c-ns-properties(n+1,c)
+     * (tag and/or anchor, rule [96]) — optionally on their own line. At the
+     * bare document root this is reached via rule [211] l-bare-document ::=
+     * s-l+block-node(-1, block-in) (§9.1.3) → [196] → [198] → [200].
+     *
+     * Detects such a node-property prefix at the document root by peeking past
+     * a possible leading INDENTATION token.
+     */
+    private function isNodePropertyAtDocumentRoot(Harvester $harvester): bool
+    {
+        $token = $harvester->tokens->current();
+        if (null === $token) {
+            return false;
+        }
+        if (TokenType::INDENTATION === $token->type) {
+            $token = $harvester->tokens->peek(1);
+        }
+
+        return null !== $token && \in_array($token->type, [
+                TokenType::ANCHOR,
+                TokenType::TAG_HANDLE_NAMED,
+                TokenType::TAG_HANDLE_PRIMARY,
+                TokenType::TAG_HANDLE_SECONDARY,
+                TokenType::TAG_HANDLE_VERBATIM,
+                TokenType::TAG_NON_SPECIFIC,
+            ], true);
     }
 
     private function isBlockScalarStartAtDocumentRoot(Harvester $harvester): bool
