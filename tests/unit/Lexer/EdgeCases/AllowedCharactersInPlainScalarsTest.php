@@ -30,6 +30,38 @@ final class AllowedCharactersInPlainScalarsTest extends LexerMappingTestCase
         yield [[
             [
                 'type' => TokenType::PLAIN_SCALAR,
+                'text' => 'safe',
+            ],
+            [
+                'type' => TokenType::VALUE_INDICATOR,
+                'text' => ':',
+            ],
+            [
+                'type' => TokenType::WHITESPACE,
+                'text' => ' ',
+            ],
+            [
+                'type' => TokenType::PLAIN_SCALAR,
+                'text' => "a!\"#$%&'()*+,-./09:;<=>?@AZ[\\]^_`az{|}~",
+            ],
+            [
+                'type' => TokenType::NEWLINE,
+                'text' => "\n",
+            ],
+            [
+                'type' => TokenType::INDENTATION,
+                'text' => '     ',
+            ],
+            [
+                'type' => TokenType::PLAIN_SCALAR,
+                'text' => '!"#$%&\'()*+,-./09:;<=>?@AZ[\\]^_`az{|}~',
+            ],
+            [
+                'type' => TokenType::NEWLINE,
+                'text' => "\n",
+            ],
+            [
+                'type' => TokenType::PLAIN_SCALAR,
                 'text' => 'safe question mark',
             ],
             [

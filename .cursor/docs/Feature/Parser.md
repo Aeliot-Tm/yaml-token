@@ -25,6 +25,10 @@ Because of this, the parser must not invent tokens that did not exist in the ori
   - Anchor is stored as [`AnchorNode`](../../src/Node/AnchorNode.php).
   - Tag property is bound to the value as [`TagPropertyNode`](../../src/Node/TagPropertyNode.php) built from tag tokens (`TagNode` + optional `TagBodyNode`, or `TAG_NON_SPECIFIC`).
   - Current scope: tag binding is implemented for values only (mapping keys are not supported yet).
+  - Block-context plain scalars may span multiple lines. In that case the value contains multiple `ScalarNode` fragments
+    (one per `PLAIN_SCALAR` token). `ValueNode` groups these fragments into a single [`MultilinePlainScalarNode`](../../../src/Node/MultilinePlainScalarNode.php) 
+    exposed via `ValueNode::getMultilinePlainScalar()`. When `multilinePlainScalar` is present, `ValueNode::getScalar()` is `null`.
+    Single-line plain (and other scalar styles) still use `ValueNode::getScalar()` with a [`ScalarNode`](../../../src/Node/ScalarNode.php).
 - Collections:
   - Block mapping: `key:` followed by an indented block of key/value couples (`BlockMappingNode`).
   - Block sequence: `key:` followed by an indented list of `-` entries (`BlockSequenceNode` with `SequenceEntryNode` children).

@@ -128,14 +128,15 @@ abstract class ParserMappingTestCase extends TestCase
 
         if ($node instanceof ValueNode) {
             return [
-                'tagProperty' => $node->getTagProperty(),
                 'anchor' => $node->getAnchor(),
                 'alias' => $node->getAlias(),
-                'scalar' => $node->getScalar(),
                 'blockMapping' => $node->getBlockMapping(),
                 'blockSequence' => $node->getBlockSequence(),
                 'flowMapping' => $node->getFlowMapping(),
                 'flowSequence' => $node->getFlowSequence(),
+                'multilinePlainScalar' => $node->getMultilinePlainScalar(),
+                'scalar' => $node->getScalar(),
+                'tagProperty' => $node->getTagProperty(),
             ];
         }
 

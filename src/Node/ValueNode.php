@@ -21,6 +21,7 @@ class ValueNode extends AbstractNode
     private ?BlockSequenceNode $blockSequence = null;
     private ?FlowMappingNode $flowMapping = null;
     private ?FlowSequenceNode $flowSequence = null;
+    private ?MultilinePlainScalarNode $multilinePlainScalar = null;
     private ?ScalarNode $scalar = null;
     private ?TagPropertyNode $tagProperty = null;
 
@@ -51,7 +52,16 @@ class ValueNode extends AbstractNode
         }
 
         if ($child instanceof ScalarNode) {
-            $this->scalar = $child;
+            if (null !== $this->multilinePlainScalar) {
+                $this->multilinePlainScalar->addChild($child);
+            } elseif (null !== $this->scalar) {
+                $this->multilinePlainScalar = new MultilinePlainScalarNode();
+                $this->multilinePlainScalar->addChild($this->scalar);
+                $this->multilinePlainScalar->addChild($child);
+                $this->scalar = null;
+            } else {
+                $this->scalar = $child;
+            }
         }
 
         if ($child instanceof TagPropertyNode) {
@@ -96,6 +106,11 @@ class ValueNode extends AbstractNode
         return $this->flowSequence;
     }
 
+    public function getMultilinePlainScalar(): ?MultilinePlainScalarNode
+    {
+        return $this->multilinePlainScalar;
+    }
+
     public function getTagProperty(): ?TagPropertyNode
     {
         return $this->tagProperty;
@@ -108,6 +123,7 @@ class ValueNode extends AbstractNode
             && null === $this->blockSequence
             && null === $this->flowMapping
             && null === $this->flowSequence
+            && null === $this->multilinePlainScalar
             && null === $this->scalar;
     }
 }

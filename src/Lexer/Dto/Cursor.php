@@ -72,4 +72,22 @@ final class Cursor
      * ({@see TokenType::INDENTATION}, {@see TokenType::PLAIN_SCALAR}, {@see TokenType::NEWLINE}), not a single block body token.
      */
     public bool $inExplicitIndentBlockScalarBody = false;
+
+    /**
+     * Leading-space count of the block mapping key line when {@see TokenType::VALUE_INDICATOR} was emitted in block context;
+     * null when not tracking an open block mapping value for multiline-plain continuation.
+     */
+    public ?int $blockMappingKeyIndent = null;
+
+    /**
+     * After a newline that followed {@see TokenType::PLAIN_SCALAR} content for an open block mapping value,
+     * the next line may continue that plain scalar with greater indentation.
+     */
+    public bool $awaitingBlockPlainContinuation = false;
+
+    /**
+     * When true, explicit tag lexing must not run for leading {@code !}
+     * (continuation line of a multiline block plain scalar); cleared at end of line.
+     */
+    public bool $suppressExplicitTagForBang = false;
 }
