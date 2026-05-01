@@ -877,9 +877,93 @@ final class Lexer
         return $result;
     }
 
+    /**
+     * Split `%TAG` lines into `DIRECTIVE_TAG`, `DIRECTIVE_TAG_HANDLE`, `DIRECTIVE_TAG_PREFIX` only when the keyword
+     * is followed by a handle (starts with `!`) or horizontal whitespace / EOF — not when followed immediately by a
+     * line break (whole-line token as before).
+     */
+    private function shouldTokenizeTagDirectiveAsParts(Harvester $harvester): bool
+    {
+        if ($harvester->cursor->position + 4 > $harvester->length) {
+            return false;
+        }
+        if ('%TAG' !== substr($harvester->input, $harvester->cursor->position, 4)) {
+            return false;
+        }
+        if ($harvester->cursor->position + 4 >= $harvester->length) {
+            return true;
+        }
+        $after = $harvester->input[$harvester->cursor->position + 4];
+
+        return \in_array($after, self::CHARS_HORIZONTAL_WHITESPACE, true) || '!' === $after;
+    }
+
     private function shouldTokenizeYamlDirectiveAsParts(Harvester $harvester): bool
     {
         return '%YAML' === substr($harvester->input, $harvester->cursor->position, 5);
+    }
+
+    private function splitExplicitIndentBlockBodyToTokens(Harvester $harvester, string $body): void
+    {
+        $len = \strlen($body);
+        $offset = 0;
+        while ($offset < $len) {
+            $nl = $this->findNextLineBreakInString($body, $offset, $len);
+            $lineEnd = null !== $nl ? $nl['start'] : $len;
+            $line = substr($body, $offset, $lineEnd - $offset);
+            $lineLen = \strlen($line);
+            $i = 0;
+            $indentBytes = '';
+            while ($i < $lineLen && \in_array($line[$i], self::CHARS_HORIZONTAL_WHITESPACE, true)) {
+                $indentBytes .= $line[$i];
+                ++$i;
+            }
+            if ('' !== $indentBytes) {
+                $harvester->stream->addToken(new Token(TokenType::INDENTATION, $indentBytes, 1, 1));
+            }
+            $rest = substr($line, $i);
+            if ('' !== $rest) {
+                $harvester->stream->addToken(new Token(TokenType::PLAIN_SCALAR, $rest, 1, 1));
+            }
+            if (null === $nl) {
+                break;
+            }
+            $harvester->stream->addToken(new Token(TokenType::NEWLINE, substr($body, $nl['start'], $nl['len']), 1, 1));
+            $offset = $nl['start'] + $nl['len'];
+        }
+    }
+
+    private function syncCursorLineColumnFromPrefix(Harvester $harvester): void
+    {
+        $pos = min($harvester->cursor->position, $harvester->length);
+        $line = 1;
+        $column = 1;
+        $i = 0;
+        while ($i < $pos) {
+            $c = $harvester->input[$i];
+            if ("\n" === $c) {
+                ++$line;
+                $column = 1;
+                ++$i;
+
+                continue;
+            }
+            if ("\r" === $c) {
+                ++$line;
+                $column = 1;
+                ++$i;
+                if ($i < $pos && "\n" === $harvester->input[$i]) {
+                    ++$i;
+                }
+
+                continue;
+            }
+            $w = $this->utf8CodePointByteWidth($harvester, $i);
+            ++$column;
+            $i += $w;
+        }
+        $harvester->cursor->line = $line;
+        $harvester->cursor->column = $column;
     }
 
     /**
@@ -1056,27 +1140,6 @@ final class Lexer
         }
 
         return $result;
-    }
-
-    /**
-     * Split `%TAG` lines into `DIRECTIVE_TAG`, `DIRECTIVE_TAG_HANDLE`, `DIRECTIVE_TAG_PREFIX` only when the keyword
-     * is followed by a handle (starts with `!`) or horizontal whitespace / EOF — not when followed immediately by a
-     * line break (whole-line token as before).
-     */
-    private function shouldTokenizeTagDirectiveAsParts(Harvester $harvester): bool
-    {
-        if ($harvester->cursor->position + 4 > $harvester->length) {
-            return false;
-        }
-        if ('%TAG' !== substr($harvester->input, $harvester->cursor->position, 4)) {
-            return false;
-        }
-        if ($harvester->cursor->position + 4 >= $harvester->length) {
-            return true;
-        }
-        $after = $harvester->input[$harvester->cursor->position + 4];
-
-        return \in_array($after, self::CHARS_HORIZONTAL_WHITESPACE, true) || '!' === $after;
     }
 
     private function readTagDirectiveHandle(Harvester $harvester): string
@@ -1259,74 +1322,11 @@ final class Lexer
         return $text;
     }
 
-    private function splitExplicitIndentBlockBodyToTokens(Harvester $harvester, string $body): void
-    {
-        $len = \strlen($body);
-        $offset = 0;
-        while ($offset < $len) {
-            $nl = $this->findNextLineBreakInString($body, $offset, $len);
-            $lineEnd = null !== $nl ? $nl['start'] : $len;
-            $line = substr($body, $offset, $lineEnd - $offset);
-            $lineLen = \strlen($line);
-            $i = 0;
-            $indentBytes = '';
-            while ($i < $lineLen && \in_array($line[$i], self::CHARS_HORIZONTAL_WHITESPACE, true)) {
-                $indentBytes .= $line[$i];
-                ++$i;
-            }
-            if ('' !== $indentBytes) {
-                $harvester->stream->addToken(new Token(TokenType::INDENTATION, $indentBytes, 1, 1));
-            }
-            $rest = substr($line, $i);
-            if ('' !== $rest) {
-                $harvester->stream->addToken(new Token(TokenType::PLAIN_SCALAR, $rest, 1, 1));
-            }
-            if (null === $nl) {
-                break;
-            }
-            $harvester->stream->addToken(new Token(TokenType::NEWLINE, substr($body, $nl['start'], $nl['len']), 1, 1));
-            $offset = $nl['start'] + $nl['len'];
-        }
-    }
-
     private function resetBlockMappingPlainState(Cursor $cursor): void
     {
         $cursor->blockMappingKeyIndent = null;
         $cursor->awaitingBlockPlainContinuation = false;
         $cursor->suppressExplicitTagForBang = false;
-    }
-
-    private function syncCursorLineColumnFromPrefix(Harvester $harvester): void
-    {
-        $pos = min($harvester->cursor->position, $harvester->length);
-        $line = 1;
-        $column = 1;
-        $i = 0;
-        while ($i < $pos) {
-            $c = $harvester->input[$i];
-            if ("\n" === $c) {
-                ++$line;
-                $column = 1;
-                ++$i;
-
-                continue;
-            }
-            if ("\r" === $c) {
-                ++$line;
-                $column = 1;
-                ++$i;
-                if ($i < $pos && "\n" === $harvester->input[$i]) {
-                    ++$i;
-                }
-
-                continue;
-            }
-            $w = $this->utf8CodePointByteWidth($harvester, $i);
-            ++$column;
-            $i += $w;
-        }
-        $harvester->cursor->line = $line;
-        $harvester->cursor->column = $column;
     }
 
     /**
