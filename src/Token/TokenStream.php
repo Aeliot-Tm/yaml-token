@@ -22,16 +22,6 @@ final class TokenStream
      */
     private array $tokens = [];
 
-    public function getPosition(): int
-    {
-        return $this->position;
-    }
-
-    public function setPosition(int $position): void
-    {
-        $this->position = max(0, min($position, \count($this->tokens)));
-    }
-
     public function current(): ?Token
     {
         return $this->tokens[$this->position] ?? null;
