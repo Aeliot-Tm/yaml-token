@@ -124,6 +124,23 @@ final class Lexer
         return $harvester->stream;
     }
 
+    private function advance(Harvester $harvester): void
+    {
+        if ($harvester->cursor->position >= $harvester->length) {
+            return;
+        }
+        if ("\n" === $harvester->input[$harvester->cursor->position]) {
+            ++$harvester->cursor->line;
+            $harvester->cursor->column = 1;
+            ++$harvester->cursor->position;
+
+            return;
+        }
+        $width = $this->utf8CodePointByteWidth($harvester, $harvester->cursor->position);
+        $harvester->cursor->position += $width;
+        ++$harvester->cursor->column;
+    }
+
     private function applyBlockPlainContinuationIndentRules(Harvester $harvester, string $indent): void
     {
         if (!$harvester->cursor->awaitingBlockPlainContinuation || null === $harvester->cursor->blockMappingKeyIndent) {
@@ -135,6 +152,11 @@ final class Lexer
         } else {
             $this->resetBlockMappingPlainState($harvester->cursor);
         }
+    }
+
+    private function blockScalarLineHasNonSpaceTabContent(string $line): bool
+    {
+        return 1 === preg_match('/[^ \t]/', $line);
     }
 
     private function getLastSignificantToken(Harvester $harvester): ?Token
@@ -470,56 +492,6 @@ final class Lexer
 
         $text = $this->consumeCodePoint($harvester);
         $harvester->stream->addToken(new Token(TokenType::UNRECOGNIZED, $text, $startLine, $startColumn));
-    }
-
-    private function advance(Harvester $harvester): void
-    {
-        if ($harvester->cursor->position >= $harvester->length) {
-            return;
-        }
-        if ("\n" === $harvester->input[$harvester->cursor->position]) {
-            ++$harvester->cursor->line;
-            $harvester->cursor->column = 1;
-            ++$harvester->cursor->position;
-
-            return;
-        }
-        $width = $this->utf8CodePointByteWidth($harvester, $harvester->cursor->position);
-        $harvester->cursor->position += $width;
-        ++$harvester->cursor->column;
-    }
-
-    /**
-     * UTF-8 byte length of the code point starting at $position, without validating continuation bytes.
-     * If the sequence is truncated or the leading byte is invalid, returns 1.
-     */
-    private function utf8CodePointByteWidth(Harvester $harvester, int $position): int
-    {
-        if ($position >= $harvester->length) {
-            return 0;
-        }
-        $byte = \ord($harvester->input[$position]);
-        if ($byte < 0x80) {
-            return 1;
-        }
-        if (0x80 === ($byte & 0xC0)) {
-            return 1;
-        }
-        $expected = 0;
-        if (0xC0 === ($byte & 0xE0)) {
-            $expected = 2;
-        } elseif (0xE0 === ($byte & 0xF0)) {
-            $expected = 3;
-        } elseif (0xF0 === ($byte & 0xF8)) {
-            $expected = 4;
-        } else {
-            return 1;
-        }
-        if ($harvester->length - $position < $expected) {
-            return 1;
-        }
-
-        return $expected;
     }
 
     private function codePointFragmentAt(Harvester $harvester, int $position): string
@@ -1243,11 +1215,6 @@ final class Lexer
         return $len - $lastNonEmptyContentEnd;
     }
 
-    private function blockScalarLineHasNonSpaceTabContent(string $line): bool
-    {
-        return 1 === preg_match('/[^ \t]/', $line);
-    }
-
     /**
      * @return array{start: int, len: int}|null
      */
@@ -1360,5 +1327,38 @@ final class Lexer
         }
 
         return $result;
+    }
+
+    /**
+     * UTF-8 byte length of the code point starting at $position, without validating continuation bytes.
+     * If the sequence is truncated or the leading byte is invalid, returns 1.
+     */
+    private function utf8CodePointByteWidth(Harvester $harvester, int $position): int
+    {
+        if ($position >= $harvester->length) {
+            return 0;
+        }
+        $byte = \ord($harvester->input[$position]);
+        if ($byte < 0x80) {
+            return 1;
+        }
+        if (0x80 === ($byte & 0xC0)) {
+            return 1;
+        }
+        $expected = 0;
+        if (0xC0 === ($byte & 0xE0)) {
+            $expected = 2;
+        } elseif (0xE0 === ($byte & 0xF0)) {
+            $expected = 3;
+        } elseif (0xF0 === ($byte & 0xF8)) {
+            $expected = 4;
+        } else {
+            return 1;
+        }
+        if ($harvester->length - $position < $expected) {
+            return 1;
+        }
+
+        return $expected;
     }
 }
