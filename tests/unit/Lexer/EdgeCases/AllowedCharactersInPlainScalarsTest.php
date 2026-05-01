@@ -120,6 +120,26 @@ final class AllowedCharactersInPlainScalarsTest extends LexerMappingTestCase
                 'type' => TokenType::NEWLINE,
                 'text' => "\n",
             ],
+            [
+                'type' => TokenType::PLAIN_SCALAR,
+                'text' => 'safe percentage',
+            ],
+            [
+                'type' => TokenType::VALUE_INDICATOR,
+                'text' => ':',
+            ],
+            [
+                'type' => TokenType::WHITESPACE,
+                'text' => ' ',
+            ],
+            [
+                'type' => TokenType::PLAIN_SCALAR,
+                'text' => '%foo',
+            ],
+            [
+                'type' => TokenType::NEWLINE,
+                'text' => "\n",
+            ],
         ], __DIR__.'/../../../fixture/edge_cases/allowed_characters_in_plain_scalars.yaml'];
     }
 }

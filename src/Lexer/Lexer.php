@@ -312,8 +312,8 @@ final class Lexer
             return;
         }
 
-        // DIRECTIVE (%... for other directives)
-        if ('%' === $char) {
+        // DIRECTIVE (%... directive line) — only at line start.
+        if ('%' === $char && 1 === $harvester->cursor->column) {
             $directive = $this->readUntilNewline($harvester);
             $harvester->stream->addToken(new Token(TokenType::DIRECTIVE, $directive, $startLine, $startColumn));
 
