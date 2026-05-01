@@ -11,10 +11,11 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace Aeliot\YamlToken\Test\Unit\Lexer;
+namespace Aeliot\YamlToken\Test\Unit\Lexer\Invalid;
 
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Lexer\Lexer;
+use Aeliot\YamlToken\Test\Unit\Lexer\LexerMappingTestCase;
 use Aeliot\YamlToken\Token\Token;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
