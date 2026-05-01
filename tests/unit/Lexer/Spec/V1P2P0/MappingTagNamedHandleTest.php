@@ -75,12 +75,8 @@ final class MappingTagNamedHandleTest extends LexerMappingTestCase
                 'text' => ' ',
             ],
             [
-                'type' => TokenType::TAG_HANDLE_NAMED,
-                'text' => '!foo!',
-            ],
-            [
-                'type' => TokenType::TAG_BODY,
-                'text' => 'custom',
+                'type' => TokenType::TAG,
+                'text' => '!foo!custom',
             ],
             [
                 'type' => TokenType::WHITESPACE,

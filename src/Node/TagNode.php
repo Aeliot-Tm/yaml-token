@@ -22,11 +22,6 @@ class TagNode extends AbstractNode implements TokenHolderInterface
     ) {
     }
 
-    public function getName(): string
-    {
-        return substr($this->token->text, 1);
-    }
-
     public function getToken(): Token
     {
         return $this->token;

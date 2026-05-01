@@ -41,12 +41,8 @@ final class MappingTagBuiltinTest extends LexerMappingTestCase
                 'text' => ' ',
             ],
             [
-                'type' => TokenType::TAG_HANDLE_SECONDARY,
-                'text' => '!!',
-            ],
-            [
-                'type' => TokenType::TAG_BODY,
-                'text' => 'str',
+                'type' => TokenType::TAG,
+                'text' => '!!str',
             ],
             [
                 'type' => TokenType::WHITESPACE,
@@ -74,12 +70,8 @@ final class MappingTagBuiltinTest extends LexerMappingTestCase
                 'text' => ' ',
             ],
             [
-                'type' => TokenType::TAG_HANDLE_SECONDARY,
-                'text' => '!!',
-            ],
-            [
-                'type' => TokenType::TAG_BODY,
-                'text' => 'int',
+                'type' => TokenType::TAG,
+                'text' => '!!int',
             ],
             [
                 'type' => TokenType::WHITESPACE,
@@ -107,12 +99,8 @@ final class MappingTagBuiltinTest extends LexerMappingTestCase
                 'text' => ' ',
             ],
             [
-                'type' => TokenType::TAG_HANDLE_SECONDARY,
-                'text' => '!!',
-            ],
-            [
-                'type' => TokenType::TAG_BODY,
-                'text' => 'float',
+                'type' => TokenType::TAG,
+                'text' => '!!float',
             ],
             [
                 'type' => TokenType::WHITESPACE,

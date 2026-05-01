@@ -41,12 +41,8 @@ final class MappingTagPrefixCaretTest extends LexerMappingTestCase
                 'text' => ' ',
             ],
             [
-                'type' => TokenType::TAG_HANDLE_PRIMARY,
-                'text' => '!',
-            ],
-            [
-                'type' => TokenType::TAG_BODY,
-                'text' => 'example.com,2000/^base',
+                'type' => TokenType::TAG,
+                'text' => '!example.com,2000/^base',
             ],
             [
                 'type' => TokenType::WHITESPACE,
@@ -74,12 +70,8 @@ final class MappingTagPrefixCaretTest extends LexerMappingTestCase
                 'text' => ' ',
             ],
             [
-                'type' => TokenType::TAG_HANDLE_PRIMARY,
-                'text' => '!',
-            ],
-            [
-                'type' => TokenType::TAG_BODY,
-                'text' => '^derived',
+                'type' => TokenType::TAG,
+                'text' => '!^derived',
             ],
             [
                 'type' => TokenType::WHITESPACE,

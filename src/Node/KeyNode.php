@@ -17,6 +17,16 @@ class KeyNode extends AbstractNode
 {
     private ?ExplicitKeyIndicatorNode $explicitKeyIndicatorNode = null;
     private ?Node $name = null;
+    private ?TagNode $tag = null;
+
+    public function addChild(Node $child): void
+    {
+        if ($child instanceof TagNode) {
+            $this->tag = $child;
+        }
+
+        parent::addChild($child);
+    }
 
     public function getExplicitKeyIndicatorNode(): ?ExplicitKeyIndicatorNode
     {
@@ -32,6 +42,11 @@ class KeyNode extends AbstractNode
     public function getName(): ?Node
     {
         return $this->name;
+    }
+
+    public function getTag(): ?TagNode
+    {
+        return $this->tag;
     }
 
     public function setName(Node $node): void

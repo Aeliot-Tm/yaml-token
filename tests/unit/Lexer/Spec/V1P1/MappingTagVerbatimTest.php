@@ -41,7 +41,7 @@ final class MappingTagVerbatimTest extends LexerMappingTestCase
                 'text' => ' ',
             ],
             [
-                'type' => TokenType::TAG_HANDLE_VERBATIM,
+                'type' => TokenType::TAG,
                 'text' => '!<tag:clarkevans.com,2002:invoice>',
             ],
             [

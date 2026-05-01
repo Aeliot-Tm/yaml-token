@@ -20,9 +20,7 @@ use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
-use Aeliot\YamlToken\Node\TagBodyNode;
 use Aeliot\YamlToken\Node\TagNode;
-use Aeliot\YamlToken\Node\TagPropertyNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
 use Aeliot\YamlToken\Parser\Parser;
@@ -36,9 +34,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(Lexer::class)]
 #[UsesClass(ScalarNode::class)]
 #[UsesClass(StreamNode::class)]
-#[UsesClass(TagBodyNode::class)]
 #[UsesClass(TagNode::class)]
-#[UsesClass(TagPropertyNode::class)]
 #[UsesClass(ValueNode::class)]
 final class ValueTagPropertyTest extends TestCase
 {
@@ -50,10 +46,9 @@ YAML));
 
         $value = $couple->getValue();
         self::assertNotNull($value);
-        $tag = $value->getTagProperty();
-        self::assertInstanceOf(TagPropertyNode::class, $tag);
-        self::assertTrue($tag->isNonSpecific());
-        self::assertNull($tag->getBodyNode());
+        $tag = $value->getTag();
+        self::assertInstanceOf(TagNode::class, $tag);
+        self::assertSame('!', $tag->getToken()->text);
     }
 
     public function testBindsPrimaryTagToMappingValue(): void
@@ -64,14 +59,10 @@ YAML));
 
         $value = $couple->getValue();
         self::assertNotNull($value);
-        $tag = $value->getTagProperty();
-        self::assertInstanceOf(TagPropertyNode::class, $tag);
-
-        $handle = $tag->getHandle();
-        self::assertInstanceOf(TagNode::class, $handle);
-        self::assertSame(TokenType::TAG_HANDLE_PRIMARY, $handle->getToken()->type);
-        self::assertSame('local', $tag->getBody());
-        self::assertFalse($tag->isNonSpecific());
+        $tag = $value->getTag();
+        self::assertInstanceOf(TagNode::class, $tag);
+        self::assertSame(TokenType::TAG, $tag->getToken()->type);
+        self::assertSame('!local', $tag->getToken()->text);
     }
 
     public function testBindsSecondaryTagToMappingValue(): void
@@ -82,14 +73,10 @@ YAML));
 
         $value = $couple->getValue();
         self::assertNotNull($value);
-        $tag = $value->getTagProperty();
-        self::assertInstanceOf(TagPropertyNode::class, $tag);
-
-        $handle = $tag->getHandle();
-        self::assertInstanceOf(TagNode::class, $handle);
-        self::assertSame(TokenType::TAG_HANDLE_SECONDARY, $handle->getToken()->type);
-        self::assertSame('str', $tag->getBody());
-        self::assertFalse($tag->isNonSpecific());
+        $tag = $value->getTag();
+        self::assertInstanceOf(TagNode::class, $tag);
+        self::assertSame(TokenType::TAG, $tag->getToken()->type);
+        self::assertSame('!!str', $tag->getToken()->text);
 
         $scalar = $value->getScalar();
         self::assertInstanceOf(ScalarNode::class, $scalar);
@@ -121,20 +108,16 @@ YAML));
 
         $value = $couple->getValue();
         self::assertNotNull($value);
-        $tag = $value->getTagProperty();
-        self::assertInstanceOf(TagPropertyNode::class, $tag);
-
-        $handle = $tag->getHandle();
-        self::assertInstanceOf(TagNode::class, $handle);
-        self::assertSame(TokenType::TAG_HANDLE_VERBATIM, $handle->getToken()->type);
-        self::assertNull($tag->getBodyNode());
-        self::assertFalse($tag->isNonSpecific());
+        $tag = $value->getTag();
+        self::assertInstanceOf(TagNode::class, $tag);
+        self::assertSame(TokenType::TAG, $tag->getToken()->type);
+        self::assertSame('!<tag:yaml.org,2002:str>', $tag->getToken()->text);
     }
 
     public function testThrowsWhenTwoTagsAreSpecifiedForSameValue(): void
     {
         $this->expectException(UnexpectedStateException::class);
-        $this->expectExceptionMessageMatches('/^Only one tag property is supported per value node/');
+        $this->expectExceptionMessageMatches('/^Only one tag is supported per value node/');
 
         (new Parser())->parse(<<<'YAML'
 key: !!str !local value

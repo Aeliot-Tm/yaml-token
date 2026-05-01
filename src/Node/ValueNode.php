@@ -23,7 +23,7 @@ class ValueNode extends AbstractNode
     private ?FlowSequenceNode $flowSequence = null;
     private ?MultilinePlainScalarNode $multilinePlainScalar = null;
     private ?ScalarNode $scalar = null;
-    private ?TagPropertyNode $tagProperty = null;
+    private ?TagNode $tag = null;
 
     public function addChild(Node $child): void
     {
@@ -64,8 +64,8 @@ class ValueNode extends AbstractNode
             }
         }
 
-        if ($child instanceof TagPropertyNode) {
-            $this->tagProperty = $child;
+        if ($child instanceof TagNode) {
+            $this->tag = $child;
         }
 
         parent::addChild($child);
@@ -111,9 +111,9 @@ class ValueNode extends AbstractNode
         return $this->scalar;
     }
 
-    public function getTagProperty(): ?TagPropertyNode
+    public function getTag(): ?TagNode
     {
-        return $this->tagProperty;
+        return $this->tag;
     }
 
     public function isEmpty(): bool

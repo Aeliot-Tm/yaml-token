@@ -41,12 +41,8 @@ final class MappingTagLocalTest extends LexerMappingTestCase
                 'text' => ' ',
             ],
             [
-                'type' => TokenType::TAG_HANDLE_PRIMARY,
-                'text' => '!',
-            ],
-            [
-                'type' => TokenType::TAG_BODY,
-                'text' => 'custom',
+                'type' => TokenType::TAG,
+                'text' => '!custom',
             ],
             [
                 'type' => TokenType::WHITESPACE,

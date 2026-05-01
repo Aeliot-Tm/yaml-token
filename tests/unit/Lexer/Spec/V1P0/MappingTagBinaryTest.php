@@ -41,12 +41,8 @@ final class MappingTagBinaryTest extends LexerMappingTestCase
                 'text' => ' ',
             ],
             [
-                'type' => TokenType::TAG_HANDLE_PRIMARY,
-                'text' => '!',
-            ],
-            [
-                'type' => TokenType::TAG_BODY,
-                'text' => 'binary',
+                'type' => TokenType::TAG,
+                'text' => '!binary',
             ],
             [
                 'type' => TokenType::WHITESPACE,

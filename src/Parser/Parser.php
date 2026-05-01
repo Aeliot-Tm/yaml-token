@@ -41,12 +41,10 @@ use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\SequenceEntryNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\SyntaxTokenNode;
-use Aeliot\YamlToken\Node\TagBodyNode;
 use Aeliot\YamlToken\Node\TagDirectiveHandleNode;
 use Aeliot\YamlToken\Node\TagDirectiveNode;
 use Aeliot\YamlToken\Node\TagDirectivePrefixNode;
 use Aeliot\YamlToken\Node\TagNode;
-use Aeliot\YamlToken\Node\TagPropertyNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 use Aeliot\YamlToken\Node\YamlDirectiveNode;
@@ -120,7 +118,7 @@ final class Parser
 
     private function collectKeyProperties(Harvester $harvester, KeyNode $keyNode): void
     {
-        $tagProperty = null;
+        $tag = null;
 
         while (!$harvester->tokens->isEnd()) {
             $token = $harvester->tokens->current();
@@ -136,32 +134,13 @@ final class Parser
                 continue;
             }
 
-            if (TokenType::TAG_BODY === $token->type) {
-                throw new UnexpectedTokenException($this->appendTokenLocation('Tag body without tag handle', $token));
-            }
-
             if ($this->isNodePropertyToken($token)) {
-                if (null !== $tagProperty) {
-                    throw new UnexpectedStateException($this->appendTokenLocation('Only one tag property is supported per key node', $token));
+                if (null !== $tag) {
+                    throw new UnexpectedStateException($this->appendTokenLocation('Only one tag is supported per key node', $token));
                 }
 
-                $tagProperty = new TagPropertyNode();
-                $tagProperty->addChild(new TagNode($token));
-                $keyNode->addChild($tagProperty);
-                $harvester->tokens->advance();
-
-                if (\in_array($token->type, [TokenType::TAG_HANDLE_VERBATIM, TokenType::TAG_NON_SPECIFIC], true)) {
-                    continue;
-                }
-
-                $this->collectTypes($harvester, [TokenType::WHITESPACE], $keyNode);
-
-                $body = $harvester->tokens->current();
-                if (TokenType::TAG_BODY !== $body?->type) {
-                    throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Tag body expected, but %s given', $body?->type->value ?? '_nothing_'), $harvester->tokens));
-                }
-
-                $tagProperty->addChild(new TagBodyNode($body));
+                $tag = new TagNode($token);
+                $keyNode->addChild($tag);
                 $harvester->tokens->advance();
                 continue;
             }
@@ -249,7 +228,7 @@ final class Parser
 
     private function collectValueProperties(Harvester $harvester, ValueNode $valueNode): void
     {
-        $tagProperty = null;
+        $tag = null;
 
         while (!$harvester->tokens->isEnd()) {
             $token = $harvester->tokens->current();
@@ -265,38 +244,13 @@ final class Parser
                 continue;
             }
 
-            if (TokenType::TAG_BODY === $token->type) {
-                throw new UnexpectedTokenException($this->appendTokenLocation('Tag body without tag handle', $token));
-            }
-
-            if (\in_array($token->type, [
-                TokenType::TAG_HANDLE_NAMED,
-                TokenType::TAG_HANDLE_PRIMARY,
-                TokenType::TAG_HANDLE_SECONDARY,
-                TokenType::TAG_HANDLE_VERBATIM,
-                TokenType::TAG_NON_SPECIFIC,
-            ], true)) {
-                if (null !== $tagProperty) {
-                    throw new UnexpectedStateException($this->appendTokenLocation('Only one tag property is supported per value node', $token));
+            if (TokenType::TAG === $token->type) {
+                if (null !== $tag) {
+                    throw new UnexpectedStateException($this->appendTokenLocation('Only one tag is supported per value node', $token));
                 }
 
-                $tagProperty = new TagPropertyNode();
-                $tagProperty->addChild(new TagNode($token));
-                $valueNode->addChild($tagProperty);
-                $harvester->tokens->advance();
-
-                if (\in_array($token->type, [TokenType::TAG_HANDLE_VERBATIM, TokenType::TAG_NON_SPECIFIC], true)) {
-                    continue;
-                }
-
-                $this->collectTypes($harvester, [TokenType::WHITESPACE], $valueNode);
-
-                $body = $harvester->tokens->current();
-                if (TokenType::TAG_BODY !== $body?->type) {
-                    throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Tag body expected, but %s given', $body?->type->value ?? '_nothing_'), $harvester->tokens));
-                }
-
-                $tagProperty->addChild(new TagBodyNode($body));
+                $tag = new TagNode($token);
+                $valueNode->addChild($tag);
                 $harvester->tokens->advance();
                 continue;
             }
@@ -347,11 +301,7 @@ final class Parser
             TokenType::LITERAL_BLOCK_SCALAR_INDICATOR => new BlockScalarIndicatorNode($token),
             TokenType::INDENTATION => new IndentationNode($token),
             TokenType::NEWLINE => new NewLineNode($token),
-            TokenType::TAG_BODY => new TagBodyNode($token),
-            TokenType::TAG_HANDLE_NAMED,
-            TokenType::TAG_HANDLE_PRIMARY,
-            TokenType::TAG_HANDLE_SECONDARY,
-            TokenType::TAG_HANDLE_VERBATIM => new TagNode($token),
+            TokenType::TAG => new TagNode($token),
             TokenType::SEQUENCE_ENTRY,
             TokenType::VALUE_INDICATOR => new SyntaxTokenNode($token),
             TokenType::WHITESPACE => new WhitespaceNode($token),
@@ -593,28 +543,11 @@ final class Parser
                 continue;
             }
 
-            if (TokenType::TAG_BODY === $token->type) {
-                return false;
-            }
-
             if ($this->isNodePropertyToken($token)) {
                 if ($seenTag) {
                     return false;
                 }
                 $seenTag = true;
-                ++$i;
-
-                if (\in_array($token->type, [TokenType::TAG_HANDLE_VERBATIM, TokenType::TAG_NON_SPECIFIC], true)) {
-                    continue;
-                }
-
-                while (TokenType::WHITESPACE === $harvester->tokens->peek($i)?->type) {
-                    ++$i;
-                }
-
-                if (TokenType::TAG_BODY !== $harvester->tokens->peek($i)?->type) {
-                    return false;
-                }
                 ++$i;
                 continue;
             }
@@ -644,13 +577,9 @@ final class Parser
         }
 
         return null !== $token && \in_array($token->type, [
-                TokenType::ANCHOR,
-                TokenType::TAG_HANDLE_NAMED,
-                TokenType::TAG_HANDLE_PRIMARY,
-                TokenType::TAG_HANDLE_SECONDARY,
-                TokenType::TAG_HANDLE_VERBATIM,
-                TokenType::TAG_NON_SPECIFIC,
-            ], true);
+            TokenType::ANCHOR,
+            TokenType::TAG,
+        ], true);
     }
 
     private function isBlockScalarStartAtDocumentRoot(Harvester $harvester): bool
@@ -674,11 +603,7 @@ final class Parser
 
         return \in_array($token->type, [
             TokenType::ANCHOR,
-            TokenType::TAG_HANDLE_NAMED,
-            TokenType::TAG_HANDLE_PRIMARY,
-            TokenType::TAG_HANDLE_SECONDARY,
-            TokenType::TAG_HANDLE_VERBATIM,
-            TokenType::TAG_NON_SPECIFIC,
+            TokenType::TAG,
         ], true);
     }
 

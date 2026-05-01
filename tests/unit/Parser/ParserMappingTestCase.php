@@ -117,6 +117,7 @@ abstract class ParserMappingTestCase extends TestCase
             return [
                 'explicitKeyIndicatorNode' => $node->getExplicitKeyIndicatorNode(),
                 'name' => $node->getName(),
+                'tag' => $node->getTag(),
             ];
         }
 
@@ -136,7 +137,7 @@ abstract class ParserMappingTestCase extends TestCase
                 'flowSequence' => $node->getFlowSequence(),
                 'multilinePlainScalar' => $node->getMultilinePlainScalar(),
                 'scalar' => $node->getScalar(),
-                'tagProperty' => $node->getTagProperty(),
+                'tag' => $node->getTag(),
             ];
         }
 

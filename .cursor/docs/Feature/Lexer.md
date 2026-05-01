@@ -84,12 +84,8 @@ The rules below describe the practical behavior relied upon by lexer unit tests.
     `<` / `<<`… is tokenized as `PLAIN_SCALAR`
 - **Anchors, aliases, tags**:
   - `&name` → `ANCHOR`, `*name` → `ALIAS`
-  - Explicit tag property at a node (not `%TAG` directive lines):
-    - Shorthand primary `!suffix` → `TAG_HANDLE_PRIMARY` (`!`), `TAG_BODY` (suffix)
-    - Shorthand secondary `!!suffix` → `TAG_HANDLE_SECONDARY` (`!!`), `TAG_BODY` (suffix)
-    - Shorthand named `!name!suffix` → `TAG_HANDLE_NAMED` (`!name!`), `TAG_BODY` (suffix)
-    - Non-specific explicit tag `!` alone → `TAG_NON_SPECIFIC` (`!`)
-    - Verbatim `!<...>` → `TAG_HANDLE_VERBATIM` (full `!<...>` including brackets)
+  - Explicit tag property at a node (not `%TAG` directive lines): one `TAG` token with the full lexeme
+    (`!`, `!suffix`, `!!suffix`, `!name!suffix`, or `!<...>` including brackets)
   - Tag suffix / shorthand continues until a forbidden delimiter: whitespace, `[]{} , : #` or `\0`
   - exception (YAML 1.0-style global tag shorthand): a comma followed by four ASCII digits (`!,NNNN`)
     is part of the tag (registration year after the domain), not a flow `,` token

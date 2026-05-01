@@ -39,9 +39,8 @@ Because of this, the parser must not invent tokens that did not exist in the ori
 - Value node properties:
   - `ValueNode` may start with node properties (metadata) before its content.
   - Anchor is stored as [`AnchorNode`](../../../src/Node/AnchorNode.php).
-  - Tag property is bound to the value as [`TagPropertyNode`](../../../src/Node/TagPropertyNode.php)
-    built from tag tokens (`TagNode` + optional `TagBodyNode`, or `TAG_NON_SPECIFIC`).
-  - Current scope: tag binding is implemented for values only (mapping keys are not supported yet).
+  - Explicit tag is stored as [`TagNode`](../../../src/Node/TagNode.php) for the `TAG` token (full tag lexeme),
+    exposed via `ValueNode::getTag()` and `KeyNode::getTag()` when a tag appears in node properties.
   - Block-context plain scalars may span multiple lines. In that case the value contains
     multiple `ScalarNode` fragments (one per `PLAIN_SCALAR` token). `ValueNode` groups these fragments
     into a single [`MultilinePlainScalarNode`](../../../src/Node/MultilinePlainScalarNode.php) 

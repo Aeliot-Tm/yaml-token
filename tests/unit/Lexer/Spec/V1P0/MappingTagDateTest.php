@@ -41,12 +41,8 @@ final class MappingTagDateTest extends LexerMappingTestCase
                 'text' => ' ',
             ],
             [
-                'type' => TokenType::TAG_HANDLE_PRIMARY,
-                'text' => '!',
-            ],
-            [
-                'type' => TokenType::TAG_BODY,
-                'text' => 'example.com,2000/timesheet',
+                'type' => TokenType::TAG,
+                'text' => '!example.com,2000/timesheet',
             ],
             [
                 'type' => TokenType::WHITESPACE,
@@ -74,12 +70,8 @@ final class MappingTagDateTest extends LexerMappingTestCase
                 'text' => ' ',
             ],
             [
-                'type' => TokenType::TAG_HANDLE_PRIMARY,
-                'text' => '!',
-            ],
-            [
-                'type' => TokenType::TAG_BODY,
-                'text' => 'example.com,2000-01/timesheet',
+                'type' => TokenType::TAG,
+                'text' => '!example.com,2000-01/timesheet',
             ],
             [
                 'type' => TokenType::WHITESPACE,
@@ -107,12 +99,8 @@ final class MappingTagDateTest extends LexerMappingTestCase
                 'text' => ' ',
             ],
             [
-                'type' => TokenType::TAG_HANDLE_PRIMARY,
-                'text' => '!',
-            ],
-            [
-                'type' => TokenType::TAG_BODY,
-                'text' => 'example.com,2000-01-01/timesheet',
+                'type' => TokenType::TAG,
+                'text' => '!example.com,2000-01-01/timesheet',
             ],
             [
                 'type' => TokenType::WHITESPACE,
