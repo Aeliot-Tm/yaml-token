@@ -103,32 +103,26 @@ abstract class ParserMappingTestCase extends TestCase
      */
     private function getExplicitNodeProperties(Node $node): array
     {
-        if ($node instanceof KeyValueCoupleNode) {
-            return [
+        return match (true) {
+            $node instanceof FlowSequenceNode => [
+                'entries' => $node->getEntries(),
+            ],
+            $node instanceof KeyValueCoupleNode => [
                 'indentation' => $node->getIndentation(),
                 'key' => $node->getKey(),
                 'mergeInstruction' => $node->getMergeInstruction(),
                 'mappingValueIndicator' => $node->getMappingValueIndicator(),
                 'value' => $node->getValue(),
-            ];
-        }
-
-        if ($node instanceof KeyNode) {
-            return [
+            ],
+            $node instanceof KeyNode => [
                 'explicitKeyIndicatorNode' => $node->getExplicitKeyIndicatorNode(),
                 'name' => $node->getName(),
                 'tag' => $node->getTag(),
-            ];
-        }
-
-        if ($node instanceof SequenceEntryNode) {
-            return [
+            ],
+            $node instanceof SequenceEntryNode => [
                 'value' => $node->getValue(),
-            ];
-        }
-
-        if ($node instanceof ValueNode) {
-            return [
+            ],
+            $node instanceof ValueNode => [
                 'alias' => $node->getAlias(),
                 'anchor' => $node->getAnchor(),
                 'blockMapping' => $node->getBlockMapping(),
@@ -138,16 +132,9 @@ abstract class ParserMappingTestCase extends TestCase
                 'multilinePlainScalar' => $node->getMultilinePlainScalar(),
                 'scalar' => $node->getScalar(),
                 'tag' => $node->getTag(),
-            ];
-        }
-
-        if ($node instanceof FlowSequenceNode) {
-            return [
-                'entries' => $node->getEntries(),
-            ];
-        }
-
-        return [];
+            ],
+            default => [],
+        };
     }
 
     /**
@@ -169,10 +156,10 @@ abstract class ParserMappingTestCase extends TestCase
         }
 
         $name = $couple->getKey()->getName();
-        if (!$name instanceof ScalarNode) {
-            return null;
+        if ($name instanceof ScalarNode) {
+            return $name->getToken()->text;
         }
 
-        return $name->getToken()->text;
+        return null;
     }
 }
