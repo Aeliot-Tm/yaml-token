@@ -24,6 +24,7 @@
     },
     "autoload-dev": {
         "psr-4": {
+            "Aeliot\\YamlToken\\TestHelper\\": "tests/helper/",
             "Aeliot\\YamlToken\\Test\\Unit\\": "tests/unit/"
         }
     },
@@ -53,6 +54,7 @@
         "cs-fixer-baseline": "XDEBUG_MODE=off tools/pcsf-baseline.phar -b .infra/scripts/php-cs-fixer/baseline.json -c .infra/scripts/php-cs-fixer/config.php -f .infra/scripts/php-cs-fixer/finder.php",
         "cs-fixer-check": "@cs-fixer-fix --dry-run",
         "cs-fixer-fix": "XDEBUG_MODE=off tools/php-cs-fixer.phar fix -vv --config=.infra/scripts/php-cs-fixer/config.php",
+        "parser-expectations": "php bin/dev/generate-parser-expectations.php",
         "phive-install": "phive install --trust-gpg-keys $(cat .phive/trust-gpg-keys.txt)",
         "phpstan": [
             "@phpstan-clear",

@@ -26,6 +26,15 @@ tests/fixture/
 └── spec_extra/         # spec-derived, yamllint rejects
 ```
 
+Bulk parser mapping tests store the expected AST shape next to the same relative
+paths under `tests/parser_expectations/` (each `.yaml` has a sibling `.php`
+snapshot). The generator loads `tests/bootstrap.php` (same as PHPUnit, including
+`BypassFinals`) so snapshots match the test runtime. These files are excluded
+from PHP CS Fixer; do not hand-format them. Regenerate after intentional parser
+or fixture changes:
+
+`docker compose exec php-cli php bin/dev/generate-parser-expectations.php`
+
 ## Buckets
 
 ### `tests/fixture/spec/`

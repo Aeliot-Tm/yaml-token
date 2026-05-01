@@ -21,6 +21,10 @@ Because of this, the parser must not invent tokens that did not exist in the ori
 
 ## Technical details
 
+- Fixture regression: [`FixtureParserMappingTest`](../../../tests/unit/Parser/FixtureParserMappingTest.php)
+  asserts the parse tree shape (via [`NodeTreeRepresenter`](../../../tests/helper/NodeTreeRepresenter.php))
+  against files under `tests/parser_expectations/`. Regenerate snapshots with `composer parser-expectations`
+  after intentional parser or YAML fixture changes (run inside the `php-cli` container when using Docker).
 - Entry points: [`Parser::parse`](../../../src/Parser/Parser.php) (lexes input),
   [`Parser::parseStream`](../../../src/Parser/Parser.php) for an existing `TokenStream`.
 - `%YAML` directive: built as [`YamlDirectiveNode`](../../../src/Node/YamlDirectiveNode.php)
