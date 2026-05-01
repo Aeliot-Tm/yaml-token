@@ -488,6 +488,90 @@ final class Lexer
         return $result;
     }
 
+    private function resetBlockMappingPlainState(Cursor $cursor): void
+    {
+        $cursor->blockMappingKeyIndent = null;
+        $cursor->awaitingBlockPlainContinuation = false;
+        $cursor->suppressExplicitTagForBang = false;
+    }
+
+    private function readBlockScalarBody(Harvester $harvester): string
+    {
+        $result = '';
+        $minIndent = null;
+
+        while ($harvester->cursor->position < $harvester->length) {
+            if (\in_array($harvester->input[$harvester->cursor->position], self::CHARS_LINE_BREAK, true)) {
+                $result .= $this->consumeCodePoint($harvester);
+                if ($harvester->cursor->position > 0 && "\r" === $harvester->input[$harvester->cursor->position - 1] && $harvester->cursor->position < $harvester->length && "\n" === $harvester->input[$harvester->cursor->position]) {
+                    $result .= $this->consumeCodePoint($harvester);
+                }
+
+                continue;
+            }
+
+            $indentStart = $harvester->cursor->position;
+            $lineIndent = 0;
+            // YAML structural indent is space-only; tabs are still copied into the body but do not add to lineIndent.
+            while ($harvester->cursor->position < $harvester->length && \in_array($harvester->input[$harvester->cursor->position], self::CHARS_HORIZONTAL_WHITESPACE, true)) {
+                if (' ' === $harvester->input[$harvester->cursor->position]) {
+                    ++$lineIndent;
+                }
+                $result .= $this->consumeCodePoint($harvester);
+            }
+
+            if ($harvester->cursor->position >= $harvester->length || \in_array($harvester->input[$harvester->cursor->position], self::CHARS_LINE_BREAK, true)) {
+                continue;
+            }
+
+            if (null === $minIndent) {
+                $minIndent = $lineIndent;
+            }
+            if ($lineIndent < $minIndent && '' !== $result && "\n" === substr($result, -1)) {
+                $backtrack = $harvester->cursor->position - $indentStart;
+                if ($backtrack > 0) {
+                    $result = substr($result, 0, -$backtrack);
+                    $harvester->cursor->position = $indentStart;
+                    $harvester->cursor->column = max(1, $harvester->cursor->column - $backtrack);
+                }
+                break;
+            }
+
+            while ($harvester->cursor->position < $harvester->length && !\in_array($harvester->input[$harvester->cursor->position], self::CHARS_LINE_BREAK, true)) {
+                $result .= $this->consumeCodePoint($harvester);
+            }
+        }
+
+        return $result;
+    }
+
+    private function readBlockScalarBodyAndApplyChomping(Harvester $harvester): string
+    {
+        $chomping = $harvester->cursor->blockScalarChomping ?? BlockScalarChomping::Clip;
+        $text = $this->readBlockScalarBody($harvester);
+
+        if (BlockScalarChomping::Strip === $chomping) {
+            $suffixLen = $this->computeBlockScalarStripSuffixLength($text);
+            if ($suffixLen > 0) {
+                $text = substr($text, 0, -$suffixLen);
+                $harvester->cursor->position -= $suffixLen;
+                $this->syncCursorLineColumnFromPrefix($harvester);
+            }
+        }
+
+        $harvester->cursor->blockScalarChomping = null;
+
+        return $text;
+    }
+
+    private function readBlockScalarBodyToken(Harvester $harvester): void
+    {
+        $type = $harvester->cursor->pendingBlockScalarBody;
+        $harvester->cursor->pendingBlockScalarBody = null;
+        $text = $this->readBlockScalarBodyAndApplyChomping($harvester);
+        $harvester->stream->addToken(new Token($type, $text, $harvester->cursor->line, $harvester->cursor->column));
+    }
+
     private function readIndentation(Harvester $harvester): string
     {
         $result = '';
@@ -1243,90 +1327,6 @@ final class Lexer
         }
 
         return $result;
-    }
-
-    private function readBlockScalarBody(Harvester $harvester): string
-    {
-        $result = '';
-        $minIndent = null;
-
-        while ($harvester->cursor->position < $harvester->length) {
-            if (\in_array($harvester->input[$harvester->cursor->position], self::CHARS_LINE_BREAK, true)) {
-                $result .= $this->consumeCodePoint($harvester);
-                if ($harvester->cursor->position > 0 && "\r" === $harvester->input[$harvester->cursor->position - 1] && $harvester->cursor->position < $harvester->length && "\n" === $harvester->input[$harvester->cursor->position]) {
-                    $result .= $this->consumeCodePoint($harvester);
-                }
-
-                continue;
-            }
-
-            $indentStart = $harvester->cursor->position;
-            $lineIndent = 0;
-            // YAML structural indent is space-only; tabs are still copied into the body but do not add to lineIndent.
-            while ($harvester->cursor->position < $harvester->length && \in_array($harvester->input[$harvester->cursor->position], self::CHARS_HORIZONTAL_WHITESPACE, true)) {
-                if (' ' === $harvester->input[$harvester->cursor->position]) {
-                    ++$lineIndent;
-                }
-                $result .= $this->consumeCodePoint($harvester);
-            }
-
-            if ($harvester->cursor->position >= $harvester->length || \in_array($harvester->input[$harvester->cursor->position], self::CHARS_LINE_BREAK, true)) {
-                continue;
-            }
-
-            if (null === $minIndent) {
-                $minIndent = $lineIndent;
-            }
-            if ($lineIndent < $minIndent && '' !== $result && "\n" === substr($result, -1)) {
-                $backtrack = $harvester->cursor->position - $indentStart;
-                if ($backtrack > 0) {
-                    $result = substr($result, 0, -$backtrack);
-                    $harvester->cursor->position = $indentStart;
-                    $harvester->cursor->column = max(1, $harvester->cursor->column - $backtrack);
-                }
-                break;
-            }
-
-            while ($harvester->cursor->position < $harvester->length && !\in_array($harvester->input[$harvester->cursor->position], self::CHARS_LINE_BREAK, true)) {
-                $result .= $this->consumeCodePoint($harvester);
-            }
-        }
-
-        return $result;
-    }
-
-    private function readBlockScalarBodyToken(Harvester $harvester): void
-    {
-        $type = $harvester->cursor->pendingBlockScalarBody;
-        $harvester->cursor->pendingBlockScalarBody = null;
-        $text = $this->readBlockScalarBodyAndApplyChomping($harvester);
-        $harvester->stream->addToken(new Token($type, $text, $harvester->cursor->line, $harvester->cursor->column));
-    }
-
-    private function readBlockScalarBodyAndApplyChomping(Harvester $harvester): string
-    {
-        $chomping = $harvester->cursor->blockScalarChomping ?? BlockScalarChomping::Clip;
-        $text = $this->readBlockScalarBody($harvester);
-
-        if (BlockScalarChomping::Strip === $chomping) {
-            $suffixLen = $this->computeBlockScalarStripSuffixLength($text);
-            if ($suffixLen > 0) {
-                $text = substr($text, 0, -$suffixLen);
-                $harvester->cursor->position -= $suffixLen;
-                $this->syncCursorLineColumnFromPrefix($harvester);
-            }
-        }
-
-        $harvester->cursor->blockScalarChomping = null;
-
-        return $text;
-    }
-
-    private function resetBlockMappingPlainState(Cursor $cursor): void
-    {
-        $cursor->blockMappingKeyIndent = null;
-        $cursor->awaitingBlockPlainContinuation = false;
-        $cursor->suppressExplicitTagForBang = false;
     }
 
     /**
