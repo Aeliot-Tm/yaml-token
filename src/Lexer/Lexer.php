@@ -159,6 +159,66 @@ final class Lexer
         return 1 === preg_match('/[^ \t]/', $line);
     }
 
+    private function codePointFragmentAt(Harvester $harvester, int $position): string
+    {
+        if ($position >= $harvester->length) {
+            return '';
+        }
+        if ("\n" === $harvester->input[$position]) {
+            return "\n";
+        }
+        $width = $this->utf8CodePointByteWidth($harvester, $position);
+
+        return substr($harvester->input, $position, $width);
+    }
+
+    /**
+     * Strip chomping (YAML 1.0 / 1.2): exclude the final line break after the last non-empty line and any
+     * trailing empty lines. Bytes from the first such line break onward are detached and re-tokenized
+     * (e.g. {@see TokenType::NEWLINE}, {@see TokenType::INDENTATION}).
+     */
+    private function computeBlockScalarStripSuffixLength(string $result): int
+    {
+        if ('' === $result) {
+            return 0;
+        }
+
+        $len = \strlen($result);
+        $offset = 0;
+        $lastNonEmptyContentEnd = null;
+
+        while ($offset < $len) {
+            $nl = $this->findNextLineBreakInString($result, $offset, $len);
+            if (null === $nl) {
+                $lineContent = substr($result, $offset);
+                if ($this->blockScalarLineHasNonSpaceTabContent($lineContent)) {
+                    $lastNonEmptyContentEnd = $len;
+                }
+                break;
+            }
+
+            $lineContent = substr($result, $offset, $nl['start'] - $offset);
+            if ($this->blockScalarLineHasNonSpaceTabContent($lineContent)) {
+                $lastNonEmptyContentEnd = $nl['start'];
+            }
+            $offset = $nl['start'] + $nl['len'];
+        }
+
+        if (null === $lastNonEmptyContentEnd) {
+            return 0;
+        }
+
+        return $len - $lastNonEmptyContentEnd;
+    }
+
+    private function consumeCodePoint(Harvester $harvester): string
+    {
+        $fragment = $this->codePointFragmentAt($harvester, $harvester->cursor->position);
+        $this->advance($harvester);
+
+        return $fragment;
+    }
+
     private function getLastSignificantToken(Harvester $harvester): ?Token
     {
         $tokens = $harvester->stream->getTokens();
@@ -492,27 +552,6 @@ final class Lexer
 
         $text = $this->consumeCodePoint($harvester);
         $harvester->stream->addToken(new Token(TokenType::UNRECOGNIZED, $text, $startLine, $startColumn));
-    }
-
-    private function codePointFragmentAt(Harvester $harvester, int $position): string
-    {
-        if ($position >= $harvester->length) {
-            return '';
-        }
-        if ("\n" === $harvester->input[$position]) {
-            return "\n";
-        }
-        $width = $this->utf8CodePointByteWidth($harvester, $position);
-
-        return substr($harvester->input, $position, $width);
-    }
-
-    private function consumeCodePoint(Harvester $harvester): string
-    {
-        $fragment = $this->codePointFragmentAt($harvester, $harvester->cursor->position);
-        $this->advance($harvester);
-
-        return $fragment;
     }
 
     private function match(Harvester $harvester, string $str): bool
@@ -1174,45 +1213,6 @@ final class Lexer
             $harvester->stream->addToken(new Token(TokenType::NEWLINE, substr($body, $nl['start'], $nl['len']), 1, 1));
             $offset = $nl['start'] + $nl['len'];
         }
-    }
-
-    /**
-     * Strip chomping (YAML 1.0 / 1.2): exclude the final line break after the last non-empty line and any
-     * trailing empty lines. Bytes from the first such line break onward are detached and re-tokenized
-     * (e.g. {@see TokenType::NEWLINE}, {@see TokenType::INDENTATION}).
-     */
-    private function computeBlockScalarStripSuffixLength(string $result): int
-    {
-        if ('' === $result) {
-            return 0;
-        }
-
-        $len = \strlen($result);
-        $offset = 0;
-        $lastNonEmptyContentEnd = null;
-
-        while ($offset < $len) {
-            $nl = $this->findNextLineBreakInString($result, $offset, $len);
-            if (null === $nl) {
-                $lineContent = substr($result, $offset);
-                if ($this->blockScalarLineHasNonSpaceTabContent($lineContent)) {
-                    $lastNonEmptyContentEnd = $len;
-                }
-                break;
-            }
-
-            $lineContent = substr($result, $offset, $nl['start'] - $offset);
-            if ($this->blockScalarLineHasNonSpaceTabContent($lineContent)) {
-                $lastNonEmptyContentEnd = $nl['start'];
-            }
-            $offset = $nl['start'] + $nl['len'];
-        }
-
-        if (null === $lastNonEmptyContentEnd) {
-            return 0;
-        }
-
-        return $len - $lastNonEmptyContentEnd;
     }
 
     /**
