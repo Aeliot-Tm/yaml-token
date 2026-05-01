@@ -205,7 +205,10 @@ YAML);
 
     private function getKeyText(KeyValueCoupleNode $couple): string
     {
-        return (string) $couple->getKey()->getName()?->getToken()->text;
+        $name = $couple->getKey()->getName();
+        self::assertInstanceOf(ScalarNode::class, $name);
+
+        return (string) $name->getToken()->text;
     }
 
     /**

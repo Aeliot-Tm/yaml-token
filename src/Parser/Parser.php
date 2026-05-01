@@ -386,7 +386,7 @@ final class Parser
         return true;
     }
 
-    private function getKeyNode(Harvester $harvester, bool $allowEmptyImplicitKey): KeyNode
+    private function getKeyNode(Harvester $harvester, bool $allowEmptyImplicitKey, ?int $entryIndentLen = null): KeyNode
     {
         $keyNode = new KeyNode();
         $this->collectKeyProperties($harvester, $keyNode);
@@ -410,6 +410,40 @@ final class Parser
             $token = $harvester->tokens->current();
         }
 
+        if (
+            null !== $keyNode->getExplicitKeyIndicatorNode()
+            && null !== $entryIndentLen
+            && TokenType::NEWLINE === $token->type
+        ) {
+            $head = $this->peekFirstSignificantBlockHead($harvester);
+            if (null === $head) {
+                return $keyNode;
+            }
+
+            [$indentLen, $significantToken] = $head;
+            if ($indentLen <= $entryIndentLen) {
+                return $keyNode;
+            }
+
+            if (TokenType::SEQUENCE_ENTRY === $significantToken->type) {
+                $keyNode->setName($this->parseBlockSequenceValue($harvester, $entryIndentLen));
+
+                return $keyNode;
+            }
+
+            if (
+                TokenType::EXPLICIT_KEY_INDICATOR === $significantToken->type
+                || TokenType::MERGE_INDICATOR === $significantToken->type
+                || $significantToken->type->isScalar()
+            ) {
+                $keyNode->setName($this->parseBlockMappingValue($harvester, $entryIndentLen));
+
+                return $keyNode;
+            }
+
+            return $keyNode;
+        }
+
         if (TokenType::VALUE_INDICATOR === $token->type) {
             if (!$allowEmptyImplicitKey && null === $keyNode->getExplicitKeyIndicatorNode()) {
                 throw new UnexpectedTokenException($this->appendTokenLocation('Empty implicit key is not allowed in this context', $token));
@@ -428,19 +462,19 @@ final class Parser
             // same line (Example 8.17). The nested block-sequence body
             // becomes a child of the KeyNode so the emitter preserves the
             // original text verbatim.
-            $keyNode->addChild($this->parseCompactBlockSequence($harvester, $token->column - 1));
+            $keyNode->setName($this->parseCompactBlockSequence($harvester, $token->column - 1));
 
             return $keyNode;
         }
 
         if (TokenType::FLOW_MAPPING_START === $token->type) {
-            $keyNode->addChild($this->parseFlowMapping($harvester));
+            $keyNode->setName($this->parseFlowMapping($harvester));
 
             return $keyNode;
         }
 
         if (TokenType::FLOW_SEQUENCE_START === $token->type) {
-            $keyNode->addChild($this->parseFlowSequence($harvester));
+            $keyNode->setName($this->parseFlowSequence($harvester));
 
             return $keyNode;
         }
@@ -453,7 +487,7 @@ final class Parser
                 throw new AnchorUndefinedException($this->appendTokenLocation(\sprintf('Undefined alias "%s"', $aliasName), $token));
             }
             $aliasNode->setAnchor($anchor);
-            $keyNode->addChild($aliasNode);
+            $keyNode->setName($aliasNode);
             $harvester->tokens->advance();
 
             return $keyNode;
@@ -1066,12 +1100,6 @@ final class Parser
             $keyValueCouple = new KeyValueCoupleNode();
             $flowMappingNode->addChild($keyValueCouple);
 
-            // Keep flow-mapping keys limited to scalars for now (project constraint),
-            // so inputs like `{[a, b]: c}` remain a hard error (covered by tests).
-            if (TokenType::FLOW_SEQUENCE_START === $token->type) {
-                throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Key scalar expected, but %s given', $token->type->value), $token));
-            }
-
             $keyValueCouple->setKey($this->getKeyNode($harvester, true));
 
             if ($this->tryConsumeFlowMappingValueIndicator($harvester, $keyValueCouple)) {
@@ -1333,7 +1361,7 @@ final class Parser
             $harvester->tokens->advance();
         }
 
-        $keyValueCouple->setKey($this->getKeyNode($harvester, true));
+        $keyValueCouple->setKey($this->getKeyNode($harvester, true, $entryIndentLen));
 
         // YAML 1.2.2 explicit block mapping entry may put ':' on the next line:
         //   ? key
@@ -1368,6 +1396,17 @@ final class Parser
                     ], $keyValueCouple);
                 }
             }
+        }
+
+        $afterKey = $harvester->tokens->current();
+        if (
+            null !== $afterKey
+            && null !== $keyValueCouple->getKey()->getExplicitKeyIndicatorNode()
+            && TokenType::INDENTATION === $afterKey->type
+            && \strlen($afterKey->text) === $entryIndentLen
+            && TokenType::VALUE_INDICATOR === $harvester->tokens->peek(1)?->type
+        ) {
+            $this->collectTypes($harvester, [TokenType::INDENTATION], $keyValueCouple);
         }
 
         $this->collectTypes($harvester, [TokenType::VALUE_INDICATOR, TokenType::WHITESPACE], $keyValueCouple);

@@ -43,16 +43,6 @@ key: [a, b
 YAML);
     }
 
-    public function testThrowsWhenFlowKeyIsNotScalar(): void
-    {
-        $this->expectException(UnexpectedTokenException::class);
-        $this->expectExceptionMessageMatches('/^Key scalar expected/');
-
-        (new Parser())->parse(<<<'YAML'
-key: {[a, b]: c}
-YAML);
-    }
-
     public function testThrowsWhenMergeSequenceContainsNonValueEntry(): void
     {
         $this->expectException(UnexpectedNodeException::class);

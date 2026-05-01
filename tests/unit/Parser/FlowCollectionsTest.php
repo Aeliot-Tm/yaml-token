@@ -169,7 +169,7 @@ YAML);
         ));
         self::assertCount(2, $flowCouples);
 
-        self::assertSame('foo', $flowCouples[0]->getKey()->getName()?->getToken()->text);
+        self::assertSame('foo', $this->getKeyText($flowCouples[0]));
         self::assertNotNull($flowCouples[0]->getMappingValueIndicator());
         self::assertNotNull($flowCouples[0]->getValue());
         self::assertTrue($flowCouples[0]->getValue()->isEmpty());
@@ -182,7 +182,10 @@ YAML);
 
     private function getKeyText(KeyValueCoupleNode $couple): string
     {
-        return (string) $couple->getKey()->getName()?->getToken()->text;
+        $name = $couple->getKey()->getName();
+        self::assertInstanceOf(ScalarNode::class, $name);
+
+        return (string) $name->getToken()->text;
     }
 
     private function getOnlyCouple(StreamNode $stream): KeyValueCoupleNode
