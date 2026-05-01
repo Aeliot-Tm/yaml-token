@@ -572,6 +572,28 @@ final class Lexer
         $harvester->stream->addToken(new Token($type, $text, $harvester->cursor->line, $harvester->cursor->column));
     }
 
+    private function readDoubleQuotedScalar(Harvester $harvester): string
+    {
+        $result = '"';
+        $this->advance($harvester);
+        while ($harvester->cursor->position < $harvester->length) {
+            $char = $harvester->input[$harvester->cursor->position];
+            if ('\\' === $char) {
+                $result .= $this->consumeCodePoint($harvester);
+                if ($harvester->cursor->position < $harvester->length) {
+                    $result .= $this->consumeCodePoint($harvester);
+                }
+            } elseif ('"' === $char) {
+                $result .= $this->consumeCodePoint($harvester);
+                break;
+            } else {
+                $result .= $this->consumeCodePoint($harvester);
+            }
+        }
+
+        return $result;
+    }
+
     private function readIndentation(Harvester $harvester): string
     {
         $result = '';
@@ -636,6 +658,27 @@ final class Lexer
                 }
             }
             $result .= $this->consumeCodePoint($harvester);
+        }
+
+        return $result;
+    }
+
+    private function readSingleQuotedScalar(Harvester $harvester): string
+    {
+        $result = "'";
+        $this->advance($harvester);
+        while ($harvester->cursor->position < $harvester->length) {
+            $char = $harvester->input[$harvester->cursor->position];
+            if ("'" === $char) {
+                $result .= $this->consumeCodePoint($harvester);
+                if ($harvester->cursor->position < $harvester->length && "'" === $harvester->input[$harvester->cursor->position]) {
+                    $result .= $this->consumeCodePoint($harvester);
+                } else {
+                    break;
+                }
+            } else {
+                $result .= $this->consumeCodePoint($harvester);
+            }
         }
 
         return $result;
@@ -1284,49 +1327,6 @@ final class Lexer
         if ('' !== $version) {
             $harvester->stream->addToken(new Token(TokenType::DIRECTIVE_YAML_VERSION, $version, $versionLine, $versionColumn));
         }
-    }
-
-    private function readDoubleQuotedScalar(Harvester $harvester): string
-    {
-        $result = '"';
-        $this->advance($harvester);
-        while ($harvester->cursor->position < $harvester->length) {
-            $char = $harvester->input[$harvester->cursor->position];
-            if ('\\' === $char) {
-                $result .= $this->consumeCodePoint($harvester);
-                if ($harvester->cursor->position < $harvester->length) {
-                    $result .= $this->consumeCodePoint($harvester);
-                }
-            } elseif ('"' === $char) {
-                $result .= $this->consumeCodePoint($harvester);
-                break;
-            } else {
-                $result .= $this->consumeCodePoint($harvester);
-            }
-        }
-
-        return $result;
-    }
-
-    private function readSingleQuotedScalar(Harvester $harvester): string
-    {
-        $result = "'";
-        $this->advance($harvester);
-        while ($harvester->cursor->position < $harvester->length) {
-            $char = $harvester->input[$harvester->cursor->position];
-            if ("'" === $char) {
-                $result .= $this->consumeCodePoint($harvester);
-                if ($harvester->cursor->position < $harvester->length && "'" === $harvester->input[$harvester->cursor->position]) {
-                    $result .= $this->consumeCodePoint($harvester);
-                } else {
-                    break;
-                }
-            } else {
-                $result .= $this->consumeCodePoint($harvester);
-            }
-        }
-
-        return $result;
     }
 
     /**
