@@ -1,5 +1,5 @@
 ---
-description: Naming conventions and alphabetical sorting rules (incl. PHP class member order)
+description: Naming conventions and alphabetical sorting rules (incl. PHP attributes and class member order)
 alwaysApply: true
 ---
 
@@ -40,3 +40,14 @@ Sort class elements deterministically using the rules below.
 4. Name: alphabetical by member name (case-insensitive).
 5. Getters/setters: keep pairs adjacent and ordered as getter first, then setter,
    even if strict alphabetical order would separate them.
+
+## Sorting (PHP attributes)
+
+When several `#[...]` attributes sit in a row on the **same** declaration and their **order does not change behavior**
+(typical for metadata: tooling, coverage, documentation), keep a stable layout:
+
+1. Sort by **attribute name** (the identifier after `#`, case-insensitive).
+2. If the same attribute is repeated, sort those lines by the **full argument list** as written in parentheses (case-insensitive).
+
+Do **not** reorder when the language, framework, or a standard assigns meaning to attribute order,
+or when reordering would obscure an intentional sequence.

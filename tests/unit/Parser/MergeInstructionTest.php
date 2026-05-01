@@ -30,12 +30,12 @@ use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Parser::class)]
-#[UsesClass(Lexer::class)]
 #[UsesClass(AliasNode::class)]
 #[UsesClass(AnchorNode::class)]
 #[UsesClass(BlockMappingNode::class)]
 #[UsesClass(DocumentNode::class)]
 #[UsesClass(KeyValueCoupleNode::class)]
+#[UsesClass(Lexer::class)]
 #[UsesClass(MergeInstructionNode::class)]
 #[UsesClass(ScalarNode::class)]
 #[UsesClass(StreamNode::class)]

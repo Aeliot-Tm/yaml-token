@@ -26,11 +26,11 @@ use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Parser::class)]
-#[UsesClass(Lexer::class)]
 #[UsesClass(AliasNode::class)]
 #[UsesClass(AnchorNode::class)]
 #[UsesClass(DocumentNode::class)]
 #[UsesClass(KeyValueCoupleNode::class)]
+#[UsesClass(Lexer::class)]
 #[UsesClass(ScalarNode::class)]
 #[UsesClass(StreamNode::class)]
 final class AliasesInExplicitBlockMappingTest extends TestCase

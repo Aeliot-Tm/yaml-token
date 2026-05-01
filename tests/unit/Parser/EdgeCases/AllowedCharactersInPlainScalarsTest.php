@@ -33,18 +33,18 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 
 #[CoversClass(Parser::class)]
-#[UsesClass(Lexer::class)]
-#[UsesClass(Token::class)]
-#[UsesClass(TokenType::class)]
 #[UsesClass(DocumentNode::class)]
 #[UsesClass(IndentationNode::class)]
 #[UsesClass(KeyNode::class)]
 #[UsesClass(KeyValueCoupleNode::class)]
+#[UsesClass(Lexer::class)]
 #[UsesClass(MultilinePlainScalarNode::class)]
 #[UsesClass(NewLineNode::class)]
 #[UsesClass(ScalarNode::class)]
 #[UsesClass(StreamNode::class)]
 #[UsesClass(SyntaxTokenNode::class)]
+#[UsesClass(Token::class)]
+#[UsesClass(TokenType::class)]
 #[UsesClass(ValueNode::class)]
 #[UsesClass(WhitespaceNode::class)]
 final class AllowedCharactersInPlainScalarsTest extends ParserMappingTestCase

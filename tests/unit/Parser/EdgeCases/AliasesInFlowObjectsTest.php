@@ -35,9 +35,6 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 
 #[CoversClass(Parser::class)]
-#[UsesClass(Lexer::class)]
-#[UsesClass(Token::class)]
-#[UsesClass(TokenType::class)]
 #[UsesClass(AliasNode::class)]
 #[UsesClass(AnchorNode::class)]
 #[UsesClass(DocumentNode::class)]
@@ -45,10 +42,13 @@ use PHPUnit\Framework\Attributes\UsesClass;
 #[UsesClass(FlowSequenceNode::class)]
 #[UsesClass(KeyNode::class)]
 #[UsesClass(KeyValueCoupleNode::class)]
+#[UsesClass(Lexer::class)]
 #[UsesClass(NewLineNode::class)]
 #[UsesClass(ScalarNode::class)]
 #[UsesClass(StreamNode::class)]
 #[UsesClass(SyntaxTokenNode::class)]
+#[UsesClass(Token::class)]
+#[UsesClass(TokenType::class)]
 #[UsesClass(ValueNode::class)]
 #[UsesClass(WhitespaceNode::class)]
 final class AliasesInFlowObjectsTest extends ParserMappingTestCase

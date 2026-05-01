@@ -33,10 +33,10 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(FlowSequenceNode::class)]
 #[UsesClass(KeyValueCoupleNode::class)]
 #[UsesClass(Lexer::class)]
-#[UsesClass(YamlEmitter::class)]
 #[UsesClass(ScalarNode::class)]
 #[UsesClass(StreamNode::class)]
 #[UsesClass(ValueNode::class)]
+#[UsesClass(YamlEmitter::class)]
 final class FlowCollectionsTest extends TestCase
 {
     public function testParsesFlowSequenceAsValue(): void
