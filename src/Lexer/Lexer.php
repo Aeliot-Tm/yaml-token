@@ -219,6 +219,27 @@ final class Lexer
         return $fragment;
     }
 
+    /**
+     * @return array{start: int, len: int}|null
+     */
+    private function findNextLineBreakInString(string $input, int $offset, int $length): ?array
+    {
+        for ($i = $offset; $i < $length; ++$i) {
+            if ("\n" === $input[$i]) {
+                return ['start' => $i, 'len' => 1];
+            }
+            if ("\r" === $input[$i]) {
+                if ($i + 1 < $length && "\n" === $input[$i + 1]) {
+                    return ['start' => $i, 'len' => 2];
+                }
+
+                return ['start' => $i, 'len' => 1];
+            }
+        }
+
+        return null;
+    }
+
     private function getLastSignificantToken(Harvester $harvester): ?Token
     {
         $tokens = $harvester->stream->getTokens();
@@ -1213,27 +1234,6 @@ final class Lexer
             $harvester->stream->addToken(new Token(TokenType::NEWLINE, substr($body, $nl['start'], $nl['len']), 1, 1));
             $offset = $nl['start'] + $nl['len'];
         }
-    }
-
-    /**
-     * @return array{start: int, len: int}|null
-     */
-    private function findNextLineBreakInString(string $input, int $offset, int $length): ?array
-    {
-        for ($i = $offset; $i < $length; ++$i) {
-            if ("\n" === $input[$i]) {
-                return ['start' => $i, 'len' => 1];
-            }
-            if ("\r" === $input[$i]) {
-                if ($i + 1 < $length && "\n" === $input[$i + 1]) {
-                    return ['start' => $i, 'len' => 2];
-                }
-
-                return ['start' => $i, 'len' => 1];
-            }
-        }
-
-        return null;
     }
 
     private function resetBlockMappingPlainState(Cursor $cursor): void
