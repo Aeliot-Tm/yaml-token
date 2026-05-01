@@ -372,6 +372,23 @@ final class Lexer
         return \in_array($nextChar, self::CHARS_WHITESPACE, true);
     }
 
+    /**
+     * After "!", comma + four ASCII digits begin the registration date in global tag shorthand (YAML 1.0 style).
+     */
+    private function isTagCommaStartsRegistrationYear(Harvester $harvester, int $commaPosition): bool
+    {
+        if ($commaPosition + 5 > $harvester->length) {
+            return false;
+        }
+        for ($i = 1; $i <= 4; ++$i) {
+            if (!ctype_digit($harvester->input[$commaPosition + $i])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     private function isTagChar(string $char): bool
     {
         return !\in_array($char, self::CHARS_ANCHOR_OR_TAG_FORBIDDEN, true);
@@ -453,6 +470,114 @@ final class Lexer
             $cursor->pendingBlockScalarBody = $cursor->blockScalarBodyTokenType;
         }
         $cursor->blockScalarBodyTokenType = null;
+    }
+
+    private function readAnchorOrAlias(Harvester $harvester): string
+    {
+        $result = '';
+        $this->advance($harvester);
+        while ($harvester->cursor->position < $harvester->length) {
+            $char = $harvester->input[$harvester->cursor->position];
+            if ($this->isAnchorChar($char)) {
+                $result .= $this->consumeCodePoint($harvester);
+            } else {
+                break;
+            }
+        }
+
+        return $result;
+    }
+
+    private function readIndentation(Harvester $harvester): string
+    {
+        $result = '';
+        while ($harvester->cursor->position < $harvester->length) {
+            $char = $harvester->input[$harvester->cursor->position];
+            if (' ' === $char) {
+                $result .= $this->consumeCodePoint($harvester);
+                ++$harvester->cursor->currentIndent;
+            } else {
+                break;
+            }
+        }
+
+        return $result;
+    }
+
+    private function readPlainScalar(Harvester $harvester): string
+    {
+        $result = '';
+        $inFlow = $harvester->cursor->flowDepth > 0;
+        while ($harvester->cursor->position < $harvester->length) {
+            $char = $harvester->input[$harvester->cursor->position];
+            if (':' === $char && $this->isMappingValue($harvester)) {
+                break;
+            }
+            if ('?' === $char && $this->isMappingKey($harvester)) {
+                break;
+            }
+            if ('#' === $char && $this->isCommentStart($harvester)) {
+                break;
+            }
+            if ($inFlow && (']' === $char || '}' === $char) && '' !== $result) {
+                $nextChar = $this->getNextChar($harvester);
+                if (null === $nextChar
+                    || \in_array($nextChar, self::CHARS_WHITESPACE, true)
+                    || \in_array($nextChar, [',', ':', ']', '}', "\n", "\r"], true)) {
+                    break;
+                }
+                $result .= $this->consumeCodePoint($harvester);
+
+                continue;
+            }
+            if (('[' === $char || '{' === $char) && '' === $result) {
+                break;
+            }
+            if (\in_array($char, self::CHARS_LINE_BREAK, true)) {
+                break;
+            }
+            if ($inFlow && \in_array($char, [',', ']', '}'], true)) {
+                break;
+            }
+            if (\in_array($char, self::CHARS_HORIZONTAL_WHITESPACE, true)) {
+                $peek = $harvester->cursor->position + 1;
+                while ($peek < $harvester->length && \in_array($harvester->input[$peek], self::CHARS_HORIZONTAL_WHITESPACE, true)) {
+                    ++$peek;
+                }
+                if ($peek >= $harvester->length
+                    || \in_array($harvester->input[$peek], self::CHARS_LINE_BREAK, true)
+                    || '#' === $harvester->input[$peek]
+                    || ($inFlow && \in_array($harvester->input[$peek], [',', ']', '}', '[', '{'], true))) {
+                    break;
+                }
+            }
+            $result .= $this->consumeCodePoint($harvester);
+        }
+
+        return $result;
+    }
+
+    private function readTagShorthandSuffix(Harvester $harvester): string
+    {
+        $result = '';
+        while ($harvester->cursor->position < $harvester->length) {
+            $char = $harvester->input[$harvester->cursor->position];
+            if (',' === $char && $this->isTagCommaStartsRegistrationYear($harvester, $harvester->cursor->position)) {
+                $result .= $this->consumeCodePoint($harvester);
+                for ($i = 0; $i < 4; ++$i) {
+                    $result .= $this->consumeCodePoint($harvester);
+                }
+
+                continue;
+            }
+            if ($this->isTagChar($char)) {
+                $result .= $this->consumeCodePoint($harvester);
+            } else {
+                break;
+            }
+        }
+
+        return $result;
     }
 
     private function readToken(Harvester $harvester): void
@@ -723,22 +848,6 @@ final class Lexer
         $harvester->stream->addToken(new Token(TokenType::UNRECOGNIZED, $text, $startLine, $startColumn));
     }
 
-    private function readIndentation(Harvester $harvester): string
-    {
-        $result = '';
-        while ($harvester->cursor->position < $harvester->length) {
-            $char = $harvester->input[$harvester->cursor->position];
-            if (' ' === $char) {
-                $result .= $this->consumeCodePoint($harvester);
-                ++$harvester->cursor->currentIndent;
-            } else {
-                break;
-            }
-        }
-
-        return $result;
-    }
-
     private function readWhitespace(Harvester $harvester): string
     {
         $result = '';
@@ -946,22 +1055,6 @@ final class Lexer
         return $result;
     }
 
-    private function readAnchorOrAlias(Harvester $harvester): string
-    {
-        $result = '';
-        $this->advance($harvester);
-        while ($harvester->cursor->position < $harvester->length) {
-            $char = $harvester->input[$harvester->cursor->position];
-            if ($this->isAnchorChar($char)) {
-                $result .= $this->consumeCodePoint($harvester);
-            } else {
-                break;
-            }
-        }
-
-        return $result;
-    }
-
     /**
      * Explicit tag property at a node: `!<...>` verbatim, shorthand (`!`, `!!`, `!name!`) + suffix, or non-specific `!`.
      * Tokens are appended to {@see Harvester::$stream}. Does not apply to `%TAG` directive lines (handled in {@see tokenizeTagDirectiveLine}).
@@ -1044,46 +1137,6 @@ final class Lexer
 
         $harvester->stream->addToken(new Token(TokenType::TAG_HANDLE_PRIMARY, '!', $bangLine, $bangColumn));
         $harvester->stream->addToken(new Token(TokenType::TAG_BODY, $suffix, $suffixLine, $suffixColumn));
-    }
-
-    private function readTagShorthandSuffix(Harvester $harvester): string
-    {
-        $result = '';
-        while ($harvester->cursor->position < $harvester->length) {
-            $char = $harvester->input[$harvester->cursor->position];
-            if (',' === $char && $this->tagCommaStartsRegistrationYear($harvester, $harvester->cursor->position)) {
-                $result .= $this->consumeCodePoint($harvester);
-                for ($i = 0; $i < 4; ++$i) {
-                    $result .= $this->consumeCodePoint($harvester);
-                }
-
-                continue;
-            }
-            if ($this->isTagChar($char)) {
-                $result .= $this->consumeCodePoint($harvester);
-            } else {
-                break;
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * After "!", comma + four ASCII digits begin the registration date in global tag shorthand (YAML 1.0 style).
-     */
-    private function tagCommaStartsRegistrationYear(Harvester $harvester, int $commaPosition): bool
-    {
-        if ($commaPosition + 5 > $harvester->length) {
-            return false;
-        }
-        for ($i = 1; $i <= 4; ++$i) {
-            if (!ctype_digit($harvester->input[$commaPosition + $i])) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     private function readDoubleQuotedScalar(Harvester $harvester): string
@@ -1274,59 +1327,6 @@ final class Lexer
         }
         $harvester->cursor->line = $line;
         $harvester->cursor->column = $column;
-    }
-
-    private function readPlainScalar(Harvester $harvester): string
-    {
-        $result = '';
-        $inFlow = $harvester->cursor->flowDepth > 0;
-        while ($harvester->cursor->position < $harvester->length) {
-            $char = $harvester->input[$harvester->cursor->position];
-            if (':' === $char && $this->isMappingValue($harvester)) {
-                break;
-            }
-            if ('?' === $char && $this->isMappingKey($harvester)) {
-                break;
-            }
-            if ('#' === $char && $this->isCommentStart($harvester)) {
-                break;
-            }
-            if ($inFlow && (']' === $char || '}' === $char) && '' !== $result) {
-                $nextChar = $this->getNextChar($harvester);
-                if (null === $nextChar
-                    || \in_array($nextChar, self::CHARS_WHITESPACE, true)
-                    || \in_array($nextChar, [',', ':', ']', '}', "\n", "\r"], true)) {
-                    break;
-                }
-                $result .= $this->consumeCodePoint($harvester);
-
-                continue;
-            }
-            if (('[' === $char || '{' === $char) && '' === $result) {
-                break;
-            }
-            if (\in_array($char, self::CHARS_LINE_BREAK, true)) {
-                break;
-            }
-            if ($inFlow && \in_array($char, [',', ']', '}'], true)) {
-                break;
-            }
-            if (\in_array($char, self::CHARS_HORIZONTAL_WHITESPACE, true)) {
-                $peek = $harvester->cursor->position + 1;
-                while ($peek < $harvester->length && \in_array($harvester->input[$peek], self::CHARS_HORIZONTAL_WHITESPACE, true)) {
-                    ++$peek;
-                }
-                if ($peek >= $harvester->length
-                    || \in_array($harvester->input[$peek], self::CHARS_LINE_BREAK, true)
-                    || '#' === $harvester->input[$peek]
-                    || ($inFlow && \in_array($harvester->input[$peek], [',', ']', '}', '[', '{'], true))) {
-                    break;
-                }
-            }
-            $result .= $this->consumeCodePoint($harvester);
-        }
-
-        return $result;
     }
 
     /**
