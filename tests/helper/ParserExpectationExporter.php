@@ -37,7 +37,7 @@ final class ParserExpectationExporter
             }
         }
 
-        sort($useLines, SORT_STRING);
+        sort($useLines, \SORT_STRING);
         $useBlock = implode("\n", $useLines);
         $body = $this->exportValue($tree, null, 0);
 
@@ -144,7 +144,7 @@ final class ParserExpectationExporter
             throw new \RuntimeException('Unexpected enum without type parent key: '.$value::class.'::'.$value->name);
         }
 
-        throw new \RuntimeException('Unsupported export type: '.\get_debug_type($value));
+        throw new \RuntimeException('Unsupported export type: '.get_debug_type($value));
     }
 
     /**
@@ -165,7 +165,7 @@ final class ParserExpectationExporter
         foreach ($array as $key => $item) {
             $keyPrefix = '';
             if (!$isList) {
-                $keyPrefix = (\is_int($key) ? (string)$key : var_export($key, true)).' => ';
+                $keyPrefix = (\is_int($key) ? (string) $key : var_export($key, true)).' => ';
             }
 
             $parentKey = \is_string($key) ? $key : null;
