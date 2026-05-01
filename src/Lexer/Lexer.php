@@ -557,6 +557,66 @@ final class Lexer
         return $result;
     }
 
+    private function readTagDirectiveHandle(Harvester $harvester): string
+    {
+        if ($harvester->cursor->position >= $harvester->length || '!' !== $harvester->input[$harvester->cursor->position]) {
+            return '';
+        }
+        $this->advance($harvester);
+        if ($harvester->cursor->position < $harvester->length && '!' === $harvester->input[$harvester->cursor->position]) {
+            $this->advance($harvester);
+
+            return '!!';
+        }
+        if ($harvester->cursor->position >= $harvester->length || \in_array($harvester->input[$harvester->cursor->position], self::CHARS_HORIZONTAL_WHITESPACE, true)) {
+            return '!';
+        }
+        $savedPosition = $harvester->cursor->position;
+        $savedLine = $harvester->cursor->line;
+        $savedColumn = $harvester->cursor->column;
+        $middle = '';
+        while ($harvester->cursor->position < $harvester->length) {
+            $c = $harvester->input[$harvester->cursor->position];
+            if ('!' === $c) {
+                $this->advance($harvester);
+
+                return '!'.$middle.'!';
+            }
+            if (\in_array($c, self::CHARS_HORIZONTAL_WHITESPACE, true)) {
+                break;
+            }
+            if (!$this->isTagChar($c)) {
+                break;
+            }
+            $middle .= $this->consumeCodePoint($harvester);
+        }
+        $harvester->cursor->position = $savedPosition;
+        $harvester->cursor->line = $savedLine;
+        $harvester->cursor->column = $savedColumn;
+
+        return '!';
+    }
+
+    private function readTagDirectivePrefix(Harvester $harvester): string
+    {
+        $result = '';
+        while ($harvester->cursor->position < $harvester->length) {
+            $c = $harvester->input[$harvester->cursor->position];
+            if (\in_array($c, self::CHARS_LINE_BREAK, true)) {
+                break;
+            }
+            if (\in_array($c, self::CHARS_HORIZONTAL_WHITESPACE, true)) {
+                break;
+            }
+            if ('#' === $c && $this->isCommentStart($harvester)) {
+                break;
+            }
+            $result .= $this->consumeCodePoint($harvester);
+        }
+
+        return $result;
+    }
+
     private function readTagShorthandSuffix(Harvester $harvester): string
     {
         $result = '';
@@ -877,6 +937,26 @@ final class Lexer
         return $result;
     }
 
+    private function readYamlDirectiveVersion(Harvester $harvester): string
+    {
+        $result = '';
+        while ($harvester->cursor->position < $harvester->length) {
+            $c = $harvester->input[$harvester->cursor->position];
+            if (\in_array($c, self::CHARS_LINE_BREAK, true)) {
+                break;
+            }
+            if (\in_array($c, self::CHARS_HORIZONTAL_WHITESPACE, true)) {
+                break;
+            }
+            if ('#' === $c && $this->isCommentStart($harvester)) {
+                break;
+            }
+            $result .= $this->consumeCodePoint($harvester);
+        }
+
+        return $result;
+    }
+
     /**
      * Split `%TAG` lines into `DIRECTIVE_TAG`, `DIRECTIVE_TAG_HANDLE`, `DIRECTIVE_TAG_PREFIX` only when the keyword
      * is followed by a handle (starts with `!`) or horizontal whitespace / EOF — not when followed immediately by a
@@ -1120,86 +1200,6 @@ final class Lexer
         if ('' !== $version) {
             $harvester->stream->addToken(new Token(TokenType::DIRECTIVE_YAML_VERSION, $version, $versionLine, $versionColumn));
         }
-    }
-
-    private function readYamlDirectiveVersion(Harvester $harvester): string
-    {
-        $result = '';
-        while ($harvester->cursor->position < $harvester->length) {
-            $c = $harvester->input[$harvester->cursor->position];
-            if (\in_array($c, self::CHARS_LINE_BREAK, true)) {
-                break;
-            }
-            if (\in_array($c, self::CHARS_HORIZONTAL_WHITESPACE, true)) {
-                break;
-            }
-            if ('#' === $c && $this->isCommentStart($harvester)) {
-                break;
-            }
-            $result .= $this->consumeCodePoint($harvester);
-        }
-
-        return $result;
-    }
-
-    private function readTagDirectiveHandle(Harvester $harvester): string
-    {
-        if ($harvester->cursor->position >= $harvester->length || '!' !== $harvester->input[$harvester->cursor->position]) {
-            return '';
-        }
-        $this->advance($harvester);
-        if ($harvester->cursor->position < $harvester->length && '!' === $harvester->input[$harvester->cursor->position]) {
-            $this->advance($harvester);
-
-            return '!!';
-        }
-        if ($harvester->cursor->position >= $harvester->length || \in_array($harvester->input[$harvester->cursor->position], self::CHARS_HORIZONTAL_WHITESPACE, true)) {
-            return '!';
-        }
-        $savedPosition = $harvester->cursor->position;
-        $savedLine = $harvester->cursor->line;
-        $savedColumn = $harvester->cursor->column;
-        $middle = '';
-        while ($harvester->cursor->position < $harvester->length) {
-            $c = $harvester->input[$harvester->cursor->position];
-            if ('!' === $c) {
-                $this->advance($harvester);
-
-                return '!'.$middle.'!';
-            }
-            if (\in_array($c, self::CHARS_HORIZONTAL_WHITESPACE, true)) {
-                break;
-            }
-            if (!$this->isTagChar($c)) {
-                break;
-            }
-            $middle .= $this->consumeCodePoint($harvester);
-        }
-        $harvester->cursor->position = $savedPosition;
-        $harvester->cursor->line = $savedLine;
-        $harvester->cursor->column = $savedColumn;
-
-        return '!';
-    }
-
-    private function readTagDirectivePrefix(Harvester $harvester): string
-    {
-        $result = '';
-        while ($harvester->cursor->position < $harvester->length) {
-            $c = $harvester->input[$harvester->cursor->position];
-            if (\in_array($c, self::CHARS_LINE_BREAK, true)) {
-                break;
-            }
-            if (\in_array($c, self::CHARS_HORIZONTAL_WHITESPACE, true)) {
-                break;
-            }
-            if ('#' === $c && $this->isCommentStart($harvester)) {
-                break;
-            }
-            $result .= $this->consumeCodePoint($harvester);
-        }
-
-        return $result;
     }
 
     private function readDoubleQuotedScalar(Harvester $harvester): string
