@@ -1,0 +1,63 @@
+<?php
+
+declare(strict_types=1);
+
+use Aeliot\YamlToken\Enum\TokenType;
+
+return [
+    [
+        'type' => TokenType::DOCUMENT_START,
+        'text' => '---',
+    ],
+    [
+        'type' => TokenType::WHITESPACE,
+        'text' => ' ',
+    ],
+    [
+        'type' => TokenType::COMMENT,
+        'text' => '# comment after document start',
+    ],
+    [
+        'type' => TokenType::NEWLINE,
+        'text' => '
+',
+    ],
+    [
+        'type' => TokenType::PLAIN_SCALAR,
+        'text' => 'key',
+    ],
+    [
+        'type' => TokenType::VALUE_INDICATOR,
+        'text' => ':',
+    ],
+    [
+        'type' => TokenType::WHITESPACE,
+        'text' => ' ',
+    ],
+    [
+        'type' => TokenType::PLAIN_SCALAR,
+        'text' => 'value',
+    ],
+    [
+        'type' => TokenType::NEWLINE,
+        'text' => '
+',
+    ],
+    [
+        'type' => TokenType::DOCUMENT_END,
+        'text' => '...',
+    ],
+    [
+        'type' => TokenType::WHITESPACE,
+        'text' => ' ',
+    ],
+    [
+        'type' => TokenType::COMMENT,
+        'text' => '# comment after document end',
+    ],
+    [
+        'type' => TokenType::NEWLINE,
+        'text' => '
+',
+    ],
+];

@@ -1,0 +1,100 @@
+<?php
+
+declare(strict_types=1);
+
+/*
+ * This file is part of the YAML Token project.
+ *
+ * (c) Anatoliy Melnikov <5785276@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
+namespace Aeliot\YamlToken\Test\Unit\Lexer;
+
+use Aeliot\YamlToken\Enum\TokenType;
+use Aeliot\YamlToken\Lexer\Lexer;
+use Aeliot\YamlToken\Token\Token;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\UsesClass;
+use PHPUnit\Framework\TestCase;
+
+#[CoversClass(Lexer::class)]
+#[UsesClass(Token::class)]
+#[UsesClass(TokenType::class)]
+final class FixtureLexerMappingTest extends TestCase
+{
+    /**
+     * @return iterable<string, array{0: string, 1: string}>
+     */
+    public static function expectedTokenCases(): iterable
+    {
+        $projectRoot = \dirname(__DIR__, 3);
+        $fixtureBase = $projectRoot.'/tests/fixture';
+        $expectBase = $projectRoot.'/tests/lexer_expectations';
+
+        $fixtureDirs = [
+            'edge_cases',
+            'edge_cases_extra',
+            'spec/1.0',
+            'spec/1.1',
+            'spec/1.2.0',
+            'spec/1.2.1',
+            'spec/1.2.2',
+            'spec_extra/1.0',
+        ];
+
+        foreach ($fixtureDirs as $sub) {
+            $dir = $fixtureBase.'/'.$sub;
+            if (!is_dir($dir)) {
+                continue;
+            }
+
+            $iterator = new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS)
+            );
+
+            $paths = [];
+            foreach ($iterator as $fileInfo) {
+                if (!$fileInfo->isFile() || !str_ends_with($fileInfo->getFilename(), '.yaml')) {
+                    continue;
+                }
+                $paths[] = $fileInfo->getPathname();
+            }
+
+            sort($paths, \SORT_STRING);
+
+            foreach ($paths as $yamlPath) {
+                $relFromFixture = substr($yamlPath, \strlen($fixtureBase) + 1);
+                $expectPath = $expectBase.'/'.substr($relFromFixture, 0, -5).'.php';
+                yield $relFromFixture => [$yamlPath, $expectPath];
+            }
+        }
+    }
+
+    #[DataProvider('expectedTokenCases')]
+    public function testFixtureMatchesStoredTokens(string $fixturePath, string $expectationPath): void
+    {
+        self::assertFileExists(
+            $expectationPath,
+            'Missing lexer expectation. Regenerate with: php bin/dev/generate-lexer-expectations.php'
+        );
+
+        $raw = (string) file_get_contents($fixturePath);
+        self::assertNotSame('', $raw);
+
+        /** @var list<array{type: TokenType, text: string}> $expected */
+        $expected = require $expectationPath;
+
+        $stream = (new Lexer())->tokenize(str_replace(["\r\n", "\r"], "\n", $raw));
+        self::assertSame(
+            $expected,
+            array_map(static fn (Token $token): array => [
+                'type' => $token->type,
+                'text' => $token->text,
+            ], $stream->getTokens())
+        );
+    }
+}

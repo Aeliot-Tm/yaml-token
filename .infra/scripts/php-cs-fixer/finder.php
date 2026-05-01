@@ -15,7 +15,7 @@ return $finder = (new PhpCsFixer\Finder())
     ->files()
     ->ignoreVCS(true)
     ->in(dirname(__DIR__, 3))
-    ->exclude(['tests/parser_expectations', 'var', 'vendor'])
+    ->exclude(['tests/lexer_expectations', 'tests/parser_expectations', 'var', 'vendor'])
     ->append([
         '.infra/scripts/composer-unused/config.php',
         '.infra/scripts/php-cs-fixer/config.php',

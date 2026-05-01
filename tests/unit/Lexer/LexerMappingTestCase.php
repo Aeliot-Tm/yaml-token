@@ -22,7 +22,7 @@ use PHPUnit\Framework\TestCase;
 abstract class LexerMappingTestCase extends TestCase
 {
     /**
-     * @return iterable<string,array{0: array<string,string|TokenType>, 1: string }>
+     * @return iterable<string, array{0: list<array{type: TokenType, text: string}>, 1: string}>
      */
     abstract public static function getDataForTestMapping(): iterable;
 
@@ -39,5 +39,39 @@ abstract class LexerMappingTestCase extends TestCase
                 'text' => $token->text,
             ], $stream->getTokens())
         );
+
+        $expectationPath = self::lexerExpectationPathForFixture($path);
+        if (null !== $expectationPath && is_file($expectationPath)) {
+            /** @var list<array{type: TokenType, text: string}> $fromExpectation */
+            $fromExpectation = require $expectationPath;
+            self::assertSame(
+                $expectedTokens,
+                $fromExpectation,
+                'Handwritten tokens must match tests/lexer_expectations for '.$path
+            );
+        }
+    }
+
+    private static function lexerExpectationPathForFixture(string $yamlPath): ?string
+    {
+        $projectRoot = \dirname(__DIR__, 3);
+        $fixtureBaseReal = realpath($projectRoot.'/tests/fixture');
+        $yamlReal = realpath($yamlPath);
+        if (false === $fixtureBaseReal || false === $yamlReal) {
+            return null;
+        }
+
+        $prefix = $fixtureBaseReal.\DIRECTORY_SEPARATOR;
+        if (!str_starts_with($yamlReal, $prefix)) {
+            return null;
+        }
+
+        $relative = substr($yamlReal, \strlen($prefix));
+        $relative = str_replace('\\', '/', $relative);
+        if (!str_ends_with($relative, '.yaml')) {
+            return null;
+        }
+
+        return $projectRoot.'/tests/lexer_expectations/'.substr($relative, 0, -5).'.php';
     }
 }
