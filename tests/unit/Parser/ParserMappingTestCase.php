@@ -129,8 +129,8 @@ abstract class ParserMappingTestCase extends TestCase
 
         if ($node instanceof ValueNode) {
             return [
-                'anchor' => $node->getAnchor(),
                 'alias' => $node->getAlias(),
+                'anchor' => $node->getAnchor(),
                 'blockMapping' => $node->getBlockMapping(),
                 'blockSequence' => $node->getBlockSequence(),
                 'flowMapping' => $node->getFlowMapping(),
