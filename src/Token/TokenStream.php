@@ -27,13 +27,6 @@ final class TokenStream
         return $this->tokens[$this->position] ?? null;
     }
 
-    public function peek(int $offset): ?Token
-    {
-        $index = $this->position + $offset;
-
-        return $this->tokens[$index] ?? null;
-    }
-
     public function advance(): ?Token
     {
         $token = $this->current();
@@ -42,11 +35,6 @@ final class TokenStream
         }
 
         return $token;
-    }
-
-    public function isEnd(): bool
-    {
-        return $this->position >= \count($this->tokens);
     }
 
     /**
@@ -65,5 +53,17 @@ final class TokenStream
     public function getLength(): int
     {
         return \count($this->tokens);
+    }
+
+    public function isEnd(): bool
+    {
+        return $this->position >= \count($this->tokens);
+    }
+
+    public function peek(int $offset): ?Token
+    {
+        $index = $this->position + $offset;
+
+        return $this->tokens[$index] ?? null;
     }
 }
