@@ -118,6 +118,58 @@ final class Parser
         }
     }
 
+    private function collectKeyProperties(Harvester $harvester, KeyNode $keyNode): void
+    {
+        $tagProperty = null;
+
+        while (!$harvester->tokens->isEnd()) {
+            $token = $harvester->tokens->current();
+            if (TokenType::WHITESPACE === $token->type) {
+                $keyNode->addChild(new WhitespaceNode($token));
+                $harvester->tokens->advance();
+                continue;
+            }
+
+            if (TokenType::ANCHOR === $token->type) {
+                $keyNode->addChild(new AnchorNode($token));
+                $harvester->tokens->advance();
+                continue;
+            }
+
+            if (TokenType::TAG_BODY === $token->type) {
+                throw new UnexpectedTokenException($this->appendTokenLocation('Tag body without tag handle', $token));
+            }
+
+            if ($this->isNodePropertyToken($token)) {
+                if (null !== $tagProperty) {
+                    throw new UnexpectedStateException($this->appendTokenLocation('Only one tag property is supported per key node', $token));
+                }
+
+                $tagProperty = new TagPropertyNode();
+                $tagProperty->addChild(new TagNode($token));
+                $keyNode->addChild($tagProperty);
+                $harvester->tokens->advance();
+
+                if (\in_array($token->type, [TokenType::TAG_HANDLE_VERBATIM, TokenType::TAG_NON_SPECIFIC], true)) {
+                    continue;
+                }
+
+                $this->collectTypes($harvester, [TokenType::WHITESPACE], $keyNode);
+
+                $body = $harvester->tokens->current();
+                if (TokenType::TAG_BODY !== $body?->type) {
+                    throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Tag body expected, but %s given', $body?->type->value ?? '_nothing_'), $harvester->tokens));
+                }
+
+                $tagProperty->addChild(new TagBodyNode($body));
+                $harvester->tokens->advance();
+                continue;
+            }
+
+            break;
+        }
+    }
+
     /**
      * @return list<AliasNode>
      */
@@ -253,58 +305,6 @@ final class Parser
         }
     }
 
-    private function collectKeyProperties(Harvester $harvester, KeyNode $keyNode): void
-    {
-        $tagProperty = null;
-
-        while (!$harvester->tokens->isEnd()) {
-            $token = $harvester->tokens->current();
-            if (TokenType::WHITESPACE === $token->type) {
-                $keyNode->addChild(new WhitespaceNode($token));
-                $harvester->tokens->advance();
-                continue;
-            }
-
-            if (TokenType::ANCHOR === $token->type) {
-                $keyNode->addChild(new AnchorNode($token));
-                $harvester->tokens->advance();
-                continue;
-            }
-
-            if (TokenType::TAG_BODY === $token->type) {
-                throw new UnexpectedTokenException($this->appendTokenLocation('Tag body without tag handle', $token));
-            }
-
-            if ($this->isNodePropertyToken($token)) {
-                if (null !== $tagProperty) {
-                    throw new UnexpectedStateException($this->appendTokenLocation('Only one tag property is supported per key node', $token));
-                }
-
-                $tagProperty = new TagPropertyNode();
-                $tagProperty->addChild(new TagNode($token));
-                $keyNode->addChild($tagProperty);
-                $harvester->tokens->advance();
-
-                if (\in_array($token->type, [TokenType::TAG_HANDLE_VERBATIM, TokenType::TAG_NON_SPECIFIC], true)) {
-                    continue;
-                }
-
-                $this->collectTypes($harvester, [TokenType::WHITESPACE], $keyNode);
-
-                $body = $harvester->tokens->current();
-                if (TokenType::TAG_BODY !== $body?->type) {
-                    throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Tag body expected, but %s given', $body?->type->value ?? '_nothing_'), $harvester->tokens));
-                }
-
-                $tagProperty->addChild(new TagBodyNode($body));
-                $harvester->tokens->advance();
-                continue;
-            }
-
-            break;
-        }
-    }
-
     /**
      * Consumes one SEQUENCE_ENTRY token followed by any number of
      * directly adjacent WHITESPACE tokens. Returns the total length
@@ -363,23 +363,6 @@ final class Parser
     private function createSyntaxTokenNode(Token $token): SyntaxTokenNode
     {
         return new SyntaxTokenNode($token);
-    }
-
-    private function tryConsumeFlowMappingValueIndicator(Harvester $harvester, KeyValueCoupleNode $couple): bool
-    {
-        $this->collectTypes($harvester, [TokenType::WHITESPACE], $couple);
-
-        $token = $harvester->tokens->current();
-        if (null === $token || TokenType::VALUE_INDICATOR !== $token->type) {
-            return false;
-        }
-
-        $couple->setMappingValueIndicator(new SyntaxTokenNode($token));
-        $harvester->tokens->advance();
-
-        $this->collectTypes($harvester, [TokenType::WHITESPACE], $couple);
-
-        return true;
     }
 
     private function getKeyNode(Harvester $harvester, bool $allowEmptyImplicitKey, ?int $entryIndentLen = null): KeyNode
@@ -1897,6 +1880,23 @@ final class Parser
         } catch (IndentationInvalidException|IndentationOverrideException $e) {
             $this->wrapParseStateIndentationException($e, $harvester->tokens);
         }
+    }
+
+    private function tryConsumeFlowMappingValueIndicator(Harvester $harvester, KeyValueCoupleNode $couple): bool
+    {
+        $this->collectTypes($harvester, [TokenType::WHITESPACE], $couple);
+
+        $token = $harvester->tokens->current();
+        if (null === $token || TokenType::VALUE_INDICATOR !== $token->type) {
+            return false;
+        }
+
+        $couple->setMappingValueIndicator(new SyntaxTokenNode($token));
+        $harvester->tokens->advance();
+
+        $this->collectTypes($harvester, [TokenType::WHITESPACE], $couple);
+
+        return true;
     }
 
     private function wrapParseStateIndentationException(\Exception $previous, TokenStreamProxy $tokens): void
