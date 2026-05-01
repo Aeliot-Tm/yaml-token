@@ -114,16 +114,6 @@ final class AliasesInFlowObjectsTest extends ParserMappingTestCase
                                                                 'children' => [],
                                                             ],
                                                             [
-                                                                'type' => WhitespaceNode::class,
-                                                                'properties' => [
-                                                                    'token' => [
-                                                                        'type' => TokenType::WHITESPACE,
-                                                                        'text' => ' ',
-                                                                    ],
-                                                                ],
-                                                                'children' => [],
-                                                            ],
-                                                            [
                                                                 'type' => ValueNode::class,
                                                                 'properties' => [
                                                                     'anchor' => [
@@ -181,6 +171,16 @@ final class AliasesInFlowObjectsTest extends ParserMappingTestCase
                                                                 'token' => [
                                                                     'type' => TokenType::FLOW_ENTRY,
                                                                     'text' => ',',
+                                                                ],
+                                                            ],
+                                                            'children' => [],
+                                                        ],
+                                                        [
+                                                            'type' => WhitespaceNode::class,
+                                                            'properties' => [
+                                                                'token' => [
+                                                                    'type' => TokenType::WHITESPACE,
+                                                                    'text' => ' ',
                                                                 ],
                                                             ],
                                                             'children' => [],
@@ -340,16 +340,6 @@ final class AliasesInFlowObjectsTest extends ParserMappingTestCase
                                                                 'children' => [],
                                                             ],
                                                             [
-                                                                'type' => WhitespaceNode::class,
-                                                                'properties' => [
-                                                                    'token' => [
-                                                                        'type' => TokenType::WHITESPACE,
-                                                                        'text' => ' ',
-                                                                    ],
-                                                                ],
-                                                                'children' => [],
-                                                            ],
-                                                            [
                                                                 'type' => ValueNode::class,
                                                                 'properties' => [
                                                                     'alias' => [
@@ -363,16 +353,6 @@ final class AliasesInFlowObjectsTest extends ParserMappingTestCase
                                                                             'anchorName' => 'b',
                                                                         ],
                                                                         'children' => [],
-                                                                    ],
-                                                                ],
-                                                                'children' => [],
-                                                            ],
-                                                            [
-                                                                'type' => WhitespaceNode::class,
-                                                                'properties' => [
-                                                                    'token' => [
-                                                                        'type' => TokenType::WHITESPACE,
-                                                                        'text' => ' ',
                                                                     ],
                                                                 ],
                                                                 'children' => [],
@@ -417,11 +397,31 @@ final class AliasesInFlowObjectsTest extends ParserMappingTestCase
                                                             'children' => [],
                                                         ],
                                                         [
+                                                            'type' => WhitespaceNode::class,
+                                                            'properties' => [
+                                                                'token' => [
+                                                                    'type' => TokenType::WHITESPACE,
+                                                                    'text' => ' ',
+                                                                ],
+                                                            ],
+                                                            'children' => [],
+                                                        ],
+                                                        [
                                                             'type' => SyntaxTokenNode::class,
                                                             'properties' => [
                                                                 'token' => [
                                                                     'type' => TokenType::FLOW_ENTRY,
                                                                     'text' => ',',
+                                                                ],
+                                                            ],
+                                                            'children' => [],
+                                                        ],
+                                                        [
+                                                            'type' => WhitespaceNode::class,
+                                                            'properties' => [
+                                                                'token' => [
+                                                                    'type' => TokenType::WHITESPACE,
+                                                                    'text' => ' ',
                                                                 ],
                                                             ],
                                                             'children' => [],

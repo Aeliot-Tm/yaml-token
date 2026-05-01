@@ -60,7 +60,6 @@ use Aeliot\YamlToken\Parser\Exception\IndentationInvalidException;
 use Aeliot\YamlToken\Parser\Exception\IndentationOverrideException;
 use Aeliot\YamlToken\Parser\Exception\IndentationUndefinedException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedEndException;
-use Aeliot\YamlToken\Parser\Exception\UnexpectedNodeException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Token\Token;
@@ -146,16 +145,13 @@ final class Parser
 
         $aliases = [];
         foreach ($flowSequence->getEntries() as $entry) {
-            if (!$entry instanceof ValueNode) {
-                throw new UnexpectedNodeException('Flow sequence entry must be a value node');
-            }
-
             $entryAliases = array_values(array_filter(
                 $entry->getChildren(),
                 static fn (Node $n): bool => $n instanceof AliasNode,
             ));
             if (1 !== \count($entryAliases)) {
-                throw new UnexpectedStateException('Each merge sequence entry must contain exactly one alias');
+                $references = array_map(static fn (AliasNode $a): string => $a->getToken()->text, $entryAliases);
+                throw new UnexpectedStateException(\sprintf('Each merge sequence entry must contain exactly one alias but %d given: %s', \count($references), implode(', ', $references)));
             }
             $aliases[] = $entryAliases[0];
         }

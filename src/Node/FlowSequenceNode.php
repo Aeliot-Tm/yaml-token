@@ -15,18 +15,18 @@ namespace Aeliot\YamlToken\Node;
 
 /**
  * Flow sequence (c-flow-sequence :137).
- * Contains: "[" + FlowNode[] + "]".
+ * Contains: "[" + ValueNode[] + "]".
  */
 class FlowSequenceNode extends AbstractNode
 {
     /**
-     * @return list<Node>
+     * @return list<ValueNode>
      */
     public function getEntries(): array
     {
         return array_values(array_filter(
             $this->children,
-            static fn (Node $c): bool => !$c instanceof SyntaxTokenNode,
+            static fn (Node $c): bool => $c instanceof ValueNode,
         ));
     }
 }

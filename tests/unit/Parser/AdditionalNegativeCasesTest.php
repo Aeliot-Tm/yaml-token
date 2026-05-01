@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Aeliot\YamlToken\Test\Unit\Parser;
 
-use Aeliot\YamlToken\Parser\Exception\UnexpectedNodeException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Parser;
@@ -45,8 +44,8 @@ YAML);
 
     public function testThrowsWhenMergeSequenceContainsNonValueEntry(): void
     {
-        $this->expectException(UnexpectedNodeException::class);
-        $this->expectExceptionMessage('Flow sequence entry must be a value node');
+        $this->expectException(UnexpectedStateException::class);
+        $this->expectExceptionMessage('Each merge sequence entry must contain exactly one alias but 0 given: ');
 
         (new Parser())->parse(<<<'YAML'
 a: &A {k: v}
