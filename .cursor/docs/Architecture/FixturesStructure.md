@@ -35,6 +35,11 @@ or fixture changes:
 
 `docker compose exec php-cli php bin/dev/generate-parser-expectations.php`
 
+Use `--force` to overwrite existing snapshots.
+Use `--only=relative/path.yaml` (repeatable; path under `tests/fixture/`, 
+with or without the prefix) to regenerate only those fixtures. 
+Without `--force`, existing snapshots are not overwritten, even when listed with `--only`.
+
 ## Buckets
 
 ### `tests/fixture/spec/`

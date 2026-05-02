@@ -15,6 +15,7 @@ declare(strict_types=1);
 require_once __DIR__.'/../../vendor/autoload.php';
 
 use Aeliot\YamlToken\Parser\Parser;
+use Aeliot\YamlToken\TestHelper\ExpectationGeneratorCliArgs;
 use Aeliot\YamlToken\TestHelper\FixtureFinder;
 use Aeliot\YamlToken\TestHelper\NodeTreeRepresenter;
 use Aeliot\YamlToken\TestHelper\ParserExpectationExporter;
@@ -38,7 +39,7 @@ $finder = new FixtureFinder(
     true,
 );
 
-$force = in_array('--force', $argv, true);
+$args = new ExpectationGeneratorCliArgs($argv, $fixtureBase);
 $parser = new Parser();
 $exporter = new ParserExpectationExporter();
 $nodeTreeRepresenter = new NodeTreeRepresenter();
@@ -47,9 +48,13 @@ $written = 0;
 
 foreach ($finder as $yamlPath) {
     $relFromFixture = substr($yamlPath, strlen($fixtureBase) + 1);
+    if (!$args->isIncluded($relFromFixture)) {
+        continue;
+    }
+
     $outPath = $expectBase.'/'.substr($relFromFixture, 0, -5).'.php';
 
-    if (!$force && is_file($outPath)) {
+    if (!$args->force && is_file($outPath)) {
         ++$skipped;
         continue;
     }
@@ -68,7 +73,7 @@ foreach ($finder as $yamlPath) {
     ++$written;
 }
 
-if ($force) {
+if ($args->force) {
     echo "Wrote {$written} expectation file(s) under tests/parser_expectations/\n";
 } else {
     echo "Wrote {$written} expectation file(s), skipped {$skipped} existing (use --force to regenerate) under tests/parser_expectations/\n";
