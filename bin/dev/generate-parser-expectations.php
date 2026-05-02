@@ -29,6 +29,8 @@ $finder = new FixtureFinder(
     [
         'edge_cases',
         'edge_cases_extra',
+        'go_yaml',
+        'go_yaml_extra',
         'spec/1.0',
         'spec/1.1',
         'spec/1.2.0',

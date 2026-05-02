@@ -8,7 +8,7 @@ globs: tests/fixture/**
 When working with anything under `tests/fixture/`, read
 [Fixtures Structure](../docs/Architecture/FixturesStructure.md) first to
 choose the correct sub-folder (`spec/`, `spec_extra/`, `edge_cases/`,
-`edge_cases_extra/`).
+`edge_cases_extra/`, `go_yaml/`, `go_yaml_extra/`).
 
 When working with specification-related fixtures in `tests/fixture/spec/`
 or `tests/fixture/spec_extra/`, also read

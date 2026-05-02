@@ -71,6 +71,7 @@
         "test-all": "@bin-phpunit",
         "unused": "XDEBUG_MODE=off tools/composer-unused.phar unused -c .infra/scripts/composer-unused/config.php",
         "yamllint": [
+            "yamllint -c .infra/scripts/yamllint.yaml tests/fixture/go_yaml",
             "yamllint -c .infra/scripts/yamllint.yaml tests/fixture/spec/1.0",
             "yamllint -c .infra/scripts/yamllint.yaml tests/fixture/spec/1.1 tests/fixture/spec/1.1.yaml",
             "yamllint -c .infra/scripts/yamllint.yaml tests/fixture/spec/1.2.0 tests/fixture/spec/1.2.0.yaml",

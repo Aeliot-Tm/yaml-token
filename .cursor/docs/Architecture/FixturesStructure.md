@@ -12,8 +12,11 @@ orthogonal axes:
   version that the project uses in CI?
 
 The combination yields four primary buckets (`spec`, `spec_extra`,
-`edge_cases`, `edge_cases_extra`). One additional bucket (`invalid`) holds
-deliberately malformed YAML used for negative-case testing.
+`edge_cases`, `edge_cases_extra`), plus two buckets that hold **verbatim**
+inputs taken from the upstream `goccy/go-yaml` test corpus (`testdata/**/in.yaml`,
+YAML test suite layout): `go_yaml` (yamllint-clean) and `go_yaml_extra`
+(yamllint rejects). One additional bucket (`invalid`) holds deliberately
+malformed YAML used for negative-case testing.
 
 ## Layout
 
@@ -21,6 +24,8 @@ deliberately malformed YAML used for negative-case testing.
 tests/fixture/
 ├── edge_cases/         # debugging-derived, yamllint-clean
 ├── edge_cases_extra/   # debugging-derived, yamllint rejects
+├── go_yaml/            # upstream goccy/go-yaml in.yaml, yamllint-clean
+├── go_yaml_extra/      # upstream goccy/go-yaml in.yaml, yamllint rejects
 ├── invalid/            # deliberately malformed YAML, for negative tests
 ├── spec/               # spec-derived, yamllint-clean
 └── spec_extra/         # spec-derived, yamllint rejects
@@ -81,6 +86,20 @@ kept in the suite — separated from `edge_cases/` for the same reason
 `spec_extra/` is separated from `spec/`: to keep `yamllint`-based checks
 green on the lintable buckets.
 
+### `tests/fixture/go_yaml/`
+
+Inputs copied **without modification** from `in.yaml` files under
+`goccy/go-yaml`’s `testdata/yaml-test-suite/` tree (same bytes as upstream).
+They must pass `yamllint` like `edge_cases/`. Lexer/parser expectations live
+under `tests/lexer_expectations/go_yaml/` and `tests/parser_expectations/go_yaml/`
+with the same relative file names.
+
+### `tests/fixture/go_yaml_extra/`
+
+Same upstream source as `go_yaml/`, but inputs that **fail** the project’s
+current `yamllint` configuration. Expectations live under
+`tests/lexer_expectations/go_yaml_extra/` and `tests/parser_expectations/go_yaml_extra/`.
+
 ### `tests/fixture/invalid/`
 
 Deliberately malformed YAML inputs used to drive **negative test cases** —
@@ -99,6 +118,8 @@ When adding a new fixture:
    - Valid → continue with the axes below.
 2. Decide the **origin**:
    - Comes from the official YAML specification → `spec*`.
+   - Verbatim `in.yaml` from upstream `goccy/go-yaml` testdata → `go_yaml*`
+     (pick `go_yaml/` vs `go_yaml_extra/` using `yamllint` like `edge_cases*`).
    - Came up while debugging the parser → `edge_cases*`.
 3. Decide the **lintability** by running the project's `yamllint`:
    - Passes → base bucket (`spec/` or `edge_cases/`).

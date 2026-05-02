@@ -20,3 +20,8 @@ Every element (key, value, indentation, comment) has its position and can be mod
 - [YAML 1.2.1](https://yaml.org/spec/1.2.1/) (2009-10-01)
 - [YAML 1.2.2](https://yaml.org/spec/1.2.2/) (2021-10-01)
 - [Specification Changes](https://yaml.org/spec/1.2.2/ext/changes/)
+
+## Third-party notices
+
+This repository includes third-party materials that are not covered solely by the copyright in [LICENSE](LICENSE).
+Their sources, scope, and license terms are listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
