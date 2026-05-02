@@ -88,6 +88,6 @@ final class IndentLessSequenceWithKeyValueCoupleTest extends LexerMappingTestCas
                 'type' => TokenType::NEWLINE,
                 'text' => "\n",
             ],
-        ], __DIR__.'/../../../../fixture/invalid/indent_less_sequence_with_key_value_couple.yaml'];
+        ], __DIR__.'/../../../fixture/invalid/indent_less_sequence_with_key_value_couple.yaml'];
     }
 }

@@ -76,6 +76,6 @@ final class IndentLessSequenceWithScalarTest extends LexerMappingTestCase
                 'type' => TokenType::NEWLINE,
                 'text' => "\n",
             ],
-        ], __DIR__.'/../../../../fixture/invalid/indent_less_sequence_with_scalar.yaml'];
+        ], __DIR__.'/../../../fixture/invalid/indent_less_sequence_with_scalar.yaml'];
     }
 }
