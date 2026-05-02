@@ -163,6 +163,7 @@ return [
                                             'children' => [],
                                         ],
                                         [
+                                            // TODO consider if INDENTATION is better in this place
                                             'type' => WhitespaceNode::class,
                                             'properties' => [
                                                 'token' => [

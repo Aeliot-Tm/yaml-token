@@ -234,6 +234,7 @@ return [
                                     'children' => [],
                                 ],
                                 [
+                                    // TODO: consider if it is better to assign comment to KeyValueCoupleNode instead of ValueNode
                                     'type' => CommentNode::class,
                                     'properties' => [
                                         'token' => [
