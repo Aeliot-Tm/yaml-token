@@ -28,22 +28,6 @@ final class Cursor
      */
     public bool $awaitingBlockPlainContinuation = false;
 
-    public int $column = 1;
-    public int $currentIndent = 0;
-
-    /**
-     * Nesting depth of flow collections (incremented on FLOW_MAPPING_START / FLOW_SEQUENCE_START,
-     * decremented on FLOW_MAPPING_END / FLOW_SEQUENCE_END). When zero, the lexer is in a block
-     * context and the flow indicators "}", "]", "," are not treated as structural tokens
-     * (they are allowed inside plain scalars per YAML 1.2 §7.3.3).
-     */
-    public int $flowDepth = 0;
-
-    /**
-     * After {@see TokenType::LITERAL_BLOCK_SCALAR_INDICATOR} / {@see TokenType::FOLDED_BLOCK_SCALAR_INDICATOR} until the header line break.
-     */
-    public bool $inBlockScalarHeaderLine = false;
-
     /**
      * Leading-space count of the block mapping key line when {@see TokenType::VALUE_INDICATOR} was emitted in block context;
      * null when not tracking an open block mapping value for multiline-plain continuation.
@@ -68,6 +52,22 @@ final class Cursor
      * True after {@see TokenType::BLOCK_SCALAR_INDENTATION_INDICATOR} on the current block header line.
      */
     public bool $blockScalarExplicitIndentIndicator = false;
+
+    public int $column = 1;
+    public int $currentIndent = 0;
+
+    /**
+     * Nesting depth of flow collections (incremented on FLOW_MAPPING_START / FLOW_SEQUENCE_START,
+     * decremented on FLOW_MAPPING_END / FLOW_SEQUENCE_END). When zero, the lexer is in a block
+     * context and the flow indicators "}", "]", "," are not treated as structural tokens
+     * (they are allowed inside plain scalars per YAML 1.2 §7.3.3).
+     */
+    public int $flowDepth = 0;
+
+    /**
+     * After {@see TokenType::LITERAL_BLOCK_SCALAR_INDICATOR} / {@see TokenType::FOLDED_BLOCK_SCALAR_INDICATOR} until the header line break.
+     */
+    public bool $inBlockScalarHeaderLine = false;
 
     /**
      * When set, block body after the header newline is emitted as line tokens
