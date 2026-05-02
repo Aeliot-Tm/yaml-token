@@ -65,6 +65,12 @@ use Aeliot\YamlToken\Token\TokenStream;
 
 final class Parser
 {
+    /**
+     * Bare-document block parent indent (YAML 1.2.2 rule [211], grammar uses n = -1). Not a column count;
+     * keeps “$lineIndent <= $parentIndent” checks uniform: no non-negative indent is <= this value.
+     */
+    private const BARE_DOCUMENT_BLOCK_PARENT_INDENT = -1;
+
     private const TOKEN_TYPES_SPASE_AND_COMMENT = [
         TokenType::COMMENT,
         TokenType::NEWLINE,
@@ -838,7 +844,7 @@ final class Parser
             // do not have an INDENTATION token emitted by the lexer.
             if (TokenType::INDENTATION === $token->type) {
                 $indentLen = \strlen($token->text);
-            } elseif ($parentIndentLen < 0 && $this->isKeyValueCoupleStart($harvester)) {
+            } elseif (self::BARE_DOCUMENT_BLOCK_PARENT_INDENT === $parentIndentLen && $this->isKeyValueCoupleStart($harvester)) {
                 $indentLen = 0;
             } else {
                 break;
@@ -906,7 +912,7 @@ final class Parser
             // do not have an INDENTATION token emitted by the lexer.
             if (TokenType::INDENTATION === $token->type) {
                 $indentLen = \strlen($token->text);
-            } elseif ($parentIndentLen < 0 && TokenType::SEQUENCE_ENTRY === $token->type) {
+            } elseif (self::BARE_DOCUMENT_BLOCK_PARENT_INDENT === $parentIndentLen && TokenType::SEQUENCE_ENTRY === $token->type) {
                 $indentLen = 0;
             } else {
                 break;
@@ -1135,12 +1141,12 @@ final class Parser
                     break;
                 }
 
-                $document->addChild($this->parseValue($harvester, -1));
+                $document->addChild($this->parseValue($harvester, self::BARE_DOCUMENT_BLOCK_PARENT_INDENT));
                 continue;
             }
 
             if (TokenType::ALIAS === $token->type) {
-                $document->addChild($this->parseValue($harvester, -1));
+                $document->addChild($this->parseValue($harvester, self::BARE_DOCUMENT_BLOCK_PARENT_INDENT));
                 continue;
             }
 
@@ -1176,7 +1182,7 @@ final class Parser
                     $harvester->tokens->advance();
                 }
 
-                $document->addChild($this->parseValue($harvester, -1));
+                $document->addChild($this->parseValue($harvester, self::BARE_DOCUMENT_BLOCK_PARENT_INDENT));
                 continue;
             }
 
@@ -1469,9 +1475,9 @@ final class Parser
 
         // Column-0 block collection (no leading INDENTATION token) — only
         // accepted at bare document root (n = -1 per YAML 1.2.2 rule [211]).
-        if ($parentIndentLen < 0) {
+        if (self::BARE_DOCUMENT_BLOCK_PARENT_INDENT === $parentIndentLen) {
             if (TokenType::SEQUENCE_ENTRY === $afterIndent->type) {
-                $valueNode->addChild($this->parseBlockSequenceValue($harvester, $parentIndentLen));
+                $valueNode->addChild($this->parseBlockSequenceValue($harvester, self::BARE_DOCUMENT_BLOCK_PARENT_INDENT));
 
                 return;
             }
@@ -1480,7 +1486,7 @@ final class Parser
                 || TokenType::MERGE_INDICATOR === $afterIndent->type
                 || $afterIndent->type->isScalar()
             ) {
-                $valueNode->addChild($this->parseBlockMappingValue($harvester, $parentIndentLen));
+                $valueNode->addChild($this->parseBlockMappingValue($harvester, self::BARE_DOCUMENT_BLOCK_PARENT_INDENT));
             }
         }
     }
