@@ -90,14 +90,16 @@ green on the lintable buckets.
 
 Inputs copied **without modification** from `in.yaml` files under
 `goccy/go-yaml`’s `testdata/yaml-test-suite/` tree (same bytes as upstream).
-They must pass `yamllint` like `edge_cases/`. Lexer/parser expectations live
-under `tests/lexer_expectations/go_yaml/` and `tests/parser_expectations/go_yaml/`
-with the same relative file names.
+Directory layout matches that tree: each case is a sub-folder (e.g.
+`allowed-characters-in-keys/`) containing `in.yaml`, not a renamed flat file.
+They must pass `yamllint` like `edge_cases/`. Lexer/parser expectations mirror
+the same paths under `tests/lexer_expectations/go_yaml/` and
+`tests/parser_expectations/go_yaml/` (e.g. `.../in.yaml` → `.../in.php`).
 
 ### `tests/fixture/go_yaml_extra/`
 
-Same upstream source as `go_yaml/`, but inputs that **fail** the project’s
-current `yamllint` configuration. Expectations live under
+Same upstream source and layout as `go_yaml/`, but inputs that **fail** the
+project’s current `yamllint` configuration. Expectations live under
 `tests/lexer_expectations/go_yaml_extra/` and `tests/parser_expectations/go_yaml_extra/`.
 
 ### `tests/fixture/invalid/`

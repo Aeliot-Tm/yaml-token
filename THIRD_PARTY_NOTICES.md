@@ -18,8 +18,8 @@ by creating an issue [here](https://github.com/Aeliot-Tm/yaml-token/issues).
 ### Scope
 
 YAML test fixtures under `tests/fixture/go_yaml/` and `tests/fixture/go_yaml_extra/`
-are derived from test data in the goccy/go-yaml repository (including cases under
-`testdata/yaml-test-suite/`). Filenames may differ from upstream layout. A verbatim copy
+are derived from test data in the goccy/go-yaml repository. Their paths mirror
+`testdata/yaml-test-suite/` (each case folder with `in.yaml`). A verbatim copy
 of the upstream `LICENSE` file is stored as `LICENSE` in each of those directories.
 
 ```
