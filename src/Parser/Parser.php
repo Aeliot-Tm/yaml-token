@@ -515,15 +515,19 @@ final class Parser
 
     private function isBlockScalarStartAtDocumentRoot(Harvester $harvester): bool
     {
-        $token = $harvester->tokens->current();
-        if (null === $token) {
-            return false;
-        }
-        if (TokenType::INDENTATION === $token->type) {
-            $token = $harvester->tokens->peek(1);
-        }
+        $offset = 0;
+        while (true) {
+            $token = $harvester->tokens->peek($offset);
+            if (null === $token) {
+                return false;
+            }
+            if (TokenType::INDENTATION === $token->type || TokenType::WHITESPACE === $token->type) {
+                ++$offset;
+                continue;
+            }
 
-        return null !== $token && \in_array($token->type, TokenType::BLOCK_SCALAR_INDICATORS, true);
+            return \in_array($token->type, TokenType::BLOCK_SCALAR_INDICATORS, true);
+        }
     }
 
     private function isFlowMappingStart(Harvester $harvester): bool
@@ -1109,9 +1113,19 @@ final class Parser
             }
 
             if ($this->isBlockScalarStartAtDocumentRoot($harvester)) {
-                if (TokenType::INDENTATION === $token->type) {
-                    $document->addChild(new IndentationNode($token));
-                    $harvester->tokens->advance();
+                while (true) {
+                    $separation = $harvester->tokens->current();
+                    if (TokenType::INDENTATION === $separation?->type) {
+                        $document->addChild(new IndentationNode($separation));
+                        $harvester->tokens->advance();
+                        continue;
+                    }
+                    if (TokenType::WHITESPACE === $separation?->type) {
+                        $document->addChild(new WhitespaceNode($separation));
+                        $harvester->tokens->advance();
+                        continue;
+                    }
+                    break;
                 }
 
                 $document->addChild($this->parseValue($harvester, -1));
