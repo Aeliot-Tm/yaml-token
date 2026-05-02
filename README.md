@@ -7,9 +7,17 @@ A YAML parser that represents YAML as a hierarchical structure of tokens and con
 The library enables working with YAML not only as data but as a full structure of the source text.
 Every element (key, value, indentation, comment) has its position and can be modified or recreated.
 
-> ### Project status:
+> ## Project status:
+> 
 > The project is in its early stages of development.
 > The structure and any interfaces are subject to change without notice.
+> 
+> **Not ready for production.** The public API, runtime behavior, and repository layout may change
+> at any time. There are no stability or semantic versioning guarantees.
+> 
+> **Git history may be rewritten.** Maintainers may force-push or otherwise rewrite branches.
+> Older commits may no longer exist on the remote. Do not pin this repository to a specific revision
+> for long-term reproducibility. A previously fetched commit may become unavailable.
 
 ## YAML Specifications
 
@@ -25,3 +33,9 @@ Every element (key, value, indentation, comment) has its position and can be mod
 
 This repository includes third-party materials that are not covered solely by the copyright in [LICENSE](LICENSE).
 Their sources, scope, and license terms are listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
+## Contributing
+
+Early feedback and contributions are welcome. Open an issue to discuss larger changes
+before investing significant time. Pull requests for fixes and tests are appreciated.
+Expect APIs to keep moving until the project stabilizes.
