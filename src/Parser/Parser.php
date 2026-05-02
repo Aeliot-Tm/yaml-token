@@ -875,25 +875,26 @@ final class Parser
 
     private function parseDocuments(Harvester $harvester, StreamNode $stream): void
     {
+        $addedDocs = [];
         $document = new DocumentNode();
         while (!$harvester->tokens->isEnd()) {
             $token = $harvester->tokens->current();
 
             if (TokenType::DOCUMENT_START === $token->type) {
                 if ($document->getChildren()) {
-                    $stream->addChild($document);
+                    $this->tryAddDocumentToStream($stream, $document, $addedDocs);
                     $document = new DocumentNode();
                 }
 
                 $document->addChild(new DocumentStartNode($token));
-                $stream->addChild($document);
+                $this->tryAddDocumentToStream($stream, $document, $addedDocs);
                 $harvester->tokens->advance();
                 continue;
             }
 
             if (TokenType::DOCUMENT_END === $token->type) {
                 $document->addChild(new DocumentEndNode($token));
-                $stream->addChild($document);
+                $this->tryAddDocumentToStream($stream, $document, $addedDocs);
                 $document = new DocumentNode();
                 $harvester->tokens->advance();
                 continue;
@@ -1023,7 +1024,7 @@ final class Parser
         }
 
         if ($document->getChildren()) {
-            $stream->addChild($document);
+            $this->tryAddDocumentToStream($stream, $document, $addedDocs);
         }
     }
 
@@ -1805,6 +1806,17 @@ final class Parser
         } catch (IndentationInvalidException|IndentationOverrideException $e) {
             $this->wrapParseStateIndentationException($e, $harvester->tokens);
         }
+    }
+
+    private function tryAddDocumentToStream(StreamNode $stream, DocumentNode $document, array &$addedDocs): void
+    {
+        $objectId = spl_object_id($document);
+        if (isset($addedDocs[$objectId])) {
+            return;
+        }
+
+        $stream->addChild($document);
+        $addedDocs[$objectId] = true;
     }
 
     private function tryConsumeFlowMappingValueIndicator(Harvester $harvester, KeyValueCoupleNode $couple): bool
