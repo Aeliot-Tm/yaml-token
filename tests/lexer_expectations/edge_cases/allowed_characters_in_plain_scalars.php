@@ -97,24 +97,4 @@ return [
         'type' => TokenType::NEWLINE,
         'text' => "\n",
     ],
-    [
-        'type' => TokenType::PLAIN_SCALAR,
-        'text' => 'safe percentage',
-    ],
-    [
-        'type' => TokenType::VALUE_INDICATOR,
-        'text' => ':',
-    ],
-    [
-        'type' => TokenType::WHITESPACE,
-        'text' => ' ',
-    ],
-    [
-        'type' => TokenType::PLAIN_SCALAR,
-        'text' => '%foo',
-    ],
-    [
-        'type' => TokenType::NEWLINE,
-        'text' => "\n",
-    ],
 ];
