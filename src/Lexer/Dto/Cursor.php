@@ -54,7 +54,16 @@ final class Cursor
     public bool $blockScalarExplicitIndentIndicator = false;
 
     public int $column = 1;
+
     public int $currentIndent = 0;
+
+    /**
+     * One stack frame per open flow collection ({@see FlowMapFrame}, {@see FlowSequenceFrame}): a map frame tracks
+     * phase so ':' after a key is a {@see TokenType::VALUE_INDICATOR} even when the value is adjacent (K3WX {@code :bar}).
+     *
+     * @var list<FlowCollectionFrameInterface>
+     */
+    public array $flowCollectionStack = [];
 
     /**
      * Nesting depth of flow collections (incremented on FLOW_MAPPING_START / FLOW_SEQUENCE_START,

@@ -772,12 +772,13 @@ final class Parser
 
     /**
      * Implicit YAML key detector (YAML 1.2.2 rule [154] ns-s-implicit-yaml-key):
-     * current token is a scalar and the next non-WHITESPACE token on the same
-     * logical position is ':' (VALUE_INDICATOR). Used both for
-     *  - flow-pair entry inside a flow-sequence (§7.4.1 [139], §7.4.2 [152]);
-     *  - compact block-mapping entry inside a block sequence entry (§8.2.1 [185], §8.2.2 [195]).
+     * current token is a scalar and the next significant token is ':' (VALUE_INDICATOR).
+     * Used for flow-pair entries (§7.4.1 [139]) and compact block-mapping in a sequence (§8.2.1 [185]).
+     *
+     * When {@code $allowFlowSeparation} is true (flow collections only), COMMENT and NEWLINE tokens may
+     * appear between the scalar and ':' (YAML test suite K3WX / flow line breaks).
      */
-    private function isScalarFollowedByValueIndicator(Harvester $harvester): bool
+    private function isScalarFollowedByValueIndicator(Harvester $harvester, bool $allowFlowSeparation = false): bool
     {
         $token = $harvester->tokens->current();
         if (null === $token || !$token->type->isScalar()) {
@@ -790,10 +791,16 @@ final class Parser
             if (null === $peeked) {
                 return false;
             }
-            if (TokenType::WHITESPACE !== $peeked->type) {
-                return TokenType::VALUE_INDICATOR === $peeked->type;
+            if (TokenType::WHITESPACE === $peeked->type) {
+                ++$offset;
+                continue;
             }
-            ++$offset;
+            if ($allowFlowSeparation && \in_array($peeked->type, [TokenType::COMMENT, TokenType::NEWLINE], true)) {
+                ++$offset;
+                continue;
+            }
+
+            return TokenType::VALUE_INDICATOR === $peeked->type;
         }
     }
 
@@ -1321,7 +1328,7 @@ final class Parser
     {
         $isExplicitKeyPair = TokenType::EXPLICIT_KEY_INDICATOR === $harvester->tokens->current()?->type;
 
-        if (!$isExplicitKeyPair && !$this->isScalarFollowedByValueIndicator($harvester)) {
+        if (!$isExplicitKeyPair && !$this->isScalarFollowedByValueIndicator($harvester, true)) {
             return $this->parseValue($harvester, 0);
         }
 
@@ -2000,7 +2007,11 @@ final class Parser
 
     private function tryConsumeFlowMappingValueIndicator(Harvester $harvester, KeyValueCoupleNode $couple): bool
     {
-        $this->collectTypes($harvester, [TokenType::WHITESPACE], $couple);
+        $this->collectTypes($harvester, [
+            TokenType::COMMENT,
+            TokenType::NEWLINE,
+            TokenType::WHITESPACE,
+        ], $couple);
 
         $token = $harvester->tokens->current();
         if (null === $token || TokenType::VALUE_INDICATOR !== $token->type) {

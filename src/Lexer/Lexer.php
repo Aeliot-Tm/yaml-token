@@ -14,8 +14,11 @@ declare(strict_types=1);
 namespace Aeliot\YamlToken\Lexer;
 
 use Aeliot\YamlToken\Enum\BlockScalarChomping;
+use Aeliot\YamlToken\Enum\FlowMapPhase;
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Lexer\Dto\Cursor;
+use Aeliot\YamlToken\Lexer\Dto\FlowMapFrame;
+use Aeliot\YamlToken\Lexer\Dto\FlowSequenceFrame;
 use Aeliot\YamlToken\Lexer\Dto\Harvester;
 use Aeliot\YamlToken\Token\Token;
 use Aeliot\YamlToken\Token\TokenStream;
@@ -287,12 +290,17 @@ final class Lexer
      * followed by any ns-plain-safe(c) char. In block context (rule [128] ns-plain-safe-out = ns-char),
      * that includes every non-whitespace char, so e.g. ":{", ":[", ':"', ":'", ":#" must stay part of
      * the scalar. In flow context (rule [129] ns-plain-safe-in = ns-char - c-flow-indicator), the
-     * c-flow-indicator chars terminate the scalar and ':' becomes a value indicator.
+     * c-flow-indicator chars terminate the scalar and ':' becomes a value indicator. Additionally,
+     * when {@see Cursor::$flowCollectionStack} top map is in phase {@see FlowMapPhase::Colon} (K3WX),
+     * ':' is a value indicator even if the value is adjacent (e.g. {@code :bar}).
      */
     private function isColonMappingValueIndicator(Harvester $harvester, int $colonPosition): bool
     {
         if ($colonPosition >= $harvester->length || ':' !== $harvester->input[$colonPosition]) {
             return false;
+        }
+        if ($this->isFlowMapExpectsValueSeparatorColon($harvester->cursor)) {
+            return true;
         }
         $afterColon = $colonPosition + 1;
         if ($afterColon >= $harvester->length) {
@@ -323,6 +331,13 @@ final class Lexer
         }
 
         return \in_array($harvester->input[$harvester->cursor->position - 1], self::CHARS_WHITESPACE, true);
+    }
+
+    private function isFlowMapExpectsValueSeparatorColon(Cursor $cursor): bool
+    {
+        $top = end($cursor->flowCollectionStack) ?: null;
+
+        return $top instanceof FlowMapFrame && FlowMapPhase::Colon === $top->phase;
     }
 
     private function isMappingKey(Harvester $harvester): bool
@@ -455,6 +470,86 @@ final class Lexer
             && TokenType::PLAIN_SCALAR === $significantBeforeBreak->type) {
             $harvester->cursor->awaitingBlockPlainContinuation = true;
         }
+    }
+
+    private function onFlowCollectionClosed(Harvester $harvester): void
+    {
+        $stack = &$harvester->cursor->flowCollectionStack;
+        if ([] === $stack) {
+            return;
+        }
+        array_pop($stack);
+        if ([] === $stack) {
+            return;
+        }
+        $i = \count($stack) - 1;
+        $parent = $stack[$i];
+        if (!$parent instanceof FlowMapFrame) {
+            return;
+        }
+        if (FlowMapPhase::Key === $parent->phase) {
+            $parent->phase = FlowMapPhase::Colon;
+        } elseif (FlowMapPhase::Value === $parent->phase) {
+            $parent->phase = FlowMapPhase::Sep;
+        }
+    }
+
+    private function onFlowEntryCommaEmitted(Harvester $harvester): void
+    {
+        $stack = &$harvester->cursor->flowCollectionStack;
+        if ([] === $stack) {
+            return;
+        }
+        $i = \count($stack) - 1;
+        $top = $stack[$i];
+        if (!$top instanceof FlowMapFrame || FlowMapPhase::Sep !== $top->phase) {
+            return;
+        }
+        $top->phase = FlowMapPhase::Key;
+    }
+
+    private function onFlowMapScalarLikeNodeEmitted(Harvester $harvester, TokenType $type): void
+    {
+        if (!\in_array($type, [
+            TokenType::ALIAS,
+            TokenType::DOUBLE_QUOTED_SCALAR,
+            TokenType::MERGE_INDICATOR,
+            TokenType::PLAIN_SCALAR,
+            TokenType::SINGLE_QUOTED_SCALAR,
+        ], true)) {
+            return;
+        }
+        $stack = &$harvester->cursor->flowCollectionStack;
+        if ([] === $stack) {
+            return;
+        }
+        $i = \count($stack) - 1;
+        $top = $stack[$i];
+        if ($top instanceof FlowSequenceFrame) {
+            return;
+        }
+        if (!$top instanceof FlowMapFrame) {
+            return;
+        }
+        if (FlowMapPhase::Key === $top->phase) {
+            $top->phase = FlowMapPhase::Colon;
+        } elseif (FlowMapPhase::Value === $top->phase) {
+            $top->phase = FlowMapPhase::Sep;
+        }
+    }
+
+    private function onFlowMappingValueIndicatorEmitted(Harvester $harvester): void
+    {
+        $stack = &$harvester->cursor->flowCollectionStack;
+        if ([] === $stack) {
+            return;
+        }
+        $i = \count($stack) - 1;
+        $top = $stack[$i];
+        if (!$top instanceof FlowMapFrame || FlowMapPhase::Colon !== $top->phase) {
+            return;
+        }
+        $top->phase = FlowMapPhase::Value;
     }
 
     private function promoteBlockScalarBodyFromHeader(Cursor $cursor): void
@@ -819,6 +914,11 @@ final class Lexer
                     return;
                 }
 
+                if ($harvester->cursor->flowDepth > 0) {
+                    $harvester->stream->addToken(new Token(TokenType::WHITESPACE, $indent, $startLine, $startColumn));
+
+                    return;
+                }
                 $this->applyBlockPlainContinuationIndentRules($harvester, $indent);
                 $harvester->stream->addToken(new Token(TokenType::INDENTATION, $indent, $startLine, $startColumn));
 
@@ -846,6 +946,7 @@ final class Lexer
         // DOCUMENT_START (---)
         if ($this->match($harvester, '---')) {
             $this->resetBlockMappingPlainState($harvester->cursor);
+            $harvester->cursor->flowCollectionStack = [];
             $harvester->stream->addToken(new Token(TokenType::DOCUMENT_START, '---', $startLine, $startColumn));
 
             return;
@@ -854,6 +955,7 @@ final class Lexer
         // DOCUMENT_END (...)
         if ($this->match($harvester, '...')) {
             $this->resetBlockMappingPlainState($harvester->cursor);
+            $harvester->cursor->flowCollectionStack = [];
             $harvester->stream->addToken(new Token(TokenType::DOCUMENT_END, '...', $startLine, $startColumn));
 
             return;
@@ -886,6 +988,11 @@ final class Lexer
                 if (1 === $harvester->cursor->flowDepth) {
                     $this->resetBlockMappingPlainState($harvester->cursor);
                 }
+                if ('{' === $char) {
+                    $harvester->cursor->flowCollectionStack[] = new FlowMapFrame(FlowMapPhase::Key);
+                } else {
+                    $harvester->cursor->flowCollectionStack[] = new FlowSequenceFrame();
+                }
                 $harvester->stream->addToken(new Token(self::FLOW_INDICATOR_TOKEN_TYPES[$char], $char, $startLine, $startColumn));
 
                 return;
@@ -893,7 +1000,10 @@ final class Lexer
             if ($harvester->cursor->flowDepth > 0) {
                 $this->advance($harvester);
                 if ('}' === $char || ']' === $char) {
+                    $this->onFlowCollectionClosed($harvester);
                     --$harvester->cursor->flowDepth;
+                } else {
+                    $this->onFlowEntryCommaEmitted($harvester);
                 }
                 $harvester->stream->addToken(new Token(self::FLOW_INDICATOR_TOKEN_TYPES[$char], $char, $startLine, $startColumn));
 
@@ -905,6 +1015,7 @@ final class Lexer
         if ('"' === $char) {
             $scalar = $this->readDoubleQuotedScalar($harvester);
             $harvester->stream->addToken(new Token(TokenType::DOUBLE_QUOTED_SCALAR, $scalar, $startLine, $startColumn));
+            $this->onFlowMapScalarLikeNodeEmitted($harvester, TokenType::DOUBLE_QUOTED_SCALAR);
 
             return;
         }
@@ -913,6 +1024,7 @@ final class Lexer
         if ("'" === $char) {
             $scalar = $this->readSingleQuotedScalar($harvester);
             $harvester->stream->addToken(new Token(TokenType::SINGLE_QUOTED_SCALAR, $scalar, $startLine, $startColumn));
+            $this->onFlowMapScalarLikeNodeEmitted($harvester, TokenType::SINGLE_QUOTED_SCALAR);
 
             return;
         }
@@ -963,6 +1075,7 @@ final class Lexer
             }
             $this->advance($harvester);
             $harvester->stream->addToken(new Token(TokenType::VALUE_INDICATOR, ':', $startLine, $startColumn));
+            $this->onFlowMappingValueIndicatorEmitted($harvester);
 
             return;
         }
@@ -979,6 +1092,7 @@ final class Lexer
         if ('*' === $char) {
             $alias = '*'.$this->readAnchorOrAlias($harvester);
             $harvester->stream->addToken(new Token(TokenType::ALIAS, $alias, $startLine, $startColumn));
+            $this->onFlowMapScalarLikeNodeEmitted($harvester, TokenType::ALIAS);
 
             return;
         }
@@ -1012,6 +1126,7 @@ final class Lexer
             $this->advance($harvester);
             $this->advance($harvester);
             $harvester->stream->addToken(new Token(TokenType::MERGE_INDICATOR, '<<', $startLine, $startColumn));
+            $this->onFlowMapScalarLikeNodeEmitted($harvester, TokenType::MERGE_INDICATOR);
 
             return;
         }
@@ -1020,6 +1135,7 @@ final class Lexer
         $plain = $this->readPlainScalar($harvester);
         if ('' !== $plain) {
             $harvester->stream->addToken(new Token(TokenType::PLAIN_SCALAR, $plain, $startLine, $startColumn));
+            $this->onFlowMapScalarLikeNodeEmitted($harvester, TokenType::PLAIN_SCALAR);
 
             return;
         }
