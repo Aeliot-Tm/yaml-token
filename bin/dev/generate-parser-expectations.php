@@ -38,14 +38,21 @@ $finder = new FixtureFinder(
     true,
 );
 
+$force = in_array('--force', $argv, true);
 $parser = new Parser();
 $exporter = new ParserExpectationExporter();
 $nodeTreeRepresenter = new NodeTreeRepresenter();
+$skipped = 0;
 $written = 0;
 
 foreach ($finder as $yamlPath) {
     $relFromFixture = substr($yamlPath, strlen($fixtureBase) + 1);
     $outPath = $expectBase.'/'.substr($relFromFixture, 0, -5).'.php';
+
+    if (!$force && is_file($outPath)) {
+        ++$skipped;
+        continue;
+    }
 
     $input = str_replace(["\r\n", "\r"], "\n", (string) file_get_contents($yamlPath));
     $tree = $nodeTreeRepresenter->build($parser->parse($input));
@@ -61,4 +68,8 @@ foreach ($finder as $yamlPath) {
     ++$written;
 }
 
-echo "Wrote {$written} expectation file(s) under tests/parser_expectations/\n";
+if ($force) {
+    echo "Wrote {$written} expectation file(s) under tests/parser_expectations/\n";
+} else {
+    echo "Wrote {$written} expectation file(s), skipped {$skipped} existing (use --force to regenerate) under tests/parser_expectations/\n";
+}

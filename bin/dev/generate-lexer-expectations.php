@@ -36,13 +36,20 @@ $finder = new FixtureFinder(
         'spec_extra/1.0',
     ],
 );
+$force = in_array('--force', $argv, true);
 $lexer = new Lexer();
 $exporter = new ParserExpectationExporter();
+$skipped = 0;
 $written = 0;
 
 foreach ($finder as $yamlPath) {
     $relFromFixture = substr($yamlPath, strlen($fixtureBase) + 1);
     $outPath = $expectBase.'/'.substr($relFromFixture, 0, -5).'.php';
+
+    if (!$force && is_file($outPath)) {
+        ++$skipped;
+        continue;
+    }
 
     $input = str_replace(["\r\n", "\r"], "\n", (string) file_get_contents($yamlPath));
     $stream = $lexer->tokenize($input);
@@ -65,4 +72,8 @@ foreach ($finder as $yamlPath) {
     ++$written;
 }
 
-echo "Wrote {$written} expectation file(s) under tests/lexer_expectations/\n";
+if ($force) {
+    echo "Wrote {$written} expectation file(s) under tests/lexer_expectations/\n";
+} else {
+    echo "Wrote {$written} expectation file(s), skipped {$skipped} existing (use --force to regenerate) under tests/lexer_expectations/\n";
+}
