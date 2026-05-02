@@ -44,27 +44,16 @@ return [
                     'children' => [],
                 ],
                 [
-                    'type' => KeyValueCoupleNode::class,
+                    'type' => ValueNode::class,
                     'properties' => [
-                        'key' => [
-                            'type' => KeyNode::class,
+                        'scalar' => [
+                            'type' => ScalarNode::class,
                             'properties' => [
-                                'name' => [
-                                    'type' => ScalarNode::class,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::PLAIN_SCALAR,
-                                            'text' => 'scalar1',
-                                        ],
-                                    ],
-                                    'children' => [],
+                                'token' => [
+                                    'type' => TokenType::PLAIN_SCALAR,
+                                    'text' => 'scalar1',
                                 ],
                             ],
-                            'children' => [],
-                        ],
-                        'value' => [
-                            'type' => ValueNode::class,
-                            'properties' => [],
                             'children' => [],
                         ],
                     ],

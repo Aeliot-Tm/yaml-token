@@ -3,18 +3,16 @@
 declare(strict_types=1);
 
 use Aeliot\YamlToken\Enum\TokenType;
-use Aeliot\YamlToken\Node\BlockScalarChompingIndicatorNode;
-use Aeliot\YamlToken\Node\BlockScalarIndentationIndicatorNode;
 use Aeliot\YamlToken\Node\BlockScalarIndicatorNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\IndentationNode;
 use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
-use Aeliot\YamlToken\Node\MultilinePlainScalarNode;
 use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\SyntaxTokenNode;
+use Aeliot\YamlToken\Node\TagNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 
@@ -37,7 +35,7 @@ return [
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::PLAIN_SCALAR,
-                                            'text' => 'script',
+                                            'text' => 'canonical',
                                         ],
                                     ],
                                     'children' => [],
@@ -48,120 +46,34 @@ return [
                         'value' => [
                             'type' => ValueNode::class,
                             'properties' => [
-                                'multilinePlainScalar' => [
-                                    'type' => MultilinePlainScalarNode::class,
-                                    'properties' => [],
-                                    'children' => [
-                                        [
-                                            'type' => ScalarNode::class,
-                                            'properties' => [
-                                                'token' => [
-                                                    'type' => TokenType::PLAIN_SCALAR,
-                                                    'text' => 'line 1',
-                                                ],
-                                            ],
-                                            'children' => [],
-                                        ],
-                                        [
-                                            'type' => ScalarNode::class,
-                                            'properties' => [
-                                                'token' => [
-                                                    'type' => TokenType::PLAIN_SCALAR,
-                                                    'text' => 'line 2',
-                                                ],
-                                            ],
-                                            'children' => [],
+                                'scalar' => [
+                                    'type' => ScalarNode::class,
+                                    'properties' => [
+                                        'token' => [
+                                            'type' => TokenType::DOUBLE_QUOTED_SCALAR,
+                                            'text' => "\"\\\n R0lGODlhDAAMAIQAAP//9/X17unp5WZmZgAAAOfn515eXvPz7Y6OjuDg4J+fn5\\\n OTk6enp56enmlpaWNjY6Ojo4SEhP/++f/++f/++f/++f/++f/++f/++f/++f/+\\\n +f/++f/++f/++f/++f/++SH+Dk1hZGUgd2l0aCBHSU1QACwAAAAADAAMAAAFLC\\\n AgjoEwnuNAFOhpEMTRiggcz4BNJHrv/zCFcLiwMWYNG84BwwEeECcgggoBADs=\"",
                                         ],
                                     ],
+                                    'children' => [],
+                                ],
+                                'tag' => [
+                                    'type' => TagNode::class,
+                                    'properties' => [
+                                        'token' => [
+                                            'type' => TokenType::TAG,
+                                            'text' => '!!binary',
+                                        ],
+                                    ],
+                                    'children' => [],
                                 ],
                             ],
                             'children' => [
                                 [
-                                    'type' => BlockScalarIndicatorNode::class,
+                                    'type' => WhitespaceNode::class,
                                     'properties' => [
                                         'token' => [
-                                            'type' => TokenType::LITERAL_BLOCK_SCALAR_INDICATOR,
-                                            'text' => '|',
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                                [
-                                    'type' => BlockScalarIndentationIndicatorNode::class,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::BLOCK_SCALAR_INDENTATION_INDICATOR,
-                                            'text' => '2',
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                                [
-                                    'type' => BlockScalarChompingIndicatorNode::class,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::BLOCK_SCALAR_CHOMPING_INDICATOR,
-                                            'text' => '-',
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                                [
-                                    'type' => NewLineNode::class,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::NEWLINE,
-                                            'text' => "\n",
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                                [
-                                    'type' => IndentationNode::class,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::INDENTATION,
-                                            'text' => '    ',
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                                [
-                                    'type' => ScalarNode::class,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::PLAIN_SCALAR,
-                                            'text' => 'line 1',
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                                [
-                                    'type' => NewLineNode::class,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::NEWLINE,
-                                            'text' => "\n",
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                                [
-                                    'type' => IndentationNode::class,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::INDENTATION,
-                                            'text' => '    ',
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                                [
-                                    'type' => ScalarNode::class,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::PLAIN_SCALAR,
-                                            'text' => 'line 2',
+                                            'type' => TokenType::WHITESPACE,
+                                            'text' => ' ',
                                         ],
                                     ],
                                     'children' => [],
@@ -213,7 +125,7 @@ return [
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::PLAIN_SCALAR,
-                                            'text' => 'next',
+                                            'text' => 'generic',
                                         ],
                                     ],
                                     'children' => [],
@@ -228,14 +140,55 @@ return [
                                     'type' => ScalarNode::class,
                                     'properties' => [
                                         'token' => [
-                                            'type' => TokenType::PLAIN_SCALAR,
-                                            'text' => 'ok',
+                                            'type' => TokenType::LITERAL_BLOCK_SCALAR,
+                                            'text' => " R0lGODlhDAAMAIQAAP//9/X17unp5WZmZgAAAOfn515eXvPz7Y6OjuDg4J+fn5\n OTk6enp56enmlpaWNjY6Ojo4SEhP/++f/++f/++f/++f/++f/++f/++f/++f/+\n +f/++f/++f/++f/++f/++SH+Dk1hZGUgd2l0aCBHSU1QACwAAAAADAAMAAAFLC\n AgjoEwnuNAFOhpEMTRiggcz4BNJHrv/zCFcLiwMWYNG84BwwEeECcgggoBADs=\n",
+                                        ],
+                                    ],
+                                    'children' => [],
+                                ],
+                                'tag' => [
+                                    'type' => TagNode::class,
+                                    'properties' => [
+                                        'token' => [
+                                            'type' => TokenType::TAG,
+                                            'text' => '!!binary',
                                         ],
                                     ],
                                     'children' => [],
                                 ],
                             ],
-                            'children' => [],
+                            'children' => [
+                                [
+                                    'type' => WhitespaceNode::class,
+                                    'properties' => [
+                                        'token' => [
+                                            'type' => TokenType::WHITESPACE,
+                                            'text' => ' ',
+                                        ],
+                                    ],
+                                    'children' => [],
+                                ],
+                                [
+                                    'type' => BlockScalarIndicatorNode::class,
+                                    'properties' => [
+                                        'token' => [
+                                            'type' => TokenType::LITERAL_BLOCK_SCALAR_INDICATOR,
+                                            'text' => '|',
+                                        ],
+                                    ],
+                                    'children' => [],
+                                ],
+                                [
+                                    'type' => NewLineNode::class,
+                                    'properties' => [
+                                        'token' => [
+                                            'type' => TokenType::NEWLINE,
+                                            'text' => "\n",
+                                        ],
+                                    ],
+                                    'children' => [],
+                                ],
+                            ],
                         ],
                     ],
                     'children' => [
@@ -255,6 +208,76 @@ return [
                                 'token' => [
                                     'type' => TokenType::WHITESPACE,
                                     'text' => ' ',
+                                ],
+                            ],
+                            'children' => [],
+                        ],
+                    ],
+                ],
+                [
+                    'type' => KeyValueCoupleNode::class,
+                    'properties' => [
+                        'key' => [
+                            'type' => KeyNode::class,
+                            'properties' => [
+                                'name' => [
+                                    'type' => ScalarNode::class,
+                                    'properties' => [
+                                        'token' => [
+                                            'type' => TokenType::PLAIN_SCALAR,
+                                            'text' => 'description',
+                                        ],
+                                    ],
+                                    'children' => [],
+                                ],
+                            ],
+                            'children' => [],
+                        ],
+                        'value' => [
+                            'type' => ValueNode::class,
+                            'properties' => [
+                                'scalar' => [
+                                    'type' => ScalarNode::class,
+                                    'properties' => [
+                                        'token' => [
+                                            'type' => TokenType::PLAIN_SCALAR,
+                                            'text' => 'The binary value above is a tiny arrow encoded as a gif image.',
+                                        ],
+                                    ],
+                                    'children' => [],
+                                ],
+                            ],
+                            'children' => [
+                                [
+                                    'type' => NewLineNode::class,
+                                    'properties' => [
+                                        'token' => [
+                                            'type' => TokenType::NEWLINE,
+                                            'text' => "\n",
+                                        ],
+                                    ],
+                                    'children' => [],
+                                ],
+                                [
+                                    'type' => IndentationNode::class,
+                                    'properties' => [
+                                        'token' => [
+                                            'type' => TokenType::INDENTATION,
+                                            'text' => ' ',
+                                        ],
+                                    ],
+                                    'children' => [],
+                                ],
+                            ],
+                        ],
+                    ],
+                    'children' => [
+                        [
+                            'type' => SyntaxTokenNode::class,
+                            'properties' => [
+                                'token' => [
+                                    'type' => TokenType::VALUE_INDICATOR,
+                                    'text' => ':',
                                 ],
                             ],
                             'children' => [],

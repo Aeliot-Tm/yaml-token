@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use Aeliot\YamlToken\Enum\TokenType;
-use Aeliot\YamlToken\Node\BlockMappingNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\IndentationNode;
 use Aeliot\YamlToken\Node\KeyNode;
@@ -44,81 +43,49 @@ return [
                         'value' => [
                             'type' => ValueNode::class,
                             'properties' => [
-                                'blockMapping' => [
-                                    'type' => BlockMappingNode::class,
-                                    'properties' => [],
-                                    'children' => [
-                                        [
-                                            'type' => NewLineNode::class,
-                                            'properties' => [
-                                                'token' => [
-                                                    'type' => TokenType::NEWLINE,
-                                                    'text' => "\n",
-                                                ],
-                                            ],
-                                            'children' => [],
-                                        ],
-                                        [
-                                            'type' => NewLineNode::class,
-                                            'properties' => [
-                                                'token' => [
-                                                    'type' => TokenType::NEWLINE,
-                                                    'text' => "\n",
-                                                ],
-                                            ],
-                                            'children' => [],
-                                        ],
-                                        [
-                                            'type' => KeyValueCoupleNode::class,
-                                            'properties' => [
-                                                'indentation' => [
-                                                    'type' => IndentationNode::class,
-                                                    'properties' => [
-                                                        'token' => [
-                                                            'type' => TokenType::INDENTATION,
-                                                            'text' => '  ',
-                                                        ],
-                                                    ],
-                                                    'children' => [],
-                                                ],
-                                                'key' => [
-                                                    'type' => KeyNode::class,
-                                                    'properties' => [
-                                                        'name' => [
-                                                            'type' => ScalarNode::class,
-                                                            'properties' => [
-                                                                'token' => [
-                                                                    'type' => TokenType::PLAIN_SCALAR,
-                                                                    'text' => 'text',
-                                                                ],
-                                                            ],
-                                                            'children' => [],
-                                                        ],
-                                                    ],
-                                                    'children' => [],
-                                                ],
-                                                'value' => [
-                                                    'type' => ValueNode::class,
-                                                    'properties' => [],
-                                                    'children' => [],
-                                                ],
-                                            ],
-                                            'children' => [],
-                                        ],
-                                        [
-                                            'type' => NewLineNode::class,
-                                            'properties' => [
-                                                'token' => [
-                                                    'type' => TokenType::NEWLINE,
-                                                    'text' => "\n",
-                                                ],
-                                            ],
-                                            'children' => [],
+                                'scalar' => [
+                                    'type' => ScalarNode::class,
+                                    'properties' => [
+                                        'token' => [
+                                            'type' => TokenType::PLAIN_SCALAR,
+                                            'text' => 'text',
                                         ],
                                     ],
+                                    'children' => [],
                                 ],
                             ],
-                            'children' => [],
+                            'children' => [
+                                [
+                                    'type' => NewLineNode::class,
+                                    'properties' => [
+                                        'token' => [
+                                            'type' => TokenType::NEWLINE,
+                                            'text' => "\n",
+                                        ],
+                                    ],
+                                    'children' => [],
+                                ],
+                                [
+                                    'type' => NewLineNode::class,
+                                    'properties' => [
+                                        'token' => [
+                                            'type' => TokenType::NEWLINE,
+                                            'text' => "\n",
+                                        ],
+                                    ],
+                                    'children' => [],
+                                ],
+                                [
+                                    'type' => IndentationNode::class,
+                                    'properties' => [
+                                        'token' => [
+                                            'type' => TokenType::INDENTATION,
+                                            'text' => '  ',
+                                        ],
+                                    ],
+                                    'children' => [],
+                                ],
+                            ],
                         ],
                     ],
                     'children' => [
@@ -133,6 +100,16 @@ return [
                             'children' => [],
                         ],
                     ],
+                ],
+                [
+                    'type' => NewLineNode::class,
+                    'properties' => [
+                        'token' => [
+                            'type' => TokenType::NEWLINE,
+                            'text' => "\n",
+                        ],
+                    ],
+                    'children' => [],
                 ],
             ],
         ],

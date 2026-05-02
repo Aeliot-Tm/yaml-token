@@ -56,6 +56,16 @@ Because of this, the parser must not invent tokens that did not exist in the ori
     `ValueNode::getScalar()` with a [`ScalarNode`](../../../src/Node/ScalarNode.php).
 - Collections:
   - Block mapping: `key:` followed by an indented block of key/value couples (`BlockMappingNode`).
+  - A line that looks like `key: value` only counts as a new mapping entry when the scalar key is
+    followed by `:` on the **same** line (implicit YAML key). Indented text on the next line without
+    that pattern is a **block scalar value** (plain or quoted), represented as `ValueNode` with
+    `ScalarNode` / layout children, not as `KeyValueCoupleNode`.
+  - Literal and folded block scalars (`|` / `>`): after the header line, non-empty continuation lines
+    use the same newline + indentation + scalar consumption as multiline plain scalars; the value may
+    become `MultilinePlainScalarNode` when several `PLAIN_SCALAR` fragments are present.
   - Block sequence: `key:` followed by an indented list of `-` entries (`BlockSequenceNode`
     with `SequenceEntryNode` children).
   - Flow mapping / sequence: `{...}` / `[...]`.
+- Bare document content that is only a scalar (no mapping key) is parsed as a top-level `ValueNode`
+  when the first token is a scalar and it is not an implicit key line.
+- The bare-document block context follows YAML 1.2.2 rule [211]. The parser passes a sentinel `BARE_DOCUMENT_BLOCK_PARENT_INDENT` (-1) into `parseValue()` so the same `$lineIndent <= $parentIndent` checks work at column 0; it is not a physical space count.

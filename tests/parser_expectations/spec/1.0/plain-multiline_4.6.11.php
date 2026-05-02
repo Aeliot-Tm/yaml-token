@@ -3,11 +3,11 @@
 declare(strict_types=1);
 
 use Aeliot\YamlToken\Enum\TokenType;
-use Aeliot\YamlToken\Node\BlockMappingNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\IndentationNode;
 use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
+use Aeliot\YamlToken\Node\MultilinePlainScalarNode;
 use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
@@ -44,110 +44,26 @@ return [
                         'value' => [
                             'type' => ValueNode::class,
                             'properties' => [
-                                'blockMapping' => [
-                                    'type' => BlockMappingNode::class,
+                                'multilinePlainScalar' => [
+                                    'type' => MultilinePlainScalarNode::class,
                                     'properties' => [],
                                     'children' => [
                                         [
-                                            'type' => NewLineNode::class,
+                                            'type' => ScalarNode::class,
                                             'properties' => [
                                                 'token' => [
-                                                    'type' => TokenType::NEWLINE,
-                                                    'text' => "\n",
+                                                    'type' => TokenType::PLAIN_SCALAR,
+                                                    'text' => 'This unquoted scalar',
                                                 ],
                                             ],
                                             'children' => [],
                                         ],
                                         [
-                                            'type' => KeyValueCoupleNode::class,
-                                            'properties' => [
-                                                'indentation' => [
-                                                    'type' => IndentationNode::class,
-                                                    'properties' => [
-                                                        'token' => [
-                                                            'type' => TokenType::INDENTATION,
-                                                            'text' => '  ',
-                                                        ],
-                                                    ],
-                                                    'children' => [],
-                                                ],
-                                                'key' => [
-                                                    'type' => KeyNode::class,
-                                                    'properties' => [
-                                                        'name' => [
-                                                            'type' => ScalarNode::class,
-                                                            'properties' => [
-                                                                'token' => [
-                                                                    'type' => TokenType::PLAIN_SCALAR,
-                                                                    'text' => 'This unquoted scalar',
-                                                                ],
-                                                            ],
-                                                            'children' => [],
-                                                        ],
-                                                    ],
-                                                    'children' => [],
-                                                ],
-                                                'value' => [
-                                                    'type' => ValueNode::class,
-                                                    'properties' => [],
-                                                    'children' => [],
-                                                ],
-                                            ],
-                                            'children' => [],
-                                        ],
-                                        [
-                                            'type' => NewLineNode::class,
+                                            'type' => ScalarNode::class,
                                             'properties' => [
                                                 'token' => [
-                                                    'type' => TokenType::NEWLINE,
-                                                    'text' => "\n",
-                                                ],
-                                            ],
-                                            'children' => [],
-                                        ],
-                                        [
-                                            'type' => KeyValueCoupleNode::class,
-                                            'properties' => [
-                                                'indentation' => [
-                                                    'type' => IndentationNode::class,
-                                                    'properties' => [
-                                                        'token' => [
-                                                            'type' => TokenType::INDENTATION,
-                                                            'text' => '  ',
-                                                        ],
-                                                    ],
-                                                    'children' => [],
-                                                ],
-                                                'key' => [
-                                                    'type' => KeyNode::class,
-                                                    'properties' => [
-                                                        'name' => [
-                                                            'type' => ScalarNode::class,
-                                                            'properties' => [
-                                                                'token' => [
-                                                                    'type' => TokenType::PLAIN_SCALAR,
-                                                                    'text' => 'spans many lines.',
-                                                                ],
-                                                            ],
-                                                            'children' => [],
-                                                        ],
-                                                    ],
-                                                    'children' => [],
-                                                ],
-                                                'value' => [
-                                                    'type' => ValueNode::class,
-                                                    'properties' => [],
-                                                    'children' => [],
-                                                ],
-                                            ],
-                                            'children' => [],
-                                        ],
-                                        [
-                                            'type' => NewLineNode::class,
-                                            'properties' => [
-                                                'token' => [
-                                                    'type' => TokenType::NEWLINE,
-                                                    'text' => "\n",
+                                                    'type' => TokenType::PLAIN_SCALAR,
+                                                    'text' => 'spans many lines.',
                                                 ],
                                             ],
                                             'children' => [],
@@ -155,7 +71,68 @@ return [
                                     ],
                                 ],
                             ],
-                            'children' => [],
+                            'children' => [
+                                [
+                                    'type' => NewLineNode::class,
+                                    'properties' => [
+                                        'token' => [
+                                            'type' => TokenType::NEWLINE,
+                                            'text' => "\n",
+                                        ],
+                                    ],
+                                    'children' => [],
+                                ],
+                                [
+                                    'type' => IndentationNode::class,
+                                    'properties' => [
+                                        'token' => [
+                                            'type' => TokenType::INDENTATION,
+                                            'text' => '  ',
+                                        ],
+                                    ],
+                                    'children' => [],
+                                ],
+                                [
+                                    'type' => ScalarNode::class,
+                                    'properties' => [
+                                        'token' => [
+                                            'type' => TokenType::PLAIN_SCALAR,
+                                            'text' => 'This unquoted scalar',
+                                        ],
+                                    ],
+                                    'children' => [],
+                                ],
+                                [
+                                    'type' => NewLineNode::class,
+                                    'properties' => [
+                                        'token' => [
+                                            'type' => TokenType::NEWLINE,
+                                            'text' => "\n",
+                                        ],
+                                    ],
+                                    'children' => [],
+                                ],
+                                [
+                                    'type' => IndentationNode::class,
+                                    'properties' => [
+                                        'token' => [
+                                            'type' => TokenType::INDENTATION,
+                                            'text' => '  ',
+                                        ],
+                                    ],
+                                    'children' => [],
+                                ],
+                                [
+                                    'type' => ScalarNode::class,
+                                    'properties' => [
+                                        'token' => [
+                                            'type' => TokenType::PLAIN_SCALAR,
+                                            'text' => 'spans many lines.',
+                                        ],
+                                    ],
+                                    'children' => [],
+                                ],
+                            ],
                         ],
                     ],
                     'children' => [
@@ -170,6 +147,16 @@ return [
                             'children' => [],
                         ],
                     ],
+                ],
+                [
+                    'type' => NewLineNode::class,
+                    'properties' => [
+                        'token' => [
+                            'type' => TokenType::NEWLINE,
+                            'text' => "\n",
+                        ],
+                    ],
+                    'children' => [],
                 ],
             ],
         ],
