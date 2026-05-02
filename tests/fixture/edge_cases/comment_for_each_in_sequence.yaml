@@ -1,0 +1,7 @@
+sequence with comments:
+  # Comment for A
+  - a
+  # Comment for B
+  - b
+  # Comment for C
+  - c
