@@ -1808,6 +1808,9 @@ final class Parser
         }
     }
 
+    /**
+     * @param array<int, bool> $addedDocs
+     */
     private function tryAddDocumentToStream(StreamNode $stream, DocumentNode $document, array &$addedDocs): void
     {
         $objectId = spl_object_id($document);
