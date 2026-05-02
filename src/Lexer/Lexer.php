@@ -1223,7 +1223,15 @@ final class Lexer
 
     private function shouldTokenizeYamlDirectiveAsParts(Harvester $harvester): bool
     {
-        return '%YAML' === substr($harvester->input, $harvester->cursor->position, 5);
+        return '%YAML' === substr($harvester->input, $harvester->cursor->position, 5)
+        && (
+            ($harvester->cursor->position + 5 >= $harvester->length)
+            || \in_array(
+                $harvester->input[$harvester->cursor->position + 5] ?? null,
+                [...self::CHARS_HORIZONTAL_WHITESPACE, ...self::CHARS_LINE_BREAK, ':'],
+                true,
+            )
+        );
     }
 
     private function splitExplicitIndentBlockBodyToTokens(Harvester $harvester, string $body): void

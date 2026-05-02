@@ -22,13 +22,13 @@ The rules below describe the practical behavior relied upon by lexer unit tests.
 - **Document markers**: `---` → `DOCUMENT_START`, `...` → `DOCUMENT_END`.
 - **Comments**: `#...` until line break is `COMMENT` (newline is a separate `NEWLINE` token).
 - **Directives**:
-  - `%YAML` lines: when the keyword is followed by horizontal whitespace, `:`, or a digit, the line
+  - `%YAML` lines: the name must be exact — the character after `L` must be horizontal whitespace,
+    `:`, a digit, a line break, or end of input. Otherwise (e.g. `%YAMLL`), the whole `%...` line
+    through the line break is a generic `DIRECTIVE` token. When the boundary matches, the line
     is split into `DIRECTIVE_YAML` (`%YAML`), optional `WHITESPACE`, optional `VALUE_INDICATOR` (`:`),
-    optional `WHITESPACE`, `DIRECTIVE_YAML_VERSION` (text until horizontal whitespace, line break, 
+    optional `WHITESPACE`, `DIRECTIVE_YAML_VERSION` (text until horizontal whitespace, line break,
     or `#` that starts a comment), optional `WHITESPACE`, optional `COMMENT`, then the line break
-    is a separate `NEWLINE`. If `%YAML` is immediately followed by a line break, or not followed
-    by whitespace/`:`/digit (e.g. glued suffix), the rest of the line is emitted
-    as a single `DIRECTIVE_YAML` token as before.
+    is a separate `NEWLINE`.
   - `%TAG` lines: when the keyword is followed by horizontal whitespace, `!` (start of a tag handle),
     or end of input, the line is split into `DIRECTIVE_TAG` (`%TAG`), optional `WHITESPACE`,
     `DIRECTIVE_TAG_HANDLE` (`!`, `!!`, or `!name!`), optional `WHITESPACE`, `DIRECTIVE_TAG_PREFIX`
