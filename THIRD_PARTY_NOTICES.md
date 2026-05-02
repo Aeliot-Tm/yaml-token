@@ -11,8 +11,8 @@ by creating an issue [here](https://github.com/Aeliot-Tm/yaml-token/issues).
 
 ## goccy/go-yaml (MIT)
 
-**Source:** https://github.com/goccy/go-yaml\
-**License:** MIT License\
+**Source:** https://github.com/goccy/go-yaml \
+**License:** MIT License \
 **Copyright:** © 2019 Masaaki Goshima
 
 ### Scope
