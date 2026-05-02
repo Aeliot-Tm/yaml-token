@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Aeliot\YamlToken\Test\Unit\Parser;
 
 use Aeliot\YamlToken\Parser\Parser;
+use Aeliot\YamlToken\TestHelper\FixtureFinder;
 use Aeliot\YamlToken\TestHelper\NodeTreeRepresenter;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -33,42 +34,24 @@ final class FixtureParserMappingTest extends TestCase
         $fixtureBase = $projectRoot.'/tests/fixture';
         $expectBase = $projectRoot.'/tests/parser_expectations';
 
-        $fixtureDirs = [
-            'edge_cases',
-            'edge_cases_extra',
-            'spec/1.0',
-            'spec/1.1',
-            'spec/1.2.0',
-            'spec/1.2.1',
-            'spec/1.2.2',
-            'spec_extra/1.0',
-        ];
+        $finder = new FixtureFinder(
+            $fixtureBase,
+            [
+                'edge_cases',
+                'edge_cases_extra',
+                'spec/1.0',
+                'spec/1.1',
+                'spec/1.2.0',
+                'spec/1.2.1',
+                'spec/1.2.2',
+                'spec_extra/1.0',
+            ],
+        );
 
-        foreach ($fixtureDirs as $sub) {
-            $dir = $fixtureBase.'/'.$sub;
-            if (!is_dir($dir)) {
-                continue;
-            }
-
-            $iterator = new \RecursiveIteratorIterator(
-                new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS)
-            );
-
-            $paths = [];
-            foreach ($iterator as $fileInfo) {
-                if (!$fileInfo->isFile() || !str_ends_with($fileInfo->getFilename(), '.yaml')) {
-                    continue;
-                }
-                $paths[] = $fileInfo->getPathname();
-            }
-
-            sort($paths, \SORT_STRING);
-
-            foreach ($paths as $yamlPath) {
-                $relFromFixture = substr($yamlPath, \strlen($fixtureBase) + 1);
-                $expectPath = $expectBase.'/'.substr($relFromFixture, 0, -5).'.php';
-                yield $relFromFixture => [$yamlPath, $expectPath];
-            }
+        foreach ($finder as $yamlPath) {
+            $relFromFixture = substr($yamlPath, \strlen($fixtureBase) + 1);
+            $expectPath = $expectBase.'/'.substr($relFromFixture, 0, -5).'.php';
+            yield $relFromFixture => [$yamlPath, $expectPath];
         }
     }
 
