@@ -49,11 +49,7 @@ return [
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::FOLDED_BLOCK_SCALAR,
-                                            'text' => '  This is a long line
-  that folds into space.
-
-  New paragraph here.
-',
+                                            'text' => "  This is a long line\n  that folds into space.\n\n  New paragraph here.\n",
                                         ],
                                     ],
                                     'children' => [],
@@ -75,8 +71,7 @@ return [
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::NEWLINE,
-                                            'text' => '
-',
+                                            'text' => "\n",
                                         ],
                                     ],
                                     'children' => [],

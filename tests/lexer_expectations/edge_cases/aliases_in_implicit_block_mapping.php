@@ -39,8 +39,7 @@ return [
     ],
     [
         'type' => TokenType::NEWLINE,
-        'text' => '
-',
+        'text' => "\n",
     ],
     [
         'type' => TokenType::ALIAS,
@@ -64,7 +63,6 @@ return [
     ],
     [
         'type' => TokenType::NEWLINE,
-        'text' => '
-',
+        'text' => "\n",
     ],
 ];

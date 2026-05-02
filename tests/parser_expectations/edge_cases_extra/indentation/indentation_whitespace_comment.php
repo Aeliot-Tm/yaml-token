@@ -40,8 +40,7 @@ return [
                     'properties' => [
                         'token' => [
                             'type' => TokenType::NEWLINE,
-                            'text' => '
-',
+                            'text' => "\n",
                         ],
                     ],
                     'children' => [],
@@ -77,8 +76,7 @@ return [
                                             'properties' => [
                                                 'token' => [
                                                     'type' => TokenType::NEWLINE,
-                                                    'text' => '
-',
+                                                    'text' => "\n",
                                                 ],
                                             ],
                                             'children' => [],
@@ -157,8 +155,7 @@ return [
                                             'properties' => [
                                                 'token' => [
                                                     'type' => TokenType::NEWLINE,
-                                                    'text' => '
-',
+                                                    'text' => "\n",
                                                 ],
                                             ],
                                             'children' => [],
@@ -178,7 +175,7 @@ return [
                                             'properties' => [
                                                 'token' => [
                                                     'type' => TokenType::WHITESPACE,
-                                                    'text' => '	',
+                                                    'text' => "\t",
                                                 ],
                                             ],
                                             'children' => [],
@@ -198,8 +195,7 @@ return [
                                             'properties' => [
                                                 'token' => [
                                                     'type' => TokenType::NEWLINE,
-                                                    'text' => '
-',
+                                                    'text' => "\n",
                                                 ],
                                             ],
                                             'children' => [],
@@ -278,8 +274,7 @@ return [
                                             'properties' => [
                                                 'token' => [
                                                     'type' => TokenType::NEWLINE,
-                                                    'text' => '
-',
+                                                    'text' => "\n",
                                                 ],
                                             ],
                                             'children' => [],

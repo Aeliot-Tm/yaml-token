@@ -27,8 +27,7 @@ return [
     ],
     [
         'type' => TokenType::NEWLINE,
-        'text' => '
-',
+        'text' => "\n",
     ],
     [
         'type' => TokenType::INDENTATION,
@@ -48,8 +47,7 @@ return [
     ],
     [
         'type' => TokenType::NEWLINE,
-        'text' => '
-',
+        'text' => "\n",
     ],
     [
         'type' => TokenType::VALUE_INDICATOR,
@@ -73,7 +71,6 @@ return [
     ],
     [
         'type' => TokenType::NEWLINE,
-        'text' => '
-',
+        'text' => "\n",
     ],
 ];

@@ -23,8 +23,7 @@ return [
     ],
     [
         'type' => TokenType::NEWLINE,
-        'text' => '
-',
+        'text' => "\n",
     ],
     [
         'type' => TokenType::SINGLE_QUOTED_SCALAR,
@@ -44,7 +43,6 @@ return [
     ],
     [
         'type' => TokenType::NEWLINE,
-        'text' => '
-',
+        'text' => "\n",
     ],
 ];

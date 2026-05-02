@@ -34,8 +34,7 @@ final class BrokenIndentTabTest extends LexerMappingTestCase
             ],
             [
                 'type' => TokenType::NEWLINE,
-                'text' => '
-',
+                'text' => "\n",
             ],
             [
                 'type' => TokenType::INDENTATION,
@@ -59,8 +58,7 @@ final class BrokenIndentTabTest extends LexerMappingTestCase
             ],
             [
                 'type' => TokenType::NEWLINE,
-                'text' => '
-',
+                'text' => "\n",
             ],
         ], __DIR__.'/../../../fixture/invalid/indent_after_directive.yaml'];
 
@@ -87,8 +85,7 @@ final class BrokenIndentTabTest extends LexerMappingTestCase
             ],
             [
                 'type' => TokenType::NEWLINE,
-                'text' => '
-',
+                'text' => "\n",
             ],
         ], __DIR__.'/../../../fixture/invalid/indent_spaces_tab_trailing_spaces.yaml'];
 
@@ -115,8 +112,7 @@ final class BrokenIndentTabTest extends LexerMappingTestCase
             ],
             [
                 'type' => TokenType::NEWLINE,
-                'text' => '
-',
+                'text' => "\n",
             ],
         ], __DIR__.'/../../../fixture/invalid/indent_spaces_then_tab.yaml'];
 
@@ -139,8 +135,7 @@ final class BrokenIndentTabTest extends LexerMappingTestCase
             ],
             [
                 'type' => TokenType::NEWLINE,
-                'text' => '
-',
+                'text' => "\n",
             ],
         ], __DIR__.'/../../../fixture/invalid/indent_tab_only.yaml'];
 
@@ -163,8 +158,7 @@ final class BrokenIndentTabTest extends LexerMappingTestCase
             ],
             [
                 'type' => TokenType::NEWLINE,
-                'text' => '
-',
+                'text' => "\n",
             ],
         ], __DIR__.'/../../../fixture/invalid/indent_tabs_only.yaml'];
     }

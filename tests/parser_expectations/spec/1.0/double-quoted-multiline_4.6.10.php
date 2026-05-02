@@ -48,8 +48,7 @@ return [
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::DOUBLE_QUOTED_SCALAR,
-                                            'text' => '"So does this
-  quoted scalar."',
+                                            'text' => "\"So does this\n  quoted scalar.\"",
                                         ],
                                     ],
                                     'children' => [],
@@ -86,8 +85,7 @@ return [
                     'properties' => [
                         'token' => [
                             'type' => TokenType::NEWLINE,
-                            'text' => '
-',
+                            'text' => "\n",
                         ],
                     ],
                     'children' => [],

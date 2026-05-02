@@ -61,7 +61,7 @@
             "@phpstan-clear",
             "@phpstan-analyse"
         ],
-        "phpstan-analyse": "XDEBUG_MODE=off tools/phpstan.phar analyse  -c .infra/scripts/phpstan/config.neon",
+        "phpstan-analyse": "XDEBUG_MODE=off tools/phpstan.phar analyse -c .infra/scripts/phpstan/config.neon --memory-limit=512M",
         "phpstan-baseline": [
             "@phpstan-clear",
             "@phpstan-analyse --generate-baseline .infra/scripts/phpstan/baseline.neon --allow-empty-baseline"

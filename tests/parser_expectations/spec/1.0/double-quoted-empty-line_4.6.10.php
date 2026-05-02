@@ -48,9 +48,7 @@ return [
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::DOUBLE_QUOTED_SCALAR,
-                                            'text' => '"Empty line
-
-  as a line feed"',
+                                            'text' => "\"Empty line\n\n  as a line feed\"",
                                         ],
                                     ],
                                     'children' => [],
@@ -87,8 +85,7 @@ return [
                     'properties' => [
                         'token' => [
                             'type' => TokenType::NEWLINE,
-                            'text' => '
-',
+                            'text' => "\n",
                         ],
                     ],
                     'children' => [],

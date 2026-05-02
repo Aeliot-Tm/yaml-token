@@ -23,14 +23,10 @@ return [
     ],
     [
         'type' => TokenType::NEWLINE,
-        'text' => '
-',
+        'text' => "\n",
     ],
     [
         'type' => TokenType::LITERAL_BLOCK_SCALAR,
-        'text' => '  void main() {
-  	printf("Hello\\n");
-  }
-',
+        'text' => "  void main() {\n  \tprintf(\"Hello\\n\");\n  }\n",
     ],
 ];

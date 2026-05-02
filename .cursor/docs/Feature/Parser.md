@@ -25,6 +25,9 @@ Because of this, the parser must not invent tokens that did not exist in the ori
   asserts the parse tree shape (via [`NodeTreeRepresenter`](../../../tests/helper/NodeTreeRepresenter.php))
   against files under `tests/parser_expectations/`. Regenerate snapshots with `composer parser-expectations`
   after intentional parser or YAML fixture changes (run inside the `php-cli` container when using Docker).
+  Snapshot PHP writes token `text` fields that contain control characters (including newlines)
+  as double-quoted strings with escapes (for example `"\n"`) for stable expectations
+  across OS and Git line-ending settings.
 - Entry points: [`Parser::parse`](../../../src/Parser/Parser.php) (lexes input),
   [`Parser::parseStream`](../../../src/Parser/Parser.php) for an existing `TokenStream`.
 - `%YAML` directive: built as [`YamlDirectiveNode`](../../../src/Node/YamlDirectiveNode.php)

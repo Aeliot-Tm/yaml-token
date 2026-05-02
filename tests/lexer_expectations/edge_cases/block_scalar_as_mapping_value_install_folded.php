@@ -23,13 +23,10 @@ return [
     ],
     [
         'type' => TokenType::NEWLINE,
-        'text' => '
-',
+        'text' => "\n",
     ],
     [
         'type' => TokenType::FOLDED_BLOCK_SCALAR,
-        'text' => '  echo "one"
-  echo "two"
-',
+        'text' => "  echo \"one\"\n  echo \"two\"\n",
     ],
 ];

@@ -19,12 +19,10 @@ return [
     ],
     [
         'type' => TokenType::DOUBLE_QUOTED_SCALAR,
-        'text' => '"So does this
-  quoted scalar."',
+        'text' => "\"So does this\n  quoted scalar.\"",
     ],
     [
         'type' => TokenType::NEWLINE,
-        'text' => '
-',
+        'text' => "\n",
     ],
 ];

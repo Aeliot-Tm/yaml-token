@@ -50,10 +50,7 @@ return [
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::LITERAL_BLOCK_SCALAR,
-                                            'text' => '  With trailing newlines
-
-
-',
+                                            'text' => "  With trailing newlines\n\n\n",
                                         ],
                                     ],
                                     'children' => [],
@@ -85,8 +82,7 @@ return [
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::NEWLINE,
-                                            'text' => '
-',
+                                            'text' => "\n",
                                         ],
                                     ],
                                     'children' => [],

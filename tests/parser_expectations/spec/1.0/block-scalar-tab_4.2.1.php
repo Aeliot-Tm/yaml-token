@@ -49,10 +49,7 @@ return [
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::LITERAL_BLOCK_SCALAR,
-                                            'text' => '  void main() {
-  	printf("Hello\\n");
-  }
-',
+                                            'text' => "  void main() {\n  \tprintf(\"Hello\\n\");\n  }\n",
                                         ],
                                     ],
                                     'children' => [],
@@ -74,8 +71,7 @@ return [
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::NEWLINE,
-                                            'text' => '
-',
+                                            'text' => "\n",
                                         ],
                                     ],
                                     'children' => [],

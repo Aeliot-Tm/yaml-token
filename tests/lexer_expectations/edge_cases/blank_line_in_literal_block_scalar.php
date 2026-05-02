@@ -23,13 +23,11 @@ return [
     ],
     [
         'type' => TokenType::NEWLINE,
-        'text' => '
-',
+        'text' => "\n",
     ],
     [
         'type' => TokenType::NEWLINE,
-        'text' => '
-',
+        'text' => "\n",
     ],
     [
         'type' => TokenType::PLAIN_SCALAR,
@@ -49,8 +47,7 @@ return [
     ],
     [
         'type' => TokenType::NEWLINE,
-        'text' => '
-',
+        'text' => "\n",
     ],
     [
         'type' => TokenType::WHITESPACE,
@@ -58,8 +55,7 @@ return [
     ],
     [
         'type' => TokenType::NEWLINE,
-        'text' => '
-',
+        'text' => "\n",
     ],
     [
         'type' => TokenType::PLAIN_SCALAR,
@@ -79,18 +75,10 @@ return [
     ],
     [
         'type' => TokenType::NEWLINE,
-        'text' => '
-',
+        'text' => "\n",
     ],
     [
         'type' => TokenType::LITERAL_BLOCK_SCALAR,
-        'text' => '  a
-    
-  b
-
-  c
- 
-  d
-',
+        'text' => "  a\n    \n  b\n\n  c\n \n  d\n",
     ],
 ];

@@ -48,9 +48,7 @@ return [
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::SINGLE_QUOTED_SCALAR,
-                                            'text' => '\' 1st non-empty
-
- 2nd non-empty 3rd non-empty \'',
+                                            'text' => "' 1st non-empty\n\n 2nd non-empty 3rd non-empty '",
                                         ],
                                     ],
                                     'children' => [],
@@ -87,8 +85,7 @@ return [
                     'properties' => [
                         'token' => [
                             'type' => TokenType::NEWLINE,
-                            'text' => '
-',
+                            'text' => "\n",
                         ],
                     ],
                     'children' => [],

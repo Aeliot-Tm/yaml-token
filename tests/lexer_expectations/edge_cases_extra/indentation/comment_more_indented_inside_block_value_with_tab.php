@@ -11,8 +11,7 @@ return [
     ],
     [
         'type' => TokenType::NEWLINE,
-        'text' => '
-',
+        'text' => "\n",
     ],
     [
         'type' => TokenType::PLAIN_SCALAR,
@@ -24,8 +23,7 @@ return [
     ],
     [
         'type' => TokenType::NEWLINE,
-        'text' => '
-',
+        'text' => "\n",
     ],
     [
         'type' => TokenType::INDENTATION,
@@ -41,8 +39,7 @@ return [
     ],
     [
         'type' => TokenType::NEWLINE,
-        'text' => '
-',
+        'text' => "\n",
     ],
     [
         'type' => TokenType::INDENTATION,
@@ -50,7 +47,7 @@ return [
     ],
     [
         'type' => TokenType::WHITESPACE,
-        'text' => '	',
+        'text' => "\t",
     ],
     [
         'type' => TokenType::COMMENT,
@@ -58,8 +55,7 @@ return [
     ],
     [
         'type' => TokenType::NEWLINE,
-        'text' => '
-',
+        'text' => "\n",
     ],
     [
         'type' => TokenType::INDENTATION,

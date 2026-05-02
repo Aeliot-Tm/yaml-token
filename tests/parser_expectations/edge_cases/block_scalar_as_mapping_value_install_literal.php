@@ -49,9 +49,7 @@ return [
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::LITERAL_BLOCK_SCALAR,
-                                            'text' => '  echo "one"
-  echo "two"
-',
+                                            'text' => "  echo \"one\"\n  echo \"two\"\n",
                                         ],
                                     ],
                                     'children' => [],
@@ -73,8 +71,7 @@ return [
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::NEWLINE,
-                                            'text' => '
-',
+                                            'text' => "\n",
                                         ],
                                     ],
                                     'children' => [],

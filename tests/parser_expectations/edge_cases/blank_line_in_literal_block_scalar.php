@@ -86,8 +86,7 @@ return [
                     'properties' => [
                         'token' => [
                             'type' => TokenType::NEWLINE,
-                            'text' => '
-',
+                            'text' => "\n",
                         ],
                     ],
                     'children' => [],
@@ -97,8 +96,7 @@ return [
                     'properties' => [
                         'token' => [
                             'type' => TokenType::NEWLINE,
-                            'text' => '
-',
+                            'text' => "\n",
                         ],
                     ],
                     'children' => [],
@@ -167,8 +165,7 @@ return [
                     'properties' => [
                         'token' => [
                             'type' => TokenType::NEWLINE,
-                            'text' => '
-',
+                            'text' => "\n",
                         ],
                     ],
                     'children' => [],
@@ -188,8 +185,7 @@ return [
                     'properties' => [
                         'token' => [
                             'type' => TokenType::NEWLINE,
-                            'text' => '
-',
+                            'text' => "\n",
                         ],
                     ],
                     'children' => [],
@@ -221,14 +217,7 @@ return [
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::LITERAL_BLOCK_SCALAR,
-                                            'text' => '  a
-    
-  b
-
-  c
- 
-  d
-',
+                                            'text' => "  a\n    \n  b\n\n  c\n \n  d\n",
                                         ],
                                     ],
                                     'children' => [],
@@ -250,8 +239,7 @@ return [
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::NEWLINE,
-                                            'text' => '
-',
+                                            'text' => "\n",
                                         ],
                                     ],
                                     'children' => [],

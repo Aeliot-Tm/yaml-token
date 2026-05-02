@@ -23,14 +23,10 @@ return [
     ],
     [
         'type' => TokenType::NEWLINE,
-        'text' => '
-',
+        'text' => "\n",
     ],
     [
         'type' => TokenType::LITERAL_BLOCK_SCALAR,
-        'text' => '  Line one
-  Line two
-  Line three
-',
+        'text' => "  Line one\n  Line two\n  Line three\n",
     ],
 ];

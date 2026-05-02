@@ -112,8 +112,7 @@ return [
                             'properties' => [
                                 'token' => [
                                     'type' => TokenType::NEWLINE,
-                                    'text' => '
-',
+                                    'text' => "\n",
                                 ],
                             ],
                             'children' => [],

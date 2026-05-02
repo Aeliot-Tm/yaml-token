@@ -31,12 +31,10 @@ return [
     ],
     [
         'type' => TokenType::NEWLINE,
-        'text' => '
-',
+        'text' => "\n",
     ],
     [
         'type' => TokenType::LITERAL_BLOCK_SCALAR,
-        'text' => '  content
-',
+        'text' => "  content\n",
     ],
 ];

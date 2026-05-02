@@ -19,12 +19,10 @@ return [
     ],
     [
         'type' => TokenType::DOUBLE_QUOTED_SCALAR,
-        'text' => '"folded to space,\\
-  or preserved\\t"',
+        'text' => "\"folded to space,\\\n  or preserved\\t\"",
     ],
     [
         'type' => TokenType::NEWLINE,
-        'text' => '
-',
+        'text' => "\n",
     ],
 ];

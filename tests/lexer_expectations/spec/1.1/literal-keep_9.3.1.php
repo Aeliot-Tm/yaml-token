@@ -27,14 +27,10 @@ return [
     ],
     [
         'type' => TokenType::NEWLINE,
-        'text' => '
-',
+        'text' => "\n",
     ],
     [
         'type' => TokenType::LITERAL_BLOCK_SCALAR,
-        'text' => '  With trailing newlines
-
-
-',
+        'text' => "  With trailing newlines\n\n\n",
     ],
 ];

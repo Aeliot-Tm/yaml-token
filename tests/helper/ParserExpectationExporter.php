@@ -65,6 +65,35 @@ final class ParserExpectationExporter
         }
     }
 
+    private function exportDoubleQuotedPhpStringForText(string $value): string
+    {
+        $out = '"';
+        $len = \strlen($value);
+        for ($i = 0; $i < $len; ++$i) {
+            $byte = $value[$i];
+            $o = \ord($byte);
+            if (10 === $o) {
+                $out .= '\n';
+            } elseif (13 === $o) {
+                $out .= '\r';
+            } elseif (9 === $o) {
+                $out .= '\t';
+            } elseif (92 === $o) {
+                $out .= '\\\\';
+            } elseif (34 === $o) {
+                $out .= '\\"';
+            } elseif (36 === $o) {
+                $out .= '\\$';
+            } elseif ($o < 32 || 127 === $o) {
+                $out .= \sprintf('\\x%02X', $o);
+            } else {
+                $out .= $byte;
+            }
+        }
+
+        return $out.'"';
+    }
+
     private function registerFqcn(string $fqcn): void
     {
         if (isset($this->importSuffixByFqcn[$fqcn])) {
@@ -133,6 +162,10 @@ final class ParserExpectationExporter
                 return $this->suffixForFqcn($value).'::class';
             }
 
+            if ('text' === $parentKey && $this->textFieldStringNeedsEscaping($value)) {
+                return $this->exportDoubleQuotedPhpStringForText($value);
+            }
+
             return var_export($value, true);
         }
 
@@ -173,5 +206,10 @@ final class ParserExpectationExporter
         }
 
         return "[\n".implode(",\n", $parts).",\n".$indent.']';
+    }
+
+    private function textFieldStringNeedsEscaping(string $value): bool
+    {
+        return 1 === preg_match('/[\x00-\x1F\x7F]/', $value);
     }
 }

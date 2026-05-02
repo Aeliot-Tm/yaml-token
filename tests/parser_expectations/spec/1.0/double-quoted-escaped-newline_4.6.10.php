@@ -48,8 +48,7 @@ return [
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::DOUBLE_QUOTED_SCALAR,
-                                            'text' => '"folded to space,\\
-  or preserved\\t"',
+                                            'text' => "\"folded to space,\\\n  or preserved\\t\"",
                                         ],
                                     ],
                                     'children' => [],
@@ -86,8 +85,7 @@ return [
                     'properties' => [
                         'token' => [
                             'type' => TokenType::NEWLINE,
-                            'text' => '
-',
+                            'text' => "\n",
                         ],
                     ],
                     'children' => [],

@@ -26,9 +26,7 @@ return [
                             'properties' => [
                                 'token' => [
                                     'type' => TokenType::LITERAL_BLOCK_SCALAR,
-                                    'text' => '  root line 1
-  root line 2
-',
+                                    'text' => "  root line 1\n  root line 2\n",
                                 ],
                             ],
                             'children' => [],
@@ -50,8 +48,7 @@ return [
                             'properties' => [
                                 'token' => [
                                     'type' => TokenType::NEWLINE,
-                                    'text' => '
-',
+                                    'text' => "\n",
                                 ],
                             ],
                             'children' => [],

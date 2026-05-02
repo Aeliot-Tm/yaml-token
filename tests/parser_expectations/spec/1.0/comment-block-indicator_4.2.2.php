@@ -50,8 +50,7 @@ return [
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::LITERAL_BLOCK_SCALAR,
-                                            'text' => '  content
-',
+                                            'text' => "  content\n",
                                         ],
                                     ],
                                     'children' => [],
@@ -93,8 +92,7 @@ return [
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::NEWLINE,
-                                            'text' => '
-',
+                                            'text' => "\n",
                                         ],
                                     ],
                                     'children' => [],
