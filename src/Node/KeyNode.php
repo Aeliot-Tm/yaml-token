@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Aeliot\YamlToken\Node;
 
+use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
+
 class KeyNode extends AbstractNode
 {
     private ?ExplicitKeyIndicatorNode $explicitKeyIndicatorNode = null;
@@ -26,6 +28,22 @@ class KeyNode extends AbstractNode
         }
 
         parent::addChild($child);
+    }
+
+    public function addScalarName(ScalarNode $node): void
+    {
+        if (null === $this->name) {
+            $this->name = $node;
+        } elseif ($this->name instanceof ScalarNode) {
+            $multilinePlainScalar = new MultilinePlainScalarNode();
+            $multilinePlainScalar->addChild($this->name);
+            $multilinePlainScalar->addChild($node);
+            $this->name = $multilinePlainScalar;
+        } else {
+            $this->name->addChild($node);
+        }
+
+        $this->addChild($node);
     }
 
     public function getExplicitKeyIndicatorNode(): ?ExplicitKeyIndicatorNode
@@ -51,6 +69,10 @@ class KeyNode extends AbstractNode
 
     public function setName(Node $node): void
     {
+        if (null !== $this->name) {
+            throw new UnexpectedStateException('Attempt to set a key name twice');
+        }
+
         $this->name = $node;
         $this->addChild($node);
     }

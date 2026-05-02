@@ -19,6 +19,7 @@ use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\FlowMappingNode;
 use Aeliot\YamlToken\Node\FlowSequenceNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
+use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Parser\Parser;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -37,6 +38,24 @@ final class ComplexMappingKeysTest extends TestCase
         self::assertFalse($couple->getKey()->isEmpty());
 
         self::assertInstanceOf(BlockMappingNode::class, $couple->getKey()->getName());
+    }
+
+    public function testParsesExplicitKeyWithIndentedPlainScalarNotAsNestedBlockMapping(): void
+    {
+        $source = "?\n  true\n: null\n";
+        $stream = (new Parser())->parse($source);
+        self::assertSame($source, (new YamlEmitter())->emit($stream));
+
+        $couple = $this->getOnlyDocumentCouple($stream);
+        self::assertFalse($couple->getKey()->isEmpty());
+        self::assertNotInstanceOf(BlockMappingNode::class, $couple->getKey()->getName());
+        self::assertInstanceOf(ScalarNode::class, $couple->getKey()->getName());
+        self::assertSame('true', $couple->getKey()->getName()->getToken()->text);
+
+        $value = $couple->getValue();
+        self::assertNotNull($value);
+        self::assertNotNull($value->getScalar());
+        self::assertSame('null', $value->getScalar()->getToken()->text);
     }
 
     public function testParsesBlockSequenceAsExplicitKeyOnNextLine(): void
