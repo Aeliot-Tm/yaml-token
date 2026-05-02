@@ -22,9 +22,6 @@ use Aeliot\YamlToken\Enum\TokenType;
  */
 final class Cursor
 {
-    /** Byte offset from the start of the input. */
-    public int $position = 0;
-    public int $line = 1;
     public int $column = 1;
     public int $currentIndent = 0;
 
@@ -48,13 +45,6 @@ final class Cursor
      * @var TokenType::LITERAL_BLOCK_SCALAR|TokenType::FOLDED_BLOCK_SCALAR|null
      */
     public ?TokenType $blockScalarBodyTokenType = null;
-
-    /**
-     * After the block scalar header newline (or EOF before body), the next token is block body.
-     *
-     * @var TokenType::LITERAL_BLOCK_SCALAR|TokenType::FOLDED_BLOCK_SCALAR|null
-     */
-    public ?TokenType $pendingBlockScalarBody = null;
 
     /**
      * Chomping from the block scalar header: set on {@see TokenType::BLOCK_SCALAR_CHOMPING_INDICATOR},
@@ -84,6 +74,18 @@ final class Cursor
      * the next line may continue that plain scalar with greater indentation.
      */
     public bool $awaitingBlockPlainContinuation = false;
+
+    public int $line = 1;
+
+    /**
+     * After the block scalar header newline (or EOF before body), the next token is block body.
+     *
+     * @var TokenType::LITERAL_BLOCK_SCALAR|TokenType::FOLDED_BLOCK_SCALAR|null
+     */
+    public ?TokenType $pendingBlockScalarBody = null;
+
+    /** Byte offset from the start of the input. */
+    public int $position = 0;
 
     /**
      * When true, explicit tag lexing must not run for leading {@code !}
