@@ -46,6 +46,7 @@ final class FixtureParserMappingTest extends TestCase
                 'spec/1.2.2',
                 'spec_extra/1.0',
             ],
+            true,
         );
 
         foreach ($finder as $yamlPath) {

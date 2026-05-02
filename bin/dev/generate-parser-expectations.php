@@ -35,6 +35,7 @@ $finder = new FixtureFinder(
         'spec/1.2.2',
         'spec_extra/1.0',
     ],
+    true,
 );
 
 $parser = new Parser();

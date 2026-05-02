@@ -21,6 +21,7 @@ final class FixtureFinder implements \IteratorAggregate
     public function __construct(
         private readonly string $fixtureBase,
         private readonly array $fixtureDirs,
+        private readonly bool $uniqueOnly = false,
     ) {
     }
 
@@ -30,6 +31,25 @@ final class FixtureFinder implements \IteratorAggregate
     }
 
     private function detect(): array
+    {
+        $paths = $this->find();
+        if ($this->uniqueOnly) {
+            $result = [];
+            foreach ($paths as $path) {
+                $hash = crc32(file_get_contents($path));
+                if (isset($result[$hash])) {
+                    continue;
+                }
+                $result[$hash] = $path;
+            }
+
+            $paths = $result;
+        }
+
+        return $paths;
+    }
+
+    private function find(): array
     {
         $paths = [];
         foreach ($this->fixtureDirs as $sub) {
