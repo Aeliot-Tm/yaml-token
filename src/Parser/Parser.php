@@ -260,7 +260,7 @@ final class Parser
     }
 
     /**
-     * TODO: refactor similar methods: consumeExplicitKeyMultilinePlainScalarFirstLine & consumeExplicitKeyMultilinePlainScalarContinuation
+     * TODO: refactor similar methods: consumeExplicitKeyMultilinePlainScalarFirstLine & consumeExplicitKeyMultilinePlainScalarContinuation.
      */
     private function consumeExplicitKeyMultilinePlainScalarContinuation(Harvester $harvester, KeyNode $keyNode, int $entryIndentLen): void
     {
@@ -609,11 +609,70 @@ final class Parser
             return true;
         }
 
-        return \in_array($token->type, [
+        if (\in_array($token->type, [
             TokenType::DOUBLE_QUOTED_SCALAR,
             TokenType::SINGLE_QUOTED_SCALAR,
             TokenType::PLAIN_SCALAR,
-        ], true);
+        ], true)) {
+            return true;
+        }
+
+        return $this->isNodePropertyToken($token)
+            && $this->isNodePropertiesFollowedByImplicitYamlKeyOnSameLine($harvester);
+    }
+
+    /**
+     * True when the line begins with c-ns-properties (anchor/tag), then — still before
+     * NEWLINE — an implicit YAML key (scalar followed by VALUE_INDICATOR). Distinguishes
+     * "&a: key: value" from a properties-only prefix line whose value continues below.
+     */
+    private function isNodePropertiesFollowedByImplicitYamlKeyOnSameLine(Harvester $harvester): bool
+    {
+        $offset = 0;
+        if (TokenType::INDENTATION === $harvester->tokens->current()?->type) {
+            $offset = 1;
+        }
+
+        if (!$this->isNodePropertyToken($harvester->tokens->peek($offset))) {
+            return false;
+        }
+
+        while (true) {
+            $token = $harvester->tokens->peek($offset);
+            if (null === $token) {
+                return false;
+            }
+            if (TokenType::NEWLINE === $token->type) {
+                return false;
+            }
+            if (TokenType::WHITESPACE === $token->type || TokenType::COMMENT === $token->type) {
+                ++$offset;
+                continue;
+            }
+            if (TokenType::ANCHOR === $token->type || TokenType::TAG === $token->type) {
+                ++$offset;
+                continue;
+            }
+
+            if (!$token->type->isScalar()) {
+                return false;
+            }
+
+            $peekOffset = $offset + 1;
+            while (true) {
+                $peeked = $harvester->tokens->peek($peekOffset);
+                if (null === $peeked) {
+                    return false;
+                }
+                if (TokenType::NEWLINE === $peeked->type) {
+                    return false;
+                }
+                if (TokenType::WHITESPACE !== $peeked->type) {
+                    return TokenType::VALUE_INDICATOR === $peeked->type;
+                }
+                ++$peekOffset;
+            }
+        }
     }
 
     private function isKeyValueCoupleStartAllowingNodeProperties(Harvester $harvester): bool

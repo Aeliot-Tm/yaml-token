@@ -24,51 +24,46 @@ return [
             'properties' => [],
             'children' => [
                 [
-                    'type' => ValueNode::class,
-                    'properties' => [
-                        'anchor' => [
-                            'type' => AnchorNode::class,
-                            'properties' => [
-                                'token' => [
-                                    'type' => TokenType::ANCHOR,
-                                    'text' => '&a',
-                                ],
-                                'name' => 'a',
-                                'declarationKeyText' => null,
-                            ],
-                            'children' => [],
-                        ],
-                        'scalar' => [
-                            'type' => ScalarNode::class,
-                            'properties' => [
-                                'token' => [
-                                    'type' => TokenType::PLAIN_SCALAR,
-                                    'text' => 'a',
-                                ],
-                            ],
-                            'children' => [],
-                        ],
-                    ],
-                    'children' => [
-                        [
-                            'type' => WhitespaceNode::class,
-                            'properties' => [
-                                'token' => [
-                                    'type' => TokenType::WHITESPACE,
-                                    'text' => ' ',
-                                ],
-                            ],
-                            'children' => [],
-                        ],
-                    ],
-                ],
-                [
                     'type' => KeyValueCoupleNode::class,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
-                            'properties' => [],
-                            'children' => [],
+                            'properties' => [
+                                'name' => [
+                                    'type' => ScalarNode::class,
+                                    'properties' => [
+                                        'token' => [
+                                            'type' => TokenType::PLAIN_SCALAR,
+                                            'text' => 'a',
+                                        ],
+                                    ],
+                                    'children' => [],
+                                ],
+                            ],
+                            'children' => [
+                                [
+                                    'type' => AnchorNode::class,
+                                    'properties' => [
+                                        'token' => [
+                                            'type' => TokenType::ANCHOR,
+                                            'text' => '&a',
+                                        ],
+                                        'name' => 'a',
+                                        'declarationKeyText' => 'a',
+                                    ],
+                                    'children' => [],
+                                ],
+                                [
+                                    'type' => WhitespaceNode::class,
+                                    'properties' => [
+                                        'token' => [
+                                            'type' => TokenType::WHITESPACE,
+                                            'text' => ' ',
+                                        ],
+                                    ],
+                                    'children' => [],
+                                ],
+                            ],
                         ],
                         'value' => [
                             'type' => ValueNode::class,
@@ -81,7 +76,7 @@ return [
                                             'text' => '&b',
                                         ],
                                         'name' => 'b',
-                                        'declarationKeyText' => null,
+                                        'declarationKeyText' => 'a',
                                     ],
                                     'children' => [],
                                 ],
