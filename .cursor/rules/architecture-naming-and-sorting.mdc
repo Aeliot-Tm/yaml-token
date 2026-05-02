@@ -27,6 +27,10 @@ alwaysApply: true
 
 ## Sorting (PHP class members, `**/*.php`)
 
+**Mandatory for every change that adds, removes, or renames a class member:** before you stop editing that class file,
+reorder members so the whole class matches the rules below. Do **not** place new methods or properties at the bottom
+of the class “for convenience” unless that position is already correct after sorting.
+
 Sort class elements deterministically using the rules below.
 
 1. Group order:
