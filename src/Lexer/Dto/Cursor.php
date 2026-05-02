@@ -22,6 +22,12 @@ use Aeliot\YamlToken\Enum\TokenType;
  */
 final class Cursor
 {
+    /**
+     * After a newline that followed {@see TokenType::PLAIN_SCALAR} content for an open block mapping value,
+     * the next line may continue that plain scalar with greater indentation.
+     */
+    public bool $awaitingBlockPlainContinuation = false;
+
     public int $column = 1;
     public int $currentIndent = 0;
 
@@ -37,6 +43,12 @@ final class Cursor
      * After {@see TokenType::LITERAL_BLOCK_SCALAR_INDICATOR} / {@see TokenType::FOLDED_BLOCK_SCALAR_INDICATOR} until the header line break.
      */
     public bool $inBlockScalarHeaderLine = false;
+
+    /**
+     * Leading-space count of the block mapping key line when {@see TokenType::VALUE_INDICATOR} was emitted in block context;
+     * null when not tracking an open block mapping value for multiline-plain continuation.
+     */
+    public ?int $blockMappingKeyIndent = null;
 
     /**
      * Set when emitting {@see TokenType::LITERAL_BLOCK_SCALAR_INDICATOR} or {@see TokenType::FOLDED_BLOCK_SCALAR_INDICATOR}:
@@ -62,18 +74,6 @@ final class Cursor
      * ({@see TokenType::INDENTATION}, {@see TokenType::PLAIN_SCALAR}, {@see TokenType::NEWLINE}), not a single block body token.
      */
     public bool $inExplicitIndentBlockScalarBody = false;
-
-    /**
-     * Leading-space count of the block mapping key line when {@see TokenType::VALUE_INDICATOR} was emitted in block context;
-     * null when not tracking an open block mapping value for multiline-plain continuation.
-     */
-    public ?int $blockMappingKeyIndent = null;
-
-    /**
-     * After a newline that followed {@see TokenType::PLAIN_SCALAR} content for an open block mapping value,
-     * the next line may continue that plain scalar with greater indentation.
-     */
-    public bool $awaitingBlockPlainContinuation = false;
 
     public int $line = 1;
 
