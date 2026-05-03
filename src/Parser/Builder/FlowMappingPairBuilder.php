@@ -54,8 +54,7 @@ final class FlowMappingPairBuilder implements BuilderInterface
         $this->host->appendFlowKeyMultilinePlainScalarContinuations($harvester, $couple->getKey());
 
         if ($this->host->tryConsumeFlowMappingValueIndicator($harvester, $couple)) {
-            $next = $harvester->tokens->current();
-            if (null === $next || \in_array($next->type, [TokenType::FLOW_ENTRY, TokenType::FLOW_MAPPING_END], true)) {
+            if ($this->isAtFlowMappingEntryBoundary($harvester)) {
                 $couple->setValue(new ValueNode());
             } else {
                 $couple->setValue($this->host->parseFlowContextValue($harvester));
@@ -65,5 +64,32 @@ final class FlowMappingPairBuilder implements BuilderInterface
         $this->host->postProcessKeyValueCouple($harvester, $couple);
 
         return new Completed($couple);
+    }
+
+    /**
+     * YAML 1.2.2 §7.4.2: a flow-mapping value may be empty (e-node, rule [148]).
+     * Peeks through WHITESPACE/COMMENT/NEWLINE for the next entry / collection close
+     * so layout between {@code :} and the boundary stays attached to the surrounding
+     * {@see FlowMappingBuilder} (rule [80] s-l-comments inside flow context).
+     */
+    private function isAtFlowMappingEntryBoundary(Harvester $harvester): bool
+    {
+        $offset = 0;
+        while (true) {
+            $peeked = $harvester->tokens->peek($offset);
+            if (null === $peeked) {
+                return true;
+            }
+            if (
+                TokenType::WHITESPACE === $peeked->type
+                || TokenType::COMMENT === $peeked->type
+                || TokenType::NEWLINE === $peeked->type
+            ) {
+                ++$offset;
+                continue;
+            }
+
+            return \in_array($peeked->type, [TokenType::FLOW_ENTRY, TokenType::FLOW_MAPPING_END], true);
+        }
     }
 }

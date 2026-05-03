@@ -39,6 +39,7 @@ final class FlowHost
      * @param \Closure(Harvester): MergeInstructionNode $parseMergeInstructionAtCurrentPosition
      * @param \Closure(Harvester, KeyValueCoupleNode): void $postProcessKeyValueCouple
      * @param \Closure(Harvester, KeyValueCoupleNode): bool $tryConsumeFlowMappingValueIndicator
+     * @param \Closure(Harvester): bool $tryReinterpretFlowJsonAdjacentValueSeparator
      */
     public function __construct(
         private readonly \Closure $appendFlowKeyMultilinePlainScalarContinuations,
@@ -51,6 +52,7 @@ final class FlowHost
         private readonly \Closure $parseMergeInstructionAtCurrentPosition,
         private readonly \Closure $postProcessKeyValueCouple,
         private readonly \Closure $tryConsumeFlowMappingValueIndicator,
+        private readonly \Closure $tryReinterpretFlowJsonAdjacentValueSeparator,
     ) {
     }
 
@@ -102,5 +104,10 @@ final class FlowHost
     public function tryConsumeFlowMappingValueIndicator(Harvester $harvester, KeyValueCoupleNode $couple): bool
     {
         return ($this->tryConsumeFlowMappingValueIndicator)($harvester, $couple);
+    }
+
+    public function tryReinterpretFlowJsonAdjacentValueSeparator(Harvester $harvester): bool
+    {
+        return ($this->tryReinterpretFlowJsonAdjacentValueSeparator)($harvester);
     }
 }

@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Aeliot\YamlToken\Token;
 
+use Aeliot\YamlToken\Enum\TokenType;
+
 final class TokenStream
 {
     private int $position = 0;
@@ -65,5 +67,38 @@ final class TokenStream
         $index = $this->position + $offset;
 
         return $this->tokens[$index] ?? null;
+    }
+
+    /**
+     * Replaces the token at the current position with two consecutive tokens whose
+     * concatenated text equals the original one. Used for parser-side disambiguation,
+     * e.g. JSON-style adjacent value separator inside flow sequences (YAML 1.2.2 rule [153]).
+     */
+    public function splitCurrent(TokenType $headType, int $headLen, TokenType $tailType): void
+    {
+        $current = $this->current();
+        if (null === $current) {
+            throw new \LogicException('Cannot split: no current token');
+        }
+
+        $textLen = \strlen($current->text);
+        if ($headLen <= 0 || $headLen >= $textLen) {
+            throw new \LogicException(\sprintf('Invalid head length %d for token text of length %d', $headLen, $textLen));
+        }
+
+        $head = new Token(
+            $headType,
+            substr($current->text, 0, $headLen),
+            $current->line,
+            $current->column,
+        );
+        $tail = new Token(
+            $tailType,
+            substr($current->text, $headLen),
+            $current->line,
+            $current->column + $headLen,
+        );
+
+        array_splice($this->tokens, $this->position, 1, [$head, $tail]);
     }
 }
