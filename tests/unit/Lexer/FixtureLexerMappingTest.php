@@ -67,8 +67,8 @@ final class FixtureLexerMappingTest extends TestCase
             'Missing lexer expectation. Regenerate with: php bin/dev/generate-lexer-expectations.php'
         );
 
-        $raw = (string) file_get_contents($fixturePath);
-        self::assertNotSame('', $raw);
+        $raw = file_get_contents($fixturePath);
+        self::assertIsNotBool($raw);
 
         /** @var list<array{type: TokenType, text: string}> $expected */
         $expected = require $expectationPath;

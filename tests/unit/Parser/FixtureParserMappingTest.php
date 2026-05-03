@@ -66,8 +66,8 @@ final class FixtureParserMappingTest extends TestCase
             'Missing parser expectation. Regenerate with: php bin/dev/generate-parser-expectations.php'
         );
 
-        $raw = (string) file_get_contents($fixturePath);
-        self::assertNotSame('', $raw);
+        $raw = file_get_contents($fixturePath);
+        self::assertIsNotBool($raw);
 
         /** @var array<string, mixed> $expected */
         $expected = require $expectationPath;
