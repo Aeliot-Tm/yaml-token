@@ -16,6 +16,10 @@ namespace Aeliot\YamlToken\Node;
 /**
  * Flow sequence (c-flow-sequence :137).
  * Contains: "[" + ValueNode[] + "]".
+ *
+ * Each entry is wrapped in a {@see ValueNode}. A flow-node entry is exposed via
+ * the usual ValueNode getters (scalar, flowMapping, etc.); a flow-pair entry
+ * (YAML 1.2.2 §7.4.1 ns-flow-pair) is exposed via {@see ValueNode::getKeyValueCouple()}.
  */
 class FlowSequenceNode extends AbstractNode
 {

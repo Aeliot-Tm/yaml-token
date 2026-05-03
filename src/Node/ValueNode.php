@@ -20,6 +20,7 @@ class ValueNode extends AbstractNode
     private ?BlockSequenceNode $blockSequence = null;
     private ?FlowMappingNode $flowMapping = null;
     private ?FlowSequenceNode $flowSequence = null;
+    private ?KeyValueCoupleNode $keyValueCouple = null;
     private ?MultilinePlainScalarNode $multilinePlainScalar = null;
     private ?NodePropertiesNode $properties = null;
     private ?ScalarNode $scalar = null;
@@ -44,6 +45,10 @@ class ValueNode extends AbstractNode
 
         if ($child instanceof FlowSequenceNode) {
             $this->flowSequence = $child;
+        }
+
+        if ($child instanceof KeyValueCoupleNode) {
+            $this->keyValueCouple = $child;
         }
 
         if ($child instanceof ScalarNode) {
@@ -92,6 +97,11 @@ class ValueNode extends AbstractNode
         return $this->flowSequence;
     }
 
+    public function getKeyValueCouple(): ?KeyValueCoupleNode
+    {
+        return $this->keyValueCouple;
+    }
+
     public function getMultilinePlainScalar(): ?MultilinePlainScalarNode
     {
         return $this->multilinePlainScalar;
@@ -125,6 +135,7 @@ class ValueNode extends AbstractNode
             && null === $this->blockSequence
             && null === $this->flowMapping
             && null === $this->flowSequence
+            && null === $this->keyValueCouple
             && null === $this->multilinePlainScalar
             && null === $this->scalar;
     }

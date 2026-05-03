@@ -177,7 +177,49 @@ return [
                             'properties' => [
                                 'blockMapping' => [
                                     'type' => BlockMappingNode::class,
-                                    'properties' => [],
+                                    'properties' => [
+                                        'entries' => [
+                                            [
+                                                'type' => KeyValueCoupleNode::class,
+                                                'properties' => [
+                                                    'indentation' => [
+                                                        'type' => IndentationNode::class,
+                                                        'properties' => [
+                                                            'token' => [
+                                                                'type' => TokenType::INDENTATION,
+                                                                'text' => '  ',
+                                                            ],
+                                                        ],
+                                                        'children' => [],
+                                                    ],
+                                                    'key' => [
+                                                        'type' => KeyNode::class,
+                                                        'properties' => [
+                                                            'name' => [
+                                                                'type' => AliasNode::class,
+                                                                'properties' => [
+                                                                    'token' => [
+                                                                        'type' => TokenType::ALIAS,
+                                                                        'text' => '*a:',
+                                                                    ],
+                                                                    'name' => 'a:',
+                                                                    'anchorName' => 'a:',
+                                                                ],
+                                                                'children' => [],
+                                                            ],
+                                                        ],
+                                                        'children' => [],
+                                                    ],
+                                                    'value' => [
+                                                        'type' => ValueNode::class,
+                                                        'properties' => [],
+                                                        'children' => [],
+                                                    ],
+                                                ],
+                                                'children' => [],
+                                            ],
+                                        ],
+                                    ],
                                     'children' => [
                                         [
                                             'type' => NewLineNode::class,
@@ -185,45 +227,6 @@ return [
                                                 'token' => [
                                                     'type' => TokenType::NEWLINE,
                                                     'text' => "\n",
-                                                ],
-                                            ],
-                                            'children' => [],
-                                        ],
-                                        [
-                                            'type' => KeyValueCoupleNode::class,
-                                            'properties' => [
-                                                'indentation' => [
-                                                    'type' => IndentationNode::class,
-                                                    'properties' => [
-                                                        'token' => [
-                                                            'type' => TokenType::INDENTATION,
-                                                            'text' => '  ',
-                                                        ],
-                                                    ],
-                                                    'children' => [],
-                                                ],
-                                                'key' => [
-                                                    'type' => KeyNode::class,
-                                                    'properties' => [
-                                                        'name' => [
-                                                            'type' => AliasNode::class,
-                                                            'properties' => [
-                                                                'token' => [
-                                                                    'type' => TokenType::ALIAS,
-                                                                    'text' => '*a:',
-                                                                ],
-                                                                'name' => 'a:',
-                                                                'anchorName' => 'a:',
-                                                            ],
-                                                            'children' => [],
-                                                        ],
-                                                    ],
-                                                    'children' => [],
-                                                ],
-                                                'value' => [
-                                                    'type' => ValueNode::class,
-                                                    'properties' => [],
-                                                    'children' => [],
                                                 ],
                                             ],
                                             'children' => [],

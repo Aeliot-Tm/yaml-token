@@ -49,7 +49,130 @@ return [
                             'properties' => [
                                 'blockSequence' => [
                                     'type' => BlockSequenceNode::class,
-                                    'properties' => [],
+                                    'properties' => [
+                                        'entries' => [
+                                            [
+                                                'type' => SequenceEntryNode::class,
+                                                'properties' => [
+                                                    'value' => [
+                                                        'type' => ValueNode::class,
+                                                        'properties' => [
+                                                            'multilinePlainScalar' => [
+                                                                'type' => MultilinePlainScalarNode::class,
+                                                                'properties' => [],
+                                                                'children' => [
+                                                                    [
+                                                                        'type' => ScalarNode::class,
+                                                                        'properties' => [
+                                                                            'token' => [
+                                                                                'type' => TokenType::PLAIN_SCALAR,
+                                                                                'text' => 'x',
+                                                                            ],
+                                                                        ],
+                                                                        'children' => [],
+                                                                    ],
+                                                                    [
+                                                                        'type' => ScalarNode::class,
+                                                                        'properties' => [
+                                                                            'token' => [
+                                                                                'type' => TokenType::PLAIN_SCALAR,
+                                                                                'text' => 'x',
+                                                                            ],
+                                                                        ],
+                                                                        'children' => [],
+                                                                    ],
+                                                                ],
+                                                            ],
+                                                        ],
+                                                        'children' => [
+                                                            [
+                                                                'type' => ScalarNode::class,
+                                                                'properties' => [
+                                                                    'token' => [
+                                                                        'type' => TokenType::PLAIN_SCALAR,
+                                                                        'text' => 'x',
+                                                                    ],
+                                                                ],
+                                                                'children' => [],
+                                                            ],
+                                                            [
+                                                                'type' => NewLineNode::class,
+                                                                'properties' => [
+                                                                    'token' => [
+                                                                        'type' => TokenType::NEWLINE,
+                                                                        'text' => "\n",
+                                                                    ],
+                                                                ],
+                                                                'children' => [],
+                                                            ],
+                                                            [
+                                                                'type' => IndentationNode::class,
+                                                                'properties' => [
+                                                                    'token' => [
+                                                                        'type' => TokenType::INDENTATION,
+                                                                        'text' => '  ',
+                                                                    ],
+                                                                ],
+                                                                'children' => [],
+                                                            ],
+                                                            [
+                                                                'type' => WhitespaceNode::class,
+                                                                'properties' => [
+                                                                    'token' => [
+                                                                        'type' => TokenType::WHITESPACE,
+                                                                        'text' => "\t",
+                                                                    ],
+                                                                ],
+                                                                'children' => [],
+                                                            ],
+                                                            [
+                                                                'type' => ScalarNode::class,
+                                                                'properties' => [
+                                                                    'token' => [
+                                                                        'type' => TokenType::PLAIN_SCALAR,
+                                                                        'text' => 'x',
+                                                                    ],
+                                                                ],
+                                                                'children' => [],
+                                                            ],
+                                                        ],
+                                                    ],
+                                                ],
+                                                'children' => [
+                                                    [
+                                                        'type' => IndentationNode::class,
+                                                        'properties' => [
+                                                            'token' => [
+                                                                'type' => TokenType::INDENTATION,
+                                                                'text' => ' ',
+                                                            ],
+                                                        ],
+                                                        'children' => [],
+                                                    ],
+                                                    [
+                                                        'type' => SyntaxTokenNode::class,
+                                                        'properties' => [
+                                                            'token' => [
+                                                                'type' => TokenType::SEQUENCE_ENTRY,
+                                                                'text' => '-',
+                                                            ],
+                                                        ],
+                                                        'children' => [],
+                                                    ],
+                                                    [
+                                                        'type' => WhitespaceNode::class,
+                                                        'properties' => [
+                                                            'token' => [
+                                                                'type' => TokenType::WHITESPACE,
+                                                                'text' => ' ',
+                                                            ],
+                                                        ],
+                                                        'children' => [],
+                                                    ],
+                                                ],
+                                            ],
+                                        ],
+                                    ],
                                     'children' => [
                                         [
                                             'type' => NewLineNode::class,
@@ -60,126 +183,6 @@ return [
                                                 ],
                                             ],
                                             'children' => [],
-                                        ],
-                                        [
-                                            'type' => SequenceEntryNode::class,
-                                            'properties' => [
-                                                'value' => [
-                                                    'type' => ValueNode::class,
-                                                    'properties' => [
-                                                        'multilinePlainScalar' => [
-                                                            'type' => MultilinePlainScalarNode::class,
-                                                            'properties' => [],
-                                                            'children' => [
-                                                                [
-                                                                    'type' => ScalarNode::class,
-                                                                    'properties' => [
-                                                                        'token' => [
-                                                                            'type' => TokenType::PLAIN_SCALAR,
-                                                                            'text' => 'x',
-                                                                        ],
-                                                                    ],
-                                                                    'children' => [],
-                                                                ],
-                                                                [
-                                                                    'type' => ScalarNode::class,
-                                                                    'properties' => [
-                                                                        'token' => [
-                                                                            'type' => TokenType::PLAIN_SCALAR,
-                                                                            'text' => 'x',
-                                                                        ],
-                                                                    ],
-                                                                    'children' => [],
-                                                                ],
-                                                            ],
-                                                        ],
-                                                    ],
-                                                    'children' => [
-                                                        [
-                                                            'type' => ScalarNode::class,
-                                                            'properties' => [
-                                                                'token' => [
-                                                                    'type' => TokenType::PLAIN_SCALAR,
-                                                                    'text' => 'x',
-                                                                ],
-                                                            ],
-                                                            'children' => [],
-                                                        ],
-                                                        [
-                                                            'type' => NewLineNode::class,
-                                                            'properties' => [
-                                                                'token' => [
-                                                                    'type' => TokenType::NEWLINE,
-                                                                    'text' => "\n",
-                                                                ],
-                                                            ],
-                                                            'children' => [],
-                                                        ],
-                                                        [
-                                                            'type' => IndentationNode::class,
-                                                            'properties' => [
-                                                                'token' => [
-                                                                    'type' => TokenType::INDENTATION,
-                                                                    'text' => '  ',
-                                                                ],
-                                                            ],
-                                                            'children' => [],
-                                                        ],
-                                                        [
-                                                            'type' => WhitespaceNode::class,
-                                                            'properties' => [
-                                                                'token' => [
-                                                                    'type' => TokenType::WHITESPACE,
-                                                                    'text' => "\t",
-                                                                ],
-                                                            ],
-                                                            'children' => [],
-                                                        ],
-                                                        [
-                                                            'type' => ScalarNode::class,
-                                                            'properties' => [
-                                                                'token' => [
-                                                                    'type' => TokenType::PLAIN_SCALAR,
-                                                                    'text' => 'x',
-                                                                ],
-                                                            ],
-                                                            'children' => [],
-                                                        ],
-                                                    ],
-                                                ],
-                                            ],
-                                            'children' => [
-                                                [
-                                                    'type' => IndentationNode::class,
-                                                    'properties' => [
-                                                        'token' => [
-                                                            'type' => TokenType::INDENTATION,
-                                                            'text' => ' ',
-                                                        ],
-                                                    ],
-                                                    'children' => [],
-                                                ],
-                                                [
-                                                    'type' => SyntaxTokenNode::class,
-                                                    'properties' => [
-                                                        'token' => [
-                                                            'type' => TokenType::SEQUENCE_ENTRY,
-                                                            'text' => '-',
-                                                        ],
-                                                    ],
-                                                    'children' => [],
-                                                ],
-                                                [
-                                                    'type' => WhitespaceNode::class,
-                                                    'properties' => [
-                                                        'token' => [
-                                                            'type' => TokenType::WHITESPACE,
-                                                            'text' => ' ',
-                                                        ],
-                                                    ],
-                                                    'children' => [],
-                                                ],
-                                            ],
                                         ],
                                         [
                                             'type' => NewLineNode::class,

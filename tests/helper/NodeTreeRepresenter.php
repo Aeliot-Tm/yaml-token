@@ -15,6 +15,9 @@ namespace Aeliot\YamlToken\TestHelper;
 
 use Aeliot\YamlToken\Node\AliasNode;
 use Aeliot\YamlToken\Node\AnchorNode;
+use Aeliot\YamlToken\Node\BlockMappingNode;
+use Aeliot\YamlToken\Node\BlockSequenceNode;
+use Aeliot\YamlToken\Node\FlowMappingNode;
 use Aeliot\YamlToken\Node\FlowSequenceNode;
 use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
@@ -90,6 +93,15 @@ final class NodeTreeRepresenter
     private function getExplicitNodeProperties(Node $node): array
     {
         return match (true) {
+            $node instanceof BlockMappingNode => [
+                'entries' => $node->getEntries(),
+            ],
+            $node instanceof BlockSequenceNode => [
+                'entries' => $node->getEntries(),
+            ],
+            $node instanceof FlowMappingNode => [
+                'entries' => $node->getEntries(),
+            ],
             $node instanceof FlowSequenceNode => [
                 'entries' => $node->getEntries(),
             ],
@@ -118,6 +130,7 @@ final class NodeTreeRepresenter
                 'blockSequence' => $node->getBlockSequence(),
                 'flowMapping' => $node->getFlowMapping(),
                 'flowSequence' => $node->getFlowSequence(),
+                'keyValueCouple' => $node->getKeyValueCouple(),
                 'multilinePlainScalar' => $node->getMultilinePlainScalar(),
                 'nodeProperties' => $node->getProperties(),
                 'scalar' => $node->getScalar(),

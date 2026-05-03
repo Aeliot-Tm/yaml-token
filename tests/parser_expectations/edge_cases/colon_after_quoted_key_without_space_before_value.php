@@ -25,7 +25,199 @@ return [
             'children' => [
                 [
                     'type' => FlowMappingNode::class,
-                    'properties' => [],
+                    'properties' => [
+                        'entries' => [
+                            [
+                                'type' => KeyValueCoupleNode::class,
+                                'properties' => [
+                                    'key' => [
+                                        'type' => KeyNode::class,
+                                        'properties' => [
+                                            'name' => [
+                                                'type' => ScalarNode::class,
+                                                'properties' => [
+                                                    'token' => [
+                                                        'type' => TokenType::DOUBLE_QUOTED_SCALAR,
+                                                        'text' => '"double quoted"',
+                                                    ],
+                                                ],
+                                                'children' => [],
+                                            ],
+                                        ],
+                                        'children' => [],
+                                    ],
+                                    'mappingValueIndicator' => [
+                                        'type' => SyntaxTokenNode::class,
+                                        'properties' => [
+                                            'token' => [
+                                                'type' => TokenType::VALUE_INDICATOR,
+                                                'text' => ':',
+                                            ],
+                                        ],
+                                        'children' => [],
+                                    ],
+                                    'value' => [
+                                        'type' => ValueNode::class,
+                                        'properties' => [
+                                            'scalar' => [
+                                                'type' => ScalarNode::class,
+                                                'properties' => [
+                                                    'token' => [
+                                                        'type' => TokenType::DOUBLE_QUOTED_SCALAR,
+                                                        'text' => '"bar"',
+                                                    ],
+                                                ],
+                                                'children' => [],
+                                            ],
+                                        ],
+                                        'children' => [],
+                                    ],
+                                ],
+                                'children' => [
+                                    [
+                                        'type' => WhitespaceNode::class,
+                                        'properties' => [
+                                            'token' => [
+                                                'type' => TokenType::WHITESPACE,
+                                                'text' => ' ',
+                                            ],
+                                        ],
+                                        'children' => [],
+                                    ],
+                                    [
+                                        'type' => CommentNode::class,
+                                        'properties' => [
+                                            'token' => [
+                                                'type' => TokenType::COMMENT,
+                                                'text' => '# comment',
+                                            ],
+                                        ],
+                                        'children' => [],
+                                    ],
+                                    [
+                                        'type' => NewLineNode::class,
+                                        'properties' => [
+                                            'token' => [
+                                                'type' => TokenType::NEWLINE,
+                                                'text' => "\n",
+                                            ],
+                                        ],
+                                        'children' => [],
+                                    ],
+                                    [
+                                        'type' => WhitespaceNode::class,
+                                        'properties' => [
+                                            'token' => [
+                                                'type' => TokenType::WHITESPACE,
+                                                'text' => '  ',
+                                            ],
+                                        ],
+                                        'children' => [],
+                                    ],
+                                ],
+                            ],
+                            [
+                                'type' => KeyValueCoupleNode::class,
+                                'properties' => [
+                                    'key' => [
+                                        'type' => KeyNode::class,
+                                        'properties' => [
+                                            'name' => [
+                                                'type' => ScalarNode::class,
+                                                'properties' => [
+                                                    'token' => [
+                                                        'type' => TokenType::SINGLE_QUOTED_SCALAR,
+                                                        'text' => '\'single quoted\'',
+                                                    ],
+                                                ],
+                                                'children' => [],
+                                            ],
+                                        ],
+                                        'children' => [],
+                                    ],
+                                    'mappingValueIndicator' => [
+                                        'type' => SyntaxTokenNode::class,
+                                        'properties' => [
+                                            'token' => [
+                                                'type' => TokenType::VALUE_INDICATOR,
+                                                'text' => ':',
+                                            ],
+                                        ],
+                                        'children' => [],
+                                    ],
+                                    'value' => [
+                                        'type' => ValueNode::class,
+                                        'properties' => [
+                                            'scalar' => [
+                                                'type' => ScalarNode::class,
+                                                'properties' => [
+                                                    'token' => [
+                                                        'type' => TokenType::SINGLE_QUOTED_SCALAR,
+                                                        'text' => '\'bar\'',
+                                                    ],
+                                                ],
+                                                'children' => [],
+                                            ],
+                                        ],
+                                        'children' => [
+                                            [
+                                                'type' => WhitespaceNode::class,
+                                                'properties' => [
+                                                    'token' => [
+                                                        'type' => TokenType::WHITESPACE,
+                                                        'text' => ' ',
+                                                    ],
+                                                ],
+                                                'children' => [],
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                                'children' => [
+                                    [
+                                        'type' => WhitespaceNode::class,
+                                        'properties' => [
+                                            'token' => [
+                                                'type' => TokenType::WHITESPACE,
+                                                'text' => ' ',
+                                            ],
+                                        ],
+                                        'children' => [],
+                                    ],
+                                    [
+                                        'type' => CommentNode::class,
+                                        'properties' => [
+                                            'token' => [
+                                                'type' => TokenType::COMMENT,
+                                                'text' => '# comment',
+                                            ],
+                                        ],
+                                        'children' => [],
+                                    ],
+                                    [
+                                        'type' => NewLineNode::class,
+                                        'properties' => [
+                                            'token' => [
+                                                'type' => TokenType::NEWLINE,
+                                                'text' => "\n",
+                                            ],
+                                        ],
+                                        'children' => [],
+                                    ],
+                                    [
+                                        'type' => WhitespaceNode::class,
+                                        'properties' => [
+                                            'token' => [
+                                                'type' => TokenType::WHITESPACE,
+                                                'text' => '  ',
+                                            ],
+                                        ],
+                                        'children' => [],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
                     'children' => [
                         [
                             'type' => SyntaxTokenNode::class,
@@ -48,95 +240,6 @@ return [
                             'children' => [],
                         ],
                         [
-                            'type' => KeyValueCoupleNode::class,
-                            'properties' => [
-                                'key' => [
-                                    'type' => KeyNode::class,
-                                    'properties' => [
-                                        'name' => [
-                                            'type' => ScalarNode::class,
-                                            'properties' => [
-                                                'token' => [
-                                                    'type' => TokenType::DOUBLE_QUOTED_SCALAR,
-                                                    'text' => '"double quoted"',
-                                                ],
-                                            ],
-                                            'children' => [],
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                                'mappingValueIndicator' => [
-                                    'type' => SyntaxTokenNode::class,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::VALUE_INDICATOR,
-                                            'text' => ':',
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                                'value' => [
-                                    'type' => ValueNode::class,
-                                    'properties' => [
-                                        'scalar' => [
-                                            'type' => ScalarNode::class,
-                                            'properties' => [
-                                                'token' => [
-                                                    'type' => TokenType::DOUBLE_QUOTED_SCALAR,
-                                                    'text' => '"bar"',
-                                                ],
-                                            ],
-                                            'children' => [],
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                            ],
-                            'children' => [
-                                [
-                                    'type' => WhitespaceNode::class,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::WHITESPACE,
-                                            'text' => ' ',
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                                [
-                                    'type' => CommentNode::class,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::COMMENT,
-                                            'text' => '# comment',
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                                [
-                                    'type' => NewLineNode::class,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::NEWLINE,
-                                            'text' => "\n",
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                                [
-                                    'type' => WhitespaceNode::class,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::WHITESPACE,
-                                            'text' => '  ',
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                            ],
-                        ],
-                        [
                             'type' => SyntaxTokenNode::class,
                             'properties' => [
                                 'token' => [
@@ -155,106 +258,6 @@ return [
                                 ],
                             ],
                             'children' => [],
-                        ],
-                        [
-                            'type' => KeyValueCoupleNode::class,
-                            'properties' => [
-                                'key' => [
-                                    'type' => KeyNode::class,
-                                    'properties' => [
-                                        'name' => [
-                                            'type' => ScalarNode::class,
-                                            'properties' => [
-                                                'token' => [
-                                                    'type' => TokenType::SINGLE_QUOTED_SCALAR,
-                                                    'text' => '\'single quoted\'',
-                                                ],
-                                            ],
-                                            'children' => [],
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                                'mappingValueIndicator' => [
-                                    'type' => SyntaxTokenNode::class,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::VALUE_INDICATOR,
-                                            'text' => ':',
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                                'value' => [
-                                    'type' => ValueNode::class,
-                                    'properties' => [
-                                        'scalar' => [
-                                            'type' => ScalarNode::class,
-                                            'properties' => [
-                                                'token' => [
-                                                    'type' => TokenType::SINGLE_QUOTED_SCALAR,
-                                                    'text' => '\'bar\'',
-                                                ],
-                                            ],
-                                            'children' => [],
-                                        ],
-                                    ],
-                                    'children' => [
-                                        [
-                                            'type' => WhitespaceNode::class,
-                                            'properties' => [
-                                                'token' => [
-                                                    'type' => TokenType::WHITESPACE,
-                                                    'text' => ' ',
-                                                ],
-                                            ],
-                                            'children' => [],
-                                        ],
-                                    ],
-                                ],
-                            ],
-                            'children' => [
-                                [
-                                    'type' => WhitespaceNode::class,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::WHITESPACE,
-                                            'text' => ' ',
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                                [
-                                    'type' => CommentNode::class,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::COMMENT,
-                                            'text' => '# comment',
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                                [
-                                    'type' => NewLineNode::class,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::NEWLINE,
-                                            'text' => "\n",
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                                [
-                                    'type' => WhitespaceNode::class,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::WHITESPACE,
-                                            'text' => '  ',
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                            ],
                         ],
                         [
                             'type' => SyntaxTokenNode::class,

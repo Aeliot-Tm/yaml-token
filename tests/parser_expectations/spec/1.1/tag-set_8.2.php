@@ -29,7 +29,154 @@ return [
                     'properties' => [
                         'blockMapping' => [
                             'type' => BlockMappingNode::class,
-                            'properties' => [],
+                            'properties' => [
+                                'entries' => [
+                                    [
+                                        'type' => KeyValueCoupleNode::class,
+                                        'properties' => [
+                                            'key' => [
+                                                'type' => KeyNode::class,
+                                                'properties' => [
+                                                    'explicitKeyIndicatorNode' => [
+                                                        'type' => ExplicitKeyIndicatorNode::class,
+                                                        'properties' => [
+                                                            'token' => [
+                                                                'type' => TokenType::EXPLICIT_KEY_INDICATOR,
+                                                                'text' => '?',
+                                                            ],
+                                                        ],
+                                                        'children' => [],
+                                                    ],
+                                                    'name' => [
+                                                        'type' => ScalarNode::class,
+                                                        'properties' => [
+                                                            'token' => [
+                                                                'type' => TokenType::PLAIN_SCALAR,
+                                                                'text' => 'Mark McGwire',
+                                                            ],
+                                                        ],
+                                                        'children' => [],
+                                                    ],
+                                                ],
+                                                'children' => [
+                                                    [
+                                                        'type' => WhitespaceNode::class,
+                                                        'properties' => [
+                                                            'token' => [
+                                                                'type' => TokenType::WHITESPACE,
+                                                                'text' => ' ',
+                                                            ],
+                                                        ],
+                                                        'children' => [],
+                                                    ],
+                                                ],
+                                            ],
+                                            'value' => [
+                                                'type' => ValueNode::class,
+                                                'properties' => [],
+                                                'children' => [],
+                                            ],
+                                        ],
+                                        'children' => [],
+                                    ],
+                                    [
+                                        'type' => KeyValueCoupleNode::class,
+                                        'properties' => [
+                                            'key' => [
+                                                'type' => KeyNode::class,
+                                                'properties' => [
+                                                    'explicitKeyIndicatorNode' => [
+                                                        'type' => ExplicitKeyIndicatorNode::class,
+                                                        'properties' => [
+                                                            'token' => [
+                                                                'type' => TokenType::EXPLICIT_KEY_INDICATOR,
+                                                                'text' => '?',
+                                                            ],
+                                                        ],
+                                                        'children' => [],
+                                                    ],
+                                                    'name' => [
+                                                        'type' => ScalarNode::class,
+                                                        'properties' => [
+                                                            'token' => [
+                                                                'type' => TokenType::PLAIN_SCALAR,
+                                                                'text' => 'Sammy Sosa',
+                                                            ],
+                                                        ],
+                                                        'children' => [],
+                                                    ],
+                                                ],
+                                                'children' => [
+                                                    [
+                                                        'type' => WhitespaceNode::class,
+                                                        'properties' => [
+                                                            'token' => [
+                                                                'type' => TokenType::WHITESPACE,
+                                                                'text' => ' ',
+                                                            ],
+                                                        ],
+                                                        'children' => [],
+                                                    ],
+                                                ],
+                                            ],
+                                            'value' => [
+                                                'type' => ValueNode::class,
+                                                'properties' => [],
+                                                'children' => [],
+                                            ],
+                                        ],
+                                        'children' => [],
+                                    ],
+                                    [
+                                        'type' => KeyValueCoupleNode::class,
+                                        'properties' => [
+                                            'key' => [
+                                                'type' => KeyNode::class,
+                                                'properties' => [
+                                                    'explicitKeyIndicatorNode' => [
+                                                        'type' => ExplicitKeyIndicatorNode::class,
+                                                        'properties' => [
+                                                            'token' => [
+                                                                'type' => TokenType::EXPLICIT_KEY_INDICATOR,
+                                                                'text' => '?',
+                                                            ],
+                                                        ],
+                                                        'children' => [],
+                                                    ],
+                                                    'name' => [
+                                                        'type' => ScalarNode::class,
+                                                        'properties' => [
+                                                            'token' => [
+                                                                'type' => TokenType::PLAIN_SCALAR,
+                                                                'text' => 'Ken Griffey',
+                                                            ],
+                                                        ],
+                                                        'children' => [],
+                                                    ],
+                                                ],
+                                                'children' => [
+                                                    [
+                                                        'type' => WhitespaceNode::class,
+                                                        'properties' => [
+                                                            'token' => [
+                                                                'type' => TokenType::WHITESPACE,
+                                                                'text' => ' ',
+                                                            ],
+                                                        ],
+                                                        'children' => [],
+                                                    ],
+                                                ],
+                                            ],
+                                            'value' => [
+                                                'type' => ValueNode::class,
+                                                'properties' => [],
+                                                'children' => [],
+                                            ],
+                                        ],
+                                        'children' => [],
+                                    ],
+                                ],
+                            ],
                             'children' => [
                                 [
                                     'type' => NewLineNode::class,
@@ -42,54 +189,6 @@ return [
                                     'children' => [],
                                 ],
                                 [
-                                    'type' => KeyValueCoupleNode::class,
-                                    'properties' => [
-                                        'key' => [
-                                            'type' => KeyNode::class,
-                                            'properties' => [
-                                                'explicitKeyIndicatorNode' => [
-                                                    'type' => ExplicitKeyIndicatorNode::class,
-                                                    'properties' => [
-                                                        'token' => [
-                                                            'type' => TokenType::EXPLICIT_KEY_INDICATOR,
-                                                            'text' => '?',
-                                                        ],
-                                                    ],
-                                                    'children' => [],
-                                                ],
-                                                'name' => [
-                                                    'type' => ScalarNode::class,
-                                                    'properties' => [
-                                                        'token' => [
-                                                            'type' => TokenType::PLAIN_SCALAR,
-                                                            'text' => 'Mark McGwire',
-                                                        ],
-                                                    ],
-                                                    'children' => [],
-                                                ],
-                                            ],
-                                            'children' => [
-                                                [
-                                                    'type' => WhitespaceNode::class,
-                                                    'properties' => [
-                                                        'token' => [
-                                                            'type' => TokenType::WHITESPACE,
-                                                            'text' => ' ',
-                                                        ],
-                                                    ],
-                                                    'children' => [],
-                                                ],
-                                            ],
-                                        ],
-                                        'value' => [
-                                            'type' => ValueNode::class,
-                                            'properties' => [],
-                                            'children' => [],
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                                [
                                     'type' => NewLineNode::class,
                                     'properties' => [
                                         'token' => [
@@ -100,107 +199,11 @@ return [
                                     'children' => [],
                                 ],
                                 [
-                                    'type' => KeyValueCoupleNode::class,
-                                    'properties' => [
-                                        'key' => [
-                                            'type' => KeyNode::class,
-                                            'properties' => [
-                                                'explicitKeyIndicatorNode' => [
-                                                    'type' => ExplicitKeyIndicatorNode::class,
-                                                    'properties' => [
-                                                        'token' => [
-                                                            'type' => TokenType::EXPLICIT_KEY_INDICATOR,
-                                                            'text' => '?',
-                                                        ],
-                                                    ],
-                                                    'children' => [],
-                                                ],
-                                                'name' => [
-                                                    'type' => ScalarNode::class,
-                                                    'properties' => [
-                                                        'token' => [
-                                                            'type' => TokenType::PLAIN_SCALAR,
-                                                            'text' => 'Sammy Sosa',
-                                                        ],
-                                                    ],
-                                                    'children' => [],
-                                                ],
-                                            ],
-                                            'children' => [
-                                                [
-                                                    'type' => WhitespaceNode::class,
-                                                    'properties' => [
-                                                        'token' => [
-                                                            'type' => TokenType::WHITESPACE,
-                                                            'text' => ' ',
-                                                        ],
-                                                    ],
-                                                    'children' => [],
-                                                ],
-                                            ],
-                                        ],
-                                        'value' => [
-                                            'type' => ValueNode::class,
-                                            'properties' => [],
-                                            'children' => [],
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                                [
                                     'type' => NewLineNode::class,
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::NEWLINE,
                                             'text' => "\n",
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                                [
-                                    'type' => KeyValueCoupleNode::class,
-                                    'properties' => [
-                                        'key' => [
-                                            'type' => KeyNode::class,
-                                            'properties' => [
-                                                'explicitKeyIndicatorNode' => [
-                                                    'type' => ExplicitKeyIndicatorNode::class,
-                                                    'properties' => [
-                                                        'token' => [
-                                                            'type' => TokenType::EXPLICIT_KEY_INDICATOR,
-                                                            'text' => '?',
-                                                        ],
-                                                    ],
-                                                    'children' => [],
-                                                ],
-                                                'name' => [
-                                                    'type' => ScalarNode::class,
-                                                    'properties' => [
-                                                        'token' => [
-                                                            'type' => TokenType::PLAIN_SCALAR,
-                                                            'text' => 'Ken Griffey',
-                                                        ],
-                                                    ],
-                                                    'children' => [],
-                                                ],
-                                            ],
-                                            'children' => [
-                                                [
-                                                    'type' => WhitespaceNode::class,
-                                                    'properties' => [
-                                                        'token' => [
-                                                            'type' => TokenType::WHITESPACE,
-                                                            'text' => ' ',
-                                                        ],
-                                                    ],
-                                                    'children' => [],
-                                                ],
-                                            ],
-                                        ],
-                                        'value' => [
-                                            'type' => ValueNode::class,
-                                            'properties' => [],
-                                            'children' => [],
                                         ],
                                     ],
                                     'children' => [],

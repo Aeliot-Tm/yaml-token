@@ -46,7 +46,9 @@ return [
                             'properties' => [
                                 'flowMapping' => [
                                     'type' => FlowMappingNode::class,
-                                    'properties' => [],
+                                    'properties' => [
+                                        'entries' => [],
+                                    ],
                                     'children' => [
                                         [
                                             'type' => SyntaxTokenNode::class,
@@ -131,7 +133,9 @@ return [
                             'properties' => [
                                 'flowMapping' => [
                                     'type' => FlowMappingNode::class,
-                                    'properties' => [],
+                                    'properties' => [
+                                        'entries' => [],
+                                    ],
                                     'children' => [
                                         [
                                             'type' => SyntaxTokenNode::class,

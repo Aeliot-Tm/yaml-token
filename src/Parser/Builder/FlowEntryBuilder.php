@@ -119,7 +119,7 @@ final class FlowEntryBuilder implements BuilderInterface
 
         $this->host->postProcessKeyValueCouple($harvester, $couple);
 
-        return new Completed($couple);
+        return $this->completeOperandAsValue($couple);
     }
 
     /**
@@ -203,7 +203,7 @@ final class FlowEntryBuilder implements BuilderInterface
 
         $this->host->postProcessKeyValueCouple($harvester, $couple);
 
-        return new Completed($couple);
+        return $this->completeOperandAsValue($couple);
     }
 
     private function peekFlowPairColon(Harvester $harvester): bool

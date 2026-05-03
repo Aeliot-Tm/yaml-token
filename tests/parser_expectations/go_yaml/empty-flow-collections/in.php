@@ -102,119 +102,123 @@ return [
                             'properties' => [
                                 'blockSequence' => [
                                     'type' => BlockSequenceNode::class,
-                                    'properties' => [],
-                                    'children' => [
-                                        [
-                                            'type' => SequenceEntryNode::class,
-                                            'properties' => [
-                                                'value' => [
-                                                    'type' => ValueNode::class,
-                                                    'properties' => [
-                                                        'blockSequence' => [
-                                                            'type' => BlockSequenceNode::class,
-                                                            'properties' => [],
-                                                            'children' => [
-                                                                [
-                                                                    'type' => SequenceEntryNode::class,
-                                                                    'properties' => [
-                                                                        'value' => [
-                                                                            'type' => ValueNode::class,
+                                    'properties' => [
+                                        'entries' => [
+                                            [
+                                                'type' => SequenceEntryNode::class,
+                                                'properties' => [
+                                                    'value' => [
+                                                        'type' => ValueNode::class,
+                                                        'properties' => [
+                                                            'blockSequence' => [
+                                                                'type' => BlockSequenceNode::class,
+                                                                'properties' => [
+                                                                    'entries' => [
+                                                                        [
+                                                                            'type' => SequenceEntryNode::class,
                                                                             'properties' => [
-                                                                                'flowSequence' => [
-                                                                                    'type' => FlowSequenceNode::class,
+                                                                                'value' => [
+                                                                                    'type' => ValueNode::class,
                                                                                     'properties' => [
-                                                                                        'entries' => [],
+                                                                                        'flowSequence' => [
+                                                                                            'type' => FlowSequenceNode::class,
+                                                                                            'properties' => [
+                                                                                                'entries' => [],
+                                                                                            ],
+                                                                                            'children' => [
+                                                                                                [
+                                                                                                    'type' => SyntaxTokenNode::class,
+                                                                                                    'properties' => [
+                                                                                                        'token' => [
+                                                                                                            'type' => TokenType::FLOW_SEQUENCE_START,
+                                                                                                            'text' => '[',
+                                                                                                        ],
+                                                                                                    ],
+                                                                                                    'children' => [],
+                                                                                                ],
+                                                                                                [
+                                                                                                    'type' => SyntaxTokenNode::class,
+                                                                                                    'properties' => [
+                                                                                                        'token' => [
+                                                                                                            'type' => TokenType::FLOW_SEQUENCE_END,
+                                                                                                            'text' => ']',
+                                                                                                        ],
+                                                                                                    ],
+                                                                                                    'children' => [],
+                                                                                                ],
+                                                                                                [
+                                                                                                    'type' => NewLineNode::class,
+                                                                                                    'properties' => [
+                                                                                                        'token' => [
+                                                                                                            'type' => TokenType::NEWLINE,
+                                                                                                            'text' => "\n",
+                                                                                                        ],
+                                                                                                    ],
+                                                                                                    'children' => [],
+                                                                                                ],
+                                                                                            ],
+                                                                                        ],
                                                                                     ],
-                                                                                    'children' => [
-                                                                                        [
-                                                                                            'type' => SyntaxTokenNode::class,
-                                                                                            'properties' => [
-                                                                                                'token' => [
-                                                                                                    'type' => TokenType::FLOW_SEQUENCE_START,
-                                                                                                    'text' => '[',
-                                                                                                ],
-                                                                                            ],
-                                                                                            'children' => [],
-                                                                                        ],
-                                                                                        [
-                                                                                            'type' => SyntaxTokenNode::class,
-                                                                                            'properties' => [
-                                                                                                'token' => [
-                                                                                                    'type' => TokenType::FLOW_SEQUENCE_END,
-                                                                                                    'text' => ']',
-                                                                                                ],
-                                                                                            ],
-                                                                                            'children' => [],
-                                                                                        ],
-                                                                                        [
-                                                                                            'type' => NewLineNode::class,
-                                                                                            'properties' => [
-                                                                                                'token' => [
-                                                                                                    'type' => TokenType::NEWLINE,
-                                                                                                    'text' => "\n",
-                                                                                                ],
-                                                                                            ],
-                                                                                            'children' => [],
+                                                                                    'children' => [],
+                                                                                ],
+                                                                            ],
+                                                                            'children' => [
+                                                                                [
+                                                                                    'type' => SyntaxTokenNode::class,
+                                                                                    'properties' => [
+                                                                                        'token' => [
+                                                                                            'type' => TokenType::SEQUENCE_ENTRY,
+                                                                                            'text' => '-',
                                                                                         ],
                                                                                     ],
+                                                                                    'children' => [],
+                                                                                ],
+                                                                                [
+                                                                                    'type' => WhitespaceNode::class,
+                                                                                    'properties' => [
+                                                                                        'token' => [
+                                                                                            'type' => TokenType::WHITESPACE,
+                                                                                            'text' => ' ',
+                                                                                        ],
+                                                                                    ],
+                                                                                    'children' => [],
                                                                                 ],
                                                                             ],
-                                                                            'children' => [],
-                                                                        ],
-                                                                    ],
-                                                                    'children' => [
-                                                                        [
-                                                                            'type' => SyntaxTokenNode::class,
-                                                                            'properties' => [
-                                                                                'token' => [
-                                                                                    'type' => TokenType::SEQUENCE_ENTRY,
-                                                                                    'text' => '-',
-                                                                                ],
-                                                                            ],
-                                                                            'children' => [],
-                                                                        ],
-                                                                        [
-                                                                            'type' => WhitespaceNode::class,
-                                                                            'properties' => [
-                                                                                'token' => [
-                                                                                    'type' => TokenType::WHITESPACE,
-                                                                                    'text' => ' ',
-                                                                                ],
-                                                                            ],
-                                                                            'children' => [],
                                                                         ],
                                                                     ],
                                                                 ],
+                                                                'children' => [],
                                                             ],
                                                         ],
+                                                        'children' => [],
                                                     ],
-                                                    'children' => [],
                                                 ],
-                                            ],
-                                            'children' => [
-                                                [
-                                                    'type' => SyntaxTokenNode::class,
-                                                    'properties' => [
-                                                        'token' => [
-                                                            'type' => TokenType::SEQUENCE_ENTRY,
-                                                            'text' => '-',
+                                                'children' => [
+                                                    [
+                                                        'type' => SyntaxTokenNode::class,
+                                                        'properties' => [
+                                                            'token' => [
+                                                                'type' => TokenType::SEQUENCE_ENTRY,
+                                                                'text' => '-',
+                                                            ],
                                                         ],
+                                                        'children' => [],
                                                     ],
-                                                    'children' => [],
-                                                ],
-                                                [
-                                                    'type' => WhitespaceNode::class,
-                                                    'properties' => [
-                                                        'token' => [
-                                                            'type' => TokenType::WHITESPACE,
-                                                            'text' => ' ',
+                                                    [
+                                                        'type' => WhitespaceNode::class,
+                                                        'properties' => [
+                                                            'token' => [
+                                                                'type' => TokenType::WHITESPACE,
+                                                                'text' => ' ',
+                                                            ],
                                                         ],
+                                                        'children' => [],
                                                     ],
-                                                    'children' => [],
                                                 ],
                                             ],
                                         ],
                                     ],
+                                    'children' => [],
                                 ],
                             ],
                             'children' => [],
@@ -251,117 +255,123 @@ return [
                             'properties' => [
                                 'blockSequence' => [
                                     'type' => BlockSequenceNode::class,
-                                    'properties' => [],
-                                    'children' => [
-                                        [
-                                            'type' => SequenceEntryNode::class,
-                                            'properties' => [
-                                                'value' => [
-                                                    'type' => ValueNode::class,
-                                                    'properties' => [
-                                                        'blockSequence' => [
-                                                            'type' => BlockSequenceNode::class,
-                                                            'properties' => [],
-                                                            'children' => [
-                                                                [
-                                                                    'type' => SequenceEntryNode::class,
-                                                                    'properties' => [
-                                                                        'value' => [
-                                                                            'type' => ValueNode::class,
+                                    'properties' => [
+                                        'entries' => [
+                                            [
+                                                'type' => SequenceEntryNode::class,
+                                                'properties' => [
+                                                    'value' => [
+                                                        'type' => ValueNode::class,
+                                                        'properties' => [
+                                                            'blockSequence' => [
+                                                                'type' => BlockSequenceNode::class,
+                                                                'properties' => [
+                                                                    'entries' => [
+                                                                        [
+                                                                            'type' => SequenceEntryNode::class,
                                                                             'properties' => [
-                                                                                'flowMapping' => [
-                                                                                    'type' => FlowMappingNode::class,
-                                                                                    'properties' => [],
-                                                                                    'children' => [
-                                                                                        [
-                                                                                            'type' => SyntaxTokenNode::class,
+                                                                                'value' => [
+                                                                                    'type' => ValueNode::class,
+                                                                                    'properties' => [
+                                                                                        'flowMapping' => [
+                                                                                            'type' => FlowMappingNode::class,
                                                                                             'properties' => [
-                                                                                                'token' => [
-                                                                                                    'type' => TokenType::FLOW_MAPPING_START,
-                                                                                                    'text' => '{',
+                                                                                                'entries' => [],
+                                                                                            ],
+                                                                                            'children' => [
+                                                                                                [
+                                                                                                    'type' => SyntaxTokenNode::class,
+                                                                                                    'properties' => [
+                                                                                                        'token' => [
+                                                                                                            'type' => TokenType::FLOW_MAPPING_START,
+                                                                                                            'text' => '{',
+                                                                                                        ],
+                                                                                                    ],
+                                                                                                    'children' => [],
+                                                                                                ],
+                                                                                                [
+                                                                                                    'type' => SyntaxTokenNode::class,
+                                                                                                    'properties' => [
+                                                                                                        'token' => [
+                                                                                                            'type' => TokenType::FLOW_MAPPING_END,
+                                                                                                            'text' => '}',
+                                                                                                        ],
+                                                                                                    ],
+                                                                                                    'children' => [],
+                                                                                                ],
+                                                                                                [
+                                                                                                    'type' => NewLineNode::class,
+                                                                                                    'properties' => [
+                                                                                                        'token' => [
+                                                                                                            'type' => TokenType::NEWLINE,
+                                                                                                            'text' => "\n",
+                                                                                                        ],
+                                                                                                    ],
+                                                                                                    'children' => [],
                                                                                                 ],
                                                                                             ],
-                                                                                            'children' => [],
-                                                                                        ],
-                                                                                        [
-                                                                                            'type' => SyntaxTokenNode::class,
-                                                                                            'properties' => [
-                                                                                                'token' => [
-                                                                                                    'type' => TokenType::FLOW_MAPPING_END,
-                                                                                                    'text' => '}',
-                                                                                                ],
-                                                                                            ],
-                                                                                            'children' => [],
-                                                                                        ],
-                                                                                        [
-                                                                                            'type' => NewLineNode::class,
-                                                                                            'properties' => [
-                                                                                                'token' => [
-                                                                                                    'type' => TokenType::NEWLINE,
-                                                                                                    'text' => "\n",
-                                                                                                ],
-                                                                                            ],
-                                                                                            'children' => [],
                                                                                         ],
                                                                                     ],
+                                                                                    'children' => [],
                                                                                 ],
                                                                             ],
-                                                                            'children' => [],
-                                                                        ],
-                                                                    ],
-                                                                    'children' => [
-                                                                        [
-                                                                            'type' => SyntaxTokenNode::class,
-                                                                            'properties' => [
-                                                                                'token' => [
-                                                                                    'type' => TokenType::SEQUENCE_ENTRY,
-                                                                                    'text' => '-',
+                                                                            'children' => [
+                                                                                [
+                                                                                    'type' => SyntaxTokenNode::class,
+                                                                                    'properties' => [
+                                                                                        'token' => [
+                                                                                            'type' => TokenType::SEQUENCE_ENTRY,
+                                                                                            'text' => '-',
+                                                                                        ],
+                                                                                    ],
+                                                                                    'children' => [],
+                                                                                ],
+                                                                                [
+                                                                                    'type' => WhitespaceNode::class,
+                                                                                    'properties' => [
+                                                                                        'token' => [
+                                                                                            'type' => TokenType::WHITESPACE,
+                                                                                            'text' => ' ',
+                                                                                        ],
+                                                                                    ],
+                                                                                    'children' => [],
                                                                                 ],
                                                                             ],
-                                                                            'children' => [],
-                                                                        ],
-                                                                        [
-                                                                            'type' => WhitespaceNode::class,
-                                                                            'properties' => [
-                                                                                'token' => [
-                                                                                    'type' => TokenType::WHITESPACE,
-                                                                                    'text' => ' ',
-                                                                                ],
-                                                                            ],
-                                                                            'children' => [],
                                                                         ],
                                                                     ],
                                                                 ],
+                                                                'children' => [],
                                                             ],
                                                         ],
+                                                        'children' => [],
                                                     ],
-                                                    'children' => [],
                                                 ],
-                                            ],
-                                            'children' => [
-                                                [
-                                                    'type' => SyntaxTokenNode::class,
-                                                    'properties' => [
-                                                        'token' => [
-                                                            'type' => TokenType::SEQUENCE_ENTRY,
-                                                            'text' => '-',
+                                                'children' => [
+                                                    [
+                                                        'type' => SyntaxTokenNode::class,
+                                                        'properties' => [
+                                                            'token' => [
+                                                                'type' => TokenType::SEQUENCE_ENTRY,
+                                                                'text' => '-',
+                                                            ],
                                                         ],
+                                                        'children' => [],
                                                     ],
-                                                    'children' => [],
-                                                ],
-                                                [
-                                                    'type' => WhitespaceNode::class,
-                                                    'properties' => [
-                                                        'token' => [
-                                                            'type' => TokenType::WHITESPACE,
-                                                            'text' => ' ',
+                                                    [
+                                                        'type' => WhitespaceNode::class,
+                                                        'properties' => [
+                                                            'token' => [
+                                                                'type' => TokenType::WHITESPACE,
+                                                                'text' => ' ',
+                                                            ],
                                                         ],
+                                                        'children' => [],
                                                     ],
-                                                    'children' => [],
                                                 ],
                                             ],
                                         ],
                                     ],
+                                    'children' => [],
                                 ],
                             ],
                             'children' => [],
@@ -501,7 +511,9 @@ return [
                             'properties' => [
                                 'flowMapping' => [
                                     'type' => FlowMappingNode::class,
-                                    'properties' => [],
+                                    'properties' => [
+                                        'entries' => [],
+                                    ],
                                     'children' => [
                                         [
                                             'type' => SyntaxTokenNode::class,
