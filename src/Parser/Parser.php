@@ -288,6 +288,31 @@ final class Parser
     }
 
     /**
+     * Recursively collects {@see AnchorNode}s declared anywhere inside the key
+     * subtree of a {@see KeyValueCoupleNode}, stopping at nested {@see KeyValueCoupleNode}
+     * frames so anchors inside an inner couple keep their inner-couple declaration
+     * (per YAML 1.2.2 §6.9.2 anchor scoping: every anchor declares the immediately
+     * enclosing node, but the parser tracks the surrounding couple for round-trip).
+     *
+     * @param list<AnchorNode> $anchors
+     */
+    private function collecAnchorsRecursive(Node $node, array &$anchors): void
+    {
+        if ($node instanceof AnchorNode) {
+            $anchors[] = $node;
+
+            return;
+        }
+
+        foreach ($node->getChildren() as $child) {
+            if ($child instanceof KeyValueCoupleNode) {
+                continue;
+            }
+            $this->collecAnchorsRecursive($child, $anchors);
+        }
+    }
+
+    /**
      * Consume one or more consecutive l-empty / l-comment lines whose
      * leading INDENTATION must not contribute to the surrounding block's
      * s-indent(n). Tokens are still attached to $root verbatim so the
@@ -2376,12 +2401,9 @@ final class Parser
     private function postProcessKeyValueCouple(Harvester $harvester, KeyValueCoupleNode $couple): void
     {
         $anchors = [];
-
+        $this->collecAnchorsRecursive($couple->getKey(), $anchors);
         if (null !== ($valueAnchor = $couple->getValue()?->getAnchor())) {
             $anchors[] = $valueAnchor;
-        }
-        if (null !== ($keyAnchor = $couple->getKey()->getAnchor())) {
-            $anchors[] = $keyAnchor;
         }
 
         foreach ($anchors as $anchor) {
