@@ -640,6 +640,24 @@ final class Parser
     }
 
     /**
+     * True when the next flow-sequence entry should be parsed as ns-flow-pair (YAML 1.2.2 §7.4.1):
+     * explicit {@code ?}, empty key before {@code :} (e-node / Yaml test matrix CFD4, §7.2), or
+     * implicit YAML key (scalar then {@code :}).
+     */
+    private function isFlowSequencePairEntryStart(Harvester $harvester): bool
+    {
+        $token = $harvester->tokens->current();
+        if (TokenType::EXPLICIT_KEY_INDICATOR === $token?->type) {
+            return true;
+        }
+        if (TokenType::VALUE_INDICATOR === $token?->type) {
+            return true;
+        }
+
+        return $this->isScalarFollowedByValueIndicator($harvester, true);
+    }
+
+    /**
      * True when the token at peek offset $scalarPeekOffset is a scalar and the same
      * logical line contains ':' as implicit YAML key (nested block mapping entry).
      *
@@ -1410,7 +1428,9 @@ final class Parser
      *  - explicit form starting with '?' (Example 7.20), which per the prose
      *    above [150] has the same syntax as ns-flow-map-explicit-entry [143]
      *    and therefore permits an empty key and/or an empty value (e-node);
-     *  - implicit YAML-key form, detected via {@see isScalarFollowedByValueIndicator()}.
+     *  - implicit YAML-key form, detected via {@see isScalarFollowedByValueIndicator()};
+     *  - empty implicit key before ':' (e-node, §7.2), same as Yaml test matrix CFD4 /
+     *    libfyaml-json: first significant token inside {@code [...]} is ':'.
      *
      * Both paths build the couple using the same helpers as {@see parseFlowMapping()}
      * so that whitespace tokens between the key and ':' end up attached to the
@@ -1420,14 +1440,12 @@ final class Parser
      */
     private function parseFlowSequenceEntry(Harvester $harvester): Node
     {
-        $isExplicitKeyPair = TokenType::EXPLICIT_KEY_INDICATOR === $harvester->tokens->current()?->type;
-
-        if (!$isExplicitKeyPair && !$this->isScalarFollowedByValueIndicator($harvester, true)) {
+        if (!$this->isFlowSequencePairEntryStart($harvester)) {
             return $this->parseValue($harvester, 0);
         }
 
         $couple = new KeyValueCoupleNode();
-        $couple->setKey($this->getKeyNode($harvester, $isExplicitKeyPair));
+        $couple->setKey($this->getKeyNode($harvester, true));
 
         $this->tryConsumeFlowMappingValueIndicator($harvester, $couple);
 
