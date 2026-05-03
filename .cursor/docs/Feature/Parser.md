@@ -61,6 +61,10 @@ Because of this, the parser must not invent tokens that did not exist in the ori
     when the following line is still a valid indented continuation (same probe as for further
     fragments, including not stealing an implicit block key), `appendMultilinePlainScalarContinuations()`
     keeps the first `NEWLINE` inside the value (YAML 1.2.2 §6.5 / §7.3.3, e.g. Example 7.12 Plain Lines).
+    A line that has only block `INDENTATION` plus horizontal `WHITESPACE` (for example a tab) before
+    the line break is another empty-continuation pattern: the parser consumes `NEWLINE` + indent +
+    those spaces/tabs and leaves the closing `NEWLINE` so the next fragment still receives a leading
+    `NewLineNode` like other continuations.
   - Plain-scalar **keys** in flow mappings (e.g. `{ multi\n  line, a: b}`) may also span
     multiple physical lines. Inside `{...}` the lexer emits `NEWLINE` + `WHITESPACE` + `PLAIN_SCALAR`
     for each continuation line (no `INDENTATION` token, since `INDENTATION` is only emitted at column 1

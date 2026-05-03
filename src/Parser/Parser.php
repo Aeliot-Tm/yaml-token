@@ -104,29 +104,7 @@ final class Parser
             // the same continuation probe as below still applies after the gap (avoid stealing structure
             // where the second NEWLINE starts unrelated content).
             if (TokenType::NEWLINE === $harvester->tokens->peek(1)?->type) {
-                $indentAfterGap = $harvester->tokens->peek(2);
-                if (TokenType::INDENTATION !== $indentAfterGap?->type) {
-                    break;
-                }
-                $gapIndentLen = \strlen($indentAfterGap->text);
-                if ($gapIndentLen <= $parentIndentLen) {
-                    break;
-                }
-
-                $scalarOffset = 3;
-                while (TokenType::WHITESPACE === $harvester->tokens->peek($scalarOffset)?->type) {
-                    ++$scalarOffset;
-                }
-                $scalarTokenAfterGap = $harvester->tokens->peek($scalarOffset);
-                if (!$scalarTokenAfterGap?->type->isScalar()) {
-                    break;
-                }
-
-                $keyProbeAfterGap = $scalarOffset + 1;
-                while (TokenType::WHITESPACE === $harvester->tokens->peek($keyProbeAfterGap)?->type) {
-                    ++$keyProbeAfterGap;
-                }
-                if (TokenType::VALUE_INDICATOR === $harvester->tokens->peek($keyProbeAfterGap)?->type) {
+                if (!$this->isIndentedMultilinePlainContinuationAt($harvester, 2, $parentIndentLen)) {
                     break;
                 }
 
@@ -135,33 +113,47 @@ final class Parser
                 continue;
             }
 
+            // Empty continuation line: INDENTATION (spaces) then only WHITESPACE (e.g. tab) before the
+            // line break — Lexer emits tab as WHITESPACE. Leave the closing NEWLINE for the next iteration
+            // so the following fragment still gets a leading NewLineNode like other continuations.
+            $maybeIndent = $harvester->tokens->peek(1);
+            if (TokenType::INDENTATION === $maybeIndent?->type && \strlen($maybeIndent->text) > $parentIndentLen) {
+                $afterIndentOffset = 2;
+                while (TokenType::WHITESPACE === $harvester->tokens->peek($afterIndentOffset)?->type) {
+                    ++$afterIndentOffset;
+                }
+                if (TokenType::NEWLINE === $harvester->tokens->peek($afterIndentOffset)?->type
+                    && $this->isIndentedMultilinePlainContinuationAt($harvester, $afterIndentOffset + 1, $parentIndentLen)
+                ) {
+                    $valueNode->addChild(new NewLineNode($newLine));
+                    $harvester->tokens->advance();
+                    $indentationToken = $harvester->tokens->current();
+                    if (TokenType::INDENTATION !== $indentationToken->type) {
+                        throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Expected INDENTATION after newline in multiline plain empty line, got %s', $indentationToken->type->value), $harvester->tokens));
+                    }
+                    $valueNode->addChild(new IndentationNode($indentationToken));
+                    $harvester->tokens->advance();
+                    for ($w = 2; $w < $afterIndentOffset; ++$w) {
+                        $wsToken = $harvester->tokens->current();
+                        if (TokenType::WHITESPACE !== $wsToken->type) {
+                            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Expected WHITESPACE in multiline plain empty line, got %s', $wsToken->type->value), $harvester->tokens));
+                        }
+                        $valueNode->addChild(new WhitespaceNode($wsToken));
+                        $harvester->tokens->advance();
+                    }
+                    $closingNewline = $harvester->tokens->current();
+                    if (TokenType::NEWLINE !== $closingNewline->type) {
+                        throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Expected NEWLINE after multiline plain empty line content, got %s', $closingNewline->type->value), $harvester->tokens));
+                    }
+                    continue;
+                }
+            }
+
+            if (!$this->isIndentedMultilinePlainContinuationAt($harvester, 1, $parentIndentLen)) {
+                break;
+            }
+
             $indentation = $harvester->tokens->peek(1);
-            if (TokenType::INDENTATION !== $indentation?->type) {
-                break;
-            }
-
-            $indentLen = \strlen($indentation->text);
-            if ($indentLen <= $parentIndentLen) {
-                break;
-            }
-
-            $scalarOffset = 2;
-            while (TokenType::WHITESPACE === $harvester->tokens->peek($scalarOffset)?->type) {
-                ++$scalarOffset;
-            }
-            $scalarToken = $harvester->tokens->peek($scalarOffset);
-            if (!$scalarToken?->type->isScalar()) {
-                break;
-            }
-
-            // Do not steal a nested block mapping entry key (implicit YAML key).
-            $keyProbe = $scalarOffset + 1;
-            while (TokenType::WHITESPACE === $harvester->tokens->peek($keyProbe)?->type) {
-                ++$keyProbe;
-            }
-            if (TokenType::VALUE_INDICATOR === $harvester->tokens->peek($keyProbe)?->type) {
-                break;
-            }
 
             $valueNode->addChild(new NewLineNode($newLine));
             $valueNode->addChild(new IndentationNode($indentation));
@@ -864,6 +856,41 @@ final class Parser
 
             return TokenType::VALUE_INDICATOR === $peeked->type;
         }
+    }
+
+    /**
+     * Whether the token stream at {@code $indentPeekOffset} from the current position is
+     * {@see TokenType::INDENTATION} deeper than $parentIndentLen followed by a multiline plain continuation
+     * fragment (not a nested implicit block key).
+     *
+     * @see Parser::appendMultilinePlainScalarContinuations()
+     */
+    private function isIndentedMultilinePlainContinuationAt(Harvester $harvester, int $indentPeekOffset, int $parentIndentLen): bool
+    {
+        $indentation = $harvester->tokens->peek($indentPeekOffset);
+        if (TokenType::INDENTATION !== $indentation?->type) {
+            return false;
+        }
+        if (\strlen($indentation->text) <= $parentIndentLen) {
+            return false;
+        }
+
+        $scalarOffset = $indentPeekOffset + 1;
+        while (TokenType::WHITESPACE === $harvester->tokens->peek($scalarOffset)?->type) {
+            ++$scalarOffset;
+        }
+        $scalarToken = $harvester->tokens->peek($scalarOffset);
+        if (!$scalarToken?->type->isScalar()) {
+            return false;
+        }
+
+        $keyProbe = $scalarOffset + 1;
+        while (TokenType::WHITESPACE === $harvester->tokens->peek($keyProbe)?->type) {
+            ++$keyProbe;
+        }
+
+
+        return TokenType::VALUE_INDICATOR !== $harvester->tokens->peek($keyProbe)?->type;
     }
 
     /**
