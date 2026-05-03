@@ -21,15 +21,15 @@ use Aeliot\YamlToken\Parser\Driver\BuilderResult\Completed;
 use Aeliot\YamlToken\Parser\Driver\Frame;
 use Aeliot\YamlToken\Parser\Dto\Harvester;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
-use Aeliot\YamlToken\Parser\Flow\FlowSequenceHost;
+use Aeliot\YamlToken\Parser\Flow\FlowHost;
 
 /**
- * Parses a single flow-sequence entry as a {@see ValueNode} via {@see FlowSequenceHost::parseFlowContextValue()}.
+ * Parses a single flow-sequence entry as a {@see ValueNode} via {@see FlowHost::parseFlowContextValue()}.
  */
 final class FlowOperandBuilder implements BuilderInterface
 {
     public function __construct(
-        private readonly FlowSequenceHost $host,
+        private readonly FlowHost $host,
     ) {
     }
 

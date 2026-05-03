@@ -16,6 +16,7 @@ namespace Aeliot\YamlToken\Parser\Flow;
 use Aeliot\YamlToken\Node\FlowMappingNode;
 use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
+use Aeliot\YamlToken\Node\MergeInstructionNode;
 use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Node\SyntaxTokenNode;
 use Aeliot\YamlToken\Node\ValueNode;
@@ -23,9 +24,9 @@ use Aeliot\YamlToken\Parser\Dto\Harvester;
 use Aeliot\YamlToken\Token\Token;
 
 /**
- * Bridges flow-sequence builders to {@see \Aeliot\YamlToken\Parser\Parser} private methods via closures.
+ * Bridges flow-collection builders to {@see \Aeliot\YamlToken\Parser\Parser} private methods via closures.
  */
-final class FlowSequenceHost
+final class FlowHost
 {
     /**
      * @param \Closure(Harvester, KeyNode): void $appendFlowKeyMultilinePlainScalarContinuations
@@ -35,6 +36,7 @@ final class FlowSequenceHost
      * @param \Closure(Harvester): bool $isScalarFollowedByValueIndicatorInFlow
      * @param \Closure(Harvester): ValueNode $parseFlowContextValue
      * @param \Closure(Harvester): FlowMappingNode $parseFlowMapping
+     * @param \Closure(Harvester): MergeInstructionNode $parseMergeInstructionAtCurrentPosition
      * @param \Closure(Harvester, KeyValueCoupleNode): void $postProcessKeyValueCouple
      * @param \Closure(Harvester, KeyValueCoupleNode): bool $tryConsumeFlowMappingValueIndicator
      */
@@ -46,6 +48,7 @@ final class FlowSequenceHost
         private readonly \Closure $isScalarFollowedByValueIndicatorInFlow,
         private readonly \Closure $parseFlowContextValue,
         private readonly \Closure $parseFlowMapping,
+        private readonly \Closure $parseMergeInstructionAtCurrentPosition,
         private readonly \Closure $postProcessKeyValueCouple,
         private readonly \Closure $tryConsumeFlowMappingValueIndicator,
     ) {
@@ -84,6 +87,11 @@ final class FlowSequenceHost
     public function parseFlowMapping(Harvester $harvester): FlowMappingNode
     {
         return ($this->parseFlowMapping)($harvester);
+    }
+
+    public function parseMergeInstructionAtCurrentPosition(Harvester $harvester): MergeInstructionNode
+    {
+        return ($this->parseMergeInstructionAtCurrentPosition)($harvester);
     }
 
     public function postProcessKeyValueCouple(Harvester $harvester, KeyValueCoupleNode $couple): void

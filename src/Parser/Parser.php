@@ -50,6 +50,7 @@ use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 use Aeliot\YamlToken\Node\YamlDirectiveNode;
 use Aeliot\YamlToken\Node\YamlDirectiveVersionNode;
+use Aeliot\YamlToken\Parser\Builder\FlowMappingBuilder;
 use Aeliot\YamlToken\Parser\Builder\FlowSequenceBuilder;
 use Aeliot\YamlToken\Parser\Driver\Driver;
 use Aeliot\YamlToken\Parser\Driver\Frame;
@@ -65,7 +66,7 @@ use Aeliot\YamlToken\Parser\Exception\IndentationUndefinedException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedEndException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
-use Aeliot\YamlToken\Parser\Flow\FlowSequenceHost;
+use Aeliot\YamlToken\Parser\Flow\FlowHost;
 use Aeliot\YamlToken\Token\Token;
 use Aeliot\YamlToken\Token\TokenStream;
 
@@ -662,6 +663,28 @@ final class Parser
         return $consumed;
     }
 
+    private function createFlowHost(): FlowHost
+    {
+        return new FlowHost(
+            function (Harvester $h, KeyNode $keyNode): void {
+                $this->appendFlowKeyMultilinePlainScalarContinuations($h, $keyNode);
+            },
+            function (Harvester $h, Node $root): void {
+                $this->collectSpaceAndComments($h, $root);
+            },
+            fn (Token $t): SyntaxTokenNode => $this->createSyntaxTokenNode($t),
+            fn (Harvester $h): KeyNode => $this->getKeyNode($h, true),
+            fn (Harvester $h): bool => $this->isScalarFollowedByValueIndicator($h, true),
+            fn (Harvester $h): ValueNode => $this->parseFlowContextValue($h),
+            fn (Harvester $h): FlowMappingNode => $this->runFlowMappingDriver($h),
+            fn (Harvester $h): MergeInstructionNode => $this->parseMergeInstructionAtCurrentPosition($h),
+            function (Harvester $h, KeyValueCoupleNode $couple): void {
+                $this->postProcessKeyValueCouple($h, $couple);
+            },
+            fn (Harvester $h, KeyValueCoupleNode $couple): bool => $this->tryConsumeFlowMappingValueIndicator($h, $couple),
+        );
+    }
+
     private function createSimpleNode(Token $token): Node
     {
         return match ($token->type) {
@@ -781,7 +804,7 @@ final class Parser
         }
 
         if (TokenType::FLOW_MAPPING_START === $token->type) {
-            $keyNode->setName($this->parseFlowMapping($harvester));
+            $keyNode->setName($this->runFlowMappingDriver($harvester));
 
             return $keyNode;
         }
@@ -1663,7 +1686,7 @@ final class Parser
                     $harvester->tokens->advance();
                 }
 
-                $document->addChild($this->parseFlowMapping($harvester));
+                $document->addChild($this->runFlowMappingDriver($harvester));
                 continue;
             }
 
@@ -1688,66 +1711,6 @@ final class Parser
     private function parseFlowContextValue(Harvester $harvester): ValueNode
     {
         return $this->parseValue($harvester, self::FLOW_COLLECTION_VALUE_PARENT_INDENT);
-    }
-
-    private function parseFlowMapping(Harvester $harvester): FlowMappingNode
-    {
-        $flowMappingNode = new FlowMappingNode();
-        $token = $harvester->tokens->current();
-        if (TokenType::FLOW_MAPPING_START !== $token?->type) {
-            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('There is no expected FLOW_MAPPING_START token, but %s given', $token?->type->value ?? '_nothing_'), $harvester->tokens));
-        }
-
-        $flowMappingNode->addChild(new SyntaxTokenNode($token));
-        $harvester->tokens->advance();
-
-        while (true) {
-            $this->collectSpaceAndComments($harvester, $flowMappingNode);
-
-            $token = $harvester->tokens->current();
-            if (null === $token || TokenType::FLOW_MAPPING_END === $token->type) {
-                break;
-            }
-
-            if (TokenType::FLOW_ENTRY === $token->type) {
-                $flowMappingNode->addChild(new SyntaxTokenNode($token));
-                $harvester->tokens->advance();
-                continue;
-            }
-
-            if (TokenType::MERGE_INDICATOR === $token->type) {
-                $flowMappingNode->addChild($this->parseMergeInstructionAtCurrentPosition($harvester));
-                continue;
-            }
-
-            $keyValueCouple = new KeyValueCoupleNode();
-            $flowMappingNode->addChild($keyValueCouple);
-
-            $keyValueCouple->setKey($this->getKeyNode($harvester, true));
-            $this->appendFlowKeyMultilinePlainScalarContinuations($harvester, $keyValueCouple->getKey());
-
-            if ($this->tryConsumeFlowMappingValueIndicator($harvester, $keyValueCouple)) {
-                $token = $harvester->tokens->current();
-                if (null === $token || \in_array($token->type, [TokenType::FLOW_ENTRY, TokenType::FLOW_MAPPING_END], true)) {
-                    $keyValueCouple->setValue(new ValueNode());
-                } else {
-                    $keyValueCouple->setValue($this->parseValue($harvester, self::FLOW_COLLECTION_VALUE_PARENT_INDENT));
-                }
-            }
-            $this->postProcessKeyValueCouple($harvester, $keyValueCouple);
-        }
-
-        $token = $harvester->tokens->current();
-        if (TokenType::FLOW_MAPPING_END !== $token?->type) {
-            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('There is no expected FLOW_MAPPING_END token, but %s given', $token?->type->value ?? '_nothing_'), $harvester->tokens));
-        }
-
-        $flowMappingNode->addChild(new SyntaxTokenNode($token));
-        $harvester->tokens->advance();
-
-        $this->collectSpaceAndComments($harvester, $flowMappingNode);
-
-        return $flowMappingNode;
     }
 
     private function parseIndentedBlockValue(Harvester $harvester, ValueNode $valueNode, int $parentIndentLen): void
@@ -1857,7 +1820,7 @@ final class Parser
                 $valueNode->addChild(
                     TokenType::FLOW_SEQUENCE_START === $afterIndent->type
                         ? $this->runFlowSequenceDriver($harvester)
-                        : $this->parseFlowMapping($harvester),
+                        : $this->runFlowMappingDriver($harvester),
                 );
 
                 return;
@@ -2305,7 +2268,7 @@ final class Parser
         } elseif (TokenType::FLOW_SEQUENCE_START === $token->type) {
             $valueNode->addChild($this->runFlowSequenceDriver($harvester));
         } elseif (TokenType::FLOW_MAPPING_START === $token->type) {
-            $valueNode->addChild($this->parseFlowMapping($harvester));
+            $valueNode->addChild($this->runFlowMappingDriver($harvester));
         } else {
             throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Unexpected type while parsing of value: %s', $token->type->value), $token));
         }
@@ -2439,6 +2402,30 @@ final class Parser
         }
     }
 
+    private function runFlowMappingDriver(Harvester $harvester): FlowMappingNode
+    {
+        $flowMappingNode = new FlowMappingNode();
+        $token = $harvester->tokens->current();
+        if (TokenType::FLOW_MAPPING_START !== $token?->type) {
+            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('There is no expected FLOW_MAPPING_START token, but %s given', $token?->type->value ?? '_nothing_'), $harvester->tokens));
+        }
+
+        $flowMappingNode->addChild($this->createSyntaxTokenNode($token));
+        $harvester->tokens->advance();
+
+        /** @var FlowMappingNode $result */
+        $result = (new Driver())->run(
+            $harvester,
+            new Frame(
+                new FlowMappingBuilder($this->createFlowHost()),
+                new ParseContext(),
+                $flowMappingNode,
+            ),
+        );
+
+        return $result;
+    }
+
     private function runFlowSequenceDriver(Harvester $harvester): FlowSequenceNode
     {
         $flowSequenceNode = new FlowSequenceNode();
@@ -2450,31 +2437,11 @@ final class Parser
         $flowSequenceNode->addChild($this->createSyntaxTokenNode($token));
         $harvester->tokens->advance();
 
-        $host = new FlowSequenceHost(
-            function (Harvester $h, KeyNode $keyNode): void {
-                $this->appendFlowKeyMultilinePlainScalarContinuations($h, $keyNode);
-            },
-            function (Harvester $h, Node $root): void {
-                $this->collectSpaceAndComments($h, $root);
-            },
-            fn (Token $t): SyntaxTokenNode => $this->createSyntaxTokenNode($t),
-            fn (Harvester $h): KeyNode => $this->getKeyNode($h, true),
-            fn (Harvester $h): bool => $this->isScalarFollowedByValueIndicator($h, true),
-            fn (Harvester $h): ValueNode => $this->parseFlowContextValue($h),
-            fn (Harvester $h): FlowMappingNode => $this->parseFlowMapping($h),
-            function (Harvester $h, KeyValueCoupleNode $couple): void {
-                $this->postProcessKeyValueCouple($h, $couple);
-            },
-            fn (Harvester $h, KeyValueCoupleNode $couple): bool => $this->tryConsumeFlowMappingValueIndicator($h, $couple),
-        );
-
-        $driver = new Driver();
-
         /** @var FlowSequenceNode $result */
-        $result = $driver->run(
+        $result = (new Driver())->run(
             $harvester,
             new Frame(
-                new FlowSequenceBuilder($host),
+                new FlowSequenceBuilder($this->createFlowHost()),
                 new ParseContext(),
                 $flowSequenceNode,
             ),

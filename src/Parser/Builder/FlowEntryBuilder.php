@@ -27,7 +27,7 @@ use Aeliot\YamlToken\Parser\Driver\BuilderResult\Delegate;
 use Aeliot\YamlToken\Parser\Driver\Frame;
 use Aeliot\YamlToken\Parser\Dto\Harvester;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
-use Aeliot\YamlToken\Parser\Flow\FlowSequenceHost;
+use Aeliot\YamlToken\Parser\Flow\FlowHost;
 
 /**
  * One flow-sequence entry: flow-node or ns-flow-pair (YAML 1.2.2 §7.4.1).
@@ -35,7 +35,7 @@ use Aeliot\YamlToken\Parser\Flow\FlowSequenceHost;
 final class FlowEntryBuilder implements BuilderInterface
 {
     public function __construct(
-        private readonly FlowSequenceHost $host,
+        private readonly FlowHost $host,
     ) {
     }
 

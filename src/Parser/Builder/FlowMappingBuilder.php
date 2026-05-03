@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace Aeliot\YamlToken\Parser\Builder;
 
 use Aeliot\YamlToken\Enum\TokenType;
-use Aeliot\YamlToken\Node\FlowSequenceNode;
+use Aeliot\YamlToken\Node\FlowMappingNode;
+use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\Node;
-use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Parser\Driver\BuilderInterface;
 use Aeliot\YamlToken\Parser\Driver\BuilderResult\BuilderResultInterface;
 use Aeliot\YamlToken\Parser\Driver\BuilderResult\Completed;
@@ -28,9 +28,9 @@ use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Flow\FlowHost;
 
 /**
- * c-flow-sequence (YAML 1.2.2 §7.4.1). Opening {@code [} is consumed by {@see Parser::runFlowSequenceDriver()}.
+ * c-flow-mapping (YAML 1.2.2 §7.4.2). Opening {@code "{"} is consumed by {@see Parser::runFlowMappingDriver()}.
  */
-final class FlowSequenceBuilder implements BuilderInterface
+final class FlowMappingBuilder implements BuilderInterface
 {
     public function __construct(
         private readonly FlowHost $host,
@@ -40,8 +40,8 @@ final class FlowSequenceBuilder implements BuilderInterface
     public function onChildCompleted(Harvester $harvester, Frame $self, Node $child): BuilderResultInterface
     {
         $node = $self->node;
-        if (!$node instanceof FlowSequenceNode) {
-            throw new UnexpectedTokenException('FlowSequenceBuilder frame node must be FlowSequenceNode');
+        if (!$node instanceof FlowMappingNode) {
+            throw new UnexpectedTokenException('FlowMappingBuilder frame node must be FlowMappingNode');
         }
         $node->addChild($child);
 
@@ -50,37 +50,43 @@ final class FlowSequenceBuilder implements BuilderInterface
 
     public function step(Harvester $harvester, Frame $self): BuilderResultInterface
     {
-        $flowSequenceNode = $self->node;
-        if (!$flowSequenceNode instanceof FlowSequenceNode) {
-            throw new UnexpectedTokenException('FlowSequenceBuilder frame node must be FlowSequenceNode');
+        $flowMappingNode = $self->node;
+        if (!$flowMappingNode instanceof FlowMappingNode) {
+            throw new UnexpectedTokenException('FlowMappingBuilder frame node must be FlowMappingNode');
         }
 
-        $this->host->collectSpaceAndComments($harvester, $flowSequenceNode);
+        $this->host->collectSpaceAndComments($harvester, $flowMappingNode);
 
         $token = $harvester->tokens->current();
-        if (null === $token || TokenType::FLOW_SEQUENCE_END === $token->type) {
-            if (TokenType::FLOW_SEQUENCE_END !== $token?->type) {
-                throw new UnexpectedTokenException(\sprintf('There is no expected FLOW_SEQUENCE_END token, but %s given', $token?->type->value ?? '_nothing_'));
+        if (null === $token || TokenType::FLOW_MAPPING_END === $token->type) {
+            if (TokenType::FLOW_MAPPING_END !== $token?->type) {
+                throw new UnexpectedTokenException(\sprintf('There is no expected FLOW_MAPPING_END token, but %s given', $token?->type->value ?? '_nothing_'));
             }
 
-            $flowSequenceNode->addChild($this->host->createSyntaxTokenNode($token));
+            $flowMappingNode->addChild($this->host->createSyntaxTokenNode($token));
             $harvester->tokens->advance();
-            $this->host->collectSpaceAndComments($harvester, $flowSequenceNode);
+            $this->host->collectSpaceAndComments($harvester, $flowMappingNode);
 
-            return new Completed($flowSequenceNode);
+            return new Completed($flowMappingNode);
         }
 
         if (TokenType::FLOW_ENTRY === $token->type) {
-            $flowSequenceNode->addChild($this->host->createSyntaxTokenNode($token));
+            $flowMappingNode->addChild($this->host->createSyntaxTokenNode($token));
             $harvester->tokens->advance();
 
             return new Continued();
         }
 
+        if (TokenType::MERGE_INDICATOR === $token->type) {
+            $flowMappingNode->addChild($this->host->parseMergeInstructionAtCurrentPosition($harvester));
+
+            return new Continued();
+        }
+
         return new Delegate(new Frame(
-            new FlowEntryBuilder($this->host),
+            new FlowMappingPairBuilder($this->host),
             $self->context,
-            new ValueNode(),
+            new KeyValueCoupleNode(),
         ));
     }
 }
