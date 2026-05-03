@@ -143,6 +143,47 @@ final class Parser
         }
     }
 
+    /**
+     * Flow-context counterpart of {@see appendMultilinePlainScalarContinuations()}: consumes one or more
+     * NEWLINE + WHITESPACE* + PLAIN_SCALAR continuation chunks for a plain-scalar key inside a flow
+     * mapping (YAML 1.2.2 §7.3.3 / §7.4.1). The lexer emits WHITESPACE — not INDENTATION — for leading
+     * spaces inside `{...}`, so the block-context helpers cannot be reused. Each consumed PLAIN_SCALAR
+     * is appended via {@see KeyNode::addScalarName()}, which automatically wraps repeated fragments
+     * into a {@see MultilinePlainScalarNode}.
+     */
+    private function appendFlowKeyMultilinePlainScalarContinuations(Harvester $harvester, KeyNode $keyNode): void
+    {
+        $name = $keyNode->getName();
+        if (!$name instanceof ScalarNode || TokenType::PLAIN_SCALAR !== $name->getToken()->type) {
+            return;
+        }
+
+        while (TokenType::NEWLINE === $harvester->tokens->current()?->type) {
+            $newLine = $harvester->tokens->current();
+            $scalarOffset = 1;
+            while (TokenType::WHITESPACE === $harvester->tokens->peek($scalarOffset)?->type) {
+                ++$scalarOffset;
+            }
+            $scalarToken = $harvester->tokens->peek($scalarOffset);
+            if (TokenType::PLAIN_SCALAR !== $scalarToken?->type) {
+                break;
+            }
+
+            $keyNode->addChild(new NewLineNode($newLine));
+            $harvester->tokens->advance();
+
+            $contentHead = $harvester->tokens->current();
+            while (TokenType::WHITESPACE === $contentHead->type) {
+                $keyNode->addChild(new WhitespaceNode($contentHead));
+                $harvester->tokens->advance();
+                $contentHead = $harvester->tokens->current();
+            }
+
+            $keyNode->addScalarName(new ScalarNode($scalarToken));
+            $harvester->tokens->advance();
+        }
+    }
+
     private function appendTokenLocation(string $message, Token|TokenStreamProxy $tokens): string
     {
         $line = $tokens instanceof Token ? $tokens->line : $tokens->getLine();
@@ -1521,6 +1562,7 @@ final class Parser
             $flowMappingNode->addChild($keyValueCouple);
 
             $keyValueCouple->setKey($this->getKeyNode($harvester, true));
+            $this->appendFlowKeyMultilinePlainScalarContinuations($harvester, $keyValueCouple->getKey());
 
             if ($this->tryConsumeFlowMappingValueIndicator($harvester, $keyValueCouple)) {
                 $token = $harvester->tokens->current();

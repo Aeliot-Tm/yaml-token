@@ -57,6 +57,16 @@ Because of this, the parser must not invent tokens that did not exist in the ori
     Continuation lines may include `WHITESPACE` (for example a tab) between the line’s `INDENTATION`
     token and the next `PLAIN_SCALAR`; the parser consumes those tokens as part of the same scalar
     line so block collections do not treat the line as a new entry.
+  - Plain-scalar **keys** in flow mappings (e.g. `{ multi\n  line, a: b}`) may also span
+    multiple physical lines. Inside `{...}` the lexer emits `NEWLINE` + `WHITESPACE` + `PLAIN_SCALAR`
+    for each continuation line (no `INDENTATION` token, since `INDENTATION` is only emitted at column 1
+    outside flow). The parser consumes those continuation chunks via
+    `appendFlowKeyMultilinePlainScalarContinuations()` and adds each fragment with
+    `KeyNode::addScalarName()`, which automatically wraps repeated `ScalarNode`s into a
+    `MultilinePlainScalarNode` exposed via `KeyNode::getName()`. Trailing `NEWLINE` + `WHITESPACE`
+    that precede `,`, `}`, or `:` on a separate continuation line stay as layout children of the
+    `KeyValueCoupleNode` (collected by `tryConsumeFlowMappingValueIndicator()`), so the source
+    round-trips byte-for-byte.
 - Collections:
   - Block mapping: `key:` followed by an indented block of key/value couples (`BlockMappingNode`).
   - A line that looks like `key: value` only counts as a new mapping entry when the scalar key is

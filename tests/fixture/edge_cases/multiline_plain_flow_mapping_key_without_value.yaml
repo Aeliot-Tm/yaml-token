@@ -1,0 +1,10 @@
+---
+- { multi
+    line
+    key
+    with
+    many
+    many
+    many
+    parts
+  , a: b}
