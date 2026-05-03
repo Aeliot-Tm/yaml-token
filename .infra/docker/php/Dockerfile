@@ -20,8 +20,14 @@ RUN set -xe; \
 RUN rm -rf /var/lib/apt/lists/* && \
     apt-get clean
 
+# Interactive bash: append history (HISTFILE is set in compose.yaml on the bind-mounted /app).
+# Sourced only from ~/.bashrc so login + non-login each load this once (no profile.d / no guard flag).
+COPY .infra/docker/php/bash-history.sh /usr/local/etc/yaml-token-bash-history.sh
+
 # Copy php configs
 COPY .infra/docker/php/conf.d/*.ini /usr/local/etc/php/conf.d/
+
+RUN printf '\n# yaml-token: persistent shell history (compose HISTFILE on /app).\n[ -r /usr/local/etc/yaml-token-bash-history.sh ] && . /usr/local/etc/yaml-token-bash-history.sh\n' >> /root/.bashrc
 
 # Install composer
 RUN set -xe; \
