@@ -711,22 +711,24 @@ final class Parser
         );
     }
 
+    /**
+     * Wraps layout/indicator tokens collected by {@see collectTypes()} and {@see collectUntil()}
+     * with their corresponding nodes. Only token types that those collectors can deliver are
+     * listed here; structural tokens (anchors, tags, block scalar indicators) are wrapped at
+     * their dedicated parsing call sites and never reach this method.
+     */
     private function createSimpleNode(Token $token): Node
     {
         return match ($token->type) {
-            TokenType::ANCHOR => new AnchorNode($token),
             TokenType::BLOCK_SCALAR_CHOMPING_INDICATOR => new BlockScalarChompingIndicatorNode($token),
             TokenType::BLOCK_SCALAR_INDENTATION_INDICATOR => new BlockScalarIndentationIndicatorNode($token),
             TokenType::COMMENT => new CommentNode($token),
-            TokenType::FOLDED_BLOCK_SCALAR_INDICATOR,
-            TokenType::LITERAL_BLOCK_SCALAR_INDICATOR => new BlockScalarIndicatorNode($token),
+            TokenType::DIRECTIVE_YAML_VERSION => new YamlDirectiveVersionNode($token),
             TokenType::INDENTATION => new IndentationNode($token),
             TokenType::NEWLINE => new NewLineNode($token),
-            TokenType::TAG => new TagNode($token),
             TokenType::SEQUENCE_ENTRY,
             TokenType::VALUE_INDICATOR => new SyntaxTokenNode($token),
             TokenType::WHITESPACE => new WhitespaceNode($token),
-            TokenType::DIRECTIVE_YAML_VERSION => new YamlDirectiveVersionNode($token),
             default => throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Not configured node for token type: %s', $token->type->value), $token)),
         };
     }

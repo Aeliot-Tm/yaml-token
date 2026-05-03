@@ -5,6 +5,49 @@
 The parser builds a tree of `Node` objects from the lexer `TokenStream`: stream, documents,
 block and flow collections, scalars, and layout (comments, indentation, newlines, structural tokens).
 
+## Flow collection driver
+
+Flow collections (`[ ... ]`, `{ ... }`) are parsed by a dedicated **Driver / Frame /
+Builder** runtime instead of nested recursive private methods. Each flow construct
+(sequence, sequence entry, sequence operand, mapping, mapping pair) has its own
+builder class under [`src/Parser/Builder/`](../../../src/Parser/Builder), the
+[`Driver`](../../../src/Parser/Driver/Driver.php) owns a frame stack and dispatches
+`Continued` / `Delegate` / `Completed` results, and a [`FlowHost`](../../../src/Parser/Flow/FlowHost.php)
+exposes the few `Parser` private helpers builders need (via closures bound in
+`Parser::createFlowHost()`). The two entry points used from block-level parsing
+are `Parser::runFlowSequenceDriver()` and `Parser::runFlowMappingDriver()`.
+
+The DTO [`ParseContext`](../../../src/Parser/Dto/ParseContext.php) threads
+lexical-rule flags (notably `afterJsonKey`, `allowEmptyKey`, `allowEmptyValue`,
+`parentIndentLen`) through frames so that JSON-style key adjacent value form
+(YAML 1.2.2 production [153]) and implicit empty values can be detected by
+peeking through layout tokens.
+
+When a builder spots a JSON-style operand (quoted scalar or flow collection)
+followed by a `PLAIN_SCALAR` starting with `:`, it asks the host to call
+`Parser::tryReinterpretFlowJsonAdjacentValueSeparator()`, which uses
+`TokenStream::splitCurrent()` to rewrite that single token into `VALUE_INDICATOR`
+plus the remaining payload, so the existing
+`tryConsumeFlowMappingValueIndicator()` works uniformly across `{a:1}` and
+`[a:1]`.
+
+See [Parser Driver Architecture](../Architecture/ParserDriver.md) for the
+component-level description.
+
+## Anchor declaration in complex keys
+
+`Parser::postProcessKeyValueCouple()` records each `KeyValueCoupleNode` as the
+**declaring couple** of every anchor that belongs to it:
+
+- The value's direct anchor, via `ValueNode::getAnchor()`.
+- All anchors inside the **key subtree**, via the recursive helper
+  `Parser::collectKeyAnchorsRecursive()`. The recursion stops at any nested
+  `KeyValueCoupleNode` so anchors declared inside an inner couple keep their
+  inner-couple declaration. This makes aliases resolve back to the surrounding
+  couple even when the anchor is buried inside a flow sequence or flow mapping
+  that serves as the key (`[ &a foo, bar ]: value`, `? [ &a foo, bar ]\n: value`,
+  `{ &a foo: bar }: outer`).
+
 ## Source round-trip and empty nodes
 
 This project preserves the original source text by keeping all lexed tokens (including layout tokens
