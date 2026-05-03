@@ -74,6 +74,9 @@ Because of this, the parser must not invent tokens that did not exist in the ori
   - Literal and folded block scalars (`|` / `>`): after the header line, non-empty continuation lines
     use the same newline + indentation + scalar consumption as multiline plain scalars; the value may
     become `MultilinePlainScalarNode` when several `PLAIN_SCALAR` fragments are present.
+    After an explicit-indent header (`|N` / `>N`, …), any further `NEWLINE` tokens that represent empty
+    lines before the first indented content line are consumed as part of the value before the first
+    `INDENTATION` / scalar fragment.
   - Block sequence: `key:` followed by an indented list of `-` entries (`BlockSequenceNode`
     with `SequenceEntryNode` children).
   - Flow mapping / sequence: `{...}` / `[...]`.

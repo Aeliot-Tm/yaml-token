@@ -65,6 +65,13 @@ The rules below describe the practical behavior relied upon by lexer unit tests.
     first body line ends the block as soon as that indent is read (the body buffer may end with
     spaces, not a newline); the same scan builds the raw body that is split per line when the header
     had a `BLOCK_SCALAR_INDENTATION_INDICATOR` digit.
+  - **Explicit digit body** (same scan as the single-token path, then split per line): the YAML
+    explicit floor is **key parent indent** (spaces before the mapping key on the header line,
+    taken from the last `PLAIN_SCALAR` before `VALUE_INDICATOR` on that line) plus the digit.
+    The first non-empty body line then picks the comparison threshold: if its indent is at least
+    two spaces deeper than that floor, that line’s indent is used to end the body on shallower
+    lines (sibling keys such as `go_yaml/literal-scalars`); otherwise the floor alone is used so a
+    later line may still sit on the floor (`go_yaml/more-indented-lines-at-the-beginning-of-folded-block-scalars`).
   - chomping: `BlockScalarChomping` on the cursor is set from `+` / `-` (`Keep` / `Strip`);
     if the header ends without them, it defaults to `Clip` when the body is promoted
   - **Strip** (`-`): after the block body is read, the line break that ends the last body line

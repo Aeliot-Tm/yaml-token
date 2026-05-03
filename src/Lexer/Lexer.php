@@ -558,10 +558,16 @@ final class Lexer
             $cursor->blockScalarChomping = BlockScalarChomping::Clip;
         }
         $cursor->inBlockScalarHeaderLine = false;
+        $parentIndent = $cursor->blockScalarValueParentIndent ?? 0;
+        $cursor->blockScalarValueParentIndent = null;
         if ($cursor->blockScalarExplicitIndentIndicator) {
             $cursor->inExplicitIndentBlockScalarBody = true;
             $cursor->blockScalarExplicitIndentIndicator = false;
+            $additional = $cursor->blockScalarAdditionalIndentFromIndicator ?? 0;
+            $cursor->blockScalarAdditionalIndentFromIndicator = null;
+            $cursor->blockScalarExplicitContentMinIndent = $parentIndent + $additional;
         } else {
+            $cursor->blockScalarAdditionalIndentFromIndicator = null;
             $cursor->pendingBlockScalarBody = $cursor->blockScalarBodyTokenType;
         }
         $cursor->blockScalarBodyTokenType = null;
@@ -586,6 +592,10 @@ final class Lexer
     private function readBlockScalarBody(Harvester $harvester): string
     {
         $result = '';
+        $explicitFloor = $harvester->cursor->blockScalarExplicitContentMinIndent;
+        if (null !== $explicitFloor) {
+            $harvester->cursor->blockScalarExplicitContentMinIndent = null;
+        }
         $minIndent = null;
 
         while ($harvester->cursor->position < $harvester->length) {
@@ -613,7 +623,13 @@ final class Lexer
             }
 
             if (null === $minIndent) {
-                $minIndent = $lineIndent;
+                if (null !== $explicitFloor) {
+                    // When the first content line is much deeper than the explicit floor, shallower lines end the body
+                    // (e.g. go_yaml/literal-scalars); otherwise the floor alone governs (more-indented-lines fixture).
+                    $minIndent = ($lineIndent - $explicitFloor >= 2) ? $lineIndent : $explicitFloor;
+                } else {
+                    $minIndent = $lineIndent;
+                }
             } elseif ($lineIndent < $minIndent && '' !== $result) {
                 // After reading this line's leading whitespace, $result often ends with spaces, not a newline;
                 // still treat a shallower indent than the block content as end-of-body (YAML 1.2.2 section 8.1.1).
@@ -1041,6 +1057,7 @@ final class Lexer
             }
             if ($char >= '0' && $char <= '9') {
                 $this->advance($harvester);
+                $harvester->cursor->blockScalarAdditionalIndentFromIndicator = (int) $char;
                 $harvester->cursor->blockScalarExplicitIndentIndicator = true;
                 $harvester->stream->addToken(new Token(TokenType::BLOCK_SCALAR_INDENTATION_INDICATOR, $char, $startLine, $startColumn));
 
@@ -1073,6 +1090,12 @@ final class Lexer
                 $harvester->cursor->blockMappingKeyIndent = $harvester->cursor->currentIndent;
                 $harvester->cursor->awaitingBlockPlainContinuation = false;
                 $harvester->cursor->suppressExplicitTagForBang = false;
+                $lastSignificant = $this->getLastSignificantToken($harvester);
+                if (null !== $lastSignificant && TokenType::PLAIN_SCALAR === $lastSignificant->type && $lastSignificant->line === $startLine) {
+                    $harvester->cursor->blockScalarValueParentIndent = $lastSignificant->column - 1;
+                } else {
+                    $harvester->cursor->blockScalarValueParentIndent = null;
+                }
             }
             $this->advance($harvester);
             $harvester->stream->addToken(new Token(TokenType::VALUE_INDICATOR, ':', $startLine, $startColumn));

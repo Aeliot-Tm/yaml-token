@@ -2086,6 +2086,12 @@ final class Parser
             $valueNode->addChild(new NewLineNode($token));
             $harvester->tokens->advance();
 
+            while (TokenType::NEWLINE === $harvester->tokens->current()?->type) {
+                $leadingEmptyLineBreak = $harvester->tokens->current();
+                $valueNode->addChild(new NewLineNode($leadingEmptyLineBreak));
+                $harvester->tokens->advance();
+            }
+
             // YAML 1.2.2 §8.1.1.1: with an explicit indentation indicator (|N, >N, |N-, >N+, ...),
             // the body may start with leading spaces that are part of the content but surface
             // to the parser as a separate INDENTATION token before the scalar payload.
@@ -2095,8 +2101,8 @@ final class Parser
             }
 
             $token = $harvester->tokens->current();
-            if (!$token->type->isScalar()) {
-                throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Scalar expected, but %s given', $token->type->value), $token));
+            if (null === $token || !$token->type->isScalar()) {
+                throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Scalar expected, but %s given', $token?->type->value ?? '_nothing_'), $token));
             }
 
             $valueNode->addChild(new ScalarNode($token));

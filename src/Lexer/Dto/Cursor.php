@@ -35,6 +35,11 @@ final class Cursor
     public ?int $blockMappingKeyIndent = null;
 
     /**
+     * Digit (1–9) from {@see TokenType::BLOCK_SCALAR_INDENTATION_INDICATOR} on the current header line; cleared when the header ends.
+     */
+    public ?int $blockScalarAdditionalIndentFromIndicator = null;
+
+    /**
      * Set when emitting {@see TokenType::LITERAL_BLOCK_SCALAR_INDICATOR} or {@see TokenType::FOLDED_BLOCK_SCALAR_INDICATOR}:
      * {@see TokenType::LITERAL_BLOCK_SCALAR} or {@see TokenType::FOLDED_BLOCK_SCALAR} for the upcoming body token.
      *
@@ -49,9 +54,20 @@ final class Cursor
     public ?BlockScalarChomping $blockScalarChomping = null;
 
     /**
+     * Sum of mapping-key parent indent and explicit digit (YAML 1.2.2 §8.1); used only to derive body line rules;
+     * cleared when block scalar body reading starts.
+     */
+    public ?int $blockScalarExplicitContentMinIndent = null;
+
+    /**
      * True after {@see TokenType::BLOCK_SCALAR_INDENTATION_INDICATOR} on the current block header line.
      */
     public bool $blockScalarExplicitIndentIndicator = false;
+
+    /**
+     * Leading-space count before the block mapping key (same line as {@see TokenType::VALUE_INDICATOR}); cleared when the block scalar header ends.
+     */
+    public ?int $blockScalarValueParentIndent = null;
 
     public int $column = 1;
 
