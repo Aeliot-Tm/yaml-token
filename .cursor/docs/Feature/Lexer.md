@@ -61,7 +61,10 @@ The rules below describe the practical behavior relied upon by lexer unit tests.
   - **Single body token** (`|` / `>` without splitting per line): when scanning where the block body ends,
     only **leading spaces** (U+0020) on each line contribute to the indent depth used for comparison;
     tabs in that prefix are still copied into the body bytes but do not increase that depth
-    (YAML structural indent is space-only).
+    (YAML structural indent is space-only). A line whose space-only indent is shallower than the
+    first body line ends the block as soon as that indent is read (the body buffer may end with
+    spaces, not a newline); the same scan builds the raw body that is split per line when the header
+    had a `BLOCK_SCALAR_INDENTATION_INDICATOR` digit.
   - chomping: `BlockScalarChomping` on the cursor is set from `+` / `-` (`Keep` / `Strip`);
     if the header ends without them, it defaults to `Clip` when the body is promoted
   - **Strip** (`-`): after the block body is read, the line break that ends the last body line

@@ -614,8 +614,9 @@ final class Lexer
 
             if (null === $minIndent) {
                 $minIndent = $lineIndent;
-            }
-            if ($lineIndent < $minIndent && '' !== $result && "\n" === substr($result, -1)) {
+            } elseif ($lineIndent < $minIndent && '' !== $result) {
+                // After reading this line's leading whitespace, $result often ends with spaces, not a newline;
+                // still treat a shallower indent than the block content as end-of-body (YAML 1.2.2 section 8.1.1).
                 $backtrack = $harvester->cursor->position - $indentStart;
                 if ($backtrack > 0) {
                     $result = substr($result, 0, -$backtrack);
