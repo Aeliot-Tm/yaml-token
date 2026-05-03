@@ -57,9 +57,15 @@ Because of this, the parser must not invent tokens that did not exist in the ori
     Continuation lines may include `WHITESPACE` (for example a tab) between the line’s `INDENTATION`
     token and the next `PLAIN_SCALAR`; the parser consumes those tokens as part of the same scalar
     line so block collections do not treat the line as a new entry.
+    At bare document root (no enclosing block indent; `Parser` passes
+    `BARE_DOCUMENT_BLOCK_PARENT_INDENT` as the parent length),
+    a continuation may begin with a scalar at column one with no leading `INDENTATION` on that line;
+    the same helper accepts it when the line is not an implicit YAML key (`:` on that line).
+    Horizontal `WHITESPACE` that ends a physical line immediately before `NEWLINE` (for example trailing
+    spaces after `b` on the same line) is folded into the scalar before the next continuation is probed.
     A completely empty line between continuation lines is lexed as two consecutive `NEWLINE` tokens;
-    when the following line is still a valid indented continuation (same probe as for further
-    fragments, including not stealing an implicit block key), `appendMultilinePlainScalarContinuations()`
+    when the following line is still a valid continuation (indented probe as before, or bare-root flush probe,
+    including not stealing an implicit block key), `appendMultilinePlainScalarContinuations()`
     keeps the first `NEWLINE` inside the value (YAML 1.2.2 §6.5 / §7.3.3, e.g. Example 7.12 Plain Lines).
     A line that has only block `INDENTATION` plus horizontal `WHITESPACE` (for example a tab) before
     the line break is another empty-continuation pattern: the parser consumes `NEWLINE` + indent +

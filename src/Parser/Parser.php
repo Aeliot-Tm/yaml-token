@@ -96,7 +96,19 @@ final class Parser
      */
     private function appendMultilinePlainScalarContinuations(Harvester $harvester, ValueNode $valueNode, int $parentIndentLen): void
     {
-        while (TokenType::NEWLINE === $harvester->tokens->current()?->type) {
+        while (true) {
+            while (
+                TokenType::WHITESPACE === $harvester->tokens->current()?->type
+                && TokenType::NEWLINE === $harvester->tokens->peek(1)?->type
+            ) {
+                $valueNode->addChild(new WhitespaceNode($harvester->tokens->current()));
+                $harvester->tokens->advance();
+            }
+
+            if (TokenType::NEWLINE !== $harvester->tokens->current()?->type) {
+                break;
+            }
+
             $newLine = $harvester->tokens->current();
 
             // Physical empty line between indented continuation lines: lexer emits two NEWLINE tokens
@@ -104,7 +116,13 @@ final class Parser
             // the same continuation probe as below still applies after the gap (avoid stealing structure
             // where the second NEWLINE starts unrelated content).
             if (TokenType::NEWLINE === $harvester->tokens->peek(1)?->type) {
-                if (!$this->isIndentedMultilinePlainContinuationAt($harvester, 2, $parentIndentLen)) {
+                $continuesAfterBlankLine =
+                    $this->isIndentedMultilinePlainContinuationAt($harvester, 2, $parentIndentLen)
+                    || (
+                        self::BARE_DOCUMENT_BLOCK_PARENT_INDENT === $parentIndentLen
+                        && $this->isBareDocumentFlushMultilinePlainContinuationAt($harvester, 2)
+                    );
+                if (!$continuesAfterBlankLine) {
                     break;
                 }
 
@@ -122,8 +140,15 @@ final class Parser
                 while (TokenType::WHITESPACE === $harvester->tokens->peek($afterIndentOffset)?->type) {
                     ++$afterIndentOffset;
                 }
-                if (TokenType::NEWLINE === $harvester->tokens->peek($afterIndentOffset)?->type
-                    && $this->isIndentedMultilinePlainContinuationAt($harvester, $afterIndentOffset + 1, $parentIndentLen)
+                if (
+                    TokenType::NEWLINE === $harvester->tokens->peek($afterIndentOffset)?->type
+                    && (
+                        $this->isIndentedMultilinePlainContinuationAt($harvester, $afterIndentOffset + 1, $parentIndentLen)
+                        || (
+                            self::BARE_DOCUMENT_BLOCK_PARENT_INDENT === $parentIndentLen
+                            && $this->isBareDocumentFlushMultilinePlainContinuationAt($harvester, $afterIndentOffset + 1)
+                        )
+                    )
                 ) {
                     $valueNode->addChild(new NewLineNode($newLine));
                     $harvester->tokens->advance();
@@ -149,26 +174,48 @@ final class Parser
                 }
             }
 
-            if (!$this->isIndentedMultilinePlainContinuationAt($harvester, 1, $parentIndentLen)) {
-                break;
-            }
+            if ($this->isIndentedMultilinePlainContinuationAt($harvester, 1, $parentIndentLen)) {
+                $indentation = $harvester->tokens->peek(1);
 
-            $indentation = $harvester->tokens->peek(1);
-
-            $valueNode->addChild(new NewLineNode($newLine));
-            $valueNode->addChild(new IndentationNode($indentation));
-            $harvester->tokens->advance();
-            $harvester->tokens->advance();
-
-            $contentHead = $harvester->tokens->current();
-            while (TokenType::WHITESPACE === $contentHead->type) {
-                $valueNode->addChild(new WhitespaceNode($contentHead));
+                $valueNode->addChild(new NewLineNode($newLine));
+                $valueNode->addChild(new IndentationNode($indentation));
                 $harvester->tokens->advance();
+                $harvester->tokens->advance();
+
                 $contentHead = $harvester->tokens->current();
+                while (TokenType::WHITESPACE === $contentHead->type) {
+                    $valueNode->addChild(new WhitespaceNode($contentHead));
+                    $harvester->tokens->advance();
+                    $contentHead = $harvester->tokens->current();
+                }
+
+                $valueNode->addChild(new ScalarNode($contentHead));
+                $harvester->tokens->advance();
+
+                continue;
             }
 
-            $valueNode->addChild(new ScalarNode($contentHead));
-            $harvester->tokens->advance();
+            if (
+                self::BARE_DOCUMENT_BLOCK_PARENT_INDENT === $parentIndentLen
+                && $this->isBareDocumentFlushMultilinePlainContinuationAt($harvester, 1)
+            ) {
+                $valueNode->addChild(new NewLineNode($newLine));
+                $harvester->tokens->advance();
+
+                $contentHead = $harvester->tokens->current();
+                while (TokenType::WHITESPACE === $contentHead->type) {
+                    $valueNode->addChild(new WhitespaceNode($contentHead));
+                    $harvester->tokens->advance();
+                    $contentHead = $harvester->tokens->current();
+                }
+
+                $valueNode->addChild(new ScalarNode($contentHead));
+                $harvester->tokens->advance();
+
+                continue;
+            }
+
+            break;
         }
     }
 
@@ -727,6 +774,25 @@ final class Parser
         return $keyNode;
     }
 
+    /**
+     * Whether {@code peek($scalarPeekOffset)} starts a continuation line of a multiline plain scalar
+     * at bare document root ({@see self::BARE_DOCUMENT_BLOCK_PARENT_INDENT}) **without** a leading
+     * {@see TokenType::INDENTATION} token (continuation at column one, YAML 1.2.2 §7.3.3).
+     */
+    private function isBareDocumentFlushMultilinePlainContinuationAt(Harvester $harvester, int $scalarPeekOffset): bool
+    {
+        $offset = $scalarPeekOffset;
+        while (TokenType::WHITESPACE === $harvester->tokens->peek($offset)?->type) {
+            ++$offset;
+        }
+        $scalarToken = $harvester->tokens->peek($offset);
+        if (!$scalarToken?->type->isScalar()) {
+            return false;
+        }
+
+        return !$this->isImplicitYamlKeyOnContinuationLine($harvester, $offset);
+    }
+
     private function isBlockScalarStartAtDocumentRoot(Harvester $harvester): bool
     {
         $offset = 0;
@@ -888,7 +954,6 @@ final class Parser
         while (TokenType::WHITESPACE === $harvester->tokens->peek($keyProbe)?->type) {
             ++$keyProbe;
         }
-
 
         return TokenType::VALUE_INDICATOR !== $harvester->tokens->peek($keyProbe)?->type;
     }
