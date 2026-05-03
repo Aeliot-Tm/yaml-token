@@ -626,6 +626,59 @@ final class Parser
         }
     }
 
+    /**
+     * True when a flow sequence or flow mapping at {@code $collectionStartPeekOffset} is closed and
+     * the next non-layout token on the same line is {@code VALUE_INDICATOR} (block implicit key
+     * whose key is a flow collection, e.g. {@code [flow]: block}).
+     */
+    private function isFlowCollectionFollowedByBlockValueIndicatorOnSameLine(Harvester $harvester, int $collectionStartPeekOffset): bool
+    {
+        $open = $harvester->tokens->peek($collectionStartPeekOffset);
+        if (!\in_array($open?->type, [TokenType::FLOW_SEQUENCE_START, TokenType::FLOW_MAPPING_START], true)) {
+            return false;
+        }
+
+        $depth = 0;
+        $i = $collectionStartPeekOffset;
+        while (true) {
+            $tok = $harvester->tokens->peek($i);
+            if (null === $tok) {
+                return false;
+            }
+
+            if (TokenType::FLOW_SEQUENCE_START === $tok->type || TokenType::FLOW_MAPPING_START === $tok->type) {
+                ++$depth;
+            } elseif (TokenType::FLOW_SEQUENCE_END === $tok->type || TokenType::FLOW_MAPPING_END === $tok->type) {
+                --$depth;
+                if ($depth < 0) {
+                    return false;
+                }
+                if (0 === $depth) {
+                    break;
+                }
+            }
+
+            ++$i;
+        }
+
+        ++$i;
+        while (true) {
+            $tok = $harvester->tokens->peek($i);
+            if (null === $tok) {
+                return false;
+            }
+            if (TokenType::WHITESPACE === $tok->type || TokenType::COMMENT === $tok->type) {
+                ++$i;
+                continue;
+            }
+            if (TokenType::NEWLINE === $tok->type) {
+                return false;
+            }
+
+            return TokenType::VALUE_INDICATOR === $tok->type;
+        }
+    }
+
     private function isFlowMappingStart(Harvester $harvester): bool
     {
         $token = $harvester->tokens->current();
@@ -713,8 +766,10 @@ final class Parser
 
     private function isKeyValueCoupleStart(Harvester $harvester): bool
     {
+        $contentPeekOffset = 0;
         $token = $harvester->tokens->current();
         if (TokenType::INDENTATION === $token->type) {
+            $contentPeekOffset = 1;
             $token = $harvester->tokens->peek(1);
         }
 
@@ -725,6 +780,10 @@ final class Parser
             || $token->type->isMergeIndicator()
         ) {
             return true;
+        }
+
+        if (\in_array($token?->type, [TokenType::FLOW_SEQUENCE_START, TokenType::FLOW_MAPPING_START], true)) {
+            return $this->isFlowCollectionFollowedByBlockValueIndicatorOnSameLine($harvester, $contentPeekOffset);
         }
 
         if (\in_array($token->type, [
@@ -1771,6 +1830,17 @@ final class Parser
         if (TokenType::SEQUENCE_ENTRY === $harvester->tokens->current()?->type) {
             $valueNode = new ValueNode();
             $valueNode->addChild($this->parseCompactBlockSequence($harvester, $compactIndent));
+
+            return $valueNode;
+        }
+
+        $flowOpen = $harvester->tokens->current();
+        if (
+            \in_array($flowOpen?->type, [TokenType::FLOW_SEQUENCE_START, TokenType::FLOW_MAPPING_START], true)
+            && $this->isFlowCollectionFollowedByBlockValueIndicatorOnSameLine($harvester, 0)
+        ) {
+            $valueNode = new ValueNode();
+            $valueNode->addChild($this->parseCompactBlockMapping($harvester, $compactIndent));
 
             return $valueNode;
         }
