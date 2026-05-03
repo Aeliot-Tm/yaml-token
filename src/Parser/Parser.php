@@ -99,8 +99,7 @@ final class Parser
         while (TokenType::NEWLINE === $harvester->tokens->current()?->type) {
             $newLine = $harvester->tokens->current();
             $indentation = $harvester->tokens->peek(1);
-            $afterIndent = $harvester->tokens->peek(2);
-            if (TokenType::INDENTATION !== $indentation?->type || !$afterIndent?->type->isScalar()) {
+            if (TokenType::INDENTATION !== $indentation?->type) {
                 break;
             }
 
@@ -109,20 +108,37 @@ final class Parser
                 break;
             }
 
-            // Do not steal a nested block mapping entry key (implicit YAML key).
-            $offset = 3;
-            while (TokenType::WHITESPACE === $harvester->tokens->peek($offset)?->type) {
-                ++$offset;
+            $scalarOffset = 2;
+            while (TokenType::WHITESPACE === $harvester->tokens->peek($scalarOffset)?->type) {
+                ++$scalarOffset;
             }
-            if (TokenType::VALUE_INDICATOR === $harvester->tokens->peek($offset)?->type) {
+            $scalarToken = $harvester->tokens->peek($scalarOffset);
+            if (!$scalarToken?->type->isScalar()) {
+                break;
+            }
+
+            // Do not steal a nested block mapping entry key (implicit YAML key).
+            $keyProbe = $scalarOffset + 1;
+            while (TokenType::WHITESPACE === $harvester->tokens->peek($keyProbe)?->type) {
+                ++$keyProbe;
+            }
+            if (TokenType::VALUE_INDICATOR === $harvester->tokens->peek($keyProbe)?->type) {
                 break;
             }
 
             $valueNode->addChild(new NewLineNode($newLine));
             $valueNode->addChild(new IndentationNode($indentation));
-            $valueNode->addChild(new ScalarNode($afterIndent));
             $harvester->tokens->advance();
             $harvester->tokens->advance();
+
+            $contentHead = $harvester->tokens->current();
+            while (TokenType::WHITESPACE === $contentHead->type) {
+                $valueNode->addChild(new WhitespaceNode($contentHead));
+                $harvester->tokens->advance();
+                $contentHead = $harvester->tokens->current();
+            }
+
+            $valueNode->addChild(new ScalarNode($contentHead));
             $harvester->tokens->advance();
         }
     }
@@ -323,8 +339,7 @@ final class Parser
         while (TokenType::NEWLINE === $harvester->tokens->current()?->type) {
             $newLine = $harvester->tokens->current();
             $indentation = $harvester->tokens->peek(1);
-            $afterIndent = $harvester->tokens->peek(2);
-            if (TokenType::INDENTATION !== $indentation?->type || !$afterIndent?->type->isScalar()) {
+            if (TokenType::INDENTATION !== $indentation?->type) {
                 break;
             }
 
@@ -333,19 +348,36 @@ final class Parser
                 break;
             }
 
-            $offset = 3;
-            while (TokenType::WHITESPACE === $harvester->tokens->peek($offset)?->type) {
-                ++$offset;
+            $scalarOffset = 2;
+            while (TokenType::WHITESPACE === $harvester->tokens->peek($scalarOffset)?->type) {
+                ++$scalarOffset;
             }
-            if (TokenType::VALUE_INDICATOR === $harvester->tokens->peek($offset)?->type) {
+            $scalarToken = $harvester->tokens->peek($scalarOffset);
+            if (!$scalarToken?->type->isScalar()) {
+                break;
+            }
+
+            $keyProbe = $scalarOffset + 1;
+            while (TokenType::WHITESPACE === $harvester->tokens->peek($keyProbe)?->type) {
+                ++$keyProbe;
+            }
+            if (TokenType::VALUE_INDICATOR === $harvester->tokens->peek($keyProbe)?->type) {
                 break;
             }
 
             $keyNode->addChild(new NewLineNode($newLine));
             $keyNode->addChild(new IndentationNode($indentation));
-            $keyNode->addScalarName(new ScalarNode($afterIndent));
             $harvester->tokens->advance();
             $harvester->tokens->advance();
+
+            $contentHead = $harvester->tokens->current();
+            while (TokenType::WHITESPACE === $contentHead->type) {
+                $keyNode->addChild(new WhitespaceNode($contentHead));
+                $harvester->tokens->advance();
+                $contentHead = $harvester->tokens->current();
+            }
+
+            $keyNode->addScalarName(new ScalarNode($contentHead));
             $harvester->tokens->advance();
         }
     }
@@ -358,8 +390,16 @@ final class Parser
         }
 
         $indentation = $harvester->tokens->peek(1);
-        $afterIndent = $harvester->tokens->peek(2);
-        if (TokenType::INDENTATION !== $indentation?->type || !$afterIndent?->type->isScalar()) {
+        if (TokenType::INDENTATION !== $indentation?->type) {
+            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Expected INDENTATION and scalar for explicit key continuation line, got %s', $harvester->tokens->current()?->type->value ?? '_nothing_'), $harvester->tokens));
+        }
+
+        $scalarOffset = 2;
+        while (TokenType::WHITESPACE === $harvester->tokens->peek($scalarOffset)?->type) {
+            ++$scalarOffset;
+        }
+        $scalarToken = $harvester->tokens->peek($scalarOffset);
+        if (!$scalarToken?->type->isScalar()) {
             throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Expected INDENTATION and scalar for explicit key continuation line, got %s', $harvester->tokens->current()?->type->value ?? '_nothing_'), $harvester->tokens));
         }
 
@@ -369,9 +409,17 @@ final class Parser
 
         $keyNode->addChild(new NewLineNode($newLine));
         $keyNode->addChild(new IndentationNode($indentation));
-        $keyNode->addScalarName(new ScalarNode($afterIndent));
         $harvester->tokens->advance();
         $harvester->tokens->advance();
+
+        $contentHead = $harvester->tokens->current();
+        while (TokenType::WHITESPACE === $contentHead->type) {
+            $keyNode->addChild(new WhitespaceNode($contentHead));
+            $harvester->tokens->advance();
+            $contentHead = $harvester->tokens->current();
+        }
+
+        $keyNode->addScalarName(new ScalarNode($contentHead));
         $harvester->tokens->advance();
     }
 
@@ -2014,7 +2062,11 @@ final class Parser
                 if (TokenType::INDENTATION !== $indentationToken?->type) {
                     break;
                 }
-                $afterIndentation = $harvester->tokens->peek(2);
+                $probe = 2;
+                while (TokenType::WHITESPACE === $harvester->tokens->peek($probe)?->type) {
+                    ++$probe;
+                }
+                $afterIndentation = $harvester->tokens->peek($probe);
                 if (null !== $afterIndentation && TokenType::NEWLINE !== $afterIndentation->type) {
                     break;
                 }
@@ -2022,6 +2074,12 @@ final class Parser
                 $harvester->tokens->advance();
                 $valueNode->addChild(new IndentationNode($indentationToken));
                 $harvester->tokens->advance();
+                $emptyLineSpace = $harvester->tokens->current();
+                while (TokenType::WHITESPACE === $emptyLineSpace->type) {
+                    $valueNode->addChild(new WhitespaceNode($emptyLineSpace));
+                    $harvester->tokens->advance();
+                    $emptyLineSpace = $harvester->tokens->current();
+                }
             }
 
             // Non-empty continuation lines (| / > body): same newline + indent + scalar

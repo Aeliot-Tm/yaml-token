@@ -54,6 +54,9 @@ Because of this, the parser must not invent tokens that did not exist in the ori
     exposed via `ValueNode::getMultilinePlainScalar()`. When `multilinePlainScalar` is present,
     `ValueNode::getScalar()` is `null`. Single-line plain (and other scalar styles) still use
     `ValueNode::getScalar()` with a [`ScalarNode`](../../../src/Node/ScalarNode.php).
+    Continuation lines may include `WHITESPACE` (for example a tab) between the line’s `INDENTATION`
+    token and the next `PLAIN_SCALAR`; the parser consumes those tokens as part of the same scalar
+    line so block collections do not treat the line as a new entry.
 - Collections:
   - Block mapping: `key:` followed by an indented block of key/value couples (`BlockMappingNode`).
   - A line that looks like `key: value` only counts as a new mapping entry when the scalar key is
