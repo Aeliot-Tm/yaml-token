@@ -13,6 +13,9 @@ declare(strict_types=1);
 
 namespace Aeliot\YamlToken\Node;
 
+/**
+ * TODO: simplify interface & add easy way to get type of value.
+ */
 class ValueNode extends AbstractNode
 {
     private ?AliasNode $alias = null;
