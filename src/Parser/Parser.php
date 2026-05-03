@@ -37,6 +37,7 @@ use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\MergeInstructionNode;
 use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\Node;
+use Aeliot\YamlToken\Node\NodePropertiesNode;
 use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\SequenceEntryNode;
 use Aeliot\YamlToken\Node\StreamNode;
@@ -302,34 +303,54 @@ final class Parser
 
     private function collectKeyProperties(Harvester $harvester, KeyNode $keyNode): void
     {
-        $tag = null;
+        $properties = null;
+        $whitespaceBuffer = [];
 
         while (!$harvester->tokens->isEnd()) {
             $token = $harvester->tokens->current();
             if (TokenType::WHITESPACE === $token->type) {
-                $keyNode->addChild(new WhitespaceNode($token));
+                if (null === $properties) {
+                    $keyNode->addChild(new WhitespaceNode($token));
+                } else {
+                    $whitespaceBuffer[] = new WhitespaceNode($token);
+                }
                 $harvester->tokens->advance();
                 continue;
             }
 
             if (TokenType::ANCHOR === $token->type) {
-                $keyNode->addChild(new AnchorNode($token));
+                $properties ??= new NodePropertiesNode();
+                foreach ($whitespaceBuffer as $whitespace) {
+                    $properties->addChild($whitespace);
+                }
+                $whitespaceBuffer = [];
+                $properties->setAnchor(new AnchorNode($token));
                 $harvester->tokens->advance();
                 continue;
             }
 
             if ($this->isNodePropertyToken($token)) {
-                if (null !== $tag) {
+                if (null !== $properties?->getTag()) {
                     throw new UnexpectedStateException($this->appendTokenLocation('Only one tag is supported per key node', $token));
                 }
-
-                $tag = new TagNode($token);
-                $keyNode->addChild($tag);
+                $properties ??= new NodePropertiesNode();
+                foreach ($whitespaceBuffer as $whitespace) {
+                    $properties->addChild($whitespace);
+                }
+                $whitespaceBuffer = [];
+                $properties->setTag(new TagNode($token));
                 $harvester->tokens->advance();
                 continue;
             }
 
             break;
+        }
+
+        if (null !== $properties) {
+            $keyNode->setProperties($properties);
+        }
+        foreach ($whitespaceBuffer as $whitespace) {
+            $keyNode->addChild($whitespace);
         }
     }
 
@@ -412,34 +433,54 @@ final class Parser
 
     private function collectValueProperties(Harvester $harvester, ValueNode $valueNode): void
     {
-        $tag = null;
+        $properties = null;
+        $whitespaceBuffer = [];
 
         while (!$harvester->tokens->isEnd()) {
             $token = $harvester->tokens->current();
             if (TokenType::WHITESPACE === $token->type) {
-                $valueNode->addChild(new WhitespaceNode($token));
+                if (null === $properties) {
+                    $valueNode->addChild(new WhitespaceNode($token));
+                } else {
+                    $whitespaceBuffer[] = new WhitespaceNode($token);
+                }
                 $harvester->tokens->advance();
                 continue;
             }
 
             if (TokenType::ANCHOR === $token->type) {
-                $valueNode->addChild(new AnchorNode($token));
+                $properties ??= new NodePropertiesNode();
+                foreach ($whitespaceBuffer as $whitespace) {
+                    $properties->addChild($whitespace);
+                }
+                $whitespaceBuffer = [];
+                $properties->setAnchor(new AnchorNode($token));
                 $harvester->tokens->advance();
                 continue;
             }
 
             if (TokenType::TAG === $token->type) {
-                if (null !== $tag) {
+                if (null !== $properties?->getTag()) {
                     throw new UnexpectedStateException($this->appendTokenLocation('Only one tag is supported per value node', $token));
                 }
-
-                $tag = new TagNode($token);
-                $valueNode->addChild($tag);
+                $properties ??= new NodePropertiesNode();
+                foreach ($whitespaceBuffer as $whitespace) {
+                    $properties->addChild($whitespace);
+                }
+                $whitespaceBuffer = [];
+                $properties->setTag(new TagNode($token));
                 $harvester->tokens->advance();
                 continue;
             }
 
             break;
+        }
+
+        if (null !== $properties) {
+            $valueNode->setProperties($properties);
+        }
+        foreach ($whitespaceBuffer as $whitespace) {
+            $valueNode->addChild($whitespace);
         }
     }
 
@@ -2462,16 +2503,11 @@ final class Parser
     {
         $anchors = [];
 
-        $valueNode = $couple->getValue();
-        $valueAnchor = $valueNode?->getAnchor();
-        if (null !== $valueAnchor) {
+        if (null !== ($valueAnchor = $couple->getValue()?->getAnchor())) {
             $anchors[] = $valueAnchor;
         }
-
-        foreach ($couple->getKey()->getChildren() as $child) {
-            if ($child instanceof AnchorNode) {
-                $anchors[] = $child;
-            }
+        if (null !== ($keyAnchor = $couple->getKey()->getAnchor())) {
+            $anchors[] = $keyAnchor;
         }
 
         foreach ($anchors as $anchor) {

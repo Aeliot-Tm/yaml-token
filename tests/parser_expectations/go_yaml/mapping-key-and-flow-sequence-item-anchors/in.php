@@ -10,6 +10,7 @@ use Aeliot\YamlToken\Node\FlowSequenceNode;
 use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\NewLineNode;
+use Aeliot\YamlToken\Node\NodePropertiesNode;
 use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\SyntaxTokenNode;
@@ -47,15 +48,21 @@ return [
                 [
                     'type' => ValueNode::class,
                     'properties' => [
-                        'anchor' => [
-                            'type' => AnchorNode::class,
+                        'nodeProperties' => [
+                            'type' => NodePropertiesNode::class,
                             'properties' => [
-                                'token' => [
-                                    'type' => TokenType::ANCHOR,
-                                    'text' => '&mapping',
+                                'anchor' => [
+                                    'type' => AnchorNode::class,
+                                    'properties' => [
+                                        'token' => [
+                                            'type' => TokenType::ANCHOR,
+                                            'text' => '&mapping',
+                                        ],
+                                        'name' => 'mapping',
+                                        'declarationKeyText' => null,
+                                    ],
+                                    'children' => [],
                                 ],
-                                'name' => 'mapping',
-                                'declarationKeyText' => null,
                             ],
                             'children' => [],
                         ],
@@ -85,15 +92,21 @@ return [
                                             [
                                                 'type' => ValueNode::class,
                                                 'properties' => [
-                                                    'anchor' => [
-                                                        'type' => AnchorNode::class,
+                                                    'nodeProperties' => [
+                                                        'type' => NodePropertiesNode::class,
                                                         'properties' => [
-                                                            'token' => [
-                                                                'type' => TokenType::ANCHOR,
-                                                                'text' => '&item',
+                                                            'anchor' => [
+                                                                'type' => AnchorNode::class,
+                                                                'properties' => [
+                                                                    'token' => [
+                                                                        'type' => TokenType::ANCHOR,
+                                                                        'text' => '&item',
+                                                                    ],
+                                                                    'name' => 'item',
+                                                                    'declarationKeyText' => null,
+                                                                ],
+                                                                'children' => [],
                                                             ],
-                                                            'name' => 'item',
-                                                            'declarationKeyText' => null,
                                                         ],
                                                         'children' => [],
                                                     ],
@@ -239,20 +252,26 @@ return [
                                         ],
                                     ],
                                 ],
-                            ],
-                            'children' => [
-                                [
-                                    'type' => AnchorNode::class,
+                                'nodeProperties' => [
+                                    'type' => NodePropertiesNode::class,
                                     'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::ANCHOR,
-                                            'text' => '&key',
+                                        'anchor' => [
+                                            'type' => AnchorNode::class,
+                                            'properties' => [
+                                                'token' => [
+                                                    'type' => TokenType::ANCHOR,
+                                                    'text' => '&key',
+                                                ],
+                                                'name' => 'key',
+                                                'declarationKeyText' => null,
+                                            ],
+                                            'children' => [],
                                         ],
-                                        'name' => 'key',
-                                        'declarationKeyText' => null,
                                     ],
                                     'children' => [],
                                 ],
+                            ],
+                            'children' => [
                                 [
                                     'type' => WhitespaceNode::class,
                                     'properties' => [

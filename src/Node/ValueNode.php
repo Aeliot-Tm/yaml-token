@@ -16,23 +16,18 @@ namespace Aeliot\YamlToken\Node;
 class ValueNode extends AbstractNode
 {
     private ?AliasNode $alias = null;
-    private ?AnchorNode $anchor = null;
     private ?BlockMappingNode $blockMapping = null;
     private ?BlockSequenceNode $blockSequence = null;
     private ?FlowMappingNode $flowMapping = null;
     private ?FlowSequenceNode $flowSequence = null;
     private ?MultilinePlainScalarNode $multilinePlainScalar = null;
+    private ?NodePropertiesNode $properties = null;
     private ?ScalarNode $scalar = null;
-    private ?TagNode $tag = null;
 
     public function addChild(Node $child): void
     {
         if ($child instanceof AliasNode) {
             $this->alias = $child;
-        }
-
-        if ($child instanceof AnchorNode) {
-            $this->anchor = $child;
         }
 
         if ($child instanceof BlockMappingNode) {
@@ -64,10 +59,6 @@ class ValueNode extends AbstractNode
             }
         }
 
-        if ($child instanceof TagNode) {
-            $this->tag = $child;
-        }
-
         parent::addChild($child);
     }
 
@@ -78,7 +69,7 @@ class ValueNode extends AbstractNode
 
     public function getAnchor(): ?AnchorNode
     {
-        return $this->anchor;
+        return $this->properties?->getAnchor();
     }
 
     public function getBlockMapping(): ?BlockMappingNode
@@ -106,6 +97,17 @@ class ValueNode extends AbstractNode
         return $this->multilinePlainScalar;
     }
 
+    public function getProperties(): ?NodePropertiesNode
+    {
+        return $this->properties;
+    }
+
+    public function setProperties(NodePropertiesNode $node): void
+    {
+        $this->properties = $node;
+        $this->addChild($node);
+    }
+
     public function getScalar(): ?ScalarNode
     {
         return $this->scalar;
@@ -113,7 +115,7 @@ class ValueNode extends AbstractNode
 
     public function getTag(): ?TagNode
     {
-        return $this->tag;
+        return $this->properties?->getTag();
     }
 
     public function isEmpty(): bool

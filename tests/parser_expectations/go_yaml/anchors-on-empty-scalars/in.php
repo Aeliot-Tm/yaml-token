@@ -11,6 +11,7 @@ use Aeliot\YamlToken\Node\IndentationNode;
 use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\NewLineNode;
+use Aeliot\YamlToken\Node\NodePropertiesNode;
 use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\SequenceEntryNode;
 use Aeliot\YamlToken\Node\StreamNode;
@@ -32,15 +33,21 @@ return [
                         'value' => [
                             'type' => ValueNode::class,
                             'properties' => [
-                                'anchor' => [
-                                    'type' => AnchorNode::class,
+                                'nodeProperties' => [
+                                    'type' => NodePropertiesNode::class,
                                     'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::ANCHOR,
-                                            'text' => '&a',
+                                        'anchor' => [
+                                            'type' => AnchorNode::class,
+                                            'properties' => [
+                                                'token' => [
+                                                    'type' => TokenType::ANCHOR,
+                                                    'text' => '&a',
+                                                ],
+                                                'name' => 'a',
+                                                'declarationKeyText' => null,
+                                            ],
+                                            'children' => [],
                                         ],
-                                        'name' => 'a',
-                                        'declarationKeyText' => null,
                                     ],
                                     'children' => [],
                                 ],
@@ -169,20 +176,27 @@ return [
                                                 ],
                                                 'key' => [
                                                     'type' => KeyNode::class,
-                                                    'properties' => [],
-                                                    'children' => [
-                                                        [
-                                                            'type' => AnchorNode::class,
+                                                    'properties' => [
+                                                        'nodeProperties' => [
+                                                            'type' => NodePropertiesNode::class,
                                                             'properties' => [
-                                                                'token' => [
-                                                                    'type' => TokenType::ANCHOR,
-                                                                    'text' => '&a',
+                                                                'anchor' => [
+                                                                    'type' => AnchorNode::class,
+                                                                    'properties' => [
+                                                                        'token' => [
+                                                                            'type' => TokenType::ANCHOR,
+                                                                            'text' => '&a',
+                                                                        ],
+                                                                        'name' => 'a',
+                                                                        'declarationKeyText' => null,
+                                                                    ],
+                                                                    'children' => [],
                                                                 ],
-                                                                'name' => 'a',
-                                                                'declarationKeyText' => null,
                                                             ],
                                                             'children' => [],
                                                         ],
+                                                    ],
+                                                    'children' => [
                                                         [
                                                             'type' => WhitespaceNode::class,
                                                             'properties' => [
@@ -277,15 +291,21 @@ return [
                                                 'value' => [
                                                     'type' => ValueNode::class,
                                                     'properties' => [
-                                                        'anchor' => [
-                                                            'type' => AnchorNode::class,
+                                                        'nodeProperties' => [
+                                                            'type' => NodePropertiesNode::class,
                                                             'properties' => [
-                                                                'token' => [
-                                                                    'type' => TokenType::ANCHOR,
-                                                                    'text' => '&b',
+                                                                'anchor' => [
+                                                                    'type' => AnchorNode::class,
+                                                                    'properties' => [
+                                                                        'token' => [
+                                                                            'type' => TokenType::ANCHOR,
+                                                                            'text' => '&b',
+                                                                        ],
+                                                                        'name' => 'b',
+                                                                        'declarationKeyText' => 'b',
+                                                                    ],
+                                                                    'children' => [],
                                                                 ],
-                                                                'name' => 'b',
-                                                                'declarationKeyText' => 'b',
                                                             ],
                                                             'children' => [],
                                                         ],
@@ -380,20 +400,27 @@ return [
                                                 ],
                                                 'key' => [
                                                     'type' => KeyNode::class,
-                                                    'properties' => [],
-                                                    'children' => [
-                                                        [
-                                                            'type' => AnchorNode::class,
+                                                    'properties' => [
+                                                        'nodeProperties' => [
+                                                            'type' => NodePropertiesNode::class,
                                                             'properties' => [
-                                                                'token' => [
-                                                                    'type' => TokenType::ANCHOR,
-                                                                    'text' => '&c',
+                                                                'anchor' => [
+                                                                    'type' => AnchorNode::class,
+                                                                    'properties' => [
+                                                                        'token' => [
+                                                                            'type' => TokenType::ANCHOR,
+                                                                            'text' => '&c',
+                                                                        ],
+                                                                        'name' => 'c',
+                                                                        'declarationKeyText' => null,
+                                                                    ],
+                                                                    'children' => [],
                                                                 ],
-                                                                'name' => 'c',
-                                                                'declarationKeyText' => null,
                                                             ],
                                                             'children' => [],
                                                         ],
+                                                    ],
+                                                    'children' => [
                                                         [
                                                             'type' => WhitespaceNode::class,
                                                             'properties' => [
@@ -409,15 +436,21 @@ return [
                                                 'value' => [
                                                     'type' => ValueNode::class,
                                                     'properties' => [
-                                                        'anchor' => [
-                                                            'type' => AnchorNode::class,
+                                                        'nodeProperties' => [
+                                                            'type' => NodePropertiesNode::class,
                                                             'properties' => [
-                                                                'token' => [
-                                                                    'type' => TokenType::ANCHOR,
-                                                                    'text' => '&a',
+                                                                'anchor' => [
+                                                                    'type' => AnchorNode::class,
+                                                                    'properties' => [
+                                                                        'token' => [
+                                                                            'type' => TokenType::ANCHOR,
+                                                                            'text' => '&a',
+                                                                        ],
+                                                                        'name' => 'a',
+                                                                        'declarationKeyText' => null,
+                                                                    ],
+                                                                    'children' => [],
                                                                 ],
-                                                                'name' => 'a',
-                                                                'declarationKeyText' => null,
                                                             ],
                                                             'children' => [],
                                                         ],
@@ -523,6 +556,24 @@ return [
                                                             ],
                                                             'children' => [],
                                                         ],
+                                                        'nodeProperties' => [
+                                                            'type' => NodePropertiesNode::class,
+                                                            'properties' => [
+                                                                'anchor' => [
+                                                                    'type' => AnchorNode::class,
+                                                                    'properties' => [
+                                                                        'token' => [
+                                                                            'type' => TokenType::ANCHOR,
+                                                                            'text' => '&d',
+                                                                        ],
+                                                                        'name' => 'd',
+                                                                        'declarationKeyText' => null,
+                                                                    ],
+                                                                    'children' => [],
+                                                                ],
+                                                            ],
+                                                            'children' => [],
+                                                        ],
                                                     ],
                                                     'children' => [
                                                         [
@@ -532,18 +583,6 @@ return [
                                                                     'type' => TokenType::WHITESPACE,
                                                                     'text' => ' ',
                                                                 ],
-                                                            ],
-                                                            'children' => [],
-                                                        ],
-                                                        [
-                                                            'type' => AnchorNode::class,
-                                                            'properties' => [
-                                                                'token' => [
-                                                                    'type' => TokenType::ANCHOR,
-                                                                    'text' => '&d',
-                                                                ],
-                                                                'name' => 'd',
-                                                                'declarationKeyText' => null,
                                                             ],
                                                             'children' => [],
                                                         ],
@@ -632,6 +671,24 @@ return [
                                                             ],
                                                             'children' => [],
                                                         ],
+                                                        'nodeProperties' => [
+                                                            'type' => NodePropertiesNode::class,
+                                                            'properties' => [
+                                                                'anchor' => [
+                                                                    'type' => AnchorNode::class,
+                                                                    'properties' => [
+                                                                        'token' => [
+                                                                            'type' => TokenType::ANCHOR,
+                                                                            'text' => '&e',
+                                                                        ],
+                                                                        'name' => 'e',
+                                                                        'declarationKeyText' => null,
+                                                                    ],
+                                                                    'children' => [],
+                                                                ],
+                                                            ],
+                                                            'children' => [],
+                                                        ],
                                                     ],
                                                     'children' => [
                                                         [
@@ -644,32 +701,26 @@ return [
                                                             ],
                                                             'children' => [],
                                                         ],
-                                                        [
-                                                            'type' => AnchorNode::class,
-                                                            'properties' => [
-                                                                'token' => [
-                                                                    'type' => TokenType::ANCHOR,
-                                                                    'text' => '&e',
-                                                                ],
-                                                                'name' => 'e',
-                                                                'declarationKeyText' => null,
-                                                            ],
-                                                            'children' => [],
-                                                        ],
                                                     ],
                                                 ],
                                                 'value' => [
                                                     'type' => ValueNode::class,
                                                     'properties' => [
-                                                        'anchor' => [
-                                                            'type' => AnchorNode::class,
+                                                        'nodeProperties' => [
+                                                            'type' => NodePropertiesNode::class,
                                                             'properties' => [
-                                                                'token' => [
-                                                                    'type' => TokenType::ANCHOR,
-                                                                    'text' => '&a',
+                                                                'anchor' => [
+                                                                    'type' => AnchorNode::class,
+                                                                    'properties' => [
+                                                                        'token' => [
+                                                                            'type' => TokenType::ANCHOR,
+                                                                            'text' => '&a',
+                                                                        ],
+                                                                        'name' => 'a',
+                                                                        'declarationKeyText' => null,
+                                                                    ],
+                                                                    'children' => [],
                                                                 ],
-                                                                'name' => 'a',
-                                                                'declarationKeyText' => null,
                                                             ],
                                                             'children' => [],
                                                         ],

@@ -10,6 +10,7 @@ use Aeliot\YamlToken\Node\DocumentStartNode;
 use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\NewLineNode;
+use Aeliot\YamlToken\Node\NodePropertiesNode;
 use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\SyntaxTokenNode;
@@ -66,15 +67,21 @@ return [
                         'value' => [
                             'type' => ValueNode::class,
                             'properties' => [
-                                'anchor' => [
-                                    'type' => AnchorNode::class,
+                                'nodeProperties' => [
+                                    'type' => NodePropertiesNode::class,
                                     'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::ANCHOR,
-                                            'text' => '&anchor',
+                                        'anchor' => [
+                                            'type' => AnchorNode::class,
+                                            'properties' => [
+                                                'token' => [
+                                                    'type' => TokenType::ANCHOR,
+                                                    'text' => '&anchor',
+                                                ],
+                                                'name' => 'anchor',
+                                                'declarationKeyText' => 'a',
+                                            ],
+                                            'children' => [],
                                         ],
-                                        'name' => 'anchor',
-                                        'declarationKeyText' => 'a',
                                     ],
                                     'children' => [],
                                 ],

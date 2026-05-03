@@ -9,6 +9,7 @@ use Aeliot\YamlToken\Node\IndentationNode;
 use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\NewLineNode;
+use Aeliot\YamlToken\Node\NodePropertiesNode;
 use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\SyntaxTokenNode;
@@ -46,22 +47,28 @@ return [
                         'value' => [
                             'type' => ValueNode::class,
                             'properties' => [
+                                'nodeProperties' => [
+                                    'type' => NodePropertiesNode::class,
+                                    'properties' => [
+                                        'tag' => [
+                                            'type' => TagNode::class,
+                                            'properties' => [
+                                                'token' => [
+                                                    'type' => TokenType::TAG,
+                                                    'text' => '!!binary',
+                                                ],
+                                            ],
+                                            'children' => [],
+                                        ],
+                                    ],
+                                    'children' => [],
+                                ],
                                 'scalar' => [
                                     'type' => ScalarNode::class,
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::DOUBLE_QUOTED_SCALAR,
                                             'text' => "\"\\\n R0lGODlhDAAMAIQAAP//9/X17unp5WZmZgAAAOfn515eXvPz7Y6OjuDg4J+fn5\\\n OTk6enp56enmlpaWNjY6Ojo4SEhP/++f/++f/++f/++f/++f/++f/++f/++f/+\\\n +f/++f/++f/++f/++f/++SH+Dk1hZGUgd2l0aCBHSU1QACwAAAAADAAMAAAFLC\\\n AgjoEwnuNAFOhpEMTRiggcz4BNJHrv/zCFcLiwMWYNG84BwwEeECcgggoBADs=\"",
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                                'tag' => [
-                                    'type' => TagNode::class,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::TAG,
-                                            'text' => '!!binary',
                                         ],
                                     ],
                                     'children' => [],
@@ -136,22 +143,28 @@ return [
                         'value' => [
                             'type' => ValueNode::class,
                             'properties' => [
+                                'nodeProperties' => [
+                                    'type' => NodePropertiesNode::class,
+                                    'properties' => [
+                                        'tag' => [
+                                            'type' => TagNode::class,
+                                            'properties' => [
+                                                'token' => [
+                                                    'type' => TokenType::TAG,
+                                                    'text' => '!!binary',
+                                                ],
+                                            ],
+                                            'children' => [],
+                                        ],
+                                    ],
+                                    'children' => [],
+                                ],
                                 'scalar' => [
                                     'type' => ScalarNode::class,
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::LITERAL_BLOCK_SCALAR,
                                             'text' => " R0lGODlhDAAMAIQAAP//9/X17unp5WZmZgAAAOfn515eXvPz7Y6OjuDg4J+fn5\n OTk6enp56enmlpaWNjY6Ojo4SEhP/++f/++f/++f/++f/++f/++f/++f/++f/+\n +f/++f/++f/++f/++f/++SH+Dk1hZGUgd2l0aCBHSU1QACwAAAAADAAMAAAFLC\n AgjoEwnuNAFOhpEMTRiggcz4BNJHrv/zCFcLiwMWYNG84BwwEeECcgggoBADs=\n",
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                                'tag' => [
-                                    'type' => TagNode::class,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::TAG,
-                                            'text' => '!!binary',
                                         ],
                                     ],
                                     'children' => [],

@@ -19,16 +19,7 @@ class KeyNode extends AbstractNode
 {
     private ?ExplicitKeyIndicatorNode $explicitKeyIndicatorNode = null;
     private ?Node $name = null;
-    private ?TagNode $tag = null;
-
-    public function addChild(Node $child): void
-    {
-        if ($child instanceof TagNode) {
-            $this->tag = $child;
-        }
-
-        parent::addChild($child);
-    }
+    private ?NodePropertiesNode $properties = null;
 
     public function addScalarName(ScalarNode $node): void
     {
@@ -44,6 +35,11 @@ class KeyNode extends AbstractNode
         }
 
         $this->addChild($node);
+    }
+
+    public function getAnchor(): ?AnchorNode
+    {
+        return $this->properties?->getAnchor();
     }
 
     public function getExplicitKeyIndicatorNode(): ?ExplicitKeyIndicatorNode
@@ -62,11 +58,6 @@ class KeyNode extends AbstractNode
         return $this->name;
     }
 
-    public function getTag(): ?TagNode
-    {
-        return $this->tag;
-    }
-
     public function setName(Node $node): void
     {
         if (null !== $this->name) {
@@ -75,6 +66,22 @@ class KeyNode extends AbstractNode
 
         $this->name = $node;
         $this->addChild($node);
+    }
+
+    public function getProperties(): ?NodePropertiesNode
+    {
+        return $this->properties;
+    }
+
+    public function setProperties(NodePropertiesNode $node): void
+    {
+        $this->properties = $node;
+        $this->addChild($node);
+    }
+
+    public function getTag(): ?TagNode
+    {
+        return $this->properties?->getTag();
     }
 
     public function isEmpty(): bool

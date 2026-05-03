@@ -9,6 +9,7 @@ use Aeliot\YamlToken\Node\ExplicitKeyIndicatorNode;
 use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\NewLineNode;
+use Aeliot\YamlToken\Node\NodePropertiesNode;
 use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\TagNode;
@@ -216,12 +217,18 @@ return [
                                 ],
                             ],
                         ],
-                        'tag' => [
-                            'type' => TagNode::class,
+                        'nodeProperties' => [
+                            'type' => NodePropertiesNode::class,
                             'properties' => [
-                                'token' => [
-                                    'type' => TokenType::TAG,
-                                    'text' => '!!set',
+                                'tag' => [
+                                    'type' => TagNode::class,
+                                    'properties' => [
+                                        'token' => [
+                                            'type' => TokenType::TAG,
+                                            'text' => '!!set',
+                                        ],
+                                    ],
+                                    'children' => [],
                                 ],
                             ],
                             'children' => [],

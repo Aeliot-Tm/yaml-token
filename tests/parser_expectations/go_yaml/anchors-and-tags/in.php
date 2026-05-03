@@ -7,6 +7,7 @@ use Aeliot\YamlToken\Node\AnchorNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\IndentationNode;
 use Aeliot\YamlToken\Node\NewLineNode;
+use Aeliot\YamlToken\Node\NodePropertiesNode;
 use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\SequenceEntryNode;
 use Aeliot\YamlToken\Node\StreamNode;
@@ -29,17 +30,44 @@ return [
                         'value' => [
                             'type' => ValueNode::class,
                             'properties' => [
-                                'anchor' => [
-                                    'type' => AnchorNode::class,
+                                'nodeProperties' => [
+                                    'type' => NodePropertiesNode::class,
                                     'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::ANCHOR,
-                                            'text' => '&a',
+                                        'anchor' => [
+                                            'type' => AnchorNode::class,
+                                            'properties' => [
+                                                'token' => [
+                                                    'type' => TokenType::ANCHOR,
+                                                    'text' => '&a',
+                                                ],
+                                                'name' => 'a',
+                                                'declarationKeyText' => null,
+                                            ],
+                                            'children' => [],
                                         ],
-                                        'name' => 'a',
-                                        'declarationKeyText' => null,
+                                        'tag' => [
+                                            'type' => TagNode::class,
+                                            'properties' => [
+                                                'token' => [
+                                                    'type' => TokenType::TAG,
+                                                    'text' => '!!str',
+                                                ],
+                                            ],
+                                            'children' => [],
+                                        ],
                                     ],
-                                    'children' => [],
+                                    'children' => [
+                                        [
+                                            'type' => WhitespaceNode::class,
+                                            'properties' => [
+                                                'token' => [
+                                                    'type' => TokenType::WHITESPACE,
+                                                    'text' => ' ',
+                                                ],
+                                            ],
+                                            'children' => [],
+                                        ],
+                                    ],
                                 ],
                                 'scalar' => [
                                     'type' => ScalarNode::class,
@@ -51,28 +79,8 @@ return [
                                     ],
                                     'children' => [],
                                 ],
-                                'tag' => [
-                                    'type' => TagNode::class,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::TAG,
-                                            'text' => '!!str',
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
                             ],
                             'children' => [
-                                [
-                                    'type' => WhitespaceNode::class,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::WHITESPACE,
-                                            'text' => ' ',
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
                                 [
                                     'type' => WhitespaceNode::class,
                                     'properties' => [
@@ -135,6 +143,22 @@ return [
                         'value' => [
                             'type' => ValueNode::class,
                             'properties' => [
+                                'nodeProperties' => [
+                                    'type' => NodePropertiesNode::class,
+                                    'properties' => [
+                                        'tag' => [
+                                            'type' => TagNode::class,
+                                            'properties' => [
+                                                'token' => [
+                                                    'type' => TokenType::TAG,
+                                                    'text' => '!!int',
+                                                ],
+                                            ],
+                                            'children' => [],
+                                        ],
+                                    ],
+                                    'children' => [],
+                                ],
                                 'scalar' => [
                                     'type' => ScalarNode::class,
                                     'properties' => [
@@ -145,16 +169,6 @@ return [
                                     ],
                                     'children' => [],
                                 ],
-                                'tag' => [
-                                    'type' => TagNode::class,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::TAG,
-                                            'text' => '!!int',
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
                             ],
                             'children' => [
                                 [
@@ -219,17 +233,44 @@ return [
                         'value' => [
                             'type' => ValueNode::class,
                             'properties' => [
-                                'anchor' => [
-                                    'type' => AnchorNode::class,
+                                'nodeProperties' => [
+                                    'type' => NodePropertiesNode::class,
                                     'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::ANCHOR,
-                                            'text' => '&c',
+                                        'anchor' => [
+                                            'type' => AnchorNode::class,
+                                            'properties' => [
+                                                'token' => [
+                                                    'type' => TokenType::ANCHOR,
+                                                    'text' => '&c',
+                                                ],
+                                                'name' => 'c',
+                                                'declarationKeyText' => null,
+                                            ],
+                                            'children' => [],
                                         ],
-                                        'name' => 'c',
-                                        'declarationKeyText' => null,
+                                        'tag' => [
+                                            'type' => TagNode::class,
+                                            'properties' => [
+                                                'token' => [
+                                                    'type' => TokenType::TAG,
+                                                    'text' => '!!int',
+                                                ],
+                                            ],
+                                            'children' => [],
+                                        ],
                                     ],
-                                    'children' => [],
+                                    'children' => [
+                                        [
+                                            'type' => WhitespaceNode::class,
+                                            'properties' => [
+                                                'token' => [
+                                                    'type' => TokenType::WHITESPACE,
+                                                    'text' => ' ',
+                                                ],
+                                            ],
+                                            'children' => [],
+                                        ],
+                                    ],
                                 ],
                                 'scalar' => [
                                     'type' => ScalarNode::class,
@@ -241,28 +282,8 @@ return [
                                     ],
                                     'children' => [],
                                 ],
-                                'tag' => [
-                                    'type' => TagNode::class,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::TAG,
-                                            'text' => '!!int',
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
                             ],
                             'children' => [
-                                [
-                                    'type' => WhitespaceNode::class,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::WHITESPACE,
-                                            'text' => ' ',
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
                                 [
                                     'type' => WhitespaceNode::class,
                                     'properties' => [
@@ -325,15 +346,21 @@ return [
                         'value' => [
                             'type' => ValueNode::class,
                             'properties' => [
-                                'anchor' => [
-                                    'type' => AnchorNode::class,
+                                'nodeProperties' => [
+                                    'type' => NodePropertiesNode::class,
                                     'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::ANCHOR,
-                                            'text' => '&d',
+                                        'anchor' => [
+                                            'type' => AnchorNode::class,
+                                            'properties' => [
+                                                'token' => [
+                                                    'type' => TokenType::ANCHOR,
+                                                    'text' => '&d',
+                                                ],
+                                                'name' => 'd',
+                                                'declarationKeyText' => null,
+                                            ],
+                                            'children' => [],
                                         ],
-                                        'name' => 'd',
-                                        'declarationKeyText' => null,
                                     ],
                                     'children' => [],
                                 ],

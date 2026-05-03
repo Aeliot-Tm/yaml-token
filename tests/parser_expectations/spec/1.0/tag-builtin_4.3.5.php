@@ -7,6 +7,7 @@ use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\NewLineNode;
+use Aeliot\YamlToken\Node\NodePropertiesNode;
 use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\SyntaxTokenNode;
@@ -44,22 +45,28 @@ return [
                         'value' => [
                             'type' => ValueNode::class,
                             'properties' => [
+                                'nodeProperties' => [
+                                    'type' => NodePropertiesNode::class,
+                                    'properties' => [
+                                        'tag' => [
+                                            'type' => TagNode::class,
+                                            'properties' => [
+                                                'token' => [
+                                                    'type' => TokenType::TAG,
+                                                    'text' => '!str',
+                                                ],
+                                            ],
+                                            'children' => [],
+                                        ],
+                                    ],
+                                    'children' => [],
+                                ],
                                 'scalar' => [
                                     'type' => ScalarNode::class,
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::PLAIN_SCALAR,
                                             'text' => '2002-04-28',
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                                'tag' => [
-                                    'type' => TagNode::class,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::TAG,
-                                            'text' => '!str',
                                         ],
                                     ],
                                     'children' => [],
@@ -134,22 +141,28 @@ return [
                         'value' => [
                             'type' => ValueNode::class,
                             'properties' => [
+                                'nodeProperties' => [
+                                    'type' => NodePropertiesNode::class,
+                                    'properties' => [
+                                        'tag' => [
+                                            'type' => TagNode::class,
+                                            'properties' => [
+                                                'token' => [
+                                                    'type' => TokenType::TAG,
+                                                    'text' => '!int',
+                                                ],
+                                            ],
+                                            'children' => [],
+                                        ],
+                                    ],
+                                    'children' => [],
+                                ],
                                 'scalar' => [
                                     'type' => ScalarNode::class,
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::PLAIN_SCALAR,
                                             'text' => '42',
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                                'tag' => [
-                                    'type' => TagNode::class,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::TAG,
-                                            'text' => '!int',
                                         ],
                                     ],
                                     'children' => [],
@@ -224,22 +237,28 @@ return [
                         'value' => [
                             'type' => ValueNode::class,
                             'properties' => [
+                                'nodeProperties' => [
+                                    'type' => NodePropertiesNode::class,
+                                    'properties' => [
+                                        'tag' => [
+                                            'type' => TagNode::class,
+                                            'properties' => [
+                                                'token' => [
+                                                    'type' => TokenType::TAG,
+                                                    'text' => '!float',
+                                                ],
+                                            ],
+                                            'children' => [],
+                                        ],
+                                    ],
+                                    'children' => [],
+                                ],
                                 'scalar' => [
                                     'type' => ScalarNode::class,
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::PLAIN_SCALAR,
                                             'text' => '3.14',
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                                'tag' => [
-                                    'type' => TagNode::class,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::TAG,
-                                            'text' => '!float',
                                         ],
                                     ],
                                     'children' => [],

@@ -10,6 +10,7 @@ use Aeliot\YamlToken\Node\ExplicitKeyIndicatorNode;
 use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\NewLineNode;
+use Aeliot\YamlToken\Node\NodePropertiesNode;
 use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\SyntaxTokenNode;
@@ -50,6 +51,24 @@ return [
                                     ],
                                     'children' => [],
                                 ],
+                                'nodeProperties' => [
+                                    'type' => NodePropertiesNode::class,
+                                    'properties' => [
+                                        'anchor' => [
+                                            'type' => AnchorNode::class,
+                                            'properties' => [
+                                                'token' => [
+                                                    'type' => TokenType::ANCHOR,
+                                                    'text' => '&a',
+                                                ],
+                                                'name' => 'a',
+                                                'declarationKeyText' => 'a',
+                                            ],
+                                            'children' => [],
+                                        ],
+                                    ],
+                                    'children' => [],
+                                ],
                             ],
                             'children' => [
                                 [
@@ -59,18 +78,6 @@ return [
                                             'type' => TokenType::WHITESPACE,
                                             'text' => ' ',
                                         ],
-                                    ],
-                                    'children' => [],
-                                ],
-                                [
-                                    'type' => AnchorNode::class,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::ANCHOR,
-                                            'text' => '&a',
-                                        ],
-                                        'name' => 'a',
-                                        'declarationKeyText' => 'a',
                                     ],
                                     'children' => [],
                                 ],
@@ -89,15 +96,21 @@ return [
                         'value' => [
                             'type' => ValueNode::class,
                             'properties' => [
-                                'anchor' => [
-                                    'type' => AnchorNode::class,
+                                'nodeProperties' => [
+                                    'type' => NodePropertiesNode::class,
                                     'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::ANCHOR,
-                                            'text' => '&b',
+                                        'anchor' => [
+                                            'type' => AnchorNode::class,
+                                            'properties' => [
+                                                'token' => [
+                                                    'type' => TokenType::ANCHOR,
+                                                    'text' => '&b',
+                                                ],
+                                                'name' => 'b',
+                                                'declarationKeyText' => 'a',
+                                            ],
+                                            'children' => [],
                                         ],
-                                        'name' => 'b',
-                                        'declarationKeyText' => 'a',
                                     ],
                                     'children' => [],
                                 ],

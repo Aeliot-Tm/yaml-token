@@ -7,6 +7,7 @@ use Aeliot\YamlToken\Node\AnchorNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\DocumentStartNode;
 use Aeliot\YamlToken\Node\NewLineNode;
+use Aeliot\YamlToken\Node\NodePropertiesNode;
 use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\SequenceEntryNode;
 use Aeliot\YamlToken\Node\StreamNode;
@@ -48,15 +49,21 @@ return [
                         'value' => [
                             'type' => ValueNode::class,
                             'properties' => [
-                                'anchor' => [
-                                    'type' => AnchorNode::class,
+                                'nodeProperties' => [
+                                    'type' => NodePropertiesNode::class,
                                     'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::ANCHOR,
-                                            'text' => '&😁',
+                                        'anchor' => [
+                                            'type' => AnchorNode::class,
+                                            'properties' => [
+                                                'token' => [
+                                                    'type' => TokenType::ANCHOR,
+                                                    'text' => '&😁',
+                                                ],
+                                                'name' => '😁',
+                                                'declarationKeyText' => null,
+                                            ],
+                                            'children' => [],
                                         ],
-                                        'name' => '😁',
-                                        'declarationKeyText' => null,
                                     ],
                                     'children' => [],
                                 ],

@@ -10,6 +10,7 @@ use Aeliot\YamlToken\Node\IndentationNode;
 use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\NewLineNode;
+use Aeliot\YamlToken\Node\NodePropertiesNode;
 use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\SequenceEntryNode;
 use Aeliot\YamlToken\Node\StreamNode;
@@ -134,12 +135,18 @@ return [
                                                                                     ],
                                                                                     'children' => [],
                                                                                 ],
-                                                                                'tag' => [
-                                                                                    'type' => TagNode::class,
+                                                                                'nodeProperties' => [
+                                                                                    'type' => NodePropertiesNode::class,
                                                                                     'properties' => [
-                                                                                        'token' => [
-                                                                                            'type' => TokenType::TAG,
-                                                                                            'text' => '!localTag',
+                                                                                        'tag' => [
+                                                                                            'type' => TagNode::class,
+                                                                                            'properties' => [
+                                                                                                'token' => [
+                                                                                                    'type' => TokenType::TAG,
+                                                                                                    'text' => '!localTag',
+                                                                                                ],
+                                                                                            ],
+                                                                                            'children' => [],
                                                                                         ],
                                                                                     ],
                                                                                     'children' => [],

@@ -12,6 +12,7 @@ use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\MergeInstructionNode;
 use Aeliot\YamlToken\Node\NewLineNode;
+use Aeliot\YamlToken\Node\NodePropertiesNode;
 use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\SyntaxTokenNode;
@@ -48,18 +49,6 @@ return [
                         'value' => [
                             'type' => ValueNode::class,
                             'properties' => [
-                                'anchor' => [
-                                    'type' => AnchorNode::class,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::ANCHOR,
-                                            'text' => '&defaults',
-                                        ],
-                                        'name' => 'defaults',
-                                        'declarationKeyText' => 'defaults',
-                                    ],
-                                    'children' => [],
-                                ],
                                 'blockMapping' => [
                                     'type' => BlockMappingNode::class,
                                     'properties' => [],
@@ -233,6 +222,24 @@ return [
                                             'children' => [],
                                         ],
                                     ],
+                                ],
+                                'nodeProperties' => [
+                                    'type' => NodePropertiesNode::class,
+                                    'properties' => [
+                                        'anchor' => [
+                                            'type' => AnchorNode::class,
+                                            'properties' => [
+                                                'token' => [
+                                                    'type' => TokenType::ANCHOR,
+                                                    'text' => '&defaults',
+                                                ],
+                                                'name' => 'defaults',
+                                                'declarationKeyText' => 'defaults',
+                                            ],
+                                            'children' => [],
+                                        ],
+                                    ],
+                                    'children' => [],
                                 ],
                             ],
                             'children' => [],

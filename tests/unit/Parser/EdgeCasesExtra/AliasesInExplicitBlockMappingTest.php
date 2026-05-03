@@ -51,15 +51,8 @@ final class AliasesInExplicitBlockMappingTest extends TestCase
         self::assertNotNull($explicitKey->getExplicitKeyIndicatorNode());
         self::assertInstanceOf(ScalarNode::class, $explicitKey->getName());
 
-        $declaredAnchor = null;
-        foreach ($explicitKey->getChildren() as $child) {
-            if ($child instanceof AnchorNode) {
-                $declaredAnchor = $child;
-                break;
-            }
-        }
+        $declaredAnchor = $explicitKey->getAnchor();
         self::assertInstanceOf(AnchorNode::class, $declaredAnchor);
-        /* @var AnchorNode $declaredAnchor */
         self::assertSame('a', $declaredAnchor->getName());
         self::assertSame($explicitKeyCouple, $declaredAnchor->getDeclarationCouple());
 

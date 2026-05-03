@@ -19,6 +19,7 @@ use Aeliot\YamlToken\Node\FlowSequenceNode;
 use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\Node;
+use Aeliot\YamlToken\Node\NodePropertiesNode;
 use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\SequenceEntryNode;
 use Aeliot\YamlToken\Node\TokenHolderInterface;
@@ -102,6 +103,10 @@ final class NodeTreeRepresenter
             $node instanceof KeyNode => [
                 'explicitKeyIndicatorNode' => $node->getExplicitKeyIndicatorNode(),
                 'name' => $node->getName(),
+                'nodeProperties' => $node->getProperties(),
+            ],
+            $node instanceof NodePropertiesNode => [
+                'anchor' => $node->getAnchor(),
                 'tag' => $node->getTag(),
             ],
             $node instanceof SequenceEntryNode => [
@@ -109,14 +114,13 @@ final class NodeTreeRepresenter
             ],
             $node instanceof ValueNode => [
                 'alias' => $node->getAlias(),
-                'anchor' => $node->getAnchor(),
                 'blockMapping' => $node->getBlockMapping(),
                 'blockSequence' => $node->getBlockSequence(),
                 'flowMapping' => $node->getFlowMapping(),
                 'flowSequence' => $node->getFlowSequence(),
                 'multilinePlainScalar' => $node->getMultilinePlainScalar(),
+                'nodeProperties' => $node->getProperties(),
                 'scalar' => $node->getScalar(),
-                'tag' => $node->getTag(),
             ],
             default => [],
         };
