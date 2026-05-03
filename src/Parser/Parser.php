@@ -845,7 +845,60 @@ final class Parser
         }
 
         return $this->isNodePropertyToken($token)
-            && $this->isNodePropertiesFollowedByImplicitYamlKeyOnSameLine($harvester);
+            && (
+                $this->isNodePropertiesFollowedByImplicitYamlKeyOnSameLine($harvester)
+                || $this->isNodePropertiesFollowedByFlowCollectionImplicitBlockKeyOnSameLine($harvester)
+            );
+    }
+
+    /**
+     * True when the line begins with c-ns-properties (anchor/tag), then — still before
+     * NEWLINE — a flow mapping or flow sequence whose closing bracket is followed on the
+     * same line by {@code VALUE_INDICATOR} (block implicit key whose key is a tagged or
+     * anchored flow collection, e.g. {@code &k [a]: b}).
+     */
+    private function isNodePropertiesFollowedByFlowCollectionImplicitBlockKeyOnSameLine(Harvester $harvester): bool
+    {
+        $offset = 0;
+        if (TokenType::INDENTATION === $harvester->tokens->current()?->type) {
+            $offset = 1;
+        }
+
+        if (!$this->isNodePropertyToken($harvester->tokens->peek($offset))) {
+            return false;
+        }
+
+        $sawProperty = false;
+        while (true) {
+            $peeked = $harvester->tokens->peek($offset);
+            if (null === $peeked) {
+                return false;
+            }
+            if (TokenType::NEWLINE === $peeked->type) {
+                return false;
+            }
+            if (TokenType::WHITESPACE === $peeked->type || TokenType::COMMENT === $peeked->type) {
+                ++$offset;
+                continue;
+            }
+            if (TokenType::ANCHOR === $peeked->type || TokenType::TAG === $peeked->type) {
+                $sawProperty = true;
+                ++$offset;
+                continue;
+            }
+
+            break;
+        }
+
+        if (!$sawProperty) {
+            return false;
+        }
+
+        if (!\in_array($peeked->type, [TokenType::FLOW_MAPPING_START, TokenType::FLOW_SEQUENCE_START], true)) {
+            return false;
+        }
+
+        return $this->isFlowCollectionFollowedByBlockValueIndicatorOnSameLine($harvester, $offset);
     }
 
     /**

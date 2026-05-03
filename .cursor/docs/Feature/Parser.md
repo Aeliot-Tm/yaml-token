@@ -65,9 +65,12 @@ Because of this, the parser must not invent tokens that did not exist in the ori
     `ScalarNode` / layout children, not as `KeyValueCoupleNode`.
   - A flow sequence or flow mapping may be the whole implicit block key when it is immediately
     followed by `:` on the same line (before a newline), e.g. `[flow]: block` or `{k: v}: block`.
-    The parser detects this in `isKeyValueCoupleStart()` (and for compact sequence entries in
-    `parseSequenceEntryValue()`) so the flow collection is parsed as the key’s `name` node, not as
-    a separate top-level flow value before an erroneous empty-key couple.
+    The same applies when the flow collection is prefixed by node properties (anchor and/or tag) on
+    that line, e.g. `&k [a]: b`. The parser detects these patterns in `isKeyValueCoupleStart()` (via
+    `isFlowCollectionFollowedByBlockValueIndicatorOnSameLine()` and
+    `isNodePropertiesFollowedByFlowCollectionImplicitBlockKeyOnSameLine()`), and for compact sequence
+    entries in `parseSequenceEntryValue()`, so the flow collection is parsed as the key’s `name`
+    node, not as a separate top-level flow value before an erroneous empty-key couple.
   - Literal and folded block scalars (`|` / `>`): after the header line, non-empty continuation lines
     use the same newline + indentation + scalar consumption as multiline plain scalars; the value may
     become `MultilinePlainScalarNode` when several `PLAIN_SCALAR` fragments are present.
