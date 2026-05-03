@@ -1,4 +1,5 @@
 .cursor/mcp/serena/config/logs/
+.bash_history
 .idea
 tools
 var
