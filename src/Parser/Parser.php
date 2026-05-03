@@ -98,6 +98,43 @@ final class Parser
     {
         while (TokenType::NEWLINE === $harvester->tokens->current()?->type) {
             $newLine = $harvester->tokens->current();
+
+            // Physical empty line between indented continuation lines: lexer emits two NEWLINE tokens
+            // (YAML 1.2.2 §6.5 / §7.3.3 multiline plain, e.g. Example 7.12 Plain Lines). Only consume when
+            // the same continuation probe as below still applies after the gap (avoid stealing structure
+            // where the second NEWLINE starts unrelated content).
+            if (TokenType::NEWLINE === $harvester->tokens->peek(1)?->type) {
+                $indentAfterGap = $harvester->tokens->peek(2);
+                if (TokenType::INDENTATION !== $indentAfterGap?->type) {
+                    break;
+                }
+                $gapIndentLen = \strlen($indentAfterGap->text);
+                if ($gapIndentLen <= $parentIndentLen) {
+                    break;
+                }
+
+                $scalarOffset = 3;
+                while (TokenType::WHITESPACE === $harvester->tokens->peek($scalarOffset)?->type) {
+                    ++$scalarOffset;
+                }
+                $scalarTokenAfterGap = $harvester->tokens->peek($scalarOffset);
+                if (!$scalarTokenAfterGap?->type->isScalar()) {
+                    break;
+                }
+
+                $keyProbeAfterGap = $scalarOffset + 1;
+                while (TokenType::WHITESPACE === $harvester->tokens->peek($keyProbeAfterGap)?->type) {
+                    ++$keyProbeAfterGap;
+                }
+                if (TokenType::VALUE_INDICATOR === $harvester->tokens->peek($keyProbeAfterGap)?->type) {
+                    break;
+                }
+
+                $valueNode->addChild(new NewLineNode($newLine));
+                $harvester->tokens->advance();
+                continue;
+            }
+
             $indentation = $harvester->tokens->peek(1);
             if (TokenType::INDENTATION !== $indentation?->type) {
                 break;
