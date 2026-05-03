@@ -66,6 +66,11 @@ Because of this, the parser must not invent tokens that did not exist in the ori
   - Block sequence: `key:` followed by an indented list of `-` entries (`BlockSequenceNode`
     with `SequenceEntryNode` children).
   - Flow mapping / sequence: `{...}` / `[...]`.
+  - Inside flow collections, a mapping value may start after a line break; the lexer then uses
+    `WHITESPACE` (not `INDENTATION`) before the node. Those values are parsed via `parseValue()`
+    with sentinel `FLOW_COLLECTION_VALUE_PARENT_INDENT` so newline-prefixed content is not mistaken
+    for block `parseIndentedBlockValue()` at indent `0` (which would not consume the value and could
+    split one `KeyValueCoupleNode` into two).
 - Bare document content that is only a scalar (no mapping key) is parsed as a top-level `ValueNode`
   when the first token is a scalar and it is not an implicit key line.
 - The bare-document block context follows YAML 1.2.2 rule [211]. The parser passes a sentinel `BARE_DOCUMENT_BLOCK_PARENT_INDENT` (-1) into `parseValue()` so the same `$lineIndent <= $parentIndent` checks work at column 0; it is not a physical space count.

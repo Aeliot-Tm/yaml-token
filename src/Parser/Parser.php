@@ -71,6 +71,13 @@ final class Parser
      */
     private const BARE_DOCUMENT_BLOCK_PARENT_INDENT = -1;
 
+    /**
+     * Sentinel for {@see parseValue()} when the value is parsed inside a flow collection or merge RHS.
+     * Flow lines use {@see TokenType::WHITESPACE} (not {@see TokenType::INDENTATION}) before the node,
+     * so a newline-prefixed value must not use block-oriented {@see parseIndentedBlockValue()} with indent 0.
+     */
+    private const FLOW_COLLECTION_VALUE_PARENT_INDENT = -2;
+
     private const TOKEN_TYPES_SPASE_AND_COMMENT = [
         TokenType::COMMENT,
         TokenType::NEWLINE,
@@ -1360,7 +1367,7 @@ final class Parser
                 if (null === $token || \in_array($token->type, [TokenType::FLOW_ENTRY, TokenType::FLOW_MAPPING_END], true)) {
                     $keyValueCouple->setValue(new ValueNode());
                 } else {
-                    $keyValueCouple->setValue($this->parseValue($harvester, 0));
+                    $keyValueCouple->setValue($this->parseValue($harvester, self::FLOW_COLLECTION_VALUE_PARENT_INDENT));
                 }
             }
             $this->postProcessKeyValueCouple($harvester, $keyValueCouple);
@@ -1441,7 +1448,7 @@ final class Parser
     private function parseFlowSequenceEntry(Harvester $harvester): Node
     {
         if (!$this->isFlowSequencePairEntryStart($harvester)) {
-            return $this->parseValue($harvester, 0);
+            return $this->parseValue($harvester, self::FLOW_COLLECTION_VALUE_PARENT_INDENT);
         }
 
         $couple = new KeyValueCoupleNode();
@@ -1453,7 +1460,7 @@ final class Parser
         if (null === $next || \in_array($next->type, [TokenType::FLOW_ENTRY, TokenType::FLOW_SEQUENCE_END], true)) {
             $couple->setValue(new ValueNode());
         } else {
-            $couple->setValue($this->parseValue($harvester, 0));
+            $couple->setValue($this->parseValue($harvester, self::FLOW_COLLECTION_VALUE_PARENT_INDENT));
         }
 
         $this->postProcessKeyValueCouple($harvester, $couple);
@@ -1702,7 +1709,7 @@ final class Parser
 
         $this->collectTypes($harvester, [TokenType::VALUE_INDICATOR, TokenType::WHITESPACE], $mergeInstruction);
 
-        $value = $this->parseValue($harvester, 0);
+        $value = $this->parseValue($harvester, self::FLOW_COLLECTION_VALUE_PARENT_INDENT);
         $mergeInstruction->addChild($value);
 
         $aliases = $this->collectMergeAliases($value);
@@ -1844,7 +1851,9 @@ final class Parser
     }
 
     /**
-     * @param int $parentIndentLen Key-line indent length (spaces), or {@see self::BARE_DOCUMENT_BLOCK_PARENT_INDENT} at bare document root (YAML 1.2.2 rule [211]).
+     * @param int $parentIndentLen Key-line indent length (spaces),
+     *                             {@see self::BARE_DOCUMENT_BLOCK_PARENT_INDENT} at bare document root (YAML 1.2.2 rule [211]),
+     *                             or {@see self::FLOW_COLLECTION_VALUE_PARENT_INDENT} for flow / merge RHS values.
      */
     private function parseValue(Harvester $harvester, int $parentIndentLen): ValueNode
     {
@@ -1859,8 +1868,36 @@ final class Parser
         $this->collectTypes($harvester, [TokenType::WHITESPACE, TokenType::COMMENT], $valueNode);
 
         $token = $harvester->tokens->current();
+        if (
+            null !== $token
+            && TokenType::NEWLINE === $token->type
+            && self::FLOW_COLLECTION_VALUE_PARENT_INDENT === $parentIndentLen
+        ) {
+            $this->collectTypes($harvester, [
+                TokenType::COMMENT,
+                TokenType::NEWLINE,
+                TokenType::WHITESPACE,
+            ], $valueNode);
+        }
+
+        $this->parseValuePrimaryPayload($harvester, $valueNode, $parentIndentLen);
+
+        $this->collectTypes($harvester, [
+            TokenType::COMMENT,
+            TokenType::WHITESPACE,
+        ], $valueNode);
+
+        return $valueNode;
+    }
+
+    /**
+     * Parses the main value payload (block scalar, block-after-newline, scalars, aliases, compact collections, flow nodes).
+     */
+    private function parseValuePrimaryPayload(Harvester $harvester, ValueNode $valueNode, int $parentIndentLen): void
+    {
+        $token = $harvester->tokens->current();
         if (null === $token) {
-            return $valueNode;
+            return;
         }
         if (\in_array($token->type, TokenType::BLOCK_SCALAR_INDICATORS, true)) {
             $valueNode->addChild(new BlockScalarIndicatorNode($token));
@@ -1869,7 +1906,7 @@ final class Parser
 
             $token = $harvester->tokens->current();
             if (!$token) {
-                return $valueNode;
+                return;
             }
 
             if (TokenType::NEWLINE !== $token->type) {
@@ -1921,6 +1958,16 @@ final class Parser
             // structure as multiline plain scalars (YAML 1.2.2 §8.1.1).
             $this->appendMultilinePlainScalarContinuations($harvester, $valueNode, $parentIndentLen);
         } elseif (TokenType::NEWLINE === $token->type) {
+            if (self::FLOW_COLLECTION_VALUE_PARENT_INDENT === $parentIndentLen) {
+                $this->collectTypes($harvester, [
+                    TokenType::COMMENT,
+                    TokenType::NEWLINE,
+                    TokenType::WHITESPACE,
+                ], $valueNode);
+                $this->parseValuePrimaryPayload($harvester, $valueNode, $parentIndentLen);
+
+                return;
+            }
             $this->parseIndentedBlockValue($harvester, $valueNode, $parentIndentLen);
         } elseif ($token->type->isScalar()) {
             $valueNode->addChild(new ScalarNode($token));
@@ -1953,13 +2000,6 @@ final class Parser
         } else {
             throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Unexpected type while parsing of value: %s', $token->type->value), $token));
         }
-
-        $this->collectTypes($harvester, [
-            TokenType::COMMENT,
-            TokenType::WHITESPACE,
-        ], $valueNode);
-
-        return $valueNode;
     }
 
     private function parseYamlDirective(Harvester $harvester): YamlDirectiveNode
