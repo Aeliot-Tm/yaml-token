@@ -464,7 +464,13 @@ final class Parser
 
     private function collectValueProperties(Harvester $harvester, ValueNode $valueNode): void
     {
-        $properties = null;
+        // Per YAML 1.2.2 rule [96] c-ns-properties(n,c), a node has at most one anchor and one tag.
+        // The properties may appear inline or be split across separate lines (see [200]
+        // s-l+block-collection). When the parser re-enters this routine after consuming the
+        // s-separate between the parts, an existing NodePropertiesNode on the value must be
+        // reused so the second property does not produce a duplicate properties node.
+        $properties = $valueNode->getProperties();
+        $hadProperties = null !== $properties;
         $whitespaceBuffer = [];
 
         while (!$harvester->tokens->isEnd()) {
@@ -480,6 +486,9 @@ final class Parser
             }
 
             if (TokenType::ANCHOR === $token->type) {
+                if (null !== $properties?->getAnchor()) {
+                    throw new UnexpectedStateException($this->appendTokenLocation('Only one anchor is supported per value node', $token));
+                }
                 $properties ??= new NodePropertiesNode();
                 foreach ($whitespaceBuffer as $whitespace) {
                     $properties->addChild($whitespace);
@@ -507,7 +516,7 @@ final class Parser
             break;
         }
 
-        if (null !== $properties) {
+        if (null !== $properties && !$hadProperties) {
             $valueNode->setProperties($properties);
         }
         foreach ($whitespaceBuffer as $whitespace) {
@@ -1785,20 +1794,26 @@ final class Parser
             // ends immediately after them, treat it as value properties. Otherwise,
             // it's a tagged/anchored key in a nested block mapping.
             if ($this->isNodePropertyToken($afterIndent) && $this->isNodePropertiesOnlyLine($harvester, $afterIndentOffset)) {
-                $valueNode->addChild(new NewLineNode($token));
+                // YAML 1.2.2 rule [96] c-ns-properties allows an s-separate between the tag and
+                // the anchor parts. When the value already carries one part of the properties
+                // (collected on the previous line), the separator that leads to the remaining
+                // part belongs inside the existing NodePropertiesNode so the on-disk order of
+                // anchor / s-separate / tag tokens is preserved when re-emitting the YAML.
+                $separatorContainer = $valueNode->getProperties() ?? $valueNode;
+                $separatorContainer->addChild(new NewLineNode($token));
                 $harvester->tokens->advance();
                 $this->collectTypes($harvester, [
                     TokenType::COMMENT,
                     TokenType::NEWLINE,
                     TokenType::WHITESPACE,
-                ], $valueNode);
-                $this->collectInsignificantIndentationLines($harvester, $valueNode);
+                ], $separatorContainer);
+                $this->collectInsignificantIndentationLines($harvester, $separatorContainer);
 
                 $indentationToken = $harvester->tokens->current();
                 if (null === $indentationToken || TokenType::INDENTATION !== $indentationToken->type) {
                     throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Expected INDENTATION before node properties, but %s given', $indentationToken?->type->value ?? '_nothing_'), $harvester->tokens));
                 }
-                $valueNode->addChild(new IndentationNode($indentationToken));
+                $separatorContainer->addChild(new IndentationNode($indentationToken));
                 $harvester->tokens->advance();
 
                 $this->collectValueProperties($harvester, $valueNode);
