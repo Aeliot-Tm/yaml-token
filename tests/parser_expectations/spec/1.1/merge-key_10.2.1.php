@@ -232,11 +232,11 @@ return [
                                         'anchor' => [
                                             'type' => AnchorNode::class,
                                             'properties' => [
+                                                'name' => 'defaults',
                                                 'token' => [
                                                     'type' => TokenType::ANCHOR,
                                                     'text' => '&defaults',
                                                 ],
-                                                'name' => 'defaults',
                                             ],
                                             'children' => [],
                                         ],
@@ -428,12 +428,12 @@ return [
                                                         'alias' => [
                                                             'type' => AliasNode::class,
                                                             'properties' => [
+                                                                'name' => 'defaults',
+                                                                'anchorName' => 'defaults',
                                                                 'token' => [
                                                                     'type' => TokenType::ALIAS,
                                                                     'text' => '*defaults',
                                                                 ],
-                                                                'name' => 'defaults',
-                                                                'anchorName' => 'defaults',
                                                             ],
                                                             'children' => [],
                                                         ],

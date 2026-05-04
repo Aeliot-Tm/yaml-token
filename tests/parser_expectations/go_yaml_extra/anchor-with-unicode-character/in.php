@@ -55,11 +55,11 @@ return [
                                         'anchor' => [
                                             'type' => AnchorNode::class,
                                             'properties' => [
+                                                'name' => '😁',
                                                 'token' => [
                                                     'type' => TokenType::ANCHOR,
                                                     'text' => '&😁',
                                                 ],
-                                                'name' => '😁',
                                             ],
                                             'children' => [],
                                         ],

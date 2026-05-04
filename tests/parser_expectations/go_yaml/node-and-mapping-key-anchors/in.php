@@ -105,11 +105,11 @@ return [
                                                                     'anchor' => [
                                                                         'type' => AnchorNode::class,
                                                                         'properties' => [
+                                                                            'name' => 'k1',
                                                                             'token' => [
                                                                                 'type' => TokenType::ANCHOR,
                                                                                 'text' => '&k1',
                                                                             ],
-                                                                            'name' => 'k1',
                                                                         ],
                                                                         'children' => [],
                                                                     ],
@@ -201,11 +201,11 @@ return [
                                         'anchor' => [
                                             'type' => AnchorNode::class,
                                             'properties' => [
+                                                'name' => 'node1',
                                                 'token' => [
                                                     'type' => TokenType::ANCHOR,
                                                     'text' => '&node1',
                                                 ],
-                                                'name' => 'node1',
                                             ],
                                             'children' => [],
                                         ],
@@ -365,11 +365,11 @@ return [
                                         'anchor' => [
                                             'type' => AnchorNode::class,
                                             'properties' => [
+                                                'name' => 'node2',
                                                 'token' => [
                                                     'type' => TokenType::ANCHOR,
                                                     'text' => '&node2',
                                                 ],
-                                                'name' => 'node2',
                                             ],
                                             'children' => [],
                                         ],
@@ -482,11 +482,11 @@ return [
                                                                     'anchor' => [
                                                                         'type' => AnchorNode::class,
                                                                         'properties' => [
+                                                                            'name' => 'k3',
                                                                             'token' => [
                                                                                 'type' => TokenType::ANCHOR,
                                                                                 'text' => '&k3',
                                                                             ],
-                                                                            'name' => 'k3',
                                                                         ],
                                                                         'children' => [],
                                                                     ],
@@ -647,11 +647,11 @@ return [
                                                                     'anchor' => [
                                                                         'type' => AnchorNode::class,
                                                                         'properties' => [
+                                                                            'name' => 'k4',
                                                                             'token' => [
                                                                                 'type' => TokenType::ANCHOR,
                                                                                 'text' => '&k4',
                                                                             ],
-                                                                            'name' => 'k4',
                                                                         ],
                                                                         'children' => [],
                                                                     ],
@@ -743,11 +743,11 @@ return [
                                         'anchor' => [
                                             'type' => AnchorNode::class,
                                             'properties' => [
+                                                'name' => 'node4',
                                                 'token' => [
                                                     'type' => TokenType::ANCHOR,
                                                     'text' => '&node4',
                                                 ],
-                                                'name' => 'node4',
                                             ],
                                             'children' => [],
                                         ],
@@ -918,11 +918,11 @@ return [
                                         'anchor' => [
                                             'type' => AnchorNode::class,
                                             'properties' => [
+                                                'name' => 'node5',
                                                 'token' => [
                                                     'type' => TokenType::ANCHOR,
                                                     'text' => '&node5',
                                                 ],
-                                                'name' => 'node5',
                                             ],
                                             'children' => [],
                                         ],
@@ -995,11 +995,11 @@ return [
                                         'anchor' => [
                                             'type' => AnchorNode::class,
                                             'properties' => [
+                                                'name' => 'val6',
                                                 'token' => [
                                                     'type' => TokenType::ANCHOR,
                                                     'text' => '&val6',
                                                 ],
-                                                'name' => 'val6',
                                             ],
                                             'children' => [],
                                         ],
@@ -1132,11 +1132,11 @@ return [
                                                                     'anchor' => [
                                                                         'type' => AnchorNode::class,
                                                                         'properties' => [
+                                                                            'name' => 'val7',
                                                                             'token' => [
                                                                                 'type' => TokenType::ANCHOR,
                                                                                 'text' => '&val7',
                                                                             ],
-                                                                            'name' => 'val7',
                                                                         ],
                                                                         'children' => [],
                                                                     ],

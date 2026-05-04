@@ -36,11 +36,11 @@ return [
                                         'anchor' => [
                                             'type' => AnchorNode::class,
                                             'properties' => [
+                                                'name' => 'a',
                                                 'token' => [
                                                     'type' => TokenType::ANCHOR,
                                                     'text' => '&a',
                                                 ],
-                                                'name' => 'a',
                                             ],
                                             'children' => [],
                                         ],
@@ -238,11 +238,11 @@ return [
                                         'anchor' => [
                                             'type' => AnchorNode::class,
                                             'properties' => [
+                                                'name' => 'c',
                                                 'token' => [
                                                     'type' => TokenType::ANCHOR,
                                                     'text' => '&c',
                                                 ],
-                                                'name' => 'c',
                                             ],
                                             'children' => [],
                                         ],
@@ -350,11 +350,11 @@ return [
                                         'anchor' => [
                                             'type' => AnchorNode::class,
                                             'properties' => [
+                                                'name' => 'd',
                                                 'token' => [
                                                     'type' => TokenType::ANCHOR,
                                                     'text' => '&d',
                                                 ],
-                                                'name' => 'd',
                                             ],
                                             'children' => [],
                                         ],

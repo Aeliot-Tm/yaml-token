@@ -46,11 +46,11 @@ return [
                                         'anchor' => [
                                             'type' => AnchorNode::class,
                                             'properties' => [
+                                                'name' => 'a',
                                                 'token' => [
                                                     'type' => TokenType::ANCHOR,
                                                     'text' => '&a',
                                                 ],
-                                                'name' => 'a',
                                             ],
                                             'children' => [],
                                         ],
@@ -80,11 +80,11 @@ return [
                                         'anchor' => [
                                             'type' => AnchorNode::class,
                                             'properties' => [
+                                                'name' => 'b',
                                                 'token' => [
                                                     'type' => TokenType::ANCHOR,
                                                     'text' => '&b',
                                                 ],
-                                                'name' => 'b',
                                             ],
                                             'children' => [],
                                         ],
@@ -155,12 +155,12 @@ return [
                         'alias' => [
                             'type' => AliasNode::class,
                             'properties' => [
+                                'name' => 'b',
+                                'anchorName' => 'b',
                                 'token' => [
                                     'type' => TokenType::ALIAS,
                                     'text' => '*b',
                                 ],
-                                'name' => 'b',
-                                'anchorName' => 'b',
                             ],
                             'children' => [],
                         ],
@@ -192,12 +192,12 @@ return [
                                 'alias' => [
                                     'type' => AliasNode::class,
                                     'properties' => [
+                                        'name' => 'a',
+                                        'anchorName' => 'a',
                                         'token' => [
                                             'type' => TokenType::ALIAS,
                                             'text' => '*a',
                                         ],
-                                        'name' => 'a',
-                                        'anchorName' => 'a',
                                     ],
                                     'children' => [],
                                 ],

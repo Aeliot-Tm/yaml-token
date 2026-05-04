@@ -39,10 +39,6 @@ final class NodeTreeRepresenter
         $representedPropertyNodeIds = [];
         $properties = [];
 
-        if ($stream instanceof TokenHolderInterface) {
-            $properties['token'] = $this->representToken($stream->getToken());
-        }
-
         if ($stream instanceof AliasNode) {
             $properties['name'] = $stream->getName();
             $properties['anchorName'] = $stream->getAnchor()?->getName();
@@ -50,6 +46,10 @@ final class NodeTreeRepresenter
 
         if ($stream instanceof AnchorNode) {
             $properties['name'] = $stream->getName();
+        }
+
+        if ($stream instanceof TokenHolderInterface) {
+            $properties['token'] = $this->representToken($stream->getToken());
         }
 
         foreach ($this->getExplicitNodeProperties($stream) as $propertyName => $value) {

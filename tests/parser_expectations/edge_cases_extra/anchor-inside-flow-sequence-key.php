@@ -64,11 +64,11 @@ return [
                                                             'anchor' => [
                                                                 'type' => AnchorNode::class,
                                                                 'properties' => [
+                                                                    'name' => 'a',
                                                                     'token' => [
                                                                         'type' => TokenType::ANCHOR,
                                                                         'text' => '&a',
                                                                     ],
-                                                                    'name' => 'a',
                                                                 ],
                                                                 'children' => [],
                                                             ],

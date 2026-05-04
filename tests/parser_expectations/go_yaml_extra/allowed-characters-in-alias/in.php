@@ -52,11 +52,11 @@ return [
                                         'anchor' => [
                                             'type' => AnchorNode::class,
                                             'properties' => [
+                                                'name' => ':@*!$"<foo>:',
                                                 'token' => [
                                                     'type' => TokenType::ANCHOR,
                                                     'text' => '&:@*!$"<foo>:',
                                                 ],
-                                                'name' => ':@*!$"<foo>:',
                                             ],
                                             'children' => [],
                                         ],
@@ -146,12 +146,12 @@ return [
                                 'alias' => [
                                     'type' => AliasNode::class,
                                     'properties' => [
+                                        'name' => ':@*!$"<foo>:',
+                                        'anchorName' => ':@*!$"<foo>:',
                                         'token' => [
                                             'type' => TokenType::ALIAS,
                                             'text' => '*:@*!$"<foo>:',
                                         ],
-                                        'name' => ':@*!$"<foo>:',
-                                        'anchorName' => ':@*!$"<foo>:',
                                     ],
                                     'children' => [],
                                 ],

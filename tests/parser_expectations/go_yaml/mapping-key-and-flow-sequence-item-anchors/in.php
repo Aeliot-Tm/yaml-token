@@ -54,11 +54,11 @@ return [
                                 'anchor' => [
                                     'type' => AnchorNode::class,
                                     'properties' => [
+                                        'name' => 'mapping',
                                         'token' => [
                                             'type' => TokenType::ANCHOR,
                                             'text' => '&mapping',
                                         ],
-                                        'name' => 'mapping',
                                     ],
                                     'children' => [],
                                 ],
@@ -97,11 +97,11 @@ return [
                                                             'anchor' => [
                                                                 'type' => AnchorNode::class,
                                                                 'properties' => [
+                                                                    'name' => 'item',
                                                                     'token' => [
                                                                         'type' => TokenType::ANCHOR,
                                                                         'text' => '&item',
                                                                     ],
-                                                                    'name' => 'item',
                                                                 ],
                                                                 'children' => [],
                                                             ],
@@ -256,11 +256,11 @@ return [
                                         'anchor' => [
                                             'type' => AnchorNode::class,
                                             'properties' => [
+                                                'name' => 'key',
                                                 'token' => [
                                                     'type' => TokenType::ANCHOR,
                                                     'text' => '&key',
                                                 ],
-                                                'name' => 'key',
                                             ],
                                             'children' => [],
                                         ],
