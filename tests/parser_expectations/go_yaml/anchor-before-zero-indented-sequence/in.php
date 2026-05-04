@@ -79,7 +79,6 @@ return [
                                                     'text' => '&anchor',
                                                 ],
                                                 'name' => 'anchor',
-                                                'declarationKeyText' => 'seq',
                                             ],
                                             'children' => [],
                                         ],

@@ -57,7 +57,6 @@ return [
                                                     'text' => '&name',
                                                 ],
                                                 'name' => 'name',
-                                                'declarationKeyText' => 'anchored',
                                             ],
                                             'children' => [],
                                         ],

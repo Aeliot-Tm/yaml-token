@@ -77,7 +77,6 @@ return [
                                                     'text' => '&an:chor',
                                                 ],
                                                 'name' => 'an:chor',
-                                                'declarationKeyText' => 'key',
                                             ],
                                             'children' => [],
                                         ],

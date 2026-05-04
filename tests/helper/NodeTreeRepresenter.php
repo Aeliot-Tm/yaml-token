@@ -50,7 +50,6 @@ final class NodeTreeRepresenter
 
         if ($stream instanceof AnchorNode) {
             $properties['name'] = $stream->getName();
-            $properties['declarationKeyText'] = $this->tryGetDeclarationKeyText($stream);
         }
 
         foreach ($this->getExplicitNodeProperties($stream) as $propertyName => $value) {
@@ -148,20 +147,5 @@ final class NodeTreeRepresenter
             'type' => $token->type,
             'text' => $token->text,
         ];
-    }
-
-    private function tryGetDeclarationKeyText(AnchorNode $anchor): ?string
-    {
-        $couple = $anchor->getDeclarationCouple();
-        if (null === $couple) {
-            return null;
-        }
-
-        $name = $couple->getKey()->getName();
-        if ($name instanceof ScalarNode) {
-            return $name->getToken()->text;
-        }
-
-        return null;
     }
 }

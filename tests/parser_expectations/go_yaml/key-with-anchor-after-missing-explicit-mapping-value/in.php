@@ -199,7 +199,6 @@ return [
                                                     'text' => '&anchor',
                                                 ],
                                                 'name' => 'anchor',
-                                                'declarationKeyText' => 'c',
                                             ],
                                             'children' => [],
                                         ],

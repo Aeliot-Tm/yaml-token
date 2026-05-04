@@ -80,7 +80,6 @@ return [
                                                                         'text' => '&a',
                                                                     ],
                                                                     'name' => 'a',
-                                                                    'declarationKeyText' => null,
                                                                 ],
                                                                 'children' => [],
                                                             ],

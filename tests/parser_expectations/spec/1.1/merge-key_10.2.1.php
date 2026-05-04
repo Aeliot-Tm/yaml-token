@@ -237,7 +237,6 @@ return [
                                                     'text' => '&defaults',
                                                 ],
                                                 'name' => 'defaults',
-                                                'declarationKeyText' => 'defaults',
                                             ],
                                             'children' => [],
                                         ],

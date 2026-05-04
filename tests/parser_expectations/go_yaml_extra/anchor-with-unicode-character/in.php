@@ -60,7 +60,6 @@ return [
                                                     'text' => '&😁',
                                                 ],
                                                 'name' => '😁',
-                                                'declarationKeyText' => null,
                                             ],
                                             'children' => [],
                                         ],

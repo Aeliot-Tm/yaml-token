@@ -57,7 +57,6 @@ return [
                                                     'text' => '&:@*!$"<foo>:',
                                                 ],
                                                 'name' => ':@*!$"<foo>:',
-                                                'declarationKeyText' => 'a',
                                             ],
                                             'children' => [],
                                         ],
