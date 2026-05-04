@@ -29,6 +29,22 @@ return [
                 [
                     'type' => ValueNode::class,
                     'properties' => [
+                        'nodeProperties' => [
+                            'type' => NodePropertiesNode::class,
+                            'properties' => [
+                                'tag' => [
+                                    'type' => TagNode::class,
+                                    'properties' => [
+                                        'token' => [
+                                            'type' => TokenType::TAG,
+                                            'text' => '!!omap',
+                                        ],
+                                    ],
+                                    'children' => [],
+                                ],
+                            ],
+                            'children' => [],
+                        ],
                         'blockSequence' => [
                             'type' => BlockSequenceNode::class,
                             'properties' => [
@@ -380,22 +396,6 @@ return [
                                     'children' => [],
                                 ],
                             ],
-                        ],
-                        'nodeProperties' => [
-                            'type' => NodePropertiesNode::class,
-                            'properties' => [
-                                'tag' => [
-                                    'type' => TagNode::class,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::TAG,
-                                            'text' => '!!omap',
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                            ],
-                            'children' => [],
                         ],
                     ],
                     'children' => [],

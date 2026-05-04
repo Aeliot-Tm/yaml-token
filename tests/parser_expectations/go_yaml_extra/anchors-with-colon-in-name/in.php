@@ -32,16 +32,6 @@ return [
                         'key' => [
                             'type' => KeyNode::class,
                             'properties' => [
-                                'name' => [
-                                    'type' => ScalarNode::class,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::PLAIN_SCALAR,
-                                            'text' => 'key',
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
                                 'nodeProperties' => [
                                     'type' => NodePropertiesNode::class,
                                     'properties' => [
@@ -55,6 +45,16 @@ return [
                                                 ],
                                             ],
                                             'children' => [],
+                                        ],
+                                    ],
+                                    'children' => [],
+                                ],
+                                'name' => [
+                                    'type' => ScalarNode::class,
+                                    'properties' => [
+                                        'token' => [
+                                            'type' => TokenType::PLAIN_SCALAR,
+                                            'text' => 'key',
                                         ],
                                     ],
                                     'children' => [],

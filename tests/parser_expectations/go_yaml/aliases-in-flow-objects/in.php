@@ -36,6 +36,23 @@ return [
                                     'key' => [
                                         'type' => KeyNode::class,
                                         'properties' => [
+                                            'nodeProperties' => [
+                                                'type' => NodePropertiesNode::class,
+                                                'properties' => [
+                                                    'anchor' => [
+                                                        'type' => AnchorNode::class,
+                                                        'properties' => [
+                                                            'name' => 'a',
+                                                            'token' => [
+                                                                'type' => TokenType::ANCHOR,
+                                                                'text' => '&a',
+                                                            ],
+                                                        ],
+                                                        'children' => [],
+                                                    ],
+                                                ],
+                                                'children' => [],
+                                            ],
                                             'name' => [
                                                 'type' => FlowSequenceNode::class,
                                                 'properties' => [
@@ -144,23 +161,6 @@ return [
                                                         'children' => [],
                                                     ],
                                                 ],
-                                            ],
-                                            'nodeProperties' => [
-                                                'type' => NodePropertiesNode::class,
-                                                'properties' => [
-                                                    'anchor' => [
-                                                        'type' => AnchorNode::class,
-                                                        'properties' => [
-                                                            'name' => 'a',
-                                                            'token' => [
-                                                                'type' => TokenType::ANCHOR,
-                                                                'text' => '&a',
-                                                            ],
-                                                        ],
-                                                        'children' => [],
-                                                    ],
-                                                ],
-                                                'children' => [],
                                             ],
                                         ],
                                         'children' => [

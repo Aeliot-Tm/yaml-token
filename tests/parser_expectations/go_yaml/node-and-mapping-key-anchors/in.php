@@ -69,6 +69,23 @@ return [
                         'value' => [
                             'type' => ValueNode::class,
                             'properties' => [
+                                'nodeProperties' => [
+                                    'type' => NodePropertiesNode::class,
+                                    'properties' => [
+                                        'anchor' => [
+                                            'type' => AnchorNode::class,
+                                            'properties' => [
+                                                'name' => 'node1',
+                                                'token' => [
+                                                    'type' => TokenType::ANCHOR,
+                                                    'text' => '&node1',
+                                                ],
+                                            ],
+                                            'children' => [],
+                                        ],
+                                    ],
+                                    'children' => [],
+                                ],
                                 'blockMapping' => [
                                     'type' => BlockMappingNode::class,
                                     'properties' => [
@@ -89,16 +106,6 @@ return [
                                                     'key' => [
                                                         'type' => KeyNode::class,
                                                         'properties' => [
-                                                            'name' => [
-                                                                'type' => ScalarNode::class,
-                                                                'properties' => [
-                                                                    'token' => [
-                                                                        'type' => TokenType::PLAIN_SCALAR,
-                                                                        'text' => 'key1',
-                                                                    ],
-                                                                ],
-                                                                'children' => [],
-                                                            ],
                                                             'nodeProperties' => [
                                                                 'type' => NodePropertiesNode::class,
                                                                 'properties' => [
@@ -112,6 +119,16 @@ return [
                                                                             ],
                                                                         ],
                                                                         'children' => [],
+                                                                    ],
+                                                                ],
+                                                                'children' => [],
+                                                            ],
+                                                            'name' => [
+                                                                'type' => ScalarNode::class,
+                                                                'properties' => [
+                                                                    'token' => [
+                                                                        'type' => TokenType::PLAIN_SCALAR,
+                                                                        'text' => 'key1',
                                                                     ],
                                                                 ],
                                                                 'children' => [],
@@ -195,23 +212,6 @@ return [
                                         ],
                                     ],
                                 ],
-                                'nodeProperties' => [
-                                    'type' => NodePropertiesNode::class,
-                                    'properties' => [
-                                        'anchor' => [
-                                            'type' => AnchorNode::class,
-                                            'properties' => [
-                                                'name' => 'node1',
-                                                'token' => [
-                                                    'type' => TokenType::ANCHOR,
-                                                    'text' => '&node1',
-                                                ],
-                                            ],
-                                            'children' => [],
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
                             ],
                             'children' => [],
                         ],
@@ -261,6 +261,23 @@ return [
                         'value' => [
                             'type' => ValueNode::class,
                             'properties' => [
+                                'nodeProperties' => [
+                                    'type' => NodePropertiesNode::class,
+                                    'properties' => [
+                                        'anchor' => [
+                                            'type' => AnchorNode::class,
+                                            'properties' => [
+                                                'name' => 'node2',
+                                                'token' => [
+                                                    'type' => TokenType::ANCHOR,
+                                                    'text' => '&node2',
+                                                ],
+                                            ],
+                                            'children' => [],
+                                        ],
+                                    ],
+                                    'children' => [],
+                                ],
                                 'blockMapping' => [
                                     'type' => BlockMappingNode::class,
                                     'properties' => [
@@ -359,23 +376,6 @@ return [
                                         ],
                                     ],
                                 ],
-                                'nodeProperties' => [
-                                    'type' => NodePropertiesNode::class,
-                                    'properties' => [
-                                        'anchor' => [
-                                            'type' => AnchorNode::class,
-                                            'properties' => [
-                                                'name' => 'node2',
-                                                'token' => [
-                                                    'type' => TokenType::ANCHOR,
-                                                    'text' => '&node2',
-                                                ],
-                                            ],
-                                            'children' => [],
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
                             ],
                             'children' => [
                                 [
@@ -466,16 +466,6 @@ return [
                                                     'key' => [
                                                         'type' => KeyNode::class,
                                                         'properties' => [
-                                                            'name' => [
-                                                                'type' => ScalarNode::class,
-                                                                'properties' => [
-                                                                    'token' => [
-                                                                        'type' => TokenType::PLAIN_SCALAR,
-                                                                        'text' => 'key3',
-                                                                    ],
-                                                                ],
-                                                                'children' => [],
-                                                            ],
                                                             'nodeProperties' => [
                                                                 'type' => NodePropertiesNode::class,
                                                                 'properties' => [
@@ -489,6 +479,16 @@ return [
                                                                             ],
                                                                         ],
                                                                         'children' => [],
+                                                                    ],
+                                                                ],
+                                                                'children' => [],
+                                                            ],
+                                                            'name' => [
+                                                                'type' => ScalarNode::class,
+                                                                'properties' => [
+                                                                    'token' => [
+                                                                        'type' => TokenType::PLAIN_SCALAR,
+                                                                        'text' => 'key3',
                                                                     ],
                                                                 ],
                                                                 'children' => [],
@@ -611,6 +611,23 @@ return [
                         'value' => [
                             'type' => ValueNode::class,
                             'properties' => [
+                                'nodeProperties' => [
+                                    'type' => NodePropertiesNode::class,
+                                    'properties' => [
+                                        'anchor' => [
+                                            'type' => AnchorNode::class,
+                                            'properties' => [
+                                                'name' => 'node4',
+                                                'token' => [
+                                                    'type' => TokenType::ANCHOR,
+                                                    'text' => '&node4',
+                                                ],
+                                            ],
+                                            'children' => [],
+                                        ],
+                                    ],
+                                    'children' => [],
+                                ],
                                 'blockMapping' => [
                                     'type' => BlockMappingNode::class,
                                     'properties' => [
@@ -631,16 +648,6 @@ return [
                                                     'key' => [
                                                         'type' => KeyNode::class,
                                                         'properties' => [
-                                                            'name' => [
-                                                                'type' => ScalarNode::class,
-                                                                'properties' => [
-                                                                    'token' => [
-                                                                        'type' => TokenType::PLAIN_SCALAR,
-                                                                        'text' => 'key4',
-                                                                    ],
-                                                                ],
-                                                                'children' => [],
-                                                            ],
                                                             'nodeProperties' => [
                                                                 'type' => NodePropertiesNode::class,
                                                                 'properties' => [
@@ -654,6 +661,16 @@ return [
                                                                             ],
                                                                         ],
                                                                         'children' => [],
+                                                                    ],
+                                                                ],
+                                                                'children' => [],
+                                                            ],
+                                                            'name' => [
+                                                                'type' => ScalarNode::class,
+                                                                'properties' => [
+                                                                    'token' => [
+                                                                        'type' => TokenType::PLAIN_SCALAR,
+                                                                        'text' => 'key4',
                                                                     ],
                                                                 ],
                                                                 'children' => [],
@@ -737,23 +754,6 @@ return [
                                         ],
                                     ],
                                 ],
-                                'nodeProperties' => [
-                                    'type' => NodePropertiesNode::class,
-                                    'properties' => [
-                                        'anchor' => [
-                                            'type' => AnchorNode::class,
-                                            'properties' => [
-                                                'name' => 'node4',
-                                                'token' => [
-                                                    'type' => TokenType::ANCHOR,
-                                                    'text' => '&node4',
-                                                ],
-                                            ],
-                                            'children' => [],
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
                             ],
                             'children' => [
                                 [
@@ -814,6 +814,23 @@ return [
                         'value' => [
                             'type' => ValueNode::class,
                             'properties' => [
+                                'nodeProperties' => [
+                                    'type' => NodePropertiesNode::class,
+                                    'properties' => [
+                                        'anchor' => [
+                                            'type' => AnchorNode::class,
+                                            'properties' => [
+                                                'name' => 'node5',
+                                                'token' => [
+                                                    'type' => TokenType::ANCHOR,
+                                                    'text' => '&node5',
+                                                ],
+                                            ],
+                                            'children' => [],
+                                        ],
+                                    ],
+                                    'children' => [],
+                                ],
                                 'blockMapping' => [
                                     'type' => BlockMappingNode::class,
                                     'properties' => [
@@ -911,23 +928,6 @@ return [
                                             'children' => [],
                                         ],
                                     ],
-                                ],
-                                'nodeProperties' => [
-                                    'type' => NodePropertiesNode::class,
-                                    'properties' => [
-                                        'anchor' => [
-                                            'type' => AnchorNode::class,
-                                            'properties' => [
-                                                'name' => 'node5',
-                                                'token' => [
-                                                    'type' => TokenType::ANCHOR,
-                                                    'text' => '&node5',
-                                                ],
-                                            ],
-                                            'children' => [],
-                                        ],
-                                    ],
-                                    'children' => [],
                                 ],
                             ],
                             'children' => [
@@ -1116,16 +1116,6 @@ return [
                                                     'key' => [
                                                         'type' => KeyNode::class,
                                                         'properties' => [
-                                                            'name' => [
-                                                                'type' => ScalarNode::class,
-                                                                'properties' => [
-                                                                    'token' => [
-                                                                        'type' => TokenType::PLAIN_SCALAR,
-                                                                        'text' => 'seven',
-                                                                    ],
-                                                                ],
-                                                                'children' => [],
-                                                            ],
                                                             'nodeProperties' => [
                                                                 'type' => NodePropertiesNode::class,
                                                                 'properties' => [
@@ -1139,6 +1129,16 @@ return [
                                                                             ],
                                                                         ],
                                                                         'children' => [],
+                                                                    ],
+                                                                ],
+                                                                'children' => [],
+                                                            ],
+                                                            'name' => [
+                                                                'type' => ScalarNode::class,
+                                                                'properties' => [
+                                                                    'token' => [
+                                                                        'type' => TokenType::PLAIN_SCALAR,
+                                                                        'text' => 'seven',
                                                                     ],
                                                                 ],
                                                                 'children' => [],

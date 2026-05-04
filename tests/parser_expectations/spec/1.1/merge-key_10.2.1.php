@@ -49,6 +49,23 @@ return [
                         'value' => [
                             'type' => ValueNode::class,
                             'properties' => [
+                                'nodeProperties' => [
+                                    'type' => NodePropertiesNode::class,
+                                    'properties' => [
+                                        'anchor' => [
+                                            'type' => AnchorNode::class,
+                                            'properties' => [
+                                                'name' => 'defaults',
+                                                'token' => [
+                                                    'type' => TokenType::ANCHOR,
+                                                    'text' => '&defaults',
+                                                ],
+                                            ],
+                                            'children' => [],
+                                        ],
+                                    ],
+                                    'children' => [],
+                                ],
                                 'blockMapping' => [
                                     'type' => BlockMappingNode::class,
                                     'properties' => [
@@ -225,23 +242,6 @@ return [
                                             'children' => [],
                                         ],
                                     ],
-                                ],
-                                'nodeProperties' => [
-                                    'type' => NodePropertiesNode::class,
-                                    'properties' => [
-                                        'anchor' => [
-                                            'type' => AnchorNode::class,
-                                            'properties' => [
-                                                'name' => 'defaults',
-                                                'token' => [
-                                                    'type' => TokenType::ANCHOR,
-                                                    'text' => '&defaults',
-                                                ],
-                                            ],
-                                            'children' => [],
-                                        ],
-                                    ],
-                                    'children' => [],
                                 ],
                             ],
                             'children' => [],

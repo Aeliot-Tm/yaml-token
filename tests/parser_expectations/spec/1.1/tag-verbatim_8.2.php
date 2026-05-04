@@ -47,6 +47,22 @@ return [
                         'value' => [
                             'type' => ValueNode::class,
                             'properties' => [
+                                'nodeProperties' => [
+                                    'type' => NodePropertiesNode::class,
+                                    'properties' => [
+                                        'tag' => [
+                                            'type' => TagNode::class,
+                                            'properties' => [
+                                                'token' => [
+                                                    'type' => TokenType::TAG,
+                                                    'text' => '!<tag:clarkevans.com,2002:invoice>',
+                                                ],
+                                            ],
+                                            'children' => [],
+                                        ],
+                                    ],
+                                    'children' => [],
+                                ],
                                 'blockMapping' => [
                                     'type' => BlockMappingNode::class,
                                     'properties' => [
@@ -144,22 +160,6 @@ return [
                                             'children' => [],
                                         ],
                                     ],
-                                ],
-                                'nodeProperties' => [
-                                    'type' => NodePropertiesNode::class,
-                                    'properties' => [
-                                        'tag' => [
-                                            'type' => TagNode::class,
-                                            'properties' => [
-                                                'token' => [
-                                                    'type' => TokenType::TAG,
-                                                    'text' => '!<tag:clarkevans.com,2002:invoice>',
-                                                ],
-                                            ],
-                                            'children' => [],
-                                        ],
-                                    ],
-                                    'children' => [],
                                 ],
                             ],
                             'children' => [],

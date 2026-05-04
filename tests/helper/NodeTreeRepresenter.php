@@ -113,8 +113,8 @@ final class NodeTreeRepresenter
             ],
             $node instanceof KeyNode => [
                 'explicitKeyIndicatorNode' => $node->getExplicitKeyIndicatorNode(),
-                'name' => $node->getName(),
                 'nodeProperties' => $node->getProperties(),
+                'name' => $node->getName(),
             ],
             $node instanceof NodePropertiesNode => [
                 'anchor' => $node->getAnchor(),
@@ -124,6 +124,7 @@ final class NodeTreeRepresenter
                 'value' => $node->getValue(),
             ],
             $node instanceof ValueNode => [
+                'nodeProperties' => $node->getProperties(),
                 'alias' => $node->getAlias(),
                 'blockMapping' => $node->getBlockMapping(),
                 'blockSequence' => $node->getBlockSequence(),
@@ -131,7 +132,6 @@ final class NodeTreeRepresenter
                 'flowSequence' => $node->getFlowSequence(),
                 'keyValueCouple' => $node->getKeyValueCouple(),
                 'multilinePlainScalar' => $node->getMultilinePlainScalar(),
-                'nodeProperties' => $node->getProperties(),
                 'scalar' => $node->getScalar(),
             ],
             default => [],

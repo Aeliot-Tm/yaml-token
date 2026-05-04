@@ -84,6 +84,23 @@ return [
                         'key' => [
                             'type' => KeyNode::class,
                             'properties' => [
+                                'nodeProperties' => [
+                                    'type' => NodePropertiesNode::class,
+                                    'properties' => [
+                                        'anchor' => [
+                                            'type' => AnchorNode::class,
+                                            'properties' => [
+                                                'name' => 'key',
+                                                'token' => [
+                                                    'type' => TokenType::ANCHOR,
+                                                    'text' => '&key',
+                                                ],
+                                            ],
+                                            'children' => [],
+                                        ],
+                                    ],
+                                    'children' => [],
+                                ],
                                 'name' => [
                                     'type' => FlowSequenceNode::class,
                                     'properties' => [
@@ -249,23 +266,6 @@ return [
                                             'children' => [],
                                         ],
                                     ],
-                                ],
-                                'nodeProperties' => [
-                                    'type' => NodePropertiesNode::class,
-                                    'properties' => [
-                                        'anchor' => [
-                                            'type' => AnchorNode::class,
-                                            'properties' => [
-                                                'name' => 'key',
-                                                'token' => [
-                                                    'type' => TokenType::ANCHOR,
-                                                    'text' => '&key',
-                                                ],
-                                            ],
-                                            'children' => [],
-                                        ],
-                                    ],
-                                    'children' => [],
                                 ],
                             ],
                             'children' => [

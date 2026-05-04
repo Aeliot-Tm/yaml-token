@@ -48,6 +48,54 @@ return [
                         'value' => [
                             'type' => ValueNode::class,
                             'properties' => [
+                                'nodeProperties' => [
+                                    'type' => NodePropertiesNode::class,
+                                    'properties' => [
+                                        'anchor' => [
+                                            'type' => AnchorNode::class,
+                                            'properties' => [
+                                                'name' => 'anchor',
+                                                'token' => [
+                                                    'type' => TokenType::ANCHOR,
+                                                    'text' => '&anchor',
+                                                ],
+                                            ],
+                                            'children' => [],
+                                        ],
+                                        'tag' => [
+                                            'type' => TagNode::class,
+                                            'properties' => [
+                                                'token' => [
+                                                    'type' => TokenType::TAG,
+                                                    'text' => '!!map',
+                                                ],
+                                            ],
+                                            'children' => [],
+                                        ],
+                                    ],
+                                    'children' => [
+                                        [
+                                            'type' => NewLineNode::class,
+                                            'properties' => [
+                                                'token' => [
+                                                    'type' => TokenType::NEWLINE,
+                                                    'text' => "\n",
+                                                ],
+                                            ],
+                                            'children' => [],
+                                        ],
+                                        [
+                                            'type' => IndentationNode::class,
+                                            'properties' => [
+                                                'token' => [
+                                                    'type' => TokenType::INDENTATION,
+                                                    'text' => ' ',
+                                                ],
+                                            ],
+                                            'children' => [],
+                                        ],
+                                    ],
+                                ],
                                 'blockMapping' => [
                                     'type' => BlockMappingNode::class,
                                     'properties' => [
@@ -140,54 +188,6 @@ return [
                                                 'token' => [
                                                     'type' => TokenType::NEWLINE,
                                                     'text' => "\n",
-                                                ],
-                                            ],
-                                            'children' => [],
-                                        ],
-                                    ],
-                                ],
-                                'nodeProperties' => [
-                                    'type' => NodePropertiesNode::class,
-                                    'properties' => [
-                                        'anchor' => [
-                                            'type' => AnchorNode::class,
-                                            'properties' => [
-                                                'name' => 'anchor',
-                                                'token' => [
-                                                    'type' => TokenType::ANCHOR,
-                                                    'text' => '&anchor',
-                                                ],
-                                            ],
-                                            'children' => [],
-                                        ],
-                                        'tag' => [
-                                            'type' => TagNode::class,
-                                            'properties' => [
-                                                'token' => [
-                                                    'type' => TokenType::TAG,
-                                                    'text' => '!!map',
-                                                ],
-                                            ],
-                                            'children' => [],
-                                        ],
-                                    ],
-                                    'children' => [
-                                        [
-                                            'type' => NewLineNode::class,
-                                            'properties' => [
-                                                'token' => [
-                                                    'type' => TokenType::NEWLINE,
-                                                    'text' => "\n",
-                                                ],
-                                            ],
-                                            'children' => [],
-                                        ],
-                                        [
-                                            'type' => IndentationNode::class,
-                                            'properties' => [
-                                                'token' => [
-                                                    'type' => TokenType::INDENTATION,
-                                                    'text' => ' ',
                                                 ],
                                             ],
                                             'children' => [],
