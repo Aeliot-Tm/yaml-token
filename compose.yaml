@@ -5,6 +5,7 @@ services:
       dockerfile: .infra/docker/php/Dockerfile
     environment:
       HISTFILE: /app/.bash_history
+      PHP_IDE_CONFIG: serverName=localhost
       XDEBUG_CONFIG: "client_host=host.docker.internal"
       XDEBUG_ENABLE: 1
     expose:
