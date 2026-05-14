@@ -2050,6 +2050,7 @@ final class Parser
 
         if (
             $this->isScalarFollowedByValueIndicator($harvester)
+            || TokenType::EXPLICIT_KEY_INDICATOR === $token?->type
             || TokenType::VALUE_INDICATOR === $token?->type
             || $nodePropertiesFollowedByValueIndicator
         ) {
