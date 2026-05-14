@@ -1742,6 +1742,12 @@ final class Parser
                 continue;
             }
 
+            if (TokenType::WHITESPACE === $token->type) {
+                $document->addChild(new WhitespaceNode($token));
+                $harvester->tokens->advance();
+                continue;
+            }
+
             throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Unexpected type: %s', $token->type->value), $token));
         }
 
