@@ -524,6 +524,19 @@ final class Parser
         }
     }
 
+    private function consumeBlockValueOpeningLayout(Harvester $harvester, ValueNode $valueNode): void
+    {
+        $valueNode->addChild(new NewLineNode($harvester->tokens->current()));
+        $harvester->tokens->advance();
+
+        $this->collectTypes($harvester, [
+            TokenType::COMMENT,
+            TokenType::NEWLINE,
+            TokenType::WHITESPACE,
+        ], $valueNode);
+        $this->collectInsignificantIndentationLines($harvester, $valueNode);
+    }
+
     /**
      * TODO: refactor similar methods: consumeExplicitKeyMultilinePlainScalarFirstLine & consumeExplicitKeyMultilinePlainScalarContinuation.
      */
@@ -624,17 +637,9 @@ final class Parser
     /**
      * Indented plain or quoted scalar on the line(s) after "key:\\n", not a nested block mapping entry.
      */
-    private function consumeIndentedBlockScalarValue(Harvester $harvester, ValueNode $valueNode, Token $leadingNewline, int $parentIndentLen): void
+    private function consumeIndentedBlockScalarValue(Harvester $harvester, ValueNode $valueNode, int $parentIndentLen): void
     {
-        $valueNode->addChild(new NewLineNode($leadingNewline));
-        $harvester->tokens->advance();
-
-        $this->collectTypes($harvester, [
-            TokenType::COMMENT,
-            TokenType::NEWLINE,
-            TokenType::WHITESPACE,
-        ], $valueNode);
-        $this->collectInsignificantIndentationLines($harvester, $valueNode);
+        $this->consumeBlockValueOpeningLayout($harvester, $valueNode);
 
         $indentationToken = $harvester->tokens->current();
         if (TokenType::INDENTATION !== $indentationToken?->type) {
@@ -1777,6 +1782,7 @@ final class Parser
             //
             // Here $indentLen equals $parentIndentLen (indentation of the key line).
             if ($indentLen === $parentIndentLen && TokenType::SEQUENCE_ENTRY === $afterIndent->type) {
+                $this->consumeBlockValueOpeningLayout($harvester, $valueNode);
                 $valueNode->addChild($this->parseBlockSequenceValue($harvester, $parentIndentLen - 1, true));
 
                 return;
@@ -1829,6 +1835,7 @@ final class Parser
             }
 
             if (TokenType::SEQUENCE_ENTRY === $afterIndent->type) {
+                $this->consumeBlockValueOpeningLayout($harvester, $valueNode);
                 $valueNode->addChild($this->parseBlockSequenceValue($harvester, $parentIndentLen));
 
                 return;
@@ -1844,14 +1851,7 @@ final class Parser
                 TokenType::FLOW_SEQUENCE_START === $afterIndent->type
                 || TokenType::FLOW_MAPPING_START === $afterIndent->type
             ) {
-                $valueNode->addChild(new NewLineNode($token));
-                $harvester->tokens->advance();
-                $this->collectTypes($harvester, [
-                    TokenType::COMMENT,
-                    TokenType::NEWLINE,
-                    TokenType::WHITESPACE,
-                ], $valueNode);
-                $this->collectInsignificantIndentationLines($harvester, $valueNode);
+                $this->consumeBlockValueOpeningLayout($harvester, $valueNode);
 
                 $indentationToken = $harvester->tokens->current();
                 if (null === $indentationToken || TokenType::INDENTATION !== $indentationToken->type) {
@@ -1877,11 +1877,12 @@ final class Parser
                 ], true)
                 && !$this->isImplicitYamlKeyOnContinuationLine($harvester, $afterIndentOffset)
             ) {
-                $this->consumeIndentedBlockScalarValue($harvester, $valueNode, $token, $parentIndentLen);
+                $this->consumeIndentedBlockScalarValue($harvester, $valueNode, $parentIndentLen);
 
                 return;
             }
 
+            $this->consumeBlockValueOpeningLayout($harvester, $valueNode);
             $valueNode->addChild($this->parseBlockMappingValue($harvester, $parentIndentLen));
 
             return;
@@ -1891,6 +1892,7 @@ final class Parser
         // accepted at bare document root (n = -1 per YAML 1.2.2 rule [211]).
         if (self::BARE_DOCUMENT_BLOCK_PARENT_INDENT === $parentIndentLen) {
             if (TokenType::SEQUENCE_ENTRY === $afterIndent->type) {
+                $this->consumeBlockValueOpeningLayout($harvester, $valueNode);
                 $valueNode->addChild($this->parseBlockSequenceValue($harvester, self::BARE_DOCUMENT_BLOCK_PARENT_INDENT));
 
                 return;
@@ -1900,6 +1902,7 @@ final class Parser
                 || TokenType::MERGE_INDICATOR === $afterIndent->type
                 || $afterIndent->type->isScalar()
             ) {
+                $this->consumeBlockValueOpeningLayout($harvester, $valueNode);
                 $valueNode->addChild($this->parseBlockMappingValue($harvester, self::BARE_DOCUMENT_BLOCK_PARENT_INDENT));
             }
         }

@@ -125,6 +125,13 @@ Because of this, the parser must not invent tokens that did not exist in the ori
     `KeyValueCoupleNode` (collected by `tryConsumeFlowMappingValueIndicator()`), so the source
     round-trips byte-for-byte.
 - Collections:
+  - When a block collection (mapping or sequence) appears as a value after `:` on a new line,
+    the opening layout tokens (the `NEWLINE` after `:`, any comment/empty lines, and whitespace
+    before the first significant content line) belong to the enclosing `ValueNode`, not to the
+    `BlockMappingNode` / `BlockSequenceNode` itself. The helper `consumeBlockValueOpeningLayout()`
+    consumes these tokens onto the `ValueNode` before dispatching to the collection parser.
+    The same helper is used for flow and scalar value branches in `parseIndentedBlockValue()`,
+    ensuring uniform ownership of the opening layout across all value types.
   - Block mapping: `key:` followed by an indented block of key/value couples (`BlockMappingNode`).
   - A line that looks like `key: value` only counts as a new mapping entry when the scalar key is
     followed by `:` on the **same** line (implicit YAML key). Indented text on the next line without

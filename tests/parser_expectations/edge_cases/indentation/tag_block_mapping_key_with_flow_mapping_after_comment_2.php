@@ -21,17 +21,17 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 2994301181,
+    'hash' => 2054562754,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 2590693205,
+            'hash' => 999767266,
             'properties' => [],
             'children' => [
                 [
                     'type' => KeyValueCoupleNode::class,
-                    'hash' => 2846773895,
+                    'hash' => 1606504357,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
@@ -39,7 +39,7 @@ return [
                         ],
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 643393416,
+                            'hash' => 2312925827,
                         ],
                     ],
                     'children' => [
@@ -79,40 +79,40 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 643393416,
+                            'hash' => 2312925827,
                             'properties' => [
                                 'blockMapping' => [
                                     'type' => BlockMappingNode::class,
-                                    'hash' => 2112885014,
+                                    'hash' => 2355906496,
                                 ],
                             ],
                             'children' => [
                                 [
+                                    'type' => NewLineNode::class,
+                                    'hash' => 763369711,
+                                    'properties' => [
+                                        'token' => [
+                                            'type' => TokenType::NEWLINE,
+                                            'text' => "\n",
+                                        ],
+                                    ],
+                                    'children' => [],
+                                ],
+                                [
                                     'type' => BlockMappingNode::class,
-                                    'hash' => 2112885014,
+                                    'hash' => 2355906496,
                                     'properties' => [
                                         'entries' => [
                                             [
                                                 'type' => KeyValueCoupleNode::class,
-                                                'hash' => 3358807132,
+                                                'hash' => 1975595837,
                                             ],
                                         ],
                                     ],
                                     'children' => [
                                         [
-                                            'type' => NewLineNode::class,
-                                            'hash' => 763369711,
-                                            'properties' => [
-                                                'token' => [
-                                                    'type' => TokenType::NEWLINE,
-                                                    'text' => "\n",
-                                                ],
-                                            ],
-                                            'children' => [],
-                                        ],
-                                        [
                                             'type' => KeyValueCoupleNode::class,
-                                            'hash' => 3358807132,
+                                            'hash' => 1975595837,
                                             'properties' => [
                                                 'indentation' => [
                                                     'type' => IndentationNode::class,
@@ -124,7 +124,7 @@ return [
                                                 ],
                                                 'value' => [
                                                     'type' => ValueNode::class,
-                                                    'hash' => 3089980760,
+                                                    'hash' => 1752968048,
                                                 ],
                                             ],
                                             'children' => [
@@ -175,40 +175,40 @@ return [
                                                 ],
                                                 [
                                                     'type' => ValueNode::class,
-                                                    'hash' => 3089980760,
+                                                    'hash' => 1752968048,
                                                     'properties' => [
                                                         'blockMapping' => [
                                                             'type' => BlockMappingNode::class,
-                                                            'hash' => 2062317169,
+                                                            'hash' => 1892387548,
                                                         ],
                                                     ],
                                                     'children' => [
                                                         [
+                                                            'type' => NewLineNode::class,
+                                                            'hash' => 763369711,
+                                                            'properties' => [
+                                                                'token' => [
+                                                                    'type' => TokenType::NEWLINE,
+                                                                    'text' => "\n",
+                                                                ],
+                                                            ],
+                                                            'children' => [],
+                                                        ],
+                                                        [
                                                             'type' => BlockMappingNode::class,
-                                                            'hash' => 2062317169,
+                                                            'hash' => 1892387548,
                                                             'properties' => [
                                                                 'entries' => [
                                                                     [
                                                                         'type' => KeyValueCoupleNode::class,
-                                                                        'hash' => 1745985524,
+                                                                        'hash' => 161863906,
                                                                     ],
                                                                 ],
                                                             ],
                                                             'children' => [
                                                                 [
-                                                                    'type' => NewLineNode::class,
-                                                                    'hash' => 763369711,
-                                                                    'properties' => [
-                                                                        'token' => [
-                                                                            'type' => TokenType::NEWLINE,
-                                                                            'text' => "\n",
-                                                                        ],
-                                                                    ],
-                                                                    'children' => [],
-                                                                ],
-                                                                [
                                                                     'type' => KeyValueCoupleNode::class,
-                                                                    'hash' => 1745985524,
+                                                                    'hash' => 161863906,
                                                                     'properties' => [
                                                                         'indentation' => [
                                                                             'type' => IndentationNode::class,
@@ -220,7 +220,7 @@ return [
                                                                         ],
                                                                         'value' => [
                                                                             'type' => ValueNode::class,
-                                                                            'hash' => 3283966251,
+                                                                            'hash' => 1066531271,
                                                                         ],
                                                                     ],
                                                                     'children' => [
@@ -309,17 +309,61 @@ return [
                                                                         ],
                                                                         [
                                                                             'type' => ValueNode::class,
-                                                                            'hash' => 3283966251,
+                                                                            'hash' => 1066531271,
                                                                             'properties' => [
                                                                                 'blockMapping' => [
                                                                                     'type' => BlockMappingNode::class,
-                                                                                    'hash' => 3283331136,
+                                                                                    'hash' => 2372544193,
                                                                                 ],
                                                                             ],
                                                                             'children' => [
                                                                                 [
+                                                                                    'type' => NewLineNode::class,
+                                                                                    'hash' => 763369711,
+                                                                                    'properties' => [
+                                                                                        'token' => [
+                                                                                            'type' => TokenType::NEWLINE,
+                                                                                            'text' => "\n",
+                                                                                        ],
+                                                                                    ],
+                                                                                    'children' => [],
+                                                                                ],
+                                                                                [
+                                                                                    'type' => IndentationNode::class,
+                                                                                    'hash' => 2695069651,
+                                                                                    'properties' => [
+                                                                                        'token' => [
+                                                                                            'type' => TokenType::INDENTATION,
+                                                                                            'text' => '        ',
+                                                                                        ],
+                                                                                    ],
+                                                                                    'children' => [],
+                                                                                ],
+                                                                                [
+                                                                                    'type' => CommentNode::class,
+                                                                                    'hash' => 3518869618,
+                                                                                    'properties' => [
+                                                                                        'token' => [
+                                                                                            'type' => TokenType::COMMENT,
+                                                                                            'text' => '# comment',
+                                                                                        ],
+                                                                                    ],
+                                                                                    'children' => [],
+                                                                                ],
+                                                                                [
+                                                                                    'type' => NewLineNode::class,
+                                                                                    'hash' => 763369711,
+                                                                                    'properties' => [
+                                                                                        'token' => [
+                                                                                            'type' => TokenType::NEWLINE,
+                                                                                            'text' => "\n",
+                                                                                        ],
+                                                                                    ],
+                                                                                    'children' => [],
+                                                                                ],
+                                                                                [
                                                                                     'type' => BlockMappingNode::class,
-                                                                                    'hash' => 3283331136,
+                                                                                    'hash' => 2372544193,
                                                                                     'properties' => [
                                                                                         'entries' => [
                                                                                             [
@@ -329,50 +373,6 @@ return [
                                                                                         ],
                                                                                     ],
                                                                                     'children' => [
-                                                                                        [
-                                                                                            'type' => NewLineNode::class,
-                                                                                            'hash' => 763369711,
-                                                                                            'properties' => [
-                                                                                                'token' => [
-                                                                                                    'type' => TokenType::NEWLINE,
-                                                                                                    'text' => "\n",
-                                                                                                ],
-                                                                                            ],
-                                                                                            'children' => [],
-                                                                                        ],
-                                                                                        [
-                                                                                            'type' => IndentationNode::class,
-                                                                                            'hash' => 2695069651,
-                                                                                            'properties' => [
-                                                                                                'token' => [
-                                                                                                    'type' => TokenType::INDENTATION,
-                                                                                                    'text' => '        ',
-                                                                                                ],
-                                                                                            ],
-                                                                                            'children' => [],
-                                                                                        ],
-                                                                                        [
-                                                                                            'type' => CommentNode::class,
-                                                                                            'hash' => 3518869618,
-                                                                                            'properties' => [
-                                                                                                'token' => [
-                                                                                                    'type' => TokenType::COMMENT,
-                                                                                                    'text' => '# comment',
-                                                                                                ],
-                                                                                            ],
-                                                                                            'children' => [],
-                                                                                        ],
-                                                                                        [
-                                                                                            'type' => NewLineNode::class,
-                                                                                            'hash' => 763369711,
-                                                                                            'properties' => [
-                                                                                                'token' => [
-                                                                                                    'type' => TokenType::NEWLINE,
-                                                                                                    'text' => "\n",
-                                                                                                ],
-                                                                                            ],
-                                                                                            'children' => [],
-                                                                                        ],
                                                                                         [
                                                                                             'type' => KeyValueCoupleNode::class,
                                                                                             'hash' => 4024539670,
