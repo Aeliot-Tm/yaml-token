@@ -16,20 +16,41 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
+    'hash' => 3718917754,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
+            'hash' => 4191029250,
             'properties' => [],
             'children' => [
                 [
                     'type' => KeyValueCoupleNode::class,
+                    'hash' => 3468928747,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
+                            'hash' => 1885271233,
+                        ],
+                        'value' => [
+                            'type' => ValueNode::class,
+                            'hash' => 1106664376,
+                        ],
+                    ],
+                    'children' => [
+                        [
+                            'type' => KeyNode::class,
+                            'hash' => 1885271233,
                             'properties' => [
                                 'name' => [
                                     'type' => ScalarNode::class,
+                                    'hash' => 3374620825,
+                                ],
+                            ],
+                            'children' => [
+                                [
+                                    'type' => ScalarNode::class,
+                                    'hash' => 3374620825,
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::PLAIN_SCALAR,
@@ -39,49 +60,10 @@ return [
                                     'children' => [],
                                 ],
                             ],
-                            'children' => [],
                         ],
-                        'value' => [
-                            'type' => ValueNode::class,
-                            'properties' => [
-                                'scalar' => [
-                                    'type' => ScalarNode::class,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::FOLDED_BLOCK_SCALAR,
-                                            'text' => "  This is a long line\n  that folds into space.\n\n  New paragraph here.\n",
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                            ],
-                            'children' => [
-                                [
-                                    'type' => BlockScalarIndicatorNode::class,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::FOLDED_BLOCK_SCALAR_INDICATOR,
-                                            'text' => '>',
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                                [
-                                    'type' => NewLineNode::class,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::NEWLINE,
-                                            'text' => "\n",
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                            ],
-                        ],
-                    ],
-                    'children' => [
                         [
                             'type' => SyntaxTokenNode::class,
+                            'hash' => 675194587,
                             'properties' => [
                                 'token' => [
                                     'type' => TokenType::VALUE_INDICATOR,
@@ -92,6 +74,7 @@ return [
                         ],
                         [
                             'type' => WhitespaceNode::class,
+                            'hash' => 1067539092,
                             'properties' => [
                                 'token' => [
                                     'type' => TokenType::WHITESPACE,
@@ -99,6 +82,51 @@ return [
                                 ],
                             ],
                             'children' => [],
+                        ],
+                        [
+                            'type' => ValueNode::class,
+                            'hash' => 1106664376,
+                            'properties' => [
+                                'scalar' => [
+                                    'type' => ScalarNode::class,
+                                    'hash' => 71323096,
+                                ],
+                            ],
+                            'children' => [
+                                [
+                                    'type' => BlockScalarIndicatorNode::class,
+                                    'hash' => 3228385119,
+                                    'properties' => [
+                                        'token' => [
+                                            'type' => TokenType::FOLDED_BLOCK_SCALAR_INDICATOR,
+                                            'text' => '>',
+                                        ],
+                                    ],
+                                    'children' => [],
+                                ],
+                                [
+                                    'type' => NewLineNode::class,
+                                    'hash' => 763369711,
+                                    'properties' => [
+                                        'token' => [
+                                            'type' => TokenType::NEWLINE,
+                                            'text' => "\n",
+                                        ],
+                                    ],
+                                    'children' => [],
+                                ],
+                                [
+                                    'type' => ScalarNode::class,
+                                    'hash' => 71323096,
+                                    'properties' => [
+                                        'token' => [
+                                            'type' => TokenType::FOLDED_BLOCK_SCALAR,
+                                            'text' => "  This is a long line\n  that folds into space.\n\n  New paragraph here.\n",
+                                        ],
+                                    ],
+                                    'children' => [],
+                                ],
+                            ],
                         ],
                     ],
                 ],

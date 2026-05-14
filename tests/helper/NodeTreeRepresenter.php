@@ -23,20 +23,40 @@ use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Node\NodePropertiesNode;
-use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\SequenceEntryNode;
 use Aeliot\YamlToken\Node\TokenHolderInterface;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Token\Token;
 
+/**
+ * @template NodeLink of array{type: string, hash: string}
+ * @template NodeRender of array{
+ *     type: class-string<Node>,
+ *     hash: string,
+ *     properties: array<string, mixed>,
+ *     children: list<array<string, mixed>>
+ * }
+ */
 final class NodeTreeRepresenter
 {
     /**
-     * @return array{type: class-string<Node>, properties: array<string, mixed>, children: list<array<string, mixed>>}
+     * @return NodeRender
      */
     public function build(Node $stream): array
     {
-        $representedPropertyNodeIds = [];
+        $renderLinks = [];
+
+        return $this->getNodeRender($stream, $renderLinks);
+    }
+
+    /**
+     * @param Node $stream
+     * @param NodeLink[] $renderLinks
+     *
+     * @return NodeRender
+     */
+    private function getNodeRender(Node $stream, array &$renderLinks): array
+    {
         $properties = [];
 
         if ($stream instanceof AliasNode) {
@@ -52,35 +72,37 @@ final class NodeTreeRepresenter
             $properties['token'] = $this->representToken($stream->getToken());
         }
 
+        $children = [];
+        foreach ($stream->getChildren() as $child) {
+            $children[] = $this->render($child, $renderLinks);
+        }
+
         foreach ($this->getExplicitNodeProperties($stream) as $propertyName => $value) {
             if (null === $value) {
                 continue;
             }
 
             if (\is_array($value)) {
-                $properties[$propertyName] = array_map(fn (Node $n): array => $this->build($n), $value);
-                foreach ($value as $n) {
-                    $representedPropertyNodeIds[spl_object_id($n)] = true;
+                $properties[$propertyName] = [];
+                foreach ($value as $propNode) {
+                    $properties[$propertyName][] = $this->render($propNode, $renderLinks);
                 }
 
                 continue;
             }
 
-            $properties[$propertyName] = $this->build($value);
-            $representedPropertyNodeIds[spl_object_id($value)] = true;
+            $properties[$propertyName] = $this->render($value, $renderLinks);
         }
 
-        $children = [];
-        foreach ($stream->getChildren() as $child) {
-            if (isset($representedPropertyNodeIds[spl_object_id($child)])) {
-                continue;
-            }
-
-            $children[] = $this->build($child);
-        }
+        $hash = crc32(json_encode([
+            'type' => $stream::class,
+            'properties' => $properties,
+            'children' => $children,
+        ], JSON_THROW_ON_ERROR));
 
         return [
             'type' => $stream::class,
+            'hash' => $hash,
             'properties' => $properties,
             'children' => $children,
         ];
@@ -136,6 +158,28 @@ final class NodeTreeRepresenter
             ],
             default => [],
         };
+    }
+
+    /**
+     * @param NodeLink[] $renderLinks
+     *
+     * @return NodeLink|NodeRender
+     */
+    private function render(Node $node, array &$renderLinks): array
+    {
+        $objectId = spl_object_id($node);
+        $rendered = $renderLinks[$objectId] ?? null;
+        if ($rendered === null) {
+            $rendered = $this->getNodeRender($node, $renderLinks);
+            $renderLinks[$objectId] = [
+                'type' => $node::class,
+                'hash' => $rendered['hash'],
+            ];
+        } else {
+            $rendered = $renderLinks[$objectId];
+        }
+
+        return $rendered;
     }
 
     /**

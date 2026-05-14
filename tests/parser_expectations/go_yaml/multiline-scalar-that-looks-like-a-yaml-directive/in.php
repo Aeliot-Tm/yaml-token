@@ -15,14 +15,17 @@ use Aeliot\YamlToken\Node\YamlDirectiveVersionNode;
 
 return [
     'type' => StreamNode::class,
+    'hash' => 2500337188,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
+            'hash' => 588842251,
             'properties' => [],
             'children' => [
                 [
                     'type' => DocumentStartNode::class,
+                    'hash' => 2270658446,
                     'properties' => [
                         'token' => [
                             'type' => TokenType::DOCUMENT_START,
@@ -33,6 +36,7 @@ return [
                 ],
                 [
                     'type' => NewLineNode::class,
+                    'hash' => 763369711,
                     'properties' => [
                         'token' => [
                             'type' => TokenType::NEWLINE,
@@ -43,9 +47,17 @@ return [
                 ],
                 [
                     'type' => ValueNode::class,
+                    'hash' => 4234646936,
                     'properties' => [
                         'scalar' => [
                             'type' => ScalarNode::class,
+                            'hash' => 2874582845,
+                        ],
+                    ],
+                    'children' => [
+                        [
+                            'type' => ScalarNode::class,
+                            'hash' => 2874582845,
                             'properties' => [
                                 'token' => [
                                     'type' => TokenType::PLAIN_SCALAR,
@@ -55,10 +67,10 @@ return [
                             'children' => [],
                         ],
                     ],
-                    'children' => [],
                 ],
                 [
                     'type' => NewLineNode::class,
+                    'hash' => 763369711,
                     'properties' => [
                         'token' => [
                             'type' => TokenType::NEWLINE,
@@ -69,6 +81,7 @@ return [
                 ],
                 [
                     'type' => YamlDirectiveNode::class,
+                    'hash' => 672493897,
                     'properties' => [
                         'token' => [
                             'type' => TokenType::DIRECTIVE_YAML,
@@ -78,6 +91,7 @@ return [
                     'children' => [
                         [
                             'type' => WhitespaceNode::class,
+                            'hash' => 1067539092,
                             'properties' => [
                                 'token' => [
                                     'type' => TokenType::WHITESPACE,
@@ -88,6 +102,7 @@ return [
                         ],
                         [
                             'type' => YamlDirectiveVersionNode::class,
+                            'hash' => 2369398325,
                             'properties' => [
                                 'token' => [
                                     'type' => TokenType::DIRECTIVE_YAML_VERSION,
@@ -98,6 +113,7 @@ return [
                         ],
                         [
                             'type' => NewLineNode::class,
+                            'hash' => 763369711,
                             'properties' => [
                                 'token' => [
                                     'type' => TokenType::NEWLINE,

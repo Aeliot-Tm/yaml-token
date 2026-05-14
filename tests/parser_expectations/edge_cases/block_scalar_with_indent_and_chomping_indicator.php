@@ -20,20 +20,41 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
+    'hash' => 3035299517,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
+            'hash' => 968005630,
             'properties' => [],
             'children' => [
                 [
                     'type' => KeyValueCoupleNode::class,
+                    'hash' => 557596179,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
+                            'hash' => 3193203428,
+                        ],
+                        'value' => [
+                            'type' => ValueNode::class,
+                            'hash' => 2792784020,
+                        ],
+                    ],
+                    'children' => [
+                        [
+                            'type' => KeyNode::class,
+                            'hash' => 3193203428,
                             'properties' => [
                                 'name' => [
                                     'type' => ScalarNode::class,
+                                    'hash' => 2928106601,
+                                ],
+                            ],
+                            'children' => [
+                                [
+                                    'type' => ScalarNode::class,
+                                    'hash' => 2928106601,
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::PLAIN_SCALAR,
@@ -43,34 +64,45 @@ return [
                                     'children' => [],
                                 ],
                             ],
+                        ],
+                        [
+                            'type' => SyntaxTokenNode::class,
+                            'hash' => 675194587,
+                            'properties' => [
+                                'token' => [
+                                    'type' => TokenType::VALUE_INDICATOR,
+                                    'text' => ':',
+                                ],
+                            ],
                             'children' => [],
                         ],
-                        'value' => [
+                        [
+                            'type' => WhitespaceNode::class,
+                            'hash' => 1067539092,
+                            'properties' => [
+                                'token' => [
+                                    'type' => TokenType::WHITESPACE,
+                                    'text' => ' ',
+                                ],
+                            ],
+                            'children' => [],
+                        ],
+                        [
                             'type' => ValueNode::class,
+                            'hash' => 2792784020,
                             'properties' => [
                                 'multilinePlainScalar' => [
                                     'type' => MultilinePlainScalarNode::class,
+                                    'hash' => 2122511875,
                                     'properties' => [],
                                     'children' => [
                                         [
                                             'type' => ScalarNode::class,
-                                            'properties' => [
-                                                'token' => [
-                                                    'type' => TokenType::PLAIN_SCALAR,
-                                                    'text' => 'line 1',
-                                                ],
-                                            ],
-                                            'children' => [],
+                                            'hash' => 41164927,
                                         ],
                                         [
                                             'type' => ScalarNode::class,
-                                            'properties' => [
-                                                'token' => [
-                                                    'type' => TokenType::PLAIN_SCALAR,
-                                                    'text' => 'line 2',
-                                                ],
-                                            ],
-                                            'children' => [],
+                                            'hash' => 2703402710,
                                         ],
                                     ],
                                 ],
@@ -78,6 +110,7 @@ return [
                             'children' => [
                                 [
                                     'type' => BlockScalarIndicatorNode::class,
+                                    'hash' => 1768284065,
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::LITERAL_BLOCK_SCALAR_INDICATOR,
@@ -88,6 +121,7 @@ return [
                                 ],
                                 [
                                     'type' => BlockScalarIndentationIndicatorNode::class,
+                                    'hash' => 2586049209,
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::BLOCK_SCALAR_INDENTATION_INDICATOR,
@@ -98,6 +132,7 @@ return [
                                 ],
                                 [
                                     'type' => BlockScalarChompingIndicatorNode::class,
+                                    'hash' => 2238875574,
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::BLOCK_SCALAR_CHOMPING_INDICATOR,
@@ -108,6 +143,7 @@ return [
                                 ],
                                 [
                                     'type' => NewLineNode::class,
+                                    'hash' => 763369711,
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::NEWLINE,
@@ -118,6 +154,7 @@ return [
                                 ],
                                 [
                                     'type' => IndentationNode::class,
+                                    'hash' => 3551679428,
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::INDENTATION,
@@ -128,6 +165,7 @@ return [
                                 ],
                                 [
                                     'type' => ScalarNode::class,
+                                    'hash' => 41164927,
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::PLAIN_SCALAR,
@@ -138,6 +176,7 @@ return [
                                 ],
                                 [
                                     'type' => NewLineNode::class,
+                                    'hash' => 763369711,
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::NEWLINE,
@@ -148,6 +187,7 @@ return [
                                 ],
                                 [
                                     'type' => IndentationNode::class,
+                                    'hash' => 3551679428,
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::INDENTATION,
@@ -158,6 +198,7 @@ return [
                                 ],
                                 [
                                     'type' => ScalarNode::class,
+                                    'hash' => 2703402710,
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::PLAIN_SCALAR,
@@ -169,31 +210,10 @@ return [
                             ],
                         ],
                     ],
-                    'children' => [
-                        [
-                            'type' => SyntaxTokenNode::class,
-                            'properties' => [
-                                'token' => [
-                                    'type' => TokenType::VALUE_INDICATOR,
-                                    'text' => ':',
-                                ],
-                            ],
-                            'children' => [],
-                        ],
-                        [
-                            'type' => WhitespaceNode::class,
-                            'properties' => [
-                                'token' => [
-                                    'type' => TokenType::WHITESPACE,
-                                    'text' => ' ',
-                                ],
-                            ],
-                            'children' => [],
-                        ],
-                    ],
                 ],
                 [
                     'type' => NewLineNode::class,
+                    'hash' => 763369711,
                     'properties' => [
                         'token' => [
                             'type' => TokenType::NEWLINE,
@@ -204,12 +224,31 @@ return [
                 ],
                 [
                     'type' => KeyValueCoupleNode::class,
+                    'hash' => 1414256965,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
+                            'hash' => 4094834478,
+                        ],
+                        'value' => [
+                            'type' => ValueNode::class,
+                            'hash' => 3524983003,
+                        ],
+                    ],
+                    'children' => [
+                        [
+                            'type' => KeyNode::class,
+                            'hash' => 4094834478,
                             'properties' => [
                                 'name' => [
                                     'type' => ScalarNode::class,
+                                    'hash' => 581416071,
+                                ],
+                            ],
+                            'children' => [
+                                [
+                                    'type' => ScalarNode::class,
+                                    'hash' => 581416071,
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::PLAIN_SCALAR,
@@ -219,28 +258,10 @@ return [
                                     'children' => [],
                                 ],
                             ],
-                            'children' => [],
                         ],
-                        'value' => [
-                            'type' => ValueNode::class,
-                            'properties' => [
-                                'scalar' => [
-                                    'type' => ScalarNode::class,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::PLAIN_SCALAR,
-                                            'text' => 'ok',
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                            ],
-                            'children' => [],
-                        ],
-                    ],
-                    'children' => [
                         [
                             'type' => SyntaxTokenNode::class,
+                            'hash' => 675194587,
                             'properties' => [
                                 'token' => [
                                     'type' => TokenType::VALUE_INDICATOR,
@@ -251,6 +272,7 @@ return [
                         ],
                         [
                             'type' => WhitespaceNode::class,
+                            'hash' => 1067539092,
                             'properties' => [
                                 'token' => [
                                     'type' => TokenType::WHITESPACE,
@@ -259,10 +281,34 @@ return [
                             ],
                             'children' => [],
                         ],
+                        [
+                            'type' => ValueNode::class,
+                            'hash' => 3524983003,
+                            'properties' => [
+                                'scalar' => [
+                                    'type' => ScalarNode::class,
+                                    'hash' => 939308037,
+                                ],
+                            ],
+                            'children' => [
+                                [
+                                    'type' => ScalarNode::class,
+                                    'hash' => 939308037,
+                                    'properties' => [
+                                        'token' => [
+                                            'type' => TokenType::PLAIN_SCALAR,
+                                            'text' => 'ok',
+                                        ],
+                                    ],
+                                    'children' => [],
+                                ],
+                            ],
+                        ],
                     ],
                 ],
                 [
                     'type' => NewLineNode::class,
+                    'hash' => 763369711,
                     'properties' => [
                         'token' => [
                             'type' => TokenType::NEWLINE,

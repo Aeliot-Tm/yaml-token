@@ -14,20 +14,41 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
+    'hash' => 1127222531,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
+            'hash' => 1081942131,
             'properties' => [],
             'children' => [
                 [
                     'type' => ValueNode::class,
+                    'hash' => 2156459520,
                     'properties' => [
                         'nodeProperties' => [
                             'type' => NodePropertiesNode::class,
+                            'hash' => 1490154007,
+                        ],
+                        'scalar' => [
+                            'type' => ScalarNode::class,
+                            'hash' => 1583972959,
+                        ],
+                    ],
+                    'children' => [
+                        [
+                            'type' => NodePropertiesNode::class,
+                            'hash' => 1490154007,
                             'properties' => [
                                 'tag' => [
                                     'type' => TagNode::class,
+                                    'hash' => 4203679380,
+                                ],
+                            ],
+                            'children' => [
+                                [
+                                    'type' => TagNode::class,
+                                    'hash' => 4203679380,
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::TAG,
@@ -37,10 +58,21 @@ return [
                                     'children' => [],
                                 ],
                             ],
+                        ],
+                        [
+                            'type' => WhitespaceNode::class,
+                            'hash' => 1067539092,
+                            'properties' => [
+                                'token' => [
+                                    'type' => TokenType::WHITESPACE,
+                                    'text' => ' ',
+                                ],
+                            ],
                             'children' => [],
                         ],
-                        'scalar' => [
+                        [
                             'type' => ScalarNode::class,
+                            'hash' => 1583972959,
                             'properties' => [
                                 'token' => [
                                     'type' => TokenType::PLAIN_SCALAR,
@@ -50,21 +82,10 @@ return [
                             'children' => [],
                         ],
                     ],
-                    'children' => [
-                        [
-                            'type' => WhitespaceNode::class,
-                            'properties' => [
-                                'token' => [
-                                    'type' => TokenType::WHITESPACE,
-                                    'text' => ' ',
-                                ],
-                            ],
-                            'children' => [],
-                        ],
-                    ],
                 ],
                 [
                     'type' => NewLineNode::class,
+                    'hash' => 763369711,
                     'properties' => [
                         'token' => [
                             'type' => TokenType::NEWLINE,

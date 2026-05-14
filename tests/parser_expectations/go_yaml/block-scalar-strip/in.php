@@ -15,29 +15,27 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
+    'hash' => 4060512321,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
+            'hash' => 2974486660,
             'properties' => [],
             'children' => [
                 [
                     'type' => ValueNode::class,
+                    'hash' => 2729224338,
                     'properties' => [
                         'scalar' => [
                             'type' => ScalarNode::class,
-                            'properties' => [
-                                'token' => [
-                                    'type' => TokenType::LITERAL_BLOCK_SCALAR,
-                                    'text' => ' ab',
-                                ],
-                            ],
-                            'children' => [],
+                            'hash' => 2756229390,
                         ],
                     ],
                     'children' => [
                         [
                             'type' => BlockScalarIndicatorNode::class,
+                            'hash' => 1768284065,
                             'properties' => [
                                 'token' => [
                                     'type' => TokenType::LITERAL_BLOCK_SCALAR_INDICATOR,
@@ -48,6 +46,7 @@ return [
                         ],
                         [
                             'type' => BlockScalarChompingIndicatorNode::class,
+                            'hash' => 2238875574,
                             'properties' => [
                                 'token' => [
                                     'type' => TokenType::BLOCK_SCALAR_CHOMPING_INDICATOR,
@@ -58,6 +57,7 @@ return [
                         ],
                         [
                             'type' => NewLineNode::class,
+                            'hash' => 763369711,
                             'properties' => [
                                 'token' => [
                                     'type' => TokenType::NEWLINE,
@@ -66,10 +66,22 @@ return [
                             ],
                             'children' => [],
                         ],
+                        [
+                            'type' => ScalarNode::class,
+                            'hash' => 2756229390,
+                            'properties' => [
+                                'token' => [
+                                    'type' => TokenType::LITERAL_BLOCK_SCALAR,
+                                    'text' => ' ab',
+                                ],
+                            ],
+                            'children' => [],
+                        ],
                     ],
                 ],
                 [
                     'type' => NewLineNode::class,
+                    'hash' => 763369711,
                     'properties' => [
                         'token' => [
                             'type' => TokenType::NEWLINE,
@@ -80,6 +92,7 @@ return [
                 ],
                 [
                     'type' => WhitespaceNode::class,
+                    'hash' => 1067539092,
                     'properties' => [
                         'token' => [
                             'type' => TokenType::WHITESPACE,
@@ -90,6 +103,7 @@ return [
                 ],
                 [
                     'type' => NewLineNode::class,
+                    'hash' => 763369711,
                     'properties' => [
                         'token' => [
                             'type' => TokenType::NEWLINE,
@@ -100,6 +114,7 @@ return [
                 ],
                 [
                     'type' => WhitespaceNode::class,
+                    'hash' => 1067539092,
                     'properties' => [
                         'token' => [
                             'type' => TokenType::WHITESPACE,
@@ -110,6 +125,7 @@ return [
                 ],
                 [
                     'type' => NewLineNode::class,
+                    'hash' => 763369711,
                     'properties' => [
                         'token' => [
                             'type' => TokenType::NEWLINE,
@@ -120,6 +136,7 @@ return [
                 ],
                 [
                     'type' => DocumentEndNode::class,
+                    'hash' => 3858097324,
                     'properties' => [
                         'token' => [
                             'type' => TokenType::DOCUMENT_END,
@@ -132,10 +149,12 @@ return [
         ],
         [
             'type' => DocumentNode::class,
+            'hash' => 888585072,
             'properties' => [],
             'children' => [
                 [
                     'type' => NewLineNode::class,
+                    'hash' => 763369711,
                     'properties' => [
                         'token' => [
                             'type' => TokenType::NEWLINE,

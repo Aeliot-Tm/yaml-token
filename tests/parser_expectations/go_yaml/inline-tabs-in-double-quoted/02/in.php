@@ -11,17 +11,27 @@ use Aeliot\YamlToken\Node\ValueNode;
 
 return [
     'type' => StreamNode::class,
+    'hash' => 2457052662,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
+            'hash' => 1743024568,
             'properties' => [],
             'children' => [
                 [
                     'type' => ValueNode::class,
+                    'hash' => 613549963,
                     'properties' => [
                         'scalar' => [
                             'type' => ScalarNode::class,
+                            'hash' => 3879687305,
+                        ],
+                    ],
+                    'children' => [
+                        [
+                            'type' => ScalarNode::class,
+                            'hash' => 3879687305,
                             'properties' => [
                                 'token' => [
                                     'type' => TokenType::DOUBLE_QUOTED_SCALAR,
@@ -31,10 +41,10 @@ return [
                             'children' => [],
                         ],
                     ],
-                    'children' => [],
                 ],
                 [
                     'type' => NewLineNode::class,
+                    'hash' => 763369711,
                     'properties' => [
                         'token' => [
                             'type' => TokenType::NEWLINE,

@@ -14,14 +14,17 @@ use Aeliot\YamlToken\Node\YamlDirectiveVersionNode;
 
 return [
     'type' => StreamNode::class,
+    'hash' => 3970734012,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
+            'hash' => 890549960,
             'properties' => [],
             'children' => [
                 [
                     'type' => YamlDirectiveNode::class,
+                    'hash' => 942011188,
                     'properties' => [
                         'token' => [
                             'type' => TokenType::DIRECTIVE_YAML,
@@ -31,6 +34,7 @@ return [
                     'children' => [
                         [
                             'type' => WhitespaceNode::class,
+                            'hash' => 1067539092,
                             'properties' => [
                                 'token' => [
                                     'type' => TokenType::WHITESPACE,
@@ -41,6 +45,7 @@ return [
                         ],
                         [
                             'type' => YamlDirectiveVersionNode::class,
+                            'hash' => 778870940,
                             'properties' => [
                                 'token' => [
                                     'type' => TokenType::DIRECTIVE_YAML_VERSION,
@@ -51,6 +56,7 @@ return [
                         ],
                         [
                             'type' => WhitespaceNode::class,
+                            'hash' => 3308018566,
                             'properties' => [
                                 'token' => [
                                     'type' => TokenType::WHITESPACE,
@@ -61,6 +67,7 @@ return [
                         ],
                         [
                             'type' => CommentNode::class,
+                            'hash' => 3518869618,
                             'properties' => [
                                 'token' => [
                                     'type' => TokenType::COMMENT,
@@ -71,6 +78,7 @@ return [
                         ],
                         [
                             'type' => NewLineNode::class,
+                            'hash' => 763369711,
                             'properties' => [
                                 'token' => [
                                     'type' => TokenType::NEWLINE,
@@ -85,10 +93,12 @@ return [
         ],
         [
             'type' => DocumentNode::class,
+            'hash' => 1152977883,
             'properties' => [],
             'children' => [
                 [
                     'type' => DocumentStartNode::class,
+                    'hash' => 2270658446,
                     'properties' => [
                         'token' => [
                             'type' => TokenType::DOCUMENT_START,
@@ -99,6 +109,7 @@ return [
                 ],
                 [
                     'type' => NewLineNode::class,
+                    'hash' => 763369711,
                     'properties' => [
                         'token' => [
                             'type' => TokenType::NEWLINE,

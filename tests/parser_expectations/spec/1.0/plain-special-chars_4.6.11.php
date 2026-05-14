@@ -14,20 +14,59 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
+    'hash' => 219482882,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
+            'hash' => 657718105,
             'properties' => [],
             'children' => [
                 [
                     'type' => SequenceEntryNode::class,
+                    'hash' => 77675823,
                     'properties' => [
                         'value' => [
                             'type' => ValueNode::class,
+                            'hash' => 1293372384,
+                        ],
+                    ],
+                    'children' => [
+                        [
+                            'type' => SyntaxTokenNode::class,
+                            'hash' => 990219541,
+                            'properties' => [
+                                'token' => [
+                                    'type' => TokenType::SEQUENCE_ENTRY,
+                                    'text' => '-',
+                                ],
+                            ],
+                            'children' => [],
+                        ],
+                        [
+                            'type' => WhitespaceNode::class,
+                            'hash' => 1067539092,
+                            'properties' => [
+                                'token' => [
+                                    'type' => TokenType::WHITESPACE,
+                                    'text' => ' ',
+                                ],
+                            ],
+                            'children' => [],
+                        ],
+                        [
+                            'type' => ValueNode::class,
+                            'hash' => 1293372384,
                             'properties' => [
                                 'scalar' => [
                                     'type' => ScalarNode::class,
+                                    'hash' => 4173317381,
+                                ],
+                            ],
+                            'children' => [
+                                [
+                                    'type' => ScalarNode::class,
+                                    'hash' => 4173317381,
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::PLAIN_SCALAR,
@@ -37,34 +76,12 @@ return [
                                     'children' => [],
                                 ],
                             ],
-                            'children' => [],
-                        ],
-                    ],
-                    'children' => [
-                        [
-                            'type' => SyntaxTokenNode::class,
-                            'properties' => [
-                                'token' => [
-                                    'type' => TokenType::SEQUENCE_ENTRY,
-                                    'text' => '-',
-                                ],
-                            ],
-                            'children' => [],
-                        ],
-                        [
-                            'type' => WhitespaceNode::class,
-                            'properties' => [
-                                'token' => [
-                                    'type' => TokenType::WHITESPACE,
-                                    'text' => ' ',
-                                ],
-                            ],
-                            'children' => [],
                         ],
                     ],
                 ],
                 [
                     'type' => NewLineNode::class,
+                    'hash' => 763369711,
                     'properties' => [
                         'token' => [
                             'type' => TokenType::NEWLINE,
@@ -75,12 +92,49 @@ return [
                 ],
                 [
                     'type' => SequenceEntryNode::class,
+                    'hash' => 1869505651,
                     'properties' => [
                         'value' => [
                             'type' => ValueNode::class,
+                            'hash' => 1988708066,
+                        ],
+                    ],
+                    'children' => [
+                        [
+                            'type' => SyntaxTokenNode::class,
+                            'hash' => 990219541,
+                            'properties' => [
+                                'token' => [
+                                    'type' => TokenType::SEQUENCE_ENTRY,
+                                    'text' => '-',
+                                ],
+                            ],
+                            'children' => [],
+                        ],
+                        [
+                            'type' => WhitespaceNode::class,
+                            'hash' => 1067539092,
+                            'properties' => [
+                                'token' => [
+                                    'type' => TokenType::WHITESPACE,
+                                    'text' => ' ',
+                                ],
+                            ],
+                            'children' => [],
+                        ],
+                        [
+                            'type' => ValueNode::class,
+                            'hash' => 1988708066,
                             'properties' => [
                                 'scalar' => [
                                     'type' => ScalarNode::class,
+                                    'hash' => 431359725,
+                                ],
+                            ],
+                            'children' => [
+                                [
+                                    'type' => ScalarNode::class,
+                                    'hash' => 431359725,
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::PLAIN_SCALAR,
@@ -90,34 +144,12 @@ return [
                                     'children' => [],
                                 ],
                             ],
-                            'children' => [],
-                        ],
-                    ],
-                    'children' => [
-                        [
-                            'type' => SyntaxTokenNode::class,
-                            'properties' => [
-                                'token' => [
-                                    'type' => TokenType::SEQUENCE_ENTRY,
-                                    'text' => '-',
-                                ],
-                            ],
-                            'children' => [],
-                        ],
-                        [
-                            'type' => WhitespaceNode::class,
-                            'properties' => [
-                                'token' => [
-                                    'type' => TokenType::WHITESPACE,
-                                    'text' => ' ',
-                                ],
-                            ],
-                            'children' => [],
                         ],
                     ],
                 ],
                 [
                     'type' => NewLineNode::class,
+                    'hash' => 763369711,
                     'properties' => [
                         'token' => [
                             'type' => TokenType::NEWLINE,
@@ -128,12 +160,49 @@ return [
                 ],
                 [
                     'type' => SequenceEntryNode::class,
+                    'hash' => 1410587638,
                     'properties' => [
                         'value' => [
                             'type' => ValueNode::class,
+                            'hash' => 1781735088,
+                        ],
+                    ],
+                    'children' => [
+                        [
+                            'type' => SyntaxTokenNode::class,
+                            'hash' => 990219541,
+                            'properties' => [
+                                'token' => [
+                                    'type' => TokenType::SEQUENCE_ENTRY,
+                                    'text' => '-',
+                                ],
+                            ],
+                            'children' => [],
+                        ],
+                        [
+                            'type' => WhitespaceNode::class,
+                            'hash' => 1067539092,
+                            'properties' => [
+                                'token' => [
+                                    'type' => TokenType::WHITESPACE,
+                                    'text' => ' ',
+                                ],
+                            ],
+                            'children' => [],
+                        ],
+                        [
+                            'type' => ValueNode::class,
+                            'hash' => 1781735088,
                             'properties' => [
                                 'scalar' => [
                                     'type' => ScalarNode::class,
+                                    'hash' => 557711492,
+                                ],
+                            ],
+                            'children' => [
+                                [
+                                    'type' => ScalarNode::class,
+                                    'hash' => 557711492,
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::PLAIN_SCALAR,
@@ -143,34 +212,12 @@ return [
                                     'children' => [],
                                 ],
                             ],
-                            'children' => [],
-                        ],
-                    ],
-                    'children' => [
-                        [
-                            'type' => SyntaxTokenNode::class,
-                            'properties' => [
-                                'token' => [
-                                    'type' => TokenType::SEQUENCE_ENTRY,
-                                    'text' => '-',
-                                ],
-                            ],
-                            'children' => [],
-                        ],
-                        [
-                            'type' => WhitespaceNode::class,
-                            'properties' => [
-                                'token' => [
-                                    'type' => TokenType::WHITESPACE,
-                                    'text' => ' ',
-                                ],
-                            ],
-                            'children' => [],
                         ],
                     ],
                 ],
                 [
                     'type' => NewLineNode::class,
+                    'hash' => 763369711,
                     'properties' => [
                         'token' => [
                             'type' => TokenType::NEWLINE,
@@ -181,12 +228,49 @@ return [
                 ],
                 [
                     'type' => SequenceEntryNode::class,
+                    'hash' => 3076150771,
                     'properties' => [
                         'value' => [
                             'type' => ValueNode::class,
+                            'hash' => 3298539507,
+                        ],
+                    ],
+                    'children' => [
+                        [
+                            'type' => SyntaxTokenNode::class,
+                            'hash' => 990219541,
+                            'properties' => [
+                                'token' => [
+                                    'type' => TokenType::SEQUENCE_ENTRY,
+                                    'text' => '-',
+                                ],
+                            ],
+                            'children' => [],
+                        ],
+                        [
+                            'type' => WhitespaceNode::class,
+                            'hash' => 1067539092,
+                            'properties' => [
+                                'token' => [
+                                    'type' => TokenType::WHITESPACE,
+                                    'text' => ' ',
+                                ],
+                            ],
+                            'children' => [],
+                        ],
+                        [
+                            'type' => ValueNode::class,
+                            'hash' => 3298539507,
                             'properties' => [
                                 'scalar' => [
                                     'type' => ScalarNode::class,
+                                    'hash' => 2945891787,
+                                ],
+                            ],
+                            'children' => [
+                                [
+                                    'type' => ScalarNode::class,
+                                    'hash' => 2945891787,
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::PLAIN_SCALAR,
@@ -196,34 +280,12 @@ return [
                                     'children' => [],
                                 ],
                             ],
-                            'children' => [],
-                        ],
-                    ],
-                    'children' => [
-                        [
-                            'type' => SyntaxTokenNode::class,
-                            'properties' => [
-                                'token' => [
-                                    'type' => TokenType::SEQUENCE_ENTRY,
-                                    'text' => '-',
-                                ],
-                            ],
-                            'children' => [],
-                        ],
-                        [
-                            'type' => WhitespaceNode::class,
-                            'properties' => [
-                                'token' => [
-                                    'type' => TokenType::WHITESPACE,
-                                    'text' => ' ',
-                                ],
-                            ],
-                            'children' => [],
                         ],
                     ],
                 ],
                 [
                     'type' => NewLineNode::class,
+                    'hash' => 763369711,
                     'properties' => [
                         'token' => [
                             'type' => TokenType::NEWLINE,
@@ -234,12 +296,49 @@ return [
                 ],
                 [
                     'type' => SequenceEntryNode::class,
+                    'hash' => 1401006522,
                     'properties' => [
                         'value' => [
                             'type' => ValueNode::class,
+                            'hash' => 2760276437,
+                        ],
+                    ],
+                    'children' => [
+                        [
+                            'type' => SyntaxTokenNode::class,
+                            'hash' => 990219541,
+                            'properties' => [
+                                'token' => [
+                                    'type' => TokenType::SEQUENCE_ENTRY,
+                                    'text' => '-',
+                                ],
+                            ],
+                            'children' => [],
+                        ],
+                        [
+                            'type' => WhitespaceNode::class,
+                            'hash' => 1067539092,
+                            'properties' => [
+                                'token' => [
+                                    'type' => TokenType::WHITESPACE,
+                                    'text' => ' ',
+                                ],
+                            ],
+                            'children' => [],
+                        ],
+                        [
+                            'type' => ValueNode::class,
+                            'hash' => 2760276437,
                             'properties' => [
                                 'scalar' => [
                                     'type' => ScalarNode::class,
+                                    'hash' => 2983354610,
+                                ],
+                            ],
+                            'children' => [
+                                [
+                                    'type' => ScalarNode::class,
+                                    'hash' => 2983354610,
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::PLAIN_SCALAR,
@@ -249,34 +348,12 @@ return [
                                     'children' => [],
                                 ],
                             ],
-                            'children' => [],
-                        ],
-                    ],
-                    'children' => [
-                        [
-                            'type' => SyntaxTokenNode::class,
-                            'properties' => [
-                                'token' => [
-                                    'type' => TokenType::SEQUENCE_ENTRY,
-                                    'text' => '-',
-                                ],
-                            ],
-                            'children' => [],
-                        ],
-                        [
-                            'type' => WhitespaceNode::class,
-                            'properties' => [
-                                'token' => [
-                                    'type' => TokenType::WHITESPACE,
-                                    'text' => ' ',
-                                ],
-                            ],
-                            'children' => [],
                         ],
                     ],
                 ],
                 [
                     'type' => NewLineNode::class,
+                    'hash' => 763369711,
                     'properties' => [
                         'token' => [
                             'type' => TokenType::NEWLINE,
@@ -287,27 +364,17 @@ return [
                 ],
                 [
                     'type' => SequenceEntryNode::class,
+                    'hash' => 1395032453,
                     'properties' => [
                         'value' => [
                             'type' => ValueNode::class,
-                            'properties' => [
-                                'scalar' => [
-                                    'type' => ScalarNode::class,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::PLAIN_SCALAR,
-                                            'text' => 'a{b}c',
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                            ],
-                            'children' => [],
+                            'hash' => 4292688825,
                         ],
                     ],
                     'children' => [
                         [
                             'type' => SyntaxTokenNode::class,
+                            'hash' => 990219541,
                             'properties' => [
                                 'token' => [
                                     'type' => TokenType::SEQUENCE_ENTRY,
@@ -318,6 +385,7 @@ return [
                         ],
                         [
                             'type' => WhitespaceNode::class,
+                            'hash' => 1067539092,
                             'properties' => [
                                 'token' => [
                                     'type' => TokenType::WHITESPACE,
@@ -326,10 +394,34 @@ return [
                             ],
                             'children' => [],
                         ],
+                        [
+                            'type' => ValueNode::class,
+                            'hash' => 4292688825,
+                            'properties' => [
+                                'scalar' => [
+                                    'type' => ScalarNode::class,
+                                    'hash' => 3388632173,
+                                ],
+                            ],
+                            'children' => [
+                                [
+                                    'type' => ScalarNode::class,
+                                    'hash' => 3388632173,
+                                    'properties' => [
+                                        'token' => [
+                                            'type' => TokenType::PLAIN_SCALAR,
+                                            'text' => 'a{b}c',
+                                        ],
+                                    ],
+                                    'children' => [],
+                                ],
+                            ],
+                        ],
                     ],
                 ],
                 [
                     'type' => NewLineNode::class,
+                    'hash' => 763369711,
                     'properties' => [
                         'token' => [
                             'type' => TokenType::NEWLINE,

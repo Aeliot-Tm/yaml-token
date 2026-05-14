@@ -11,14 +11,17 @@ use Aeliot\YamlToken\Node\StreamNode;
 
 return [
     'type' => StreamNode::class,
+    'hash' => 1014081463,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
+            'hash' => 3865320190,
             'properties' => [],
             'children' => [
                 [
                     'type' => DirectiveNode::class,
+                    'hash' => 2202584059,
                     'properties' => [
                         'token' => [
                             'type' => TokenType::DIRECTIVE,
@@ -29,6 +32,7 @@ return [
                 ],
                 [
                     'type' => NewLineNode::class,
+                    'hash' => 763369711,
                     'properties' => [
                         'token' => [
                             'type' => TokenType::NEWLINE,
@@ -41,10 +45,12 @@ return [
         ],
         [
             'type' => DocumentNode::class,
+            'hash' => 1152977883,
             'properties' => [],
             'children' => [
                 [
                     'type' => DocumentStartNode::class,
+                    'hash' => 2270658446,
                     'properties' => [
                         'token' => [
                             'type' => TokenType::DOCUMENT_START,
@@ -55,6 +61,7 @@ return [
                 ],
                 [
                     'type' => NewLineNode::class,
+                    'hash' => 763369711,
                     'properties' => [
                         'token' => [
                             'type' => TokenType::NEWLINE,
