@@ -50,7 +50,6 @@ final class NodeTreeRepresenter
     }
 
     /**
-     * @param Node $stream
      * @param NodeLink[] $renderLinks
      *
      * @return NodeRender
@@ -98,7 +97,7 @@ final class NodeTreeRepresenter
             'type' => $stream::class,
             'properties' => $properties,
             'children' => $children,
-        ], JSON_THROW_ON_ERROR));
+        ], \JSON_THROW_ON_ERROR));
 
         return [
             'type' => $stream::class,
@@ -163,7 +162,7 @@ final class NodeTreeRepresenter
     {
         $objectId = spl_object_id($node);
         $rendered = $renderLinks[$objectId] ?? null;
-        if ($rendered === null) {
+        if (null === $rendered) {
             $rendered = $this->getNodeRender($node, $renderLinks);
             $renderLinks[$objectId] = [
                 'type' => $node::class,
