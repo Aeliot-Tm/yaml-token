@@ -114,15 +114,9 @@ final class NodeTreeRepresenter
     private function getExplicitNodeProperties(Node $node): array
     {
         return match (true) {
-            $node instanceof BlockMappingNode => [
-                'entries' => $node->getEntries(),
-            ],
-            $node instanceof BlockSequenceNode => [
-                'entries' => $node->getEntries(),
-            ],
-            $node instanceof FlowMappingNode => [
-                'entries' => $node->getEntries(),
-            ],
+            $node instanceof BlockMappingNode,
+            $node instanceof BlockSequenceNode,
+            $node instanceof FlowMappingNode,
             $node instanceof FlowSequenceNode => [
                 'entries' => $node->getEntries(),
             ],
