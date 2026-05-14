@@ -23,8 +23,9 @@ use Aeliot\YamlToken\Enum\TokenType;
 final class Cursor
 {
     /**
-     * After a newline that followed {@see TokenType::PLAIN_SCALAR} content for an open block mapping value,
-     * the next line may continue that plain scalar with greater indentation.
+     * After a newline that followed {@see TokenType::PLAIN_SCALAR} content, the next line may continue that
+     * plain scalar with greater indentation than {@see self::$plainScalarContinuationBaseIndent} (block mapping
+     * value or explicit document after {@see TokenType::DOCUMENT_START}).
      */
     public bool $awaitingBlockPlainContinuation = false;
 
@@ -109,8 +110,19 @@ final class Cursor
      */
     public ?TokenType $pendingBlockScalarBody = null;
 
+    /**
+     * Indent (space count) of the line that started a block-context plain scalar or mapping value;
+     * continuation lines with greater indent may treat {@code &}, {@code *}, {@code !} as plain content (YAML 1.2.2 §7.3.3).
+     */
+    public ?int $plainScalarContinuationBaseIndent = null;
+
     /** Byte offset from the start of the input. */
     public int $position = 0;
+
+    /**
+     * When true, {@code &} and {@code *} are not lexed as anchor/alias (multiline plain continuation line).
+     */
+    public bool $suppressAnchorAlias = false;
 
     /**
      * When true, explicit tag lexing must not run for leading {@code !}

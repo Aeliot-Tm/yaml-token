@@ -146,11 +146,15 @@ final class Lexer
 
     private function applyBlockPlainContinuationIndentRules(Harvester $harvester, string $indent): void
     {
-        if (!$harvester->cursor->awaitingBlockPlainContinuation || null === $harvester->cursor->blockMappingKeyIndent) {
+        if (
+            !$harvester->cursor->awaitingBlockPlainContinuation
+            || null === $harvester->cursor->plainScalarContinuationBaseIndent
+        ) {
             return;
         }
         $n = \strlen($indent);
-        if ($n > $harvester->cursor->blockMappingKeyIndent) {
+        if ($n > $harvester->cursor->plainScalarContinuationBaseIndent) {
+            $harvester->cursor->suppressAnchorAlias = true;
             $harvester->cursor->suppressExplicitTagForBang = true;
         } else {
             $this->resetBlockMappingPlainState($harvester->cursor);
@@ -453,10 +457,14 @@ final class Lexer
             return;
         }
         $char = $harvester->input[$harvester->cursor->position];
-        if (\in_array($char, self::CHARS_HORIZONTAL_WHITESPACE, true)) {
-            return;
-        }
-        if (null === $harvester->cursor->blockMappingKeyIndent || !$harvester->cursor->awaitingBlockPlainContinuation) {
+        if (
+            \in_array($char, self::CHARS_HORIZONTAL_WHITESPACE, true)
+            || !$harvester->cursor->awaitingBlockPlainContinuation
+            || (
+                null === $harvester->cursor->plainScalarContinuationBaseIndent
+                && null === $harvester->cursor->blockMappingKeyIndent
+            )
+        ) {
             return;
         }
         $this->resetBlockMappingPlainState($harvester->cursor);
@@ -464,10 +472,16 @@ final class Lexer
 
     private function onEmittedNewlineAfterBlockPlainScalar(Harvester $harvester, ?Token $significantBeforeBreak): void
     {
+        $harvester->cursor->suppressAnchorAlias = false;
         $harvester->cursor->suppressExplicitTagForBang = false;
-        if (null !== $harvester->cursor->blockMappingKeyIndent
-            && null !== $significantBeforeBreak
-            && TokenType::PLAIN_SCALAR === $significantBeforeBreak->type) {
+        if (
+            null !== $significantBeforeBreak
+            && TokenType::PLAIN_SCALAR === $significantBeforeBreak->type
+            && (
+                null !== $harvester->cursor->blockMappingKeyIndent
+                || null !== $harvester->cursor->plainScalarContinuationBaseIndent
+            )
+        ) {
             $harvester->cursor->awaitingBlockPlainContinuation = true;
         }
     }
@@ -964,6 +978,7 @@ final class Lexer
         if ($this->match($harvester, '---')) {
             $this->resetBlockMappingPlainState($harvester->cursor);
             $harvester->cursor->flowCollectionStack = [];
+            $harvester->cursor->plainScalarContinuationBaseIndent = 0;
             $harvester->stream->addToken(new Token(TokenType::DOCUMENT_START, '---', $startLine, $startColumn));
 
             return;
@@ -1088,7 +1103,9 @@ final class Lexer
         if (':' === $char && $this->isMappingValue($harvester)) {
             if (0 === $harvester->cursor->flowDepth) {
                 $harvester->cursor->blockMappingKeyIndent = $harvester->cursor->currentIndent;
+                $harvester->cursor->plainScalarContinuationBaseIndent = $harvester->cursor->currentIndent;
                 $harvester->cursor->awaitingBlockPlainContinuation = false;
+                $harvester->cursor->suppressAnchorAlias = false;
                 $harvester->cursor->suppressExplicitTagForBang = false;
                 $lastSignificant = $this->getLastSignificantToken($harvester);
                 if (null !== $lastSignificant && TokenType::PLAIN_SCALAR === $lastSignificant->type && $lastSignificant->line === $startLine) {
@@ -1105,7 +1122,7 @@ final class Lexer
         }
 
         // ANCHOR (&name)
-        if ('&' === $char) {
+        if ('&' === $char && !$harvester->cursor->suppressAnchorAlias) {
             $anchor = '&'.$this->readAnchorOrAlias($harvester);
             $harvester->stream->addToken(new Token(TokenType::ANCHOR, $anchor, $startLine, $startColumn));
 
@@ -1113,7 +1130,7 @@ final class Lexer
         }
 
         // ALIAS (*name)
-        if ('*' === $char) {
+        if ('*' === $char && !$harvester->cursor->suppressAnchorAlias) {
             $alias = '*'.$this->readAnchorOrAlias($harvester);
             $harvester->stream->addToken(new Token(TokenType::ALIAS, $alias, $startLine, $startColumn));
             $this->onFlowMapScalarLikeNodeEmitted($harvester, TokenType::ALIAS);
@@ -1219,8 +1236,10 @@ final class Lexer
 
     private function resetBlockMappingPlainState(Cursor $cursor): void
     {
-        $cursor->blockMappingKeyIndent = null;
         $cursor->awaitingBlockPlainContinuation = false;
+        $cursor->blockMappingKeyIndent = null;
+        $cursor->plainScalarContinuationBaseIndent = null;
+        $cursor->suppressAnchorAlias = false;
         $cursor->suppressExplicitTagForBang = false;
     }
 
