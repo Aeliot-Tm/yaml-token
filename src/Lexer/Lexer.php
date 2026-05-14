@@ -738,7 +738,7 @@ final class Lexer
             if (':' === $char && $this->isMappingValue($harvester)) {
                 break;
             }
-            if ('?' === $char && $this->isMappingKey($harvester)) {
+            if ('?' === $char && '' === $result && $this->isMappingKey($harvester)) {
                 break;
             }
             if ('#' === $char && $this->isCommentStart($harvester)) {
