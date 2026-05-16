@@ -2238,7 +2238,6 @@ final class Parser
                 $this->collectTypes($harvester, [
                     TokenType::WHITESPACE,
                     TokenType::COMMENT,
-                    TokenType::NEWLINE,
                 ], $tagDirectiveNode);
 
                 return $tagDirectiveNode;
@@ -2456,7 +2455,6 @@ final class Parser
                 $this->collectTypes($harvester, [
                     TokenType::WHITESPACE,
                     TokenType::COMMENT,
-                    TokenType::NEWLINE,
                 ], $yamlDirectiveNode);
 
                 return $yamlDirectiveNode;

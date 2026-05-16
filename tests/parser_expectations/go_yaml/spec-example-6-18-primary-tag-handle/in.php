@@ -21,7 +21,7 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 2646760446,
+    'hash' => 3500291754,
     'properties' => [],
     'children' => [
         [
@@ -149,7 +149,7 @@ return [
         ],
         [
             'type' => DocumentNode::class,
-            'hash' => 3439309995,
+            'hash' => 479771987,
             'properties' => [],
             'children' => [
                 [
@@ -176,7 +176,7 @@ return [
                 ],
                 [
                     'type' => TagDirectiveNode::class,
-                    'hash' => 2113455477,
+                    'hash' => 2614686077,
                     'properties' => [],
                     'children' => [
                         [
@@ -234,18 +234,18 @@ return [
                             ],
                             'children' => [],
                         ],
-                        [
-                            'type' => NewLineNode::class,
-                            'hash' => 763369711,
-                            'properties' => [
-                                'token' => [
-                                    'type' => TokenType::NEWLINE,
-                                    'text' => "\n",
-                                ],
-                            ],
-                            'children' => [],
+                    ],
+                ],
+                [
+                    'type' => NewLineNode::class,
+                    'hash' => 763369711,
+                    'properties' => [
+                        'token' => [
+                            'type' => TokenType::NEWLINE,
+                            'text' => "\n",
                         ],
                     ],
+                    'children' => [],
                 ],
             ],
         ],
