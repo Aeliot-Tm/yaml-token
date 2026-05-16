@@ -1067,7 +1067,7 @@ final class Lexer
 
         // DIRECTIVE (%... directive line) — only at line start.
         if ('%' === $char && 1 === $harvester->cursor->column) {
-            $directive = $this->readUntilNewline($harvester);
+            $directive = $this->readGenericDirectiveLineLexeme($harvester);
             $harvester->stream->addToken(new Token(TokenType::DIRECTIVE, $directive, $startLine, $startColumn));
 
             return;
@@ -1262,6 +1262,33 @@ final class Lexer
         }
 
         return $result;
+    }
+
+    /**
+     * Generic % directive line lexeme: until line break or a comment start (# preceded by whitespace).
+     */
+    private function readGenericDirectiveLineLexeme(Harvester $harvester): string
+    {
+        $result = '';
+        while ($harvester->cursor->position < $harvester->length) {
+            $char = $harvester->input[$harvester->cursor->position];
+            if (\in_array($char, self::CHARS_LINE_BREAK, true)) {
+                break;
+            }
+            if ('#' === $char && $this->isCommentStart($harvester)) {
+                break;
+            }
+            $result .= $this->consumeCodePoint($harvester);
+        }
+
+        $trimmed = rtrim($result, " \t");
+        $suffixLen = \strlen($result) - \strlen($trimmed);
+        if ($suffixLen > 0) {
+            $harvester->cursor->position -= $suffixLen;
+            $harvester->cursor->column = max(1, $harvester->cursor->column - $suffixLen);
+        }
+
+        return $trimmed;
     }
 
     private function readWhitespace(Harvester $harvester): string

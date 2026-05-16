@@ -36,7 +36,9 @@ The rules below describe the practical behavior relied upon by lexer unit tests.
     optional `COMMENT`, then the line break is a separate `NEWLINE`. If `%TAG` is immediately
     followed by a line break, or `%TAG` is not followed by whitespace/`!` (e.g. glued text),
     the rest of the line is emitted as a single `DIRECTIVE_TAG_INDICATOR` token as before.
-  - any other `%...` until line break → `DIRECTIVE`
+  - any other `%...` line: `DIRECTIVE` (text until horizontal whitespace, line break, or `#` that
+    starts a comment), optional `WHITESPACE`, optional `COMMENT`, then the line break is a separate
+    `NEWLINE`. A `#` glued to the directive text without separating whitespace stays inside `DIRECTIVE`.
 - **Flow indicators**: `[ ] { } ,` are emitted as flow tokens:
   - `FLOW_SEQUENCE_START`, `FLOW_SEQUENCE_END`
   - `FLOW_MAPPING_START`, `FLOW_MAPPING_END`
