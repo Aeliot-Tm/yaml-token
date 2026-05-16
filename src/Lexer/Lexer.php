@@ -69,6 +69,12 @@ final class Lexer
         ',' => TokenType::FLOW_ENTRY,
     ];
 
+    /**
+     * Minimum indent delta (spaces) on a continuation line before a leading {@code -} is treated as a nested
+     * block sequence entry rather than plain scalar content (YAML Test Suite AB8U / go-yaml lenient disambiguation).
+     */
+    private const MIN_NESTED_BLOCK_COLLECTION_INDENT_DELTA = 2;
+
     public function tokenize(string $input): TokenStream
     {
         $harvester = new Harvester($input);
@@ -379,6 +385,29 @@ final class Lexer
         }
 
         return $this->isColonMappingValueIndicator($harvester, $pos);
+    }
+
+    /**
+     * True when {@code -} on the current line continues a block plain scalar (AB8U-style wrong indent),
+     * not a structural block sequence entry.
+     */
+    private function isDashBlockPlainContinuationLine(Harvester $harvester): bool
+    {
+        if (0 !== $harvester->cursor->flowDepth) {
+            return false;
+        }
+        if (
+            !$harvester->cursor->awaitingBlockPlainContinuation
+            || null === $harvester->cursor->plainScalarContinuationBaseIndent
+        ) {
+            return false;
+        }
+        $indentDelta = $harvester->cursor->currentIndent - $harvester->cursor->plainScalarContinuationBaseIndent;
+        if ($indentDelta <= 0) {
+            return false;
+        }
+
+        return $indentDelta < self::MIN_NESTED_BLOCK_COLLECTION_INDENT_DELTA;
     }
 
     private function isSequenceEntry(Harvester $harvester): bool
@@ -1081,9 +1110,11 @@ final class Lexer
         }
 
         // SEQUENCE_ENTRY (-) - must check before plain scalar
-        if ('-' === $char && $this->isSequenceEntry($harvester)) {
+        if ('-' === $char && $this->isSequenceEntry($harvester) && !$this->isDashBlockPlainContinuationLine($harvester)) {
             if (0 === $harvester->cursor->flowDepth) {
                 $this->resetBlockMappingPlainState($harvester->cursor);
+                $harvester->cursor->plainScalarContinuationBaseIndent = $harvester->cursor->currentIndent;
+                $harvester->cursor->awaitingBlockPlainContinuation = false;
             }
             $this->advance($harvester);
             $harvester->stream->addToken(new Token(TokenType::SEQUENCE_ENTRY, '-', $startLine, $startColumn));

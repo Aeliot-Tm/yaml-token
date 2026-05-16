@@ -25,7 +25,8 @@ final class Cursor
     /**
      * After a newline that followed {@see TokenType::PLAIN_SCALAR} content, the next line may continue that
      * plain scalar with greater indentation than {@see self::$plainScalarContinuationBaseIndent} (block mapping
-     * value or explicit document after {@see TokenType::DOCUMENT_START}).
+     * value, block sequence entry with plain on the same line, or explicit document after
+     * {@see TokenType::DOCUMENT_START}).
      */
     public bool $awaitingBlockPlainContinuation = false;
 

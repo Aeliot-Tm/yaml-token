@@ -102,13 +102,17 @@ The rules below describe the practical behavior relied upon by lexer unit tests.
   - after that `!,NNNN` segment, optional `-MM` / `-DD` (tag URI / ISO date parts) and the rest
     of the shorthand continue as normal tag characters (for example `!domain,2000-01-01/path`)
   - **Block multiline plain continuation**: after a newline that follows `PLAIN_SCALAR` content
-    for a block mapping value (`VALUE_INDICATOR` with `flowDepth == 0`), the next line may continue
-    that plain scalar with **greater** indentation than the mapping key line. On such continuation
-    lines, a leading `!` (and prefixes like `!!`, `!<`) is **not** split into explicit tag tokens;
-    it stays inside `PLAIN_SCALAR` until the line ends. Continuation mode resets when indentation
-    does not exceed the key-line indent, when a new line starts at column 1 without leading spaces
-    (sibling key at the root), or on `SEQUENCE_ENTRY`, `DOCUMENT_START` / `DOCUMENT_END`,
-    or opening `[` / `{`.
+    for a block mapping value (`VALUE_INDICATOR` with `flowDepth == 0`) or a block sequence entry
+    (`SEQUENCE_ENTRY` on the same line as the first plain fragment), the next line may continue
+    that plain scalar with **greater** indentation than the key / entry line (`plainScalarContinuationBaseIndent`).
+    On such continuation lines, a leading `!` (and prefixes like `!!`, `!<`) is **not** split into explicit tag tokens;
+    it stays inside `PLAIN_SCALAR` until the line ends. A leading `-` followed by separation space is also kept
+    inside `PLAIN_SCALAR` when the line indent exceeds the base by less than
+    `MIN_NESTED_BLOCK_COLLECTION_INDENT_DELTA` (2) — YAML Test Suite AB8U / go-yaml lenient disambiguation
+  - against a nested block sequence entry at a larger indent step. Continuation mode resets when indentation
+    does not exceed the base indent, when a new line starts at column 1 without leading spaces
+    (sibling key or sequence entry at the root), or on structural `SEQUENCE_ENTRY` / `DOCUMENT_START` /
+    `DOCUMENT_END`, or opening `[` / `{`.
 - **Plain scalars**: everything else is `PLAIN_SCALAR` until a stop character is reached: line break, `[ ] { } , : #`.
   - `?` is only a stop character at the start of a token (empty result so far); inside an already-started
     plain scalar `?` is a valid `ns-plain-char` per YAML 1.2.2 §7.3.3 rule [129] and does not end the scalar

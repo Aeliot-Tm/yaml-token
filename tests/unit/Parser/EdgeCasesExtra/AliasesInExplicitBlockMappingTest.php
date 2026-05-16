@@ -37,7 +37,7 @@ final class AliasesInExplicitBlockMappingTest extends TestCase
 {
     public function testResolvesAliasToAnchorDeclaredOnExplicitKey(): void
     {
-        $input = (string) file_get_contents(__DIR__.'/../../../fixture/go_yaml_extra/aliases-in-explicit-block-mapping/in.yaml');
+        $input = (string) file_get_contents(__DIR__.'/../../../fixture/go_yaml_extra/aliases-in-explicit-block-mapping/sequence-entry-nested-after-plain.yaml');
         self::assertNotSame('', $input);
 
         $stream = (new Parser())->parse($input);
