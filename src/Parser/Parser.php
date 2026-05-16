@@ -43,6 +43,7 @@ use Aeliot\YamlToken\Node\SequenceEntryNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\SyntaxTokenNode;
 use Aeliot\YamlToken\Node\TagDirectiveHandleNode;
+use Aeliot\YamlToken\Node\TagDirectiveIndicatorNode;
 use Aeliot\YamlToken\Node\TagDirectiveNode;
 use Aeliot\YamlToken\Node\TagDirectivePrefixNode;
 use Aeliot\YamlToken\Node\TagNode;
@@ -1649,7 +1650,7 @@ final class Parser
                 continue;
             }
 
-            if (TokenType::DIRECTIVE_TAG === $token->type) {
+            if (TokenType::DIRECTIVE_TAG_INDICATOR === $token->type) {
                 $document->addChild($this->parseTagDirective($harvester));
                 continue;
             }
@@ -2139,11 +2140,12 @@ final class Parser
     private function parseTagDirective(Harvester $harvester): TagDirectiveNode
     {
         $token = $harvester->tokens->current();
-        if (TokenType::DIRECTIVE_TAG !== $token?->type) {
-            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Expected DIRECTIVE_TAG token, but %s given', $token?->type->value ?? '_nothing_'), $harvester->tokens));
+        if (TokenType::DIRECTIVE_TAG_INDICATOR !== $token?->type) {
+            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Expected DIRECTIVE_TAG_INDICATOR token, but %s given', $token?->type->value ?? '_nothing_'), $harvester->tokens));
         }
 
-        $tagDirectiveNode = new TagDirectiveNode($token);
+        $tagDirectiveNode = new TagDirectiveNode();
+        $tagDirectiveNode->addChild(new TagDirectiveIndicatorNode($token));
         $harvester->tokens->advance();
 
         $seenHandle = false;

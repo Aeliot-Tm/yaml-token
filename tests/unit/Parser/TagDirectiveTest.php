@@ -15,6 +15,7 @@ namespace Aeliot\YamlToken\Test\Unit\Parser;
 
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\StreamNode;
+use Aeliot\YamlToken\Node\TagDirectiveIndicatorNode;
 use Aeliot\YamlToken\Node\TagDirectiveNode;
 use Aeliot\YamlToken\Parser\Parser;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -25,6 +26,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(Parser::class)]
 #[UsesClass(DocumentNode::class)]
 #[UsesClass(StreamNode::class)]
+#[UsesClass(TagDirectiveIndicatorNode::class)]
 #[UsesClass(TagDirectiveNode::class)]
 final class TagDirectiveTest extends TestCase
 {
@@ -63,7 +65,7 @@ final class TagDirectiveTest extends TestCase
             static fn ($n): bool => $n instanceof TagDirectiveNode,
         ));
         self::assertCount(1, $directives);
-        self::assertSame('%TAG', $directives[0]->getToken()->text);
+        self::assertSame('%TAG', $directives[0]->getIndicatorNode()->getToken()->text);
         self::assertSame($expectedHandle, $directives[0]->getHandle());
         self::assertSame($expectedPrefix, $directives[0]->getPrefix());
     }

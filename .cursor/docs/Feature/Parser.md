@@ -71,8 +71,9 @@ Because of this, the parser must not invent tokens that did not exist in the ori
   Horizontal whitespace and comments after the version token stay at document level
   (same loop as other layout). If a newline or comment appears before a version token, or the token stream
   ends before a version token, the parser throws [`LogicException`](../../../src/Parser/Parser.php).
-- `%TAG` directive: built as [`TagDirectiveNode`](../../../src/Node/TagDirectiveNode.php) 
-  with the `DIRECTIVE_TAG` keyword token and child nodes for optional horizontal whitespace,
+- `%TAG` directive: built as [`TagDirectiveNode`](../../../src/Node/TagDirectiveNode.php)
+  with [`TagDirectiveIndicatorNode`](../../../src/Node/TagDirectiveIndicatorNode.php) for the
+  `DIRECTIVE_TAG_INDICATOR` (`%TAG`) token and child nodes for optional horizontal whitespace,
   required `DIRECTIVE_TAG_HANDLE` (as [`TagDirectiveHandleNode`](../../../src/Node/TagDirectiveHandleNode.php))
   and required `DIRECTIVE_TAG_PREFIX` (as [`TagDirectivePrefixNode`](../../../src/Node/TagDirectivePrefixNode.php)).
   If a newline or comment appears before handle/prefix, or the token stream ends before

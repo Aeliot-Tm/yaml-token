@@ -6,7 +6,7 @@ use Aeliot\YamlToken\Enum\TokenType;
 
 return [
     [
-        'type' => TokenType::DIRECTIVE_TAG,
+        'type' => TokenType::DIRECTIVE_TAG_INDICATOR,
         'text' => '%TAG',
     ],
     [

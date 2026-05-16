@@ -1307,7 +1307,7 @@ final class Lexer
     }
 
     /**
-     * Split `%TAG` lines into `DIRECTIVE_TAG`, `DIRECTIVE_TAG_HANDLE`, `DIRECTIVE_TAG_PREFIX` only when the keyword
+     * Split `%TAG` lines into `DIRECTIVE_TAG_INDICATOR`, `DIRECTIVE_TAG_HANDLE`, `DIRECTIVE_TAG_PREFIX` only when the keyword
      * is followed by a handle (starts with `!`) or horizontal whitespace / EOF — not when followed immediately by a
      * line break (whole-line token as before).
      */
@@ -1484,7 +1484,7 @@ final class Lexer
         if (!$this->match($harvester, '%TAG')) {
             return;
         }
-        $harvester->stream->addToken(new Token(TokenType::DIRECTIVE_TAG, '%TAG', $directiveTagLine, $directiveTagColumn));
+        $harvester->stream->addToken(new Token(TokenType::DIRECTIVE_TAG_INDICATOR, '%TAG', $directiveTagLine, $directiveTagColumn));
 
         if ($harvester->cursor->position < $harvester->length && \in_array($harvester->input[$harvester->cursor->position], self::CHARS_HORIZONTAL_WHITESPACE, true)) {
             $wsLine = $harvester->cursor->line;

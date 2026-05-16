@@ -13,22 +13,19 @@ declare(strict_types=1);
 
 namespace Aeliot\YamlToken\Node;
 
-use Aeliot\YamlToken\Token\Token;
-
-class TagDirectiveNode extends AbstractNode implements TokenHolderInterface
+class TagDirectiveNode extends AbstractNode
 {
     private TagDirectiveHandleNode $handleNode;
+    private TagDirectiveIndicatorNode $indicatorNode;
     private TagDirectivePrefixNode $prefixNode;
-
-    public function __construct(
-        private Token $token,
-    ) {
-    }
 
     public function addChild(Node $child): void
     {
         if ($child instanceof TagDirectiveHandleNode) {
             $this->handleNode = $child;
+        }
+        if ($child instanceof TagDirectiveIndicatorNode) {
+            $this->indicatorNode = $child;
         }
         if ($child instanceof TagDirectivePrefixNode) {
             $this->prefixNode = $child;
@@ -47,6 +44,11 @@ class TagDirectiveNode extends AbstractNode implements TokenHolderInterface
         return $this->handleNode;
     }
 
+    public function getIndicatorNode(): TagDirectiveIndicatorNode
+    {
+        return $this->indicatorNode;
+    }
+
     public function getPrefix(): string
     {
         return $this->prefixNode->getPrefix();
@@ -55,10 +57,5 @@ class TagDirectiveNode extends AbstractNode implements TokenHolderInterface
     public function getPrefixNode(): TagDirectivePrefixNode
     {
         return $this->prefixNode;
-    }
-
-    public function getToken(): Token
-    {
-        return $this->token;
     }
 }
