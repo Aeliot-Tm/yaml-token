@@ -715,6 +715,57 @@ final class Parser
     }
 
     /**
+     * Indented tag/anchor-prefixed scalar on the line after "key:\n" (YAML 1.2.2 §6.9, §8.2.2),
+     * not a nested block-mapping key.
+     */
+    private function consumeIndentedBlockTaggedScalarValue(Harvester $harvester, ValueNode $valueNode, int $parentIndentLen): void
+    {
+        $this->consumeBlockValueOpeningLayout($harvester, $valueNode);
+
+        $indentationToken = $harvester->tokens->current();
+        if (TokenType::INDENTATION !== $indentationToken?->type) {
+            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Expected INDENTATION for indented block tagged scalar value, but %s given', $indentationToken?->type->value ?? '_nothing_'), $harvester->tokens));
+        }
+        if (\strlen($indentationToken->text) <= $parentIndentLen) {
+            throw new IndentationInvalidException($this->appendTokenLocation(\sprintf('Indented block tagged scalar must be deeper than parent key line indent (%d spaces)', $parentIndentLen), $indentationToken));
+        }
+
+        $valueNode->addChild(new IndentationNode($indentationToken));
+        $harvester->tokens->advance();
+
+        $this->collectValueProperties($harvester, $valueNode);
+
+        if ($anchor = $valueNode->getAnchor()) {
+            $harvester->registry->anchors[$anchor->getName()] = $anchor;
+        }
+
+        $this->collectTypes($harvester, [TokenType::WHITESPACE, TokenType::COMMENT], $valueNode);
+
+        $scalarToken = $harvester->tokens->current();
+        if (null === $scalarToken || !\in_array($scalarToken->type, [
+            TokenType::DOUBLE_QUOTED_SCALAR,
+            TokenType::SINGLE_QUOTED_SCALAR,
+            TokenType::PLAIN_SCALAR,
+        ], true)) {
+            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Scalar expected for indented block tagged scalar value, but %s given', $scalarToken?->type->value ?? '_nothing_'), $harvester->tokens));
+        }
+
+        if (
+            TokenType::PLAIN_SCALAR === $scalarToken->type
+            && $this->isMultilinePlainContinuationAhead($harvester, 1, $parentIndentLen)
+        ) {
+            $multiline = new MultilinePlainScalarNode();
+            $multiline->addChild(new ScalarNode($scalarToken));
+            $harvester->tokens->advance();
+            $this->appendMultilinePlainScalarContinuations($harvester, $multiline, $parentIndentLen);
+            $valueNode->addChild($multiline);
+        } else {
+            $valueNode->addChild(new ScalarNode($scalarToken));
+            $harvester->tokens->advance();
+        }
+    }
+
+    /**
      * Consumes one SEQUENCE_ENTRY token followed by any number of
      * directly adjacent WHITESPACE tokens. Returns the total length
      * in characters (always >= 1). Per YAML 1.2.2 §8.2.1 this
@@ -1274,6 +1325,17 @@ final class Parser
             return false;
         }
 
+        return $this->isNodePropertiesFollowedByImplicitKeyFromOffset($harvester, $offset);
+    }
+
+    /**
+     * Whether c-ns-properties at {@code $offset} are followed on the same line by an implicit YAML key
+     * (scalar then VALUE_INDICATOR before NEWLINE).
+     *
+     * @param int $offset Peek offset to the first TAG or ANCHOR on the line
+     */
+    private function isNodePropertiesFollowedByImplicitKeyFromOffset(Harvester $harvester, int $offset): bool
+    {
         while (true) {
             $token = $harvester->tokens->peek($offset);
             if (null === $token) {
@@ -1289,6 +1351,11 @@ final class Parser
             if (TokenType::ANCHOR === $token->type || TokenType::TAG === $token->type) {
                 ++$offset;
                 continue;
+            }
+
+            // Key node whose name is empty but carries c-ns-properties, e.g. "&a : value".
+            if (TokenType::VALUE_INDICATOR === $token->type) {
+                return true;
             }
 
             if (!$token->type->isScalar()) {
@@ -1966,6 +2033,15 @@ final class Parser
                         ? $this->runFlowSequenceDriver($harvester)
                         : $this->runFlowMappingDriver($harvester),
                 );
+
+                return;
+            }
+
+            if (
+                $this->isNodePropertyToken($afterIndent)
+                && !$this->isNodePropertiesFollowedByImplicitKeyFromOffset($harvester, $afterIndentOffset)
+            ) {
+                $this->consumeIndentedBlockTaggedScalarValue($harvester, $valueNode, $parentIndentLen);
 
                 return;
             }
