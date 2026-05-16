@@ -30,16 +30,8 @@ return [
         'text' => "\n",
     ],
     [
-        'type' => TokenType::INDENTATION,
-        'text' => '    ',
-    ],
-    [
-        'type' => TokenType::PLAIN_SCALAR,
-        'text' => 'Content indented relative to indicator',
-    ],
-    [
-        'type' => TokenType::NEWLINE,
-        'text' => "\n",
+        'type' => TokenType::LITERAL_BLOCK_SCALAR,
+        'text' => "    Content indented relative to indicator\n",
     ],
     [
         'type' => TokenType::PLAIN_SCALAR,
@@ -66,16 +58,8 @@ return [
         'text' => "\n",
     ],
     [
-        'type' => TokenType::INDENTATION,
-        'text' => ' ',
-    ],
-    [
-        'type' => TokenType::PLAIN_SCALAR,
-        'text' => 'folded',
-    ],
-    [
-        'type' => TokenType::NEWLINE,
-        'text' => "\n",
+        'type' => TokenType::FOLDED_BLOCK_SCALAR,
+        'text' => " folded\n",
     ],
     [
         'type' => TokenType::PLAIN_SCALAR,
@@ -106,12 +90,8 @@ return [
         'text' => "\n",
     ],
     [
-        'type' => TokenType::INDENTATION,
-        'text' => ' ',
-    ],
-    [
-        'type' => TokenType::PLAIN_SCALAR,
-        'text' => 'strip',
+        'type' => TokenType::FOLDED_BLOCK_SCALAR,
+        'text' => ' strip',
     ],
     [
         'type' => TokenType::NEWLINE,

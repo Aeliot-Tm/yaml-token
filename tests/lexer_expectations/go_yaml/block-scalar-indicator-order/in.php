@@ -30,12 +30,8 @@ return [
         'text' => "\n",
     ],
     [
-        'type' => TokenType::INDENTATION,
-        'text' => '  ',
-    ],
-    [
-        'type' => TokenType::PLAIN_SCALAR,
-        'text' => 'explicit indent and chomp',
+        'type' => TokenType::LITERAL_BLOCK_SCALAR,
+        'text' => '  explicit indent and chomp',
     ],
     [
         'type' => TokenType::NEWLINE,
@@ -66,12 +62,8 @@ return [
         'text' => "\n",
     ],
     [
-        'type' => TokenType::INDENTATION,
-        'text' => '  ',
-    ],
-    [
-        'type' => TokenType::PLAIN_SCALAR,
-        'text' => 'chomp and explicit indent',
+        'type' => TokenType::LITERAL_BLOCK_SCALAR,
+        'text' => '  chomp and explicit indent',
     ],
     [
         'type' => TokenType::NEWLINE,

@@ -7,7 +7,6 @@ use Aeliot\YamlToken\Node\BlockScalarChompingIndicatorNode;
 use Aeliot\YamlToken\Node\BlockScalarIndentationIndicatorNode;
 use Aeliot\YamlToken\Node\BlockScalarIndicatorNode;
 use Aeliot\YamlToken\Node\DocumentNode;
-use Aeliot\YamlToken\Node\IndentationNode;
 use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\SequenceEntryNode;
@@ -18,21 +17,21 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 147404790,
+    'hash' => 514593410,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 2850623374,
+            'hash' => 2650878902,
             'properties' => [],
             'children' => [
                 [
                     'type' => SequenceEntryNode::class,
-                    'hash' => 475756400,
+                    'hash' => 3731696814,
                     'properties' => [
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 2411496134,
+                            'hash' => 1118748356,
                         ],
                     ],
                     'children' => [
@@ -60,11 +59,11 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 2411496134,
+                            'hash' => 1118748356,
                             'properties' => [
                                 'scalar' => [
                                     'type' => ScalarNode::class,
-                                    'hash' => 900928719,
+                                    'hash' => 3047752096,
                                 ],
                             ],
                             'children' => [
@@ -113,23 +112,12 @@ return [
                                     'children' => [],
                                 ],
                                 [
-                                    'type' => IndentationNode::class,
-                                    'hash' => 412793561,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::INDENTATION,
-                                            'text' => '  ',
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                                [
                                     'type' => ScalarNode::class,
-                                    'hash' => 900928719,
+                                    'hash' => 3047752096,
                                     'properties' => [
                                         'token' => [
-                                            'type' => TokenType::PLAIN_SCALAR,
-                                            'text' => 'explicit indent and chomp',
+                                            'type' => TokenType::LITERAL_BLOCK_SCALAR,
+                                            'text' => '  explicit indent and chomp',
                                         ],
                                     ],
                                     'children' => [],
@@ -151,11 +139,11 @@ return [
                 ],
                 [
                     'type' => SequenceEntryNode::class,
-                    'hash' => 3177793616,
+                    'hash' => 2058009098,
                     'properties' => [
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 2228904192,
+                            'hash' => 3735283429,
                         ],
                     ],
                     'children' => [
@@ -183,11 +171,11 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 2228904192,
+                            'hash' => 3735283429,
                             'properties' => [
                                 'scalar' => [
                                     'type' => ScalarNode::class,
-                                    'hash' => 3244700796,
+                                    'hash' => 1098653971,
                                 ],
                             ],
                             'children' => [
@@ -236,23 +224,12 @@ return [
                                     'children' => [],
                                 ],
                                 [
-                                    'type' => IndentationNode::class,
-                                    'hash' => 412793561,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::INDENTATION,
-                                            'text' => '  ',
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                                [
                                     'type' => ScalarNode::class,
-                                    'hash' => 3244700796,
+                                    'hash' => 1098653971,
                                     'properties' => [
                                         'token' => [
-                                            'type' => TokenType::PLAIN_SCALAR,
-                                            'text' => 'chomp and explicit indent',
+                                            'type' => TokenType::LITERAL_BLOCK_SCALAR,
+                                            'text' => '  chomp and explicit indent',
                                         ],
                                     ],
                                     'children' => [],

@@ -38,28 +38,8 @@ return [
         'text' => "\n",
     ],
     [
-        'type' => TokenType::INDENTATION,
-        'text' => '   ',
-    ],
-    [
-        'type' => TokenType::PLAIN_SCALAR,
-        'text' => 'more indented',
-    ],
-    [
-        'type' => TokenType::NEWLINE,
-        'text' => "\n",
-    ],
-    [
-        'type' => TokenType::INDENTATION,
-        'text' => '  ',
-    ],
-    [
-        'type' => TokenType::PLAIN_SCALAR,
-        'text' => 'regular',
-    ],
-    [
-        'type' => TokenType::NEWLINE,
-        'text' => "\n",
+        'type' => TokenType::FOLDED_BLOCK_SCALAR,
+        'text' => "   more indented\n  regular\n",
     ],
     [
         'type' => TokenType::PLAIN_SCALAR,
@@ -86,35 +66,7 @@ return [
         'text' => "\n",
     ],
     [
-        'type' => TokenType::NEWLINE,
-        'text' => "\n",
-    ],
-    [
-        'type' => TokenType::NEWLINE,
-        'text' => "\n",
-    ],
-    [
-        'type' => TokenType::INDENTATION,
-        'text' => '   ',
-    ],
-    [
-        'type' => TokenType::PLAIN_SCALAR,
-        'text' => 'more indented',
-    ],
-    [
-        'type' => TokenType::NEWLINE,
-        'text' => "\n",
-    ],
-    [
-        'type' => TokenType::INDENTATION,
-        'text' => '  ',
-    ],
-    [
-        'type' => TokenType::PLAIN_SCALAR,
-        'text' => 'regular',
-    ],
-    [
-        'type' => TokenType::NEWLINE,
-        'text' => "\n",
+        'type' => TokenType::FOLDED_BLOCK_SCALAR,
+        'text' => "\n\n   more indented\n  regular\n",
     ],
 ];

@@ -7,7 +7,6 @@ use Aeliot\YamlToken\Node\BlockScalarIndentationIndicatorNode;
 use Aeliot\YamlToken\Node\BlockScalarIndicatorNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\DocumentStartNode;
-use Aeliot\YamlToken\Node\IndentationNode;
 use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\NewLineNode;
@@ -19,12 +18,12 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 3258826090,
+    'hash' => 2183560888,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 1815546608,
+            'hash' => 309543968,
             'properties' => [],
             'children' => [
                 [
@@ -51,7 +50,7 @@ return [
                 ],
                 [
                     'type' => KeyValueCoupleNode::class,
-                    'hash' => 2962808207,
+                    'hash' => 3549652464,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
@@ -59,7 +58,7 @@ return [
                         ],
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 1443390014,
+                            'hash' => 3748246594,
                         ],
                     ],
                     'children' => [
@@ -110,11 +109,11 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 1443390014,
+                            'hash' => 3748246594,
                             'properties' => [
                                 'scalar' => [
                                     'type' => ScalarNode::class,
-                                    'hash' => 1477621501,
+                                    'hash' => 2525143254,
                                 ],
                             ],
                             'children' => [
@@ -152,56 +151,12 @@ return [
                                     'children' => [],
                                 ],
                                 [
-                                    'type' => IndentationNode::class,
-                                    'hash' => 3446037835,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::INDENTATION,
-                                            'text' => '   ',
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                                [
                                     'type' => ScalarNode::class,
-                                    'hash' => 3848523395,
+                                    'hash' => 2525143254,
                                     'properties' => [
                                         'token' => [
-                                            'type' => TokenType::PLAIN_SCALAR,
-                                            'text' => 'more indented',
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                                [
-                                    'type' => NewLineNode::class,
-                                    'hash' => 763369711,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::NEWLINE,
-                                            'text' => "\n",
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                                [
-                                    'type' => IndentationNode::class,
-                                    'hash' => 412793561,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::INDENTATION,
-                                            'text' => '  ',
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                                [
-                                    'type' => ScalarNode::class,
-                                    'hash' => 1477621501,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::PLAIN_SCALAR,
-                                            'text' => 'regular',
+                                            'type' => TokenType::FOLDED_BLOCK_SCALAR,
+                                            'text' => "   more indented\n  regular\n",
                                         ],
                                     ],
                                     'children' => [],
@@ -211,19 +166,8 @@ return [
                     ],
                 ],
                 [
-                    'type' => NewLineNode::class,
-                    'hash' => 763369711,
-                    'properties' => [
-                        'token' => [
-                            'type' => TokenType::NEWLINE,
-                            'text' => "\n",
-                        ],
-                    ],
-                    'children' => [],
-                ],
-                [
                     'type' => KeyValueCoupleNode::class,
-                    'hash' => 145695018,
+                    'hash' => 3715166735,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
@@ -231,7 +175,7 @@ return [
                         ],
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 407187440,
+                            'hash' => 3021278388,
                         ],
                     ],
                     'children' => [
@@ -282,11 +226,11 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 407187440,
+                            'hash' => 3021278388,
                             'properties' => [
                                 'scalar' => [
                                     'type' => ScalarNode::class,
-                                    'hash' => 1477621501,
+                                    'hash' => 2667918972,
                                 ],
                             ],
                             'children' => [
@@ -324,78 +268,12 @@ return [
                                     'children' => [],
                                 ],
                                 [
-                                    'type' => NewLineNode::class,
-                                    'hash' => 763369711,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::NEWLINE,
-                                            'text' => "\n",
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                                [
-                                    'type' => NewLineNode::class,
-                                    'hash' => 763369711,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::NEWLINE,
-                                            'text' => "\n",
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                                [
-                                    'type' => IndentationNode::class,
-                                    'hash' => 3446037835,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::INDENTATION,
-                                            'text' => '   ',
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                                [
                                     'type' => ScalarNode::class,
-                                    'hash' => 3848523395,
+                                    'hash' => 2667918972,
                                     'properties' => [
                                         'token' => [
-                                            'type' => TokenType::PLAIN_SCALAR,
-                                            'text' => 'more indented',
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                                [
-                                    'type' => NewLineNode::class,
-                                    'hash' => 763369711,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::NEWLINE,
-                                            'text' => "\n",
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                                [
-                                    'type' => IndentationNode::class,
-                                    'hash' => 412793561,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::INDENTATION,
-                                            'text' => '  ',
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                                [
-                                    'type' => ScalarNode::class,
-                                    'hash' => 1477621501,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::PLAIN_SCALAR,
-                                            'text' => 'regular',
+                                            'type' => TokenType::FOLDED_BLOCK_SCALAR,
+                                            'text' => "\n\n   more indented\n  regular\n",
                                         ],
                                     ],
                                     'children' => [],
@@ -403,17 +281,6 @@ return [
                             ],
                         ],
                     ],
-                ],
-                [
-                    'type' => NewLineNode::class,
-                    'hash' => 763369711,
-                    'properties' => [
-                        'token' => [
-                            'type' => TokenType::NEWLINE,
-                            'text' => "\n",
-                        ],
-                    ],
-                    'children' => [],
                 ],
             ],
         ],

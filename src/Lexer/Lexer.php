@@ -94,8 +94,10 @@ final class Lexer
             }
 
             if ($harvester->cursor->inExplicitIndentBlockScalarBody) {
+                $type = $harvester->cursor->blockScalarBodyTokenType ?? TokenType::LITERAL_BLOCK_SCALAR;
+                $harvester->cursor->blockScalarBodyTokenType = null;
                 $body = $this->readBlockScalarBodyAndApplyChomping($harvester);
-                $this->splitExplicitIndentBlockBodyToTokens($harvester, $body);
+                $harvester->stream->addToken(new Token($type, $body, $harvester->cursor->line, $harvester->cursor->column));
                 $harvester->cursor->inExplicitIndentBlockScalarBody = false;
 
                 continue;
@@ -643,8 +645,8 @@ final class Lexer
         } else {
             $cursor->blockScalarAdditionalIndentFromIndicator = null;
             $cursor->pendingBlockScalarBody = $cursor->blockScalarBodyTokenType;
+            $cursor->blockScalarBodyTokenType = null;
         }
-        $cursor->blockScalarBodyTokenType = null;
     }
 
     private function readAnchorOrAlias(Harvester $harvester): string
@@ -1338,36 +1340,6 @@ final class Lexer
                 true,
             )
         );
-    }
-
-    private function splitExplicitIndentBlockBodyToTokens(Harvester $harvester, string $body): void
-    {
-        $len = \strlen($body);
-        $offset = 0;
-        while ($offset < $len) {
-            $nl = $this->findNextLineBreakInString($body, $offset, $len);
-            $lineEnd = null !== $nl ? $nl['start'] : $len;
-            $line = substr($body, $offset, $lineEnd - $offset);
-            $lineLen = \strlen($line);
-            $i = 0;
-            $indentBytes = '';
-            while ($i < $lineLen && \in_array($line[$i], self::CHARS_HORIZONTAL_WHITESPACE, true)) {
-                $indentBytes .= $line[$i];
-                ++$i;
-            }
-            if ('' !== $indentBytes) {
-                $harvester->stream->addToken(new Token(TokenType::INDENTATION, $indentBytes, 1, 1));
-            }
-            $rest = substr($line, $i);
-            if ('' !== $rest) {
-                $harvester->stream->addToken(new Token(TokenType::PLAIN_SCALAR, $rest, 1, 1));
-            }
-            if (null === $nl) {
-                break;
-            }
-            $harvester->stream->addToken(new Token(TokenType::NEWLINE, substr($body, $nl['start'], $nl['len']), 1, 1));
-            $offset = $nl['start'] + $nl['len'];
-        }
     }
 
     private function syncCursorLineColumnFromPrefix(Harvester $harvester): void

@@ -38,16 +38,8 @@ return [
         'text' => "\n",
     ],
     [
-        'type' => TokenType::INDENTATION,
-        'text' => '    ',
-    ],
-    [
-        'type' => TokenType::PLAIN_SCALAR,
-        'text' => 'xxx',
-    ],
-    [
-        'type' => TokenType::NEWLINE,
-        'text' => "\n",
+        'type' => TokenType::LITERAL_BLOCK_SCALAR,
+        'text' => "    xxx\n",
     ],
     [
         'type' => TokenType::INDENTATION,

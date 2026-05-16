@@ -34,24 +34,8 @@ return [
         'text' => "\n",
     ],
     [
-        'type' => TokenType::INDENTATION,
-        'text' => '    ',
-    ],
-    [
-        'type' => TokenType::PLAIN_SCALAR,
-        'text' => 'line 1',
-    ],
-    [
-        'type' => TokenType::NEWLINE,
-        'text' => "\n",
-    ],
-    [
-        'type' => TokenType::INDENTATION,
-        'text' => '    ',
-    ],
-    [
-        'type' => TokenType::PLAIN_SCALAR,
-        'text' => 'line 2',
+        'type' => TokenType::LITERAL_BLOCK_SCALAR,
+        'text' => "    line 1\n    line 2",
     ],
     [
         'type' => TokenType::NEWLINE,

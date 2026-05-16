@@ -98,8 +98,9 @@ final class Cursor
     public bool $inBlockScalarHeaderLine = false;
 
     /**
-     * When set, block body after the header newline is emitted as line tokens
-     * ({@see TokenType::INDENTATION}, {@see TokenType::PLAIN_SCALAR}, {@see TokenType::NEWLINE}), not a single block body token.
+     * When set, the next iteration emits the block body as a single
+     * {@see TokenType::LITERAL_BLOCK_SCALAR} or {@see TokenType::FOLDED_BLOCK_SCALAR} token
+     * using the explicit indentation indicator to determine content boundaries.
      */
     public bool $inExplicitIndentBlockScalarBody = false;
 

@@ -20,21 +20,21 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 475587798,
+    'hash' => 3441135391,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 3660667866,
+            'hash' => 217130286,
             'properties' => [],
             'children' => [
                 [
                     'type' => SequenceEntryNode::class,
-                    'hash' => 2178618274,
+                    'hash' => 3620846749,
                     'properties' => [
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 2887757285,
+                            'hash' => 2992372644,
                         ],
                     ],
                     'children' => [
@@ -62,22 +62,22 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 2887757285,
+                            'hash' => 2992372644,
                             'properties' => [
                                 'blockMapping' => [
                                     'type' => BlockMappingNode::class,
-                                    'hash' => 798853704,
+                                    'hash' => 1655108517,
                                 ],
                             ],
                             'children' => [
                                 [
                                     'type' => BlockMappingNode::class,
-                                    'hash' => 798853704,
+                                    'hash' => 1655108517,
                                     'properties' => [
                                         'entries' => [
                                             [
                                                 'type' => KeyValueCoupleNode::class,
-                                                'hash' => 3996368589,
+                                                'hash' => 586146362,
                                             ],
                                             [
                                                 'type' => KeyValueCoupleNode::class,
@@ -88,7 +88,7 @@ return [
                                     'children' => [
                                         [
                                             'type' => KeyValueCoupleNode::class,
-                                            'hash' => 3996368589,
+                                            'hash' => 586146362,
                                             'properties' => [
                                                 'key' => [
                                                     'type' => KeyNode::class,
@@ -96,7 +96,7 @@ return [
                                                 ],
                                                 'value' => [
                                                     'type' => ValueNode::class,
-                                                    'hash' => 2435566679,
+                                                    'hash' => 1726200071,
                                                 ],
                                             ],
                                             'children' => [
@@ -147,11 +147,11 @@ return [
                                                 ],
                                                 [
                                                     'type' => ValueNode::class,
-                                                    'hash' => 2435566679,
+                                                    'hash' => 1726200071,
                                                     'properties' => [
                                                         'scalar' => [
                                                             'type' => ScalarNode::class,
-                                                            'hash' => 2024480070,
+                                                            'hash' => 555776568,
                                                         ],
                                                     ],
                                                     'children' => [
@@ -189,23 +189,12 @@ return [
                                                             'children' => [],
                                                         ],
                                                         [
-                                                            'type' => IndentationNode::class,
-                                                            'hash' => 3551679428,
-                                                            'properties' => [
-                                                                'token' => [
-                                                                    'type' => TokenType::INDENTATION,
-                                                                    'text' => '    ',
-                                                                ],
-                                                            ],
-                                                            'children' => [],
-                                                        ],
-                                                        [
                                                             'type' => ScalarNode::class,
-                                                            'hash' => 2024480070,
+                                                            'hash' => 555776568,
                                                             'properties' => [
                                                                 'token' => [
-                                                                    'type' => TokenType::PLAIN_SCALAR,
-                                                                    'text' => 'xxx',
+                                                                    'type' => TokenType::LITERAL_BLOCK_SCALAR,
+                                                                    'text' => "    xxx\n",
                                                                 ],
                                                             ],
                                                             'children' => [],
@@ -213,17 +202,6 @@ return [
                                                     ],
                                                 ],
                                             ],
-                                        ],
-                                        [
-                                            'type' => NewLineNode::class,
-                                            'hash' => 763369711,
-                                            'properties' => [
-                                                'token' => [
-                                                    'type' => TokenType::NEWLINE,
-                                                    'text' => "\n",
-                                                ],
-                                            ],
-                                            'children' => [],
                                         ],
                                         [
                                             'type' => KeyValueCoupleNode::class,
