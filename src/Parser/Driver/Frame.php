@@ -16,13 +16,11 @@ namespace Aeliot\YamlToken\Parser\Driver;
 use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Parser\Driver\BuilderResult\BuilderResultInterface;
 use Aeliot\YamlToken\Parser\Dto\Harvester;
-use Aeliot\YamlToken\Parser\Dto\ParseContext;
 
 final class Frame
 {
     public function __construct(
         public readonly BuilderInterface $builder,
-        public readonly ParseContext $context,
         public readonly Node $node,
     ) {
     }

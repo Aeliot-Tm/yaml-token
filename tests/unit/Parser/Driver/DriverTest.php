@@ -19,7 +19,6 @@ use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Parser\Driver\Driver;
 use Aeliot\YamlToken\Parser\Driver\Frame;
 use Aeliot\YamlToken\Parser\Dto\Harvester;
-use Aeliot\YamlToken\Parser\Dto\ParseContext;
 use Aeliot\YamlToken\Parser\Dto\ParseRegistry;
 use Aeliot\YamlToken\Parser\Dto\ParseState;
 use Aeliot\YamlToken\Parser\Dto\TokenStreamProxy;
@@ -38,7 +37,7 @@ final class DriverTest extends TestCase
         $harvester = $this->createHarvester();
         $rootNode = new ValueNode();
         $driver = new Driver();
-        $result = $driver->run($harvester, new Frame(new TestRootDelegateOnceBuilder(), new ParseContext(), $rootNode));
+        $result = $driver->run($harvester, new Frame(new TestRootDelegateOnceBuilder(), $rootNode));
 
         self::assertSame($rootNode, $result);
         self::assertCount(1, $rootNode->getChildren());
@@ -52,7 +51,7 @@ final class DriverTest extends TestCase
         $driver = new Driver();
         $result = $driver->run(
             $harvester,
-            new Frame(new TestRootNestedDelegateBuilder(), new ParseContext(), $rootNode)
+            new Frame(new TestRootNestedDelegateBuilder(), $rootNode)
         );
 
         self::assertSame($rootNode, $result);

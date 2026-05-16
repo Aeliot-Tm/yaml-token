@@ -58,7 +58,6 @@ final class FlowEntryBuilder implements BuilderInterface
 
             return new Delegate(new Frame(
                 new FlowSequenceBuilder($this->host),
-                $self->context,
                 $inner,
             ));
         }
@@ -69,7 +68,6 @@ final class FlowEntryBuilder implements BuilderInterface
 
         return new Delegate(new Frame(
             new FlowOperandBuilder($this->host),
-            $self->context,
             new ValueNode(),
         ));
     }

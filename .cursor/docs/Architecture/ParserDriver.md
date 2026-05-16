@@ -38,12 +38,10 @@ proxy). This keeps the loop generic and makes builders testable in isolation.
 
 ### Frame
 
-[`Frame`](../../../src/Parser/Driver/Frame.php) is an immutable triple
-`(BuilderInterface $builder, ParseContext $context, Node $node)` plus thin
-forwarders `step()` and `onChildCompleted()`. The pair `(builder, node)`
-carries the structural part (what is being built), while `context` carries
-all rule-level flags that depend on the lexical environment
-(see `ParseContext` below).
+[`Frame`](../../../src/Parser/Driver/Frame.php) is an immutable pair
+`(BuilderInterface $builder, Node $node)` plus thin forwarders `step()` and
+`onChildCompleted()`. The builder decides how to advance parsing; the node is
+the in-progress AST fragment for that frame.
 
 ### BuilderInterface
 
@@ -76,23 +74,6 @@ The three result classes describe the only transitions a builder can request:
 This three-state vocabulary intentionally matches the recursive descent shape
 that the legacy code expressed with nested `private function parse*()` calls,
 so each old recursion site maps to a single builder method.
-
-### ParseContext
-
-[`ParseContext`](../../../src/Parser/Dto/ParseContext.php) is an immutable DTO
-threading lexical-rule flags through frames. Defaults are tuned for "value
-inside flow context" parsing (YAML 1.2.2 §7.4):
-
-- `allowEmptyKey` / `allowEmptyValue` — empty-node admissibility per
-  §7.4.1 / §7.4.2.
-- `inFlow` — flow vs block context (currently always `true` for builders, but
-  carried through for future block builders).
-- `parentIndentLen` — passed to `Parser::parseValue()` for nested block-style
-  values; uses the sentinel `FLOW_COLLECTION_VALUE_PARENT_INDENT` (`-2`).
-
-Mutations are produced by `withAllowEmptyKey()`, …
-returning a new instance. Frames hold their own `ParseContext`, so a child
-frame can carry a mutated context without leaking back to the parent.
 
 ### FlowHost
 

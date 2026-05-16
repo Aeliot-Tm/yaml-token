@@ -85,7 +85,6 @@ final class FlowMappingBuilder implements BuilderInterface
 
         return new Delegate(new Frame(
             new FlowMappingPairBuilder($this->host),
-            $self->context,
             new KeyValueCoupleNode(),
         ));
     }

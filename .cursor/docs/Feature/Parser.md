@@ -17,11 +17,6 @@ exposes the few `Parser` private helpers builders need (via closures bound in
 `Parser::createFlowHost()`). The two entry points used from block-level parsing
 are `Parser::runFlowSequenceDriver()` and `Parser::runFlowMappingDriver()`.
 
-The DTO [`ParseContext`](../../../src/Parser/Dto/ParseContext.php) threads
-lexical-rule flags (`allowEmptyKey`, `allowEmptyValue`, `parentIndentLen`)
-through frames so implicit empty values and nested block values can be
-detected by peeking through layout tokens.
-
 JSON-style flow-pair keys in sequences (YAML 1.2.2 production [153], e.g.
 `["key":value]` or `[{a: b}:c]`) are tokenized by the lexer as a separate
 `VALUE_INDICATOR` even when `:` is adjacent to the value; flow builders then

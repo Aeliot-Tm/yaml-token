@@ -55,7 +55,6 @@ use Aeliot\YamlToken\Parser\Builder\FlowSequenceBuilder;
 use Aeliot\YamlToken\Parser\Driver\Driver;
 use Aeliot\YamlToken\Parser\Driver\Frame;
 use Aeliot\YamlToken\Parser\Dto\Harvester;
-use Aeliot\YamlToken\Parser\Dto\ParseContext;
 use Aeliot\YamlToken\Parser\Dto\ParseRegistry;
 use Aeliot\YamlToken\Parser\Dto\ParseState;
 use Aeliot\YamlToken\Parser\Dto\TokenStreamProxy;
@@ -2467,7 +2466,6 @@ final class Parser
             $harvester,
             new Frame(
                 new FlowMappingBuilder($this->createFlowHost()),
-                new ParseContext(),
                 $flowMappingNode,
             ),
         );
@@ -2491,7 +2489,6 @@ final class Parser
             $harvester,
             new Frame(
                 new FlowSequenceBuilder($this->createFlowHost()),
-                new ParseContext(),
                 $flowSequenceNode,
             ),
         );

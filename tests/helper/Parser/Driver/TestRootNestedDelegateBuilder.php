@@ -22,7 +22,6 @@ use Aeliot\YamlToken\Parser\Driver\BuilderResult\Continued;
 use Aeliot\YamlToken\Parser\Driver\BuilderResult\Delegate;
 use Aeliot\YamlToken\Parser\Driver\Frame;
 use Aeliot\YamlToken\Parser\Dto\Harvester;
-use Aeliot\YamlToken\Parser\Dto\ParseContext;
 
 final class TestRootNestedDelegateBuilder implements BuilderInterface
 {
@@ -43,6 +42,6 @@ final class TestRootNestedDelegateBuilder implements BuilderInterface
         $this->delegated = true;
         $mid = new ValueNode();
 
-        return new Delegate(new Frame(new TestMidDelegateBuilder(), new ParseContext(), $mid));
+        return new Delegate(new Frame(new TestMidDelegateBuilder(), $mid));
     }
 }

@@ -79,7 +79,6 @@ final class FlowSequenceBuilder implements BuilderInterface
 
         return new Delegate(new Frame(
             new FlowEntryBuilder($this->host),
-            $self->context,
             new ValueNode(),
         ));
     }
