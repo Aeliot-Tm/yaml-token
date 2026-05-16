@@ -29,6 +29,12 @@ Every element (key, value, indentation, comment) has its position and can be mod
 - [YAML 1.2.2](https://yaml.org/spec/1.2.2/) (2021-10-01)
 - [Specification Changes](https://yaml.org/spec/1.2.2/ext/changes/)
 
+## Acknowledgments
+
+Thanks to [Masaaki Goshima](https://github.com/goccy) for [goccy/go-yaml](https://github.com/goccy/go-yaml)
+test fixtures used under the MIT License and with the author's permission in `tests/fixture/go_yaml/`
+and `tests/fixture/go_yaml_extra/`. 
+
 ## Third-party notices
 
 This repository includes third-party materials that are not covered solely by the copyright in [LICENSE](LICENSE).
