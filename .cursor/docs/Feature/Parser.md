@@ -150,6 +150,10 @@ Because of this, the parser must not invent tokens that did not exist in the ori
     with sentinel `FLOW_COLLECTION_VALUE_PARENT_INDENT` so newline-prefixed content is not mistaken
     for block `parseIndentedBlockValue()` at indent `0` (which would not consume the value and could
     split one `KeyValueCoupleNode` into two).
+  - In flow context, separation spaces and comments after a value (before `,`, `]`, or `}`) are
+    children of the enclosing `FlowSequenceNode` or `FlowMappingNode`, not of the `ValueNode` that
+    carries the scalar or nested flow node. Spaces after `:` in a flow pair stay on `KeyValueCoupleNode`
+    (see Example 7.19).
 - Bare document content that is only a scalar (no mapping key) is parsed as a top-level `ValueNode`
   when the first token is a scalar and it is not an implicit key line.
 - The bare-document block context follows YAML 1.2.2 rule [211]. The parser passes a sentinel `BARE_DOCUMENT_BLOCK_PARENT_INDENT` (-1) into `parseValue()` so the same `$lineIndent <= $parentIndent` checks work at column 0; it is not a physical space count.

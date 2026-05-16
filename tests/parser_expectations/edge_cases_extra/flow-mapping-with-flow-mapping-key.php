@@ -17,12 +17,12 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 237248835,
+    'hash' => 2447217902,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 2245374284,
+            'hash' => 1036091757,
             'properties' => [],
             'children' => [
                 [
@@ -49,12 +49,12 @@ return [
                 ],
                 [
                     'type' => FlowMappingNode::class,
-                    'hash' => 1835091880,
+                    'hash' => 3336109156,
                     'properties' => [
                         'entries' => [
                             [
                                 'type' => KeyValueCoupleNode::class,
-                                'hash' => 1482268964,
+                                'hash' => 2112047621,
                             ],
                         ],
                     ],
@@ -83,7 +83,7 @@ return [
                         ],
                         [
                             'type' => KeyValueCoupleNode::class,
-                            'hash' => 1482268964,
+                            'hash' => 2112047621,
                             'properties' => [
                                 'key' => [
                                     'type' => KeyNode::class,
@@ -95,7 +95,7 @@ return [
                                 ],
                                 'value' => [
                                     'type' => ValueNode::class,
-                                    'hash' => 3896912698,
+                                    'hash' => 3569730860,
                                 ],
                             ],
                             'children' => [
@@ -259,7 +259,7 @@ return [
                                 ],
                                 [
                                     'type' => ValueNode::class,
-                                    'hash' => 3896912698,
+                                    'hash' => 3569730860,
                                     'properties' => [
                                         'scalar' => [
                                             'type' => ScalarNode::class,
@@ -278,20 +278,20 @@ return [
                                             ],
                                             'children' => [],
                                         ],
-                                        [
-                                            'type' => WhitespaceNode::class,
-                                            'hash' => 1067539092,
-                                            'properties' => [
-                                                'token' => [
-                                                    'type' => TokenType::WHITESPACE,
-                                                    'text' => ' ',
-                                                ],
-                                            ],
-                                            'children' => [],
-                                        ],
                                     ],
                                 ],
                             ],
+                        ],
+                        [
+                            'type' => WhitespaceNode::class,
+                            'hash' => 1067539092,
+                            'properties' => [
+                                'token' => [
+                                    'type' => TokenType::WHITESPACE,
+                                    'text' => ' ',
+                                ],
+                            ],
+                            'children' => [],
                         ],
                         [
                             'type' => SyntaxTokenNode::class,

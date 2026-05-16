@@ -2189,10 +2189,14 @@ final class Parser
 
         $this->parseValuePrimaryPayload($harvester, $valueNode, $parentIndentLen);
 
-        $this->collectTypes($harvester, [
-            TokenType::COMMENT,
-            TokenType::WHITESPACE,
-        ], $valueNode);
+        // Trailing s-separate / s-l-comments before ',', ']', or '}' belong to the enclosing
+        // FlowSequenceBuilder / FlowMappingBuilder (YAML 1.2.2 §6.3, §7.1), not this ValueNode.
+        if (self::FLOW_COLLECTION_VALUE_PARENT_INDENT !== $parentIndentLen) {
+            $this->collectTypes($harvester, [
+                TokenType::COMMENT,
+                TokenType::WHITESPACE,
+            ], $valueNode);
+        }
 
         return $valueNode;
     }
