@@ -1,0 +1,83 @@
+---
+description: Require official YAML spec evidence for any lexer/parser correctness claim
+alwaysApply: false
+globs: src/Lexer/**,src/Parser/**,src/Token/**,tests/fixture/**,tests/lexer_expectations/**,tests/parser_expectations/**,.cursor/docs/**
+---
+
+# YAML parsing: spec-grounded reasoning
+
+Treat **every** statement about whether YAML input is valid, invalid, or how it
+must be tokenized/parsed as **unproven** until backed by the **official YAML
+specification** on [yaml.org](https://yaml.org/spec/).
+
+## Default stance
+
+- **Do not trust** without verification: this codebase, tests, fixtures,
+  comments, prior chat turns, or “obvious” YAML behavior.
+- **Do not assert** lexer/parser correctness from implementation behavior alone
+  (“the code does X, therefore X is correct”).
+- Separate clearly:
+  - **Normative** (what the spec requires),
+  - **Observed** (what our lexer/parser or a reference implementation does),
+  - **Assumed** (hypothesis not yet checked against the spec).
+
+## Before answering or changing behavior
+
+1. **Identify YAML version scope**
+   - From input: `%YAML` directive when present.
+   - From fixture path: e.g. `tests/fixture/spec/1.2.0/` vs `1.2.2/`.
+   - From task context: project default is **YAML 1.2.2** unless the stream or
+     fixture explicitly targets another version.
+   - If behavior differs between versions (1.1 / 1.2.0 / 1.2.2), **state the
+     version** for each claim. Do not generalize across versions silently.
+
+2. **Locate normative source**
+   - Primary: [YAML 1.2.2](https://yaml.org/spec/1.2.2/) (default for this project).
+   - When the task or fixture is version-specific, also use:
+     - [YAML 1.2.1](https://yaml.org/spec/1.2.1/)
+     - [YAML 1.2.0](https://yaml.org/spec/1.2.0/)
+     - [YAML 1.1](https://yaml.org/spec/1.1/) (legacy; only when relevant)
+     - [YAML 1.1: merge](https://yaml.org/type/merge.html) (legacy, merge; only when relevant)
+     - [YAML 1.0](https://yaml.org/spec/1.0/) (legacy; only when relevant).
+   - Also, take into account [specification Changes](https://yaml.org/spec/1.2.2/ext/changes/).
+   - Prefer spec **sections**, **grammar productions** (e.g. rule `[153]`),
+     and **examples** (e.g. “Example 7.12”) over paraphrase.
+
+3. **Cite every claim**
+   For each non-trivial statement (validity, token boundaries, indentation,
+   plain-scalar rules, flow/block context, directives, tags, anchors):
+   - Add at least one **stable spec link** (section anchor or identifiable
+     chapter/example), **or**
+   - Label it **UNVERIFIED** / **HYPOTHESIS** and say what must be checked.
+   - If the spec **contradicts** the codebase or a test, say so explicitly and
+     cite the spec; do not “fix” the narrative to match the code without evidence.
+
+4. **Secondary sources**
+   - Project docs under `.cursor/docs/` and comments in `src/` describe
+     **current implementation intent**, not normative truth.
+   - `go_yaml` / `go_yaml_extra` fixtures reflect **go-yaml behavior**, not
+     automatically the official spec (see
+     [Fixtures Structure](../docs/Architecture/FixturesStructure.md)).
+   - `spec/` and `spec_extra/` are aligned with the official spec but still
+     require a spec citation when arguing correctness.
+   - For version-specific specification fixtures, read
+     [Specification Cover Fixtures](../docs/Feature/SpecificationCoverFixtures.md).
+
+## Response format (when discussing parsing)
+
+Use a short evidence block when it matters:
+
+- **Claim:** …
+- **Spec:** YAML x.y, §… / rule `[…]` / Example … — [link](…)
+- **Version note:** (if not 1.2.2 or version-dependent)
+- **Status:** confirmed | refuted | ambiguous | unverified
+
+If the spec is ambiguous, present **both** readings with citations; do not pick
+one without saying it is an interpretation.
+
+## When changing code or expectations
+
+- Do not change lexer/parser logic or golden expectations based only on
+  intuition or reference-parser output.
+- Required chain: **spec citation → expected behavior → code/test change**.
+- If no spec support exists, stop and report the gap instead of guessing.
