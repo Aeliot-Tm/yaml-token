@@ -11,12 +11,12 @@ use Aeliot\YamlToken\Node\StreamNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 2646918757,
+    'hash' => 1468893867,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 2207768783,
+            'hash' => 3581956948,
             'properties' => [],
             'children' => [
                 [
@@ -52,13 +52,6 @@ return [
                     ],
                     'children' => [],
                 ],
-            ],
-        ],
-        [
-            'type' => DocumentNode::class,
-            'hash' => 888585072,
-            'properties' => [],
-            'children' => [
                 [
                     'type' => NewLineNode::class,
                     'hash' => 763369711,

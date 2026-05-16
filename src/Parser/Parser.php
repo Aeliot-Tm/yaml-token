@@ -537,6 +537,38 @@ final class Parser
     }
 
     /**
+     * Consumes the line suffix after a document end marker (YAML 1.2.2 rule [209] c-document-end).
+     */
+    private function consumeDocumentEndLineSuffix(Harvester $harvester, DocumentNode $document): void
+    {
+        while (true) {
+            $token = $harvester->tokens->current();
+            if (null === $token) {
+                break;
+            }
+
+            if (TokenType::WHITESPACE === $token->type) {
+                $document->addChild(new WhitespaceNode($token));
+                $harvester->tokens->advance();
+                continue;
+            }
+
+            if (TokenType::COMMENT === $token->type) {
+                $document->addChild(new CommentNode($token));
+                $harvester->tokens->advance();
+                continue;
+            }
+
+            if (TokenType::NEWLINE === $token->type) {
+                $document->addChild(new NewLineNode($token));
+                $harvester->tokens->advance();
+            }
+
+            break;
+        }
+    }
+
+    /**
      * TODO: refactor similar methods: consumeExplicitKeyMultilinePlainScalarFirstLine & consumeExplicitKeyMultilinePlainScalarContinuation.
      */
     private function consumeExplicitKeyMultilinePlainScalarContinuation(Harvester $harvester, KeyNode $keyNode, int $entryIndentLen): void
@@ -1600,8 +1632,9 @@ final class Parser
             if (TokenType::DOCUMENT_END === $token->type) {
                 $document->addChild(new DocumentEndNode($token));
                 $this->tryAddDocumentToStream($stream, $document, $addedDocs);
-                $document = new DocumentNode();
                 $harvester->tokens->advance();
+                $this->consumeDocumentEndLineSuffix($harvester, $document);
+                $document = new DocumentNode();
                 continue;
             }
 

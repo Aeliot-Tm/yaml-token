@@ -3,8 +3,6 @@
 declare(strict_types=1);
 
 use Aeliot\YamlToken\Enum\TokenType;
-use Aeliot\YamlToken\Node\BlockScalarChompingIndicatorNode;
-use Aeliot\YamlToken\Node\BlockScalarIndicatorNode;
 use Aeliot\YamlToken\Node\DocumentEndNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\DocumentStartNode;
@@ -12,16 +10,15 @@ use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\ValueNode;
-use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 999675131,
+    'hash' => 3523822314,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 4186217681,
+            'hash' => 3818218080,
             'properties' => [],
             'children' => [
                 [
@@ -36,115 +33,141 @@ return [
                     'children' => [],
                 ],
                 [
-                    'type' => WhitespaceNode::class,
-                    'hash' => 1067539092,
+                    'type' => NewLineNode::class,
+                    'hash' => 763369711,
                     'properties' => [
                         'token' => [
-                            'type' => TokenType::WHITESPACE,
-                            'text' => ' ',
+                            'type' => TokenType::NEWLINE,
+                            'text' => "\n",
                         ],
                     ],
                     'children' => [],
                 ],
                 [
                     'type' => ValueNode::class,
-                    'hash' => 2729224338,
+                    'hash' => 3471758415,
                     'properties' => [
                         'scalar' => [
                             'type' => ScalarNode::class,
-                            'hash' => 2756229390,
+                            'hash' => 3251691483,
                         ],
                     ],
                     'children' => [
                         [
-                            'type' => BlockScalarIndicatorNode::class,
-                            'hash' => 1768284065,
+                            'type' => ScalarNode::class,
+                            'hash' => 3251691483,
                             'properties' => [
                                 'token' => [
-                                    'type' => TokenType::LITERAL_BLOCK_SCALAR_INDICATOR,
-                                    'text' => '|',
+                                    'type' => TokenType::PLAIN_SCALAR,
+                                    'text' => 'Value of first doc',
                                 ],
                             ],
                             'children' => [],
                         ],
-                        [
-                            'type' => BlockScalarChompingIndicatorNode::class,
-                            'hash' => 2238875574,
-                            'properties' => [
-                                'token' => [
-                                    'type' => TokenType::BLOCK_SCALAR_CHOMPING_INDICATOR,
-                                    'text' => '-',
-                                ],
-                            ],
-                            'children' => [],
+                    ],
+                ],
+                [
+                    'type' => NewLineNode::class,
+                    'hash' => 763369711,
+                    'properties' => [
+                        'token' => [
+                            'type' => TokenType::NEWLINE,
+                            'text' => "\n",
                         ],
-                        [
-                            'type' => NewLineNode::class,
-                            'hash' => 763369711,
-                            'properties' => [
-                                'token' => [
-                                    'type' => TokenType::NEWLINE,
-                                    'text' => "\n",
-                                ],
-                            ],
-                            'children' => [],
+                    ],
+                    'children' => [],
+                ],
+                [
+                    'type' => DocumentEndNode::class,
+                    'hash' => 3858097324,
+                    'properties' => [
+                        'token' => [
+                            'type' => TokenType::DOCUMENT_END,
+                            'text' => '...',
                         ],
+                    ],
+                    'children' => [],
+                ],
+                [
+                    'type' => NewLineNode::class,
+                    'hash' => 763369711,
+                    'properties' => [
+                        'token' => [
+                            'type' => TokenType::NEWLINE,
+                            'text' => "\n",
+                        ],
+                    ],
+                    'children' => [],
+                ],
+            ],
+        ],
+        [
+            'type' => DocumentNode::class,
+            'hash' => 888585072,
+            'properties' => [],
+            'children' => [
+                [
+                    'type' => NewLineNode::class,
+                    'hash' => 763369711,
+                    'properties' => [
+                        'token' => [
+                            'type' => TokenType::NEWLINE,
+                            'text' => "\n",
+                        ],
+                    ],
+                    'children' => [],
+                ],
+            ],
+        ],
+        [
+            'type' => DocumentNode::class,
+            'hash' => 4073769623,
+            'properties' => [],
+            'children' => [
+                [
+                    'type' => DocumentStartNode::class,
+                    'hash' => 2270658446,
+                    'properties' => [
+                        'token' => [
+                            'type' => TokenType::DOCUMENT_START,
+                            'text' => '---',
+                        ],
+                    ],
+                    'children' => [],
+                ],
+                [
+                    'type' => NewLineNode::class,
+                    'hash' => 763369711,
+                    'properties' => [
+                        'token' => [
+                            'type' => TokenType::NEWLINE,
+                            'text' => "\n",
+                        ],
+                    ],
+                    'children' => [],
+                ],
+                [
+                    'type' => ValueNode::class,
+                    'hash' => 3755146114,
+                    'properties' => [
+                        'scalar' => [
+                            'type' => ScalarNode::class,
+                            'hash' => 3657517998,
+                        ],
+                    ],
+                    'children' => [
                         [
                             'type' => ScalarNode::class,
-                            'hash' => 2756229390,
+                            'hash' => 3657517998,
                             'properties' => [
                                 'token' => [
-                                    'type' => TokenType::LITERAL_BLOCK_SCALAR,
-                                    'text' => ' ab',
+                                    'type' => TokenType::PLAIN_SCALAR,
+                                    'text' => 'Value of second doc',
                                 ],
                             ],
                             'children' => [],
                         ],
                     ],
-                ],
-                [
-                    'type' => NewLineNode::class,
-                    'hash' => 763369711,
-                    'properties' => [
-                        'token' => [
-                            'type' => TokenType::NEWLINE,
-                            'text' => "\n",
-                        ],
-                    ],
-                    'children' => [],
-                ],
-                [
-                    'type' => WhitespaceNode::class,
-                    'hash' => 1067539092,
-                    'properties' => [
-                        'token' => [
-                            'type' => TokenType::WHITESPACE,
-                            'text' => ' ',
-                        ],
-                    ],
-                    'children' => [],
-                ],
-                [
-                    'type' => NewLineNode::class,
-                    'hash' => 763369711,
-                    'properties' => [
-                        'token' => [
-                            'type' => TokenType::NEWLINE,
-                            'text' => "\n",
-                        ],
-                    ],
-                    'children' => [],
-                ],
-                [
-                    'type' => WhitespaceNode::class,
-                    'hash' => 1067539092,
-                    'properties' => [
-                        'token' => [
-                            'type' => TokenType::WHITESPACE,
-                            'text' => ' ',
-                        ],
-                    ],
-                    'children' => [],
                 ],
                 [
                     'type' => NewLineNode::class,
