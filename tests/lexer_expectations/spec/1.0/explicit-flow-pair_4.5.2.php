@@ -19,7 +19,11 @@ return [
     ],
     [
         'type' => TokenType::PLAIN_SCALAR,
-        'text' => 'foo bar ',
+        'text' => 'foo bar',
+    ],
+    [
+        'type' => TokenType::WHITESPACE,
+        'text' => ' ',
     ],
     [
         'type' => TokenType::VALUE_INDICATOR,

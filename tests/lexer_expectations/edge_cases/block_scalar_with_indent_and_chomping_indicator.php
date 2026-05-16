@@ -37,7 +37,6 @@ return [
         'type' => TokenType::INDENTATION,
         'text' => '    ',
     ],
-    // FIXME: consider lexer incorrectly splints literal block scalar
     [
         'type' => TokenType::PLAIN_SCALAR,
         'text' => 'line 1',

@@ -17,22 +17,22 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 1679069139,
+    'hash' => 1116564568,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 2746550322,
+            'hash' => 7882401,
             'properties' => [],
             'children' => [
                 [
                     'type' => FlowSequenceNode::class,
-                    'hash' => 391523375,
+                    'hash' => 940718892,
                     'properties' => [
                         'entries' => [
                             [
                                 'type' => ValueNode::class,
-                                'hash' => 4099993588,
+                                'hash' => 2437735693,
                             ],
                         ],
                     ],
@@ -50,21 +50,21 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 4099993588,
+                            'hash' => 2437735693,
                             'properties' => [
                                 'keyValueCouple' => [
                                     'type' => KeyValueCoupleNode::class,
-                                    'hash' => 650558140,
+                                    'hash' => 2335643525,
                                 ],
                             ],
                             'children' => [
                                 [
                                     'type' => KeyValueCoupleNode::class,
-                                    'hash' => 650558140,
+                                    'hash' => 2335643525,
                                     'properties' => [
                                         'key' => [
                                             'type' => KeyNode::class,
-                                            'hash' => 3887823543,
+                                            'hash' => 1059383168,
                                         ],
                                         'mappingValueIndicator' => [
                                             'type' => SyntaxTokenNode::class,
@@ -78,7 +78,7 @@ return [
                                     'children' => [
                                         [
                                             'type' => KeyNode::class,
-                                            'hash' => 3887823543,
+                                            'hash' => 1059383168,
                                             'properties' => [
                                                 'explicitKeyIndicatorNode' => [
                                                     'type' => ExplicitKeyIndicatorNode::class,
@@ -86,7 +86,7 @@ return [
                                                 ],
                                                 'name' => [
                                                     'type' => ScalarNode::class,
-                                                    'hash' => 1269226975,
+                                                    'hash' => 197720585,
                                                 ],
                                             ],
                                             'children' => [
@@ -114,16 +114,27 @@ return [
                                                 ],
                                                 [
                                                     'type' => ScalarNode::class,
-                                                    'hash' => 1269226975,
+                                                    'hash' => 197720585,
                                                     'properties' => [
                                                         'token' => [
                                                             'type' => TokenType::PLAIN_SCALAR,
-                                                            'text' => 'foo bar ',
+                                                            'text' => 'foo bar',
                                                         ],
                                                     ],
                                                     'children' => [],
                                                 ],
                                             ],
+                                        ],
+                                        [
+                                            'type' => WhitespaceNode::class,
+                                            'hash' => 1067539092,
+                                            'properties' => [
+                                                'token' => [
+                                                    'type' => TokenType::WHITESPACE,
+                                                    'text' => ' ',
+                                                ],
+                                            ],
+                                            'children' => [],
                                         ],
                                         [
                                             'type' => SyntaxTokenNode::class,

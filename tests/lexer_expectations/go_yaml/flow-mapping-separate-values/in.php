@@ -15,7 +15,11 @@ return [
     ],
     [
         'type' => TokenType::PLAIN_SCALAR,
-        'text' => 'unquoted ',
+        'text' => 'unquoted',
+    ],
+    [
+        'type' => TokenType::WHITESPACE,
+        'text' => ' ',
     ],
     [
         'type' => TokenType::VALUE_INDICATOR,

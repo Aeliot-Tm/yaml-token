@@ -23,7 +23,11 @@ return [
     ],
     [
         'type' => TokenType::PLAIN_SCALAR,
-        'text' => 'YAML ',
+        'text' => 'YAML',
+    ],
+    [
+        'type' => TokenType::WHITESPACE,
+        'text' => ' ',
     ],
     [
         'type' => TokenType::VALUE_INDICATOR,

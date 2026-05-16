@@ -832,6 +832,7 @@ final class Lexer
                 if ($peek >= $harvester->length
                     || \in_array($harvester->input[$peek], self::CHARS_LINE_BREAK, true)
                     || '#' === $harvester->input[$peek]
+                    || (':' === $harvester->input[$peek] && $this->isColonMappingValueIndicator($harvester, $peek))
                     || ($inFlow && \in_array($harvester->input[$peek], [',', ']', '}', '[', '{'], true))) {
                     break;
                 }
