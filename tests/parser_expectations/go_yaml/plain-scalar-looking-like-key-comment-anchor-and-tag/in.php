@@ -14,12 +14,12 @@ use Aeliot\YamlToken\Node\ValueNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 556270923,
+    'hash' => 3791275557,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 3346003601,
+            'hash' => 835909346,
             'properties' => [],
             'children' => [
                 [
@@ -46,68 +46,64 @@ return [
                 ],
                 [
                     'type' => ValueNode::class,
-                    'hash' => 1835525216,
+                    'hash' => 2141045926,
                     'properties' => [
                         'multilinePlainScalar' => [
                             'type' => MultilinePlainScalarNode::class,
-                            'hash' => 2373222545,
+                            'hash' => 901542566,
+                        ],
+                    ],
+                    'children' => [
+                        [
+                            'type' => MultilinePlainScalarNode::class,
+                            'hash' => 901542566,
                             'properties' => [],
                             'children' => [
                                 [
                                     'type' => ScalarNode::class,
                                     'hash' => 2180763694,
+                                    'properties' => [
+                                        'token' => [
+                                            'type' => TokenType::PLAIN_SCALAR,
+                                            'text' => 'k:#foo',
+                                        ],
+                                    ],
+                                    'children' => [],
+                                ],
+                                [
+                                    'type' => NewLineNode::class,
+                                    'hash' => 763369711,
+                                    'properties' => [
+                                        'token' => [
+                                            'type' => TokenType::NEWLINE,
+                                            'text' => "\n",
+                                        ],
+                                    ],
+                                    'children' => [],
+                                ],
+                                [
+                                    'type' => IndentationNode::class,
+                                    'hash' => 2218577147,
+                                    'properties' => [
+                                        'token' => [
+                                            'type' => TokenType::INDENTATION,
+                                            'text' => ' ',
+                                        ],
+                                    ],
+                                    'children' => [],
                                 ],
                                 [
                                     'type' => ScalarNode::class,
                                     'hash' => 2358486340,
+                                    'properties' => [
+                                        'token' => [
+                                            'type' => TokenType::PLAIN_SCALAR,
+                                            'text' => '&a !t s',
+                                        ],
+                                    ],
+                                    'children' => [],
                                 ],
                             ],
-                        ],
-                    ],
-                    'children' => [
-                        [
-                            'type' => ScalarNode::class,
-                            'hash' => 2180763694,
-                            'properties' => [
-                                'token' => [
-                                    'type' => TokenType::PLAIN_SCALAR,
-                                    'text' => 'k:#foo',
-                                ],
-                            ],
-                            'children' => [],
-                        ],
-                        [
-                            'type' => NewLineNode::class,
-                            'hash' => 763369711,
-                            'properties' => [
-                                'token' => [
-                                    'type' => TokenType::NEWLINE,
-                                    'text' => "\n",
-                                ],
-                            ],
-                            'children' => [],
-                        ],
-                        [
-                            'type' => IndentationNode::class,
-                            'hash' => 2218577147,
-                            'properties' => [
-                                'token' => [
-                                    'type' => TokenType::INDENTATION,
-                                    'text' => ' ',
-                                ],
-                            ],
-                            'children' => [],
-                        ],
-                        [
-                            'type' => ScalarNode::class,
-                            'hash' => 2358486340,
-                            'properties' => [
-                                'token' => [
-                                    'type' => TokenType::PLAIN_SCALAR,
-                                    'text' => '&a !t s',
-                                ],
-                            ],
-                            'children' => [],
                         ],
                     ],
                 ],

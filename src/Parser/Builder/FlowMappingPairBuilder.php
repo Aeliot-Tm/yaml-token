@@ -51,7 +51,6 @@ final class FlowMappingPairBuilder implements BuilderInterface
         }
 
         $couple->setKey($this->host->getFlowEntryKeyNode($harvester));
-        $this->host->appendFlowKeyMultilinePlainScalarContinuations($harvester, $couple->getKey());
 
         if ($this->host->tryConsumeFlowMappingValueIndicator($harvester, $couple)) {
             if ($this->isAtFlowMappingEntryBoundary($harvester)) {

@@ -35,6 +35,21 @@ abstract class AbstractNode implements Node
         return $this->children;
     }
 
+    /**
+     * Removes $child from this node's children only. Does not clear {@see setParent()};
+     * the caller must attach the node elsewhere via {@see addChild()} if it stays in the tree.
+     */
+    public function removeChild(Node $child): void
+    {
+        $index = array_search($child, $this->children, true);
+        if (false === $index) {
+            return;
+        }
+
+        unset($this->children[$index]);
+        $this->children = array_values($this->children);
+    }
+
     public function getParent(): ?Node
     {
         return $this->parent;

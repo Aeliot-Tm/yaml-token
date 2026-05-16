@@ -26,12 +26,12 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 180092453,
+    'hash' => 2143710101,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 2756297210,
+            'hash' => 2699537086,
             'properties' => [],
             'children' => [
                 [
@@ -58,7 +58,7 @@ return [
                 ],
                 [
                     'type' => ValueNode::class,
-                    'hash' => 3043399130,
+                    'hash' => 1099553987,
                     'properties' => [
                         'nodeProperties' => [
                             'type' => NodePropertiesNode::class,
@@ -66,7 +66,7 @@ return [
                         ],
                         'blockMapping' => [
                             'type' => BlockMappingNode::class,
-                            'hash' => 3767075182,
+                            'hash' => 3467875753,
                         ],
                     ],
                     'children' => [
@@ -106,7 +106,7 @@ return [
                         ],
                         [
                             'type' => BlockMappingNode::class,
-                            'hash' => 3767075182,
+                            'hash' => 3467875753,
                             'properties' => [
                                 'entries' => [
                                     [
@@ -139,7 +139,7 @@ return [
                                     ],
                                     [
                                         'type' => KeyValueCoupleNode::class,
-                                        'hash' => 165733272,
+                                        'hash' => 2182195803,
                                     ],
                                 ],
                             ],
@@ -2814,7 +2814,7 @@ return [
                                 ],
                                 [
                                     'type' => KeyValueCoupleNode::class,
-                                    'hash' => 165733272,
+                                    'hash' => 2182195803,
                                     'properties' => [
                                         'key' => [
                                             'type' => KeyNode::class,
@@ -2822,7 +2822,7 @@ return [
                                         ],
                                         'value' => [
                                             'type' => ValueNode::class,
-                                            'hash' => 4132780461,
+                                            'hash' => 3316681408,
                                         ],
                                     ],
                                     'children' => [
@@ -2862,26 +2862,11 @@ return [
                                         ],
                                         [
                                             'type' => ValueNode::class,
-                                            'hash' => 4132780461,
+                                            'hash' => 3316681408,
                                             'properties' => [
                                                 'multilinePlainScalar' => [
                                                     'type' => MultilinePlainScalarNode::class,
-                                                    'hash' => 228783498,
-                                                    'properties' => [],
-                                                    'children' => [
-                                                        [
-                                                            'type' => ScalarNode::class,
-                                                            'hash' => 2527138818,
-                                                        ],
-                                                        [
-                                                            'type' => ScalarNode::class,
-                                                            'hash' => 765257370,
-                                                        ],
-                                                        [
-                                                            'type' => ScalarNode::class,
-                                                            'hash' => 2825072430,
-                                                        ],
-                                                    ],
+                                                    'hash' => 3301945052,
                                                 ],
                                             ],
                                             'children' => [
@@ -2897,92 +2882,99 @@ return [
                                                     'children' => [],
                                                 ],
                                                 [
-                                                    'type' => IndentationNode::class,
-                                                    'hash' => 3551679428,
-                                                    'properties' => [
-                                                        'token' => [
-                                                            'type' => TokenType::INDENTATION,
-                                                            'text' => '    ',
+                                                    'type' => MultilinePlainScalarNode::class,
+                                                    'hash' => 3301945052,
+                                                    'properties' => [],
+                                                    'children' => [
+                                                        [
+                                                            'type' => IndentationNode::class,
+                                                            'hash' => 3551679428,
+                                                            'properties' => [
+                                                                'token' => [
+                                                                    'type' => TokenType::INDENTATION,
+                                                                    'text' => '    ',
+                                                                ],
+                                                            ],
+                                                            'children' => [],
+                                                        ],
+                                                        [
+                                                            'type' => ScalarNode::class,
+                                                            'hash' => 2527138818,
+                                                            'properties' => [
+                                                                'token' => [
+                                                                    'type' => TokenType::PLAIN_SCALAR,
+                                                                    'text' => 'Late afternoon is best.',
+                                                                ],
+                                                            ],
+                                                            'children' => [],
+                                                        ],
+                                                        [
+                                                            'type' => NewLineNode::class,
+                                                            'hash' => 763369711,
+                                                            'properties' => [
+                                                                'token' => [
+                                                                    'type' => TokenType::NEWLINE,
+                                                                    'text' => "\n",
+                                                                ],
+                                                            ],
+                                                            'children' => [],
+                                                        ],
+                                                        [
+                                                            'type' => IndentationNode::class,
+                                                            'hash' => 3551679428,
+                                                            'properties' => [
+                                                                'token' => [
+                                                                    'type' => TokenType::INDENTATION,
+                                                                    'text' => '    ',
+                                                                ],
+                                                            ],
+                                                            'children' => [],
+                                                        ],
+                                                        [
+                                                            'type' => ScalarNode::class,
+                                                            'hash' => 765257370,
+                                                            'properties' => [
+                                                                'token' => [
+                                                                    'type' => TokenType::PLAIN_SCALAR,
+                                                                    'text' => 'Backup contact is Nancy',
+                                                                ],
+                                                            ],
+                                                            'children' => [],
+                                                        ],
+                                                        [
+                                                            'type' => NewLineNode::class,
+                                                            'hash' => 763369711,
+                                                            'properties' => [
+                                                                'token' => [
+                                                                    'type' => TokenType::NEWLINE,
+                                                                    'text' => "\n",
+                                                                ],
+                                                            ],
+                                                            'children' => [],
+                                                        ],
+                                                        [
+                                                            'type' => IndentationNode::class,
+                                                            'hash' => 3551679428,
+                                                            'properties' => [
+                                                                'token' => [
+                                                                    'type' => TokenType::INDENTATION,
+                                                                    'text' => '    ',
+                                                                ],
+                                                            ],
+                                                            'children' => [],
+                                                        ],
+                                                        [
+                                                            'type' => ScalarNode::class,
+                                                            'hash' => 2825072430,
+                                                            'properties' => [
+                                                                'token' => [
+                                                                    'type' => TokenType::PLAIN_SCALAR,
+                                                                    'text' => 'Billsmer @ 338-4338.',
+                                                                ],
+                                                            ],
+                                                            'children' => [],
                                                         ],
                                                     ],
-                                                    'children' => [],
-                                                ],
-                                                [
-                                                    'type' => ScalarNode::class,
-                                                    'hash' => 2527138818,
-                                                    'properties' => [
-                                                        'token' => [
-                                                            'type' => TokenType::PLAIN_SCALAR,
-                                                            'text' => 'Late afternoon is best.',
-                                                        ],
-                                                    ],
-                                                    'children' => [],
-                                                ],
-                                                [
-                                                    'type' => NewLineNode::class,
-                                                    'hash' => 763369711,
-                                                    'properties' => [
-                                                        'token' => [
-                                                            'type' => TokenType::NEWLINE,
-                                                            'text' => "\n",
-                                                        ],
-                                                    ],
-                                                    'children' => [],
-                                                ],
-                                                [
-                                                    'type' => IndentationNode::class,
-                                                    'hash' => 3551679428,
-                                                    'properties' => [
-                                                        'token' => [
-                                                            'type' => TokenType::INDENTATION,
-                                                            'text' => '    ',
-                                                        ],
-                                                    ],
-                                                    'children' => [],
-                                                ],
-                                                [
-                                                    'type' => ScalarNode::class,
-                                                    'hash' => 765257370,
-                                                    'properties' => [
-                                                        'token' => [
-                                                            'type' => TokenType::PLAIN_SCALAR,
-                                                            'text' => 'Backup contact is Nancy',
-                                                        ],
-                                                    ],
-                                                    'children' => [],
-                                                ],
-                                                [
-                                                    'type' => NewLineNode::class,
-                                                    'hash' => 763369711,
-                                                    'properties' => [
-                                                        'token' => [
-                                                            'type' => TokenType::NEWLINE,
-                                                            'text' => "\n",
-                                                        ],
-                                                    ],
-                                                    'children' => [],
-                                                ],
-                                                [
-                                                    'type' => IndentationNode::class,
-                                                    'hash' => 3551679428,
-                                                    'properties' => [
-                                                        'token' => [
-                                                            'type' => TokenType::INDENTATION,
-                                                            'text' => '    ',
-                                                        ],
-                                                    ],
-                                                    'children' => [],
-                                                ],
-                                                [
-                                                    'type' => ScalarNode::class,
-                                                    'hash' => 2825072430,
-                                                    'properties' => [
-                                                        'token' => [
-                                                            'type' => TokenType::PLAIN_SCALAR,
-                                                            'text' => 'Billsmer @ 338-4338.',
-                                                        ],
-                                                    ],
-                                                    'children' => [],
                                                 ],
                                             ],
                                         ],

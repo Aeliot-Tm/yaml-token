@@ -29,7 +29,6 @@ use Aeliot\YamlToken\Token\Token;
 final class FlowHost
 {
     /**
-     * @param \Closure(Harvester, KeyNode): void $appendFlowKeyMultilinePlainScalarContinuations
      * @param \Closure(Harvester, Node): void $collectSpaceAndComments
      * @param \Closure(Token): SyntaxTokenNode $createSyntaxTokenNode
      * @param \Closure(Harvester): KeyNode $getFlowEntryKeyNode
@@ -41,7 +40,6 @@ final class FlowHost
      * @param \Closure(Harvester, KeyValueCoupleNode): bool $tryConsumeFlowMappingValueIndicator
      */
     public function __construct(
-        private readonly \Closure $appendFlowKeyMultilinePlainScalarContinuations,
         private readonly \Closure $collectSpaceAndComments,
         private readonly \Closure $createSyntaxTokenNode,
         private readonly \Closure $getFlowEntryKeyNode,
@@ -52,11 +50,6 @@ final class FlowHost
         private readonly \Closure $postProcessKeyValueCouple,
         private readonly \Closure $tryConsumeFlowMappingValueIndicator,
     ) {
-    }
-
-    public function appendFlowKeyMultilinePlainScalarContinuations(Harvester $harvester, KeyNode $keyNode): void
-    {
-        ($this->appendFlowKeyMultilinePlainScalarContinuations)($harvester, $keyNode);
     }
 
     public function collectSpaceAndComments(Harvester $harvester, Node $root): void

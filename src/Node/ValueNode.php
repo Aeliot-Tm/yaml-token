@@ -54,17 +54,12 @@ class ValueNode extends AbstractNode
             $this->keyValueCouple = $child;
         }
 
+        if ($child instanceof MultilinePlainScalarNode) {
+            $this->multilinePlainScalar = $child;
+        }
+
         if ($child instanceof ScalarNode) {
-            if (null !== $this->multilinePlainScalar) {
-                $this->multilinePlainScalar->addChild($child);
-            } elseif (null !== $this->scalar) {
-                $this->multilinePlainScalar = new MultilinePlainScalarNode();
-                $this->multilinePlainScalar->addChild($this->scalar);
-                $this->multilinePlainScalar->addChild($child);
-                $this->scalar = null;
-            } else {
-                $this->scalar = $child;
-            }
+            $this->scalar = $child;
         }
 
         parent::addChild($child);

@@ -154,7 +154,6 @@ final class FlowEntryBuilder implements BuilderInterface
     {
         $couple = new KeyValueCoupleNode();
         $couple->setKey($this->host->getFlowEntryKeyNode($harvester));
-        $this->host->appendFlowKeyMultilinePlainScalarContinuations($harvester, $couple->getKey());
 
         $this->host->tryConsumeFlowMappingValueIndicator($harvester, $couple);
 

@@ -10,7 +10,6 @@ use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\IndentationNode;
 use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
-use Aeliot\YamlToken\Node\MultilinePlainScalarNode;
 use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
@@ -20,17 +19,17 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 3035299517,
+    'hash' => 2755955035,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 968005630,
+            'hash' => 3021180584,
             'properties' => [],
             'children' => [
                 [
                     'type' => KeyValueCoupleNode::class,
-                    'hash' => 557596179,
+                    'hash' => 2553242735,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
@@ -38,7 +37,7 @@ return [
                         ],
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 2792784020,
+                            'hash' => 2876721646,
                         ],
                     ],
                     'children' => [
@@ -89,22 +88,11 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 2792784020,
+                            'hash' => 2876721646,
                             'properties' => [
-                                'multilinePlainScalar' => [
-                                    'type' => MultilinePlainScalarNode::class,
-                                    'hash' => 2122511875,
-                                    'properties' => [],
-                                    'children' => [
-                                        [
-                                            'type' => ScalarNode::class,
-                                            'hash' => 41164927,
-                                        ],
-                                        [
-                                            'type' => ScalarNode::class,
-                                            'hash' => 2703402710,
-                                        ],
-                                    ],
+                                'scalar' => [
+                                    'type' => ScalarNode::class,
+                                    'hash' => 2703402710,
                                 ],
                             ],
                             'children' => [

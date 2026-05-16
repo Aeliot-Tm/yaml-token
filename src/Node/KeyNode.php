@@ -21,22 +21,6 @@ class KeyNode extends AbstractNode
     private ?Node $name = null;
     private ?NodePropertiesNode $properties = null;
 
-    public function addScalarName(ScalarNode $node): void
-    {
-        if (null === $this->name) {
-            $this->name = $node;
-        } elseif ($this->name instanceof ScalarNode) {
-            $multilinePlainScalar = new MultilinePlainScalarNode();
-            $multilinePlainScalar->addChild($this->name);
-            $multilinePlainScalar->addChild($node);
-            $this->name = $multilinePlainScalar;
-        } else {
-            $this->name->addChild($node);
-        }
-
-        $this->addChild($node);
-    }
-
     public function getAnchor(): ?AnchorNode
     {
         return $this->properties?->getAnchor();

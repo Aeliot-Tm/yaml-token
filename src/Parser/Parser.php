@@ -35,6 +35,7 @@ use Aeliot\YamlToken\Node\IndentationNode;
 use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\MergeInstructionNode;
+use Aeliot\YamlToken\Node\MultilinePlainScalarNode;
 use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Node\NodePropertiesNode;
@@ -102,14 +103,14 @@ final class Parser
      *
      * @see Parser::parseValue() YAML 1.2.2 §7.3.3 / §8.1.1
      */
-    private function appendMultilinePlainScalarContinuations(Harvester $harvester, ValueNode $valueNode, int $parentIndentLen): void
+    private function appendMultilinePlainScalarContinuations(Harvester $harvester, Node $targetNode, int $parentIndentLen): void
     {
         while (true) {
             while (
                 TokenType::WHITESPACE === $harvester->tokens->current()?->type
                 && TokenType::NEWLINE === $harvester->tokens->peek(1)?->type
             ) {
-                $valueNode->addChild(new WhitespaceNode($harvester->tokens->current()));
+                $targetNode->addChild(new WhitespaceNode($harvester->tokens->current()));
                 $harvester->tokens->advance();
             }
 
@@ -134,7 +135,7 @@ final class Parser
                     break;
                 }
 
-                $valueNode->addChild(new NewLineNode($newLine));
+                $targetNode->addChild(new NewLineNode($newLine));
                 $harvester->tokens->advance();
                 continue;
             }
@@ -158,20 +159,20 @@ final class Parser
                         )
                     )
                 ) {
-                    $valueNode->addChild(new NewLineNode($newLine));
+                    $targetNode->addChild(new NewLineNode($newLine));
                     $harvester->tokens->advance();
                     $indentationToken = $harvester->tokens->current();
                     if (TokenType::INDENTATION !== $indentationToken->type) {
                         throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Expected INDENTATION after newline in multiline plain empty line, got %s', $indentationToken->type->value), $harvester->tokens));
                     }
-                    $valueNode->addChild(new IndentationNode($indentationToken));
+                    $targetNode->addChild(new IndentationNode($indentationToken));
                     $harvester->tokens->advance();
                     for ($w = 2; $w < $afterIndentOffset; ++$w) {
                         $wsToken = $harvester->tokens->current();
                         if (TokenType::WHITESPACE !== $wsToken->type) {
                             throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Expected WHITESPACE in multiline plain empty line, got %s', $wsToken->type->value), $harvester->tokens));
                         }
-                        $valueNode->addChild(new WhitespaceNode($wsToken));
+                        $targetNode->addChild(new WhitespaceNode($wsToken));
                         $harvester->tokens->advance();
                     }
                     $closingNewline = $harvester->tokens->current();
@@ -185,19 +186,19 @@ final class Parser
             if ($this->isIndentedMultilinePlainContinuationAt($harvester, 1, $parentIndentLen)) {
                 $indentation = $harvester->tokens->peek(1);
 
-                $valueNode->addChild(new NewLineNode($newLine));
-                $valueNode->addChild(new IndentationNode($indentation));
+                $targetNode->addChild(new NewLineNode($newLine));
+                $targetNode->addChild(new IndentationNode($indentation));
                 $harvester->tokens->advance();
                 $harvester->tokens->advance();
 
                 $contentHead = $harvester->tokens->current();
                 while (TokenType::WHITESPACE === $contentHead->type) {
-                    $valueNode->addChild(new WhitespaceNode($contentHead));
+                    $targetNode->addChild(new WhitespaceNode($contentHead));
                     $harvester->tokens->advance();
                     $contentHead = $harvester->tokens->current();
                 }
 
-                $valueNode->addChild(new ScalarNode($contentHead));
+                $targetNode->addChild(new ScalarNode($contentHead));
                 $harvester->tokens->advance();
 
                 continue;
@@ -207,64 +208,23 @@ final class Parser
                 self::BARE_DOCUMENT_BLOCK_PARENT_INDENT === $parentIndentLen
                 && $this->isBareDocumentFlushMultilinePlainContinuationAt($harvester, 1)
             ) {
-                $valueNode->addChild(new NewLineNode($newLine));
+                $targetNode->addChild(new NewLineNode($newLine));
                 $harvester->tokens->advance();
 
                 $contentHead = $harvester->tokens->current();
                 while (TokenType::WHITESPACE === $contentHead->type) {
-                    $valueNode->addChild(new WhitespaceNode($contentHead));
+                    $targetNode->addChild(new WhitespaceNode($contentHead));
                     $harvester->tokens->advance();
                     $contentHead = $harvester->tokens->current();
                 }
 
-                $valueNode->addChild(new ScalarNode($contentHead));
+                $targetNode->addChild(new ScalarNode($contentHead));
                 $harvester->tokens->advance();
 
                 continue;
             }
 
             break;
-        }
-    }
-
-    /**
-     * Flow-context counterpart of {@see appendMultilinePlainScalarContinuations()}: consumes one or more
-     * NEWLINE + WHITESPACE* + PLAIN_SCALAR continuation chunks for a plain-scalar key inside a flow
-     * mapping (YAML 1.2.2 §7.3.3 / §7.4.1). The lexer emits WHITESPACE — not INDENTATION — for leading
-     * spaces inside `{...}`, so the block-context helpers cannot be reused. Each consumed PLAIN_SCALAR
-     * is appended via {@see KeyNode::addScalarName()}, which automatically wraps repeated fragments
-     * into a {@see MultilinePlainScalarNode}.
-     */
-    private function appendFlowKeyMultilinePlainScalarContinuations(Harvester $harvester, KeyNode $keyNode): void
-    {
-        $name = $keyNode->getName();
-        if (!$name instanceof ScalarNode || TokenType::PLAIN_SCALAR !== $name->getToken()->type) {
-            return;
-        }
-
-        while (TokenType::NEWLINE === $harvester->tokens->current()?->type) {
-            $newLine = $harvester->tokens->current();
-            $scalarOffset = 1;
-            while (TokenType::WHITESPACE === $harvester->tokens->peek($scalarOffset)?->type) {
-                ++$scalarOffset;
-            }
-            $scalarToken = $harvester->tokens->peek($scalarOffset);
-            if (TokenType::PLAIN_SCALAR !== $scalarToken?->type) {
-                break;
-            }
-
-            $keyNode->addChild(new NewLineNode($newLine));
-            $harvester->tokens->advance();
-
-            $contentHead = $harvester->tokens->current();
-            while (TokenType::WHITESPACE === $contentHead->type) {
-                $keyNode->addChild(new WhitespaceNode($contentHead));
-                $harvester->tokens->advance();
-                $contentHead = $harvester->tokens->current();
-            }
-
-            $keyNode->addScalarName(new ScalarNode($scalarToken));
-            $harvester->tokens->advance();
         }
     }
 
@@ -286,6 +246,75 @@ final class Parser
         } catch (IndentationInvalidException|IndentationUndefinedException $e) {
             $this->wrapParseStateIndentationException($e, $harvester->tokens);
         }
+    }
+
+    /**
+     * Explicit-block-key continuation after a first-line scalar (YAML 1.2.2 §8.2.2): subsequent lines
+     * with INDENTATION > entry indent and a PLAIN_SCALAR (not the start of a nested implicit key)
+     * extend the same plain scalar. Returns the head scalar when no continuation is consumed.
+     */
+    private function buildExplicitBlockKeyMultilinePlainScalarName(
+        Harvester $harvester,
+        ScalarNode $head,
+        int $entryIndentLen,
+    ): Node {
+        $multiline = new MultilinePlainScalarNode();
+        $multiline->addChild($head);
+
+        $consumedAny = false;
+        while ($this->tryConsumeExplicitKeyMultilinePlainScalarLine($harvester, $multiline, $entryIndentLen)) {
+            $consumedAny = true;
+        }
+
+        return $consumedAny ? $multiline : $head;
+    }
+
+    /**
+     * Flow-context multiline plain key (YAML 1.2.2 §7.3.3 / §7.4.1): NEWLINE WHITESPACE* PLAIN_SCALAR
+     * fragments may follow the first scalar. Returns the head scalar when no continuation is consumed,
+     * otherwise a {@see MultilinePlainScalarNode} that wraps the head plus consumed fragments.
+     */
+    private function buildFlowKeyMultilinePlainScalarName(Harvester $harvester, ScalarNode $head): Node
+    {
+        $multiline = new MultilinePlainScalarNode();
+        $multiline->addChild($head);
+
+        $consumedAny = false;
+        while ($this->tryConsumeFlowKeyMultilinePlainScalarLine($harvester, $multiline)) {
+            $consumedAny = true;
+        }
+
+        return $consumedAny ? $multiline : $head;
+    }
+
+    /**
+     * Builds the {@see KeyNode} name node for a leading scalar key token, eagerly consuming any
+     * multiline plain-scalar continuation lines (YAML 1.2.2 §7.3.3 / §7.4.1 in flow context, §8.2.2
+     * for the body of explicit block keys). Returning the final node lets the caller invoke
+     * {@see KeyNode::setName()} exactly once.
+     */
+    private function buildScalarKeyName(
+        Harvester $harvester,
+        Token $headToken,
+        ?int $entryIndentLen,
+        bool $hasExplicitKeyIndicator,
+    ): Node {
+        $head = new ScalarNode($headToken);
+        $harvester->tokens->advance();
+
+        if (TokenType::PLAIN_SCALAR !== $headToken->type) {
+            return $head;
+        }
+
+        if (null === $entryIndentLen) {
+            return $this->buildFlowKeyMultilinePlainScalarName($harvester, $head);
+        }
+
+        if ($hasExplicitKeyIndicator) {
+            return $this->buildExplicitBlockKeyMultilinePlainScalarName($harvester, $head, $entryIndentLen);
+        }
+
+        return $head;
     }
 
     /**
@@ -571,100 +600,55 @@ final class Parser
     }
 
     /**
-     * TODO: refactor similar methods: consumeExplicitKeyMultilinePlainScalarFirstLine & consumeExplicitKeyMultilinePlainScalarContinuation.
+     * Builds the {@see KeyNode} name for the explicit-block-key path where the key starts on a new line
+     * after the `?` indicator (YAML 1.2.2 §8.2.2). Consumes the first NEWLINE + INDENTATION + PLAIN_SCALAR
+     * line and any subsequent continuation lines. When only a single scalar fragment is present, the
+     * leading layout (NEWLINE / INDENTATION / WHITESPACE) is attached directly to the {@see KeyNode}
+     * and the name becomes a plain {@see ScalarNode}; otherwise the whole sequence is wrapped in a
+     * {@see MultilinePlainScalarNode}.
      */
-    private function consumeExplicitKeyMultilinePlainScalarContinuation(Harvester $harvester, KeyNode $keyNode, int $entryIndentLen): void
+    private function consumeExplicitKeyMultilinePlainScalar(Harvester $harvester, KeyNode $keyNode, int $entryIndentLen): void
     {
-        $name = $keyNode->getName();
-        if (!$name instanceof ScalarNode || TokenType::PLAIN_SCALAR !== $name->getToken()->type) {
+        if (TokenType::NEWLINE !== $harvester->tokens->current()?->type) {
             return;
         }
 
-        while (TokenType::NEWLINE === $harvester->tokens->current()?->type) {
-            $newLine = $harvester->tokens->current();
-            $indentation = $harvester->tokens->peek(1);
-            if (TokenType::INDENTATION !== $indentation?->type) {
-                break;
-            }
+        $multiline = new MultilinePlainScalarNode();
+        $this->consumeExplicitKeyMultilinePlainScalarLine($harvester, $multiline, $entryIndentLen);
 
-            $indentLen = \strlen($indentation->text);
-            if ($indentLen <= $entryIndentLen) {
-                break;
-            }
-
-            $scalarOffset = 2;
-            while (TokenType::WHITESPACE === $harvester->tokens->peek($scalarOffset)?->type) {
-                ++$scalarOffset;
-            }
-            $scalarToken = $harvester->tokens->peek($scalarOffset);
-            if (!$scalarToken?->type->isScalar()) {
-                break;
-            }
-
-            $keyProbe = $scalarOffset + 1;
-            while (TokenType::WHITESPACE === $harvester->tokens->peek($keyProbe)?->type) {
-                ++$keyProbe;
-            }
-            if (TokenType::VALUE_INDICATOR === $harvester->tokens->peek($keyProbe)?->type) {
-                break;
-            }
-
-            $keyNode->addChild(new NewLineNode($newLine));
-            $keyNode->addChild(new IndentationNode($indentation));
-            $harvester->tokens->advance();
-            $harvester->tokens->advance();
-
-            $contentHead = $harvester->tokens->current();
-            while (TokenType::WHITESPACE === $contentHead->type) {
-                $keyNode->addChild(new WhitespaceNode($contentHead));
-                $harvester->tokens->advance();
-                $contentHead = $harvester->tokens->current();
-            }
-
-            $keyNode->addScalarName(new ScalarNode($contentHead));
-            $harvester->tokens->advance();
+        while ($this->tryConsumeExplicitKeyMultilinePlainScalarLine($harvester, $multiline, $entryIndentLen)) {
+            // continuation lines collected into $multiline
         }
+
+        $scalars = array_values(array_filter(
+            $multiline->getChildren(),
+            static fn (Node $child): bool => $child instanceof ScalarNode,
+        ));
+
+        if (1 === \count($scalars)) {
+            foreach ($multiline->getChildren() as $child) {
+                if ($child instanceof ScalarNode) {
+                    $keyNode->setName($child);
+                } else {
+                    $keyNode->addChild($child);
+                }
+            }
+
+            return;
+        }
+
+        $keyNode->setName($multiline);
     }
 
-    private function consumeExplicitKeyMultilinePlainScalarFirstLine(Harvester $harvester, KeyNode $keyNode, int $entryIndentLen): void
-    {
-        $newLine = $harvester->tokens->current();
-        if (TokenType::NEWLINE !== $newLine->type) {
-            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Expected NEWLINE to start indented explicit key plain scalar, got %s', $newLine->type->value), $newLine));
+    private function consumeExplicitKeyMultilinePlainScalarLine(
+        Harvester $harvester,
+        MultilinePlainScalarNode $multiline,
+        int $entryIndentLen,
+    ): void {
+        if (!$this->tryConsumeExplicitKeyMultilinePlainScalarLine($harvester, $multiline, $entryIndentLen)) {
+            $token = $harvester->tokens->current();
+            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Expected NEWLINE to start indented explicit key plain scalar, got %s', $token?->type->value ?? '_nothing_'), $harvester->tokens));
         }
-
-        $indentation = $harvester->tokens->peek(1);
-        if (TokenType::INDENTATION !== $indentation?->type) {
-            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Expected INDENTATION and scalar for explicit key continuation line, got %s', $harvester->tokens->current()?->type->value ?? '_nothing_'), $harvester->tokens));
-        }
-
-        $scalarOffset = 2;
-        while (TokenType::WHITESPACE === $harvester->tokens->peek($scalarOffset)?->type) {
-            ++$scalarOffset;
-        }
-        $scalarToken = $harvester->tokens->peek($scalarOffset);
-        if (!$scalarToken?->type->isScalar()) {
-            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Expected INDENTATION and scalar for explicit key continuation line, got %s', $harvester->tokens->current()?->type->value ?? '_nothing_'), $harvester->tokens));
-        }
-
-        if (\strlen($indentation->text) <= $entryIndentLen) {
-            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Indented explicit key line must be deeper than entry indent %d', $entryIndentLen), $indentation));
-        }
-
-        $keyNode->addChild(new NewLineNode($newLine));
-        $keyNode->addChild(new IndentationNode($indentation));
-        $harvester->tokens->advance();
-        $harvester->tokens->advance();
-
-        $contentHead = $harvester->tokens->current();
-        while (TokenType::WHITESPACE === $contentHead->type) {
-            $keyNode->addChild(new WhitespaceNode($contentHead));
-            $harvester->tokens->advance();
-            $contentHead = $harvester->tokens->current();
-        }
-
-        $keyNode->addScalarName(new ScalarNode($contentHead));
-        $harvester->tokens->advance();
     }
 
     /**
@@ -682,10 +666,21 @@ final class Parser
             throw new IndentationInvalidException($this->appendTokenLocation(\sprintf('Indented block scalar must be deeper than parent key line indent (%d spaces)', $parentIndentLen), $indentationToken));
         }
 
-        $valueNode->addChild(new IndentationNode($indentationToken));
+        $indentationNode = new IndentationNode($indentationToken);
         $harvester->tokens->advance();
 
-        $this->collectTypes($harvester, [TokenType::WHITESPACE, TokenType::COMMENT], $valueNode);
+        $layoutBuffer = [];
+        while (true) {
+            $layoutToken = $harvester->tokens->current();
+            if (
+                null === $layoutToken
+                || !\in_array($layoutToken->type, [TokenType::WHITESPACE, TokenType::COMMENT], true)
+            ) {
+                break;
+            }
+            $layoutBuffer[] = $this->createSimpleNode($layoutToken);
+            $harvester->tokens->advance();
+        }
 
         $scalarToken = $harvester->tokens->current();
         if (null === $scalarToken || !\in_array($scalarToken->type, [
@@ -696,11 +691,26 @@ final class Parser
             throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Scalar expected for indented block value, but %s given', $scalarToken?->type->value ?? '_nothing_'), $harvester->tokens));
         }
 
-        $valueNode->addChild(new ScalarNode($scalarToken));
-        $harvester->tokens->advance();
-
-        if (TokenType::PLAIN_SCALAR === $scalarToken->type) {
-            $this->appendMultilinePlainScalarContinuations($harvester, $valueNode, $parentIndentLen);
+        if (
+            TokenType::PLAIN_SCALAR === $scalarToken->type
+            && $this->isMultilinePlainContinuationAhead($harvester, 1, $parentIndentLen)
+        ) {
+            $multiline = new MultilinePlainScalarNode();
+            $multiline->addChild($indentationNode);
+            foreach ($layoutBuffer as $layoutNode) {
+                $multiline->addChild($layoutNode);
+            }
+            $multiline->addChild(new ScalarNode($scalarToken));
+            $harvester->tokens->advance();
+            $this->appendMultilinePlainScalarContinuations($harvester, $multiline, $parentIndentLen);
+            $valueNode->addChild($multiline);
+        } else {
+            $valueNode->addChild($indentationNode);
+            foreach ($layoutBuffer as $layoutNode) {
+                $valueNode->addChild($layoutNode);
+            }
+            $valueNode->addChild(new ScalarNode($scalarToken));
+            $harvester->tokens->advance();
         }
     }
 
@@ -738,9 +748,6 @@ final class Parser
     private function createFlowHost(): FlowHost
     {
         return new FlowHost(
-            function (Harvester $h, KeyNode $keyNode): void {
-                $this->appendFlowKeyMultilinePlainScalarContinuations($h, $keyNode);
-            },
             function (Harvester $h, Node $root): void {
                 $this->collectSpaceAndComments($h, $root);
             },
@@ -844,8 +851,7 @@ final class Parser
                 if ($this->isImplicitYamlKeyOnContinuationLine($harvester, $scalarPeekOffset)) {
                     $keyNode->setName($this->parseBlockMappingValue($harvester, $entryIndentLen));
                 } else {
-                    $this->consumeExplicitKeyMultilinePlainScalarFirstLine($harvester, $keyNode, $entryIndentLen);
-                    $this->consumeExplicitKeyMultilinePlainScalarContinuation($harvester, $keyNode, $entryIndentLen);
+                    $this->consumeExplicitKeyMultilinePlainScalar($harvester, $keyNode, $entryIndentLen);
                 }
 
                 return $keyNode;
@@ -911,8 +917,14 @@ final class Parser
             throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Key scalar expected, but %s given', $token->type->value), $token));
         }
 
-        $keyNode->addScalarName(new ScalarNode($token));
-        $harvester->tokens->advance();
+        $keyNode->setName(
+            $this->buildScalarKeyName(
+                $harvester,
+                $token,
+                $entryIndentLen,
+                null !== $keyNode->getExplicitKeyIndicatorNode(),
+            ),
+        );
 
         return $keyNode;
     }
@@ -1143,6 +1155,56 @@ final class Parser
             && (
                 $this->isNodePropertiesFollowedByImplicitYamlKeyOnSameLine($harvester)
                 || $this->isNodePropertiesFollowedByFlowCollectionImplicitBlockKeyOnSameLine($harvester)
+            );
+    }
+
+    /**
+     * Whether at least one multiline plain-scalar continuation line follows the current PLAIN_SCALAR
+     * (peek-only; does not consume tokens).
+     *
+     * @see Parser::appendMultilinePlainScalarContinuations()
+     */
+    private function isMultilinePlainContinuationAhead(Harvester $harvester, int $peekOffset, int $parentIndentLen): bool
+    {
+        $offset = $peekOffset;
+        if (TokenType::WHITESPACE === $harvester->tokens->peek($offset)?->type) {
+            if (TokenType::NEWLINE !== $harvester->tokens->peek($offset + 1)?->type) {
+                return false;
+            }
+            ++$offset;
+        }
+
+        if (TokenType::NEWLINE !== $harvester->tokens->peek($offset)?->type) {
+            return false;
+        }
+
+        if (TokenType::NEWLINE === $harvester->tokens->peek($offset + 1)?->type) {
+            return $this->isIndentedMultilinePlainContinuationAt($harvester, $offset + 2, $parentIndentLen)
+                || (
+                    self::BARE_DOCUMENT_BLOCK_PARENT_INDENT === $parentIndentLen
+                    && $this->isBareDocumentFlushMultilinePlainContinuationAt($harvester, $offset + 2)
+                );
+        }
+
+        $maybeIndent = $harvester->tokens->peek($offset + 1);
+        if (TokenType::INDENTATION === $maybeIndent?->type && \strlen($maybeIndent->text) > $parentIndentLen) {
+            $afterIndentOffset = $offset + 2;
+            while (TokenType::WHITESPACE === $harvester->tokens->peek($afterIndentOffset)?->type) {
+                ++$afterIndentOffset;
+            }
+            if (TokenType::NEWLINE === $harvester->tokens->peek($afterIndentOffset)?->type) {
+                return $this->isIndentedMultilinePlainContinuationAt($harvester, $afterIndentOffset + 1, $parentIndentLen)
+                    || (
+                        self::BARE_DOCUMENT_BLOCK_PARENT_INDENT === $parentIndentLen
+                        && $this->isBareDocumentFlushMultilinePlainContinuationAt($harvester, $afterIndentOffset + 1)
+                    );
+            }
+        }
+
+        return $this->isIndentedMultilinePlainContinuationAt($harvester, $offset + 1, $parentIndentLen)
+            || (
+                self::BARE_DOCUMENT_BLOCK_PARENT_INDENT === $parentIndentLen
+                && $this->isBareDocumentFlushMultilinePlainContinuationAt($harvester, $offset + 1)
             );
     }
 
@@ -1965,9 +2027,6 @@ final class Parser
         }
 
         $keyValueCouple->setKey($this->getKeyNode($harvester, true, $entryIndentLen));
-        if (null !== $keyValueCouple->getKey()->getExplicitKeyIndicatorNode()) {
-            $this->consumeExplicitKeyMultilinePlainScalarContinuation($harvester, $keyValueCouple->getKey(), $entryIndentLen);
-        }
 
         // YAML 1.2.2 explicit block mapping entry may put ':' on the next line:
         //   ? key
@@ -2333,16 +2392,18 @@ final class Parser
             }
             $this->parseIndentedBlockValue($harvester, $valueNode, $parentIndentLen);
         } elseif ($token->type->isScalar()) {
-            $valueNode->addChild(new ScalarNode($token));
-            $harvester->tokens->advance();
-
-            // YAML 1.2.2 §7.3.3 / §8.1.1: plain scalars in block context may span multiple lines.
-            // The lexer emits them as a sequence of:
-            //   PLAIN_SCALAR NEWLINE INDENTATION PLAIN_SCALAR ...
-            // When such a continuation line is indented deeper than the parent node indentation,
-            // it belongs to the same scalar (not to the surrounding block collection).
-            if (TokenType::PLAIN_SCALAR === $token->type) {
-                $this->appendMultilinePlainScalarContinuations($harvester, $valueNode, $parentIndentLen);
+            if (
+                TokenType::PLAIN_SCALAR === $token->type
+                && $this->isMultilinePlainContinuationAhead($harvester, 1, $parentIndentLen)
+            ) {
+                $multiline = new MultilinePlainScalarNode();
+                $multiline->addChild(new ScalarNode($token));
+                $harvester->tokens->advance();
+                $this->appendMultilinePlainScalarContinuations($harvester, $multiline, $parentIndentLen);
+                $valueNode->addChild($multiline);
+            } else {
+                $valueNode->addChild(new ScalarNode($token));
+                $harvester->tokens->advance();
             }
         } elseif (TokenType::ALIAS === $token->type) {
             $aliasNode = new AliasNode($token);
@@ -2549,6 +2610,92 @@ final class Parser
 
         $stream->addChild($document);
         $addedDocs[$objectId] = true;
+    }
+
+    private function tryConsumeExplicitKeyMultilinePlainScalarLine(
+        Harvester $harvester,
+        MultilinePlainScalarNode $multiline,
+        int $entryIndentLen,
+    ): bool {
+        $newLine = $harvester->tokens->current();
+        if (TokenType::NEWLINE !== $newLine?->type) {
+            return false;
+        }
+
+        $indentation = $harvester->tokens->peek(1);
+        if (TokenType::INDENTATION !== $indentation?->type) {
+            return false;
+        }
+
+        if (\strlen($indentation->text) <= $entryIndentLen) {
+            return false;
+        }
+
+        $scalarOffset = 2;
+        while (TokenType::WHITESPACE === $harvester->tokens->peek($scalarOffset)?->type) {
+            ++$scalarOffset;
+        }
+        $scalarToken = $harvester->tokens->peek($scalarOffset);
+        if (!$scalarToken?->type->isScalar()) {
+            return false;
+        }
+
+        $keyProbe = $scalarOffset + 1;
+        while (TokenType::WHITESPACE === $harvester->tokens->peek($keyProbe)?->type) {
+            ++$keyProbe;
+        }
+        if (TokenType::VALUE_INDICATOR === $harvester->tokens->peek($keyProbe)?->type) {
+            return false;
+        }
+
+        $multiline->addChild(new NewLineNode($newLine));
+        $multiline->addChild(new IndentationNode($indentation));
+        $harvester->tokens->advance();
+        $harvester->tokens->advance();
+
+        $contentHead = $harvester->tokens->current();
+        while (TokenType::WHITESPACE === $contentHead->type) {
+            $multiline->addChild(new WhitespaceNode($contentHead));
+            $harvester->tokens->advance();
+            $contentHead = $harvester->tokens->current();
+        }
+
+        $multiline->addChild(new ScalarNode($contentHead));
+        $harvester->tokens->advance();
+
+        return true;
+    }
+
+    private function tryConsumeFlowKeyMultilinePlainScalarLine(Harvester $harvester, MultilinePlainScalarNode $multiline): bool
+    {
+        if (TokenType::NEWLINE !== $harvester->tokens->current()?->type) {
+            return false;
+        }
+
+        $newLine = $harvester->tokens->current();
+        $scalarOffset = 1;
+        while (TokenType::WHITESPACE === $harvester->tokens->peek($scalarOffset)?->type) {
+            ++$scalarOffset;
+        }
+        $scalarToken = $harvester->tokens->peek($scalarOffset);
+        if (TokenType::PLAIN_SCALAR !== $scalarToken?->type) {
+            return false;
+        }
+
+        $multiline->addChild(new NewLineNode($newLine));
+        $harvester->tokens->advance();
+
+        $contentHead = $harvester->tokens->current();
+        while (TokenType::WHITESPACE === $contentHead->type) {
+            $multiline->addChild(new WhitespaceNode($contentHead));
+            $harvester->tokens->advance();
+            $contentHead = $harvester->tokens->current();
+        }
+
+        $multiline->addChild(new ScalarNode($scalarToken));
+        $harvester->tokens->advance();
+
+        return true;
     }
 
     private function tryConsumeFlowMappingValueIndicator(Harvester $harvester, KeyValueCoupleNode $couple): bool

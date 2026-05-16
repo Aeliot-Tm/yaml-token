@@ -18,17 +18,17 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 2461598796,
+    'hash' => 3021768932,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 904183777,
+            'hash' => 2968943478,
             'properties' => [],
             'children' => [
                 [
                     'type' => KeyValueCoupleNode::class,
-                    'hash' => 2010101909,
+                    'hash' => 61081674,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
@@ -36,7 +36,7 @@ return [
                         ],
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 788796067,
+                            'hash' => 3378924890,
                         ],
                     ],
                     'children' => [
@@ -87,68 +87,64 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 788796067,
+                            'hash' => 3378924890,
                             'properties' => [
                                 'multilinePlainScalar' => [
                                     'type' => MultilinePlainScalarNode::class,
-                                    'hash' => 3469180929,
+                                    'hash' => 2952369817,
+                                ],
+                            ],
+                            'children' => [
+                                [
+                                    'type' => MultilinePlainScalarNode::class,
+                                    'hash' => 2952369817,
                                     'properties' => [],
                                     'children' => [
                                         [
                                             'type' => ScalarNode::class,
                                             'hash' => 474157382,
+                                            'properties' => [
+                                                'token' => [
+                                                    'type' => TokenType::PLAIN_SCALAR,
+                                                    'text' => 'text',
+                                                ],
+                                            ],
+                                            'children' => [],
+                                        ],
+                                        [
+                                            'type' => NewLineNode::class,
+                                            'hash' => 763369711,
+                                            'properties' => [
+                                                'token' => [
+                                                    'type' => TokenType::NEWLINE,
+                                                    'text' => "\n",
+                                                ],
+                                            ],
+                                            'children' => [],
+                                        ],
+                                        [
+                                            'type' => IndentationNode::class,
+                                            'hash' => 412793561,
+                                            'properties' => [
+                                                'token' => [
+                                                    'type' => TokenType::INDENTATION,
+                                                    'text' => '  ',
+                                                ],
+                                            ],
+                                            'children' => [],
                                         ],
                                         [
                                             'type' => ScalarNode::class,
                                             'hash' => 2359274653,
+                                            'properties' => [
+                                                'token' => [
+                                                    'type' => TokenType::PLAIN_SCALAR,
+                                                    'text' => 'lines',
+                                                ],
+                                            ],
+                                            'children' => [],
                                         ],
                                     ],
-                                ],
-                            ],
-                            'children' => [
-                                [
-                                    'type' => ScalarNode::class,
-                                    'hash' => 474157382,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::PLAIN_SCALAR,
-                                            'text' => 'text',
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                                [
-                                    'type' => NewLineNode::class,
-                                    'hash' => 763369711,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::NEWLINE,
-                                            'text' => "\n",
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                                [
-                                    'type' => IndentationNode::class,
-                                    'hash' => 412793561,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::INDENTATION,
-                                            'text' => '  ',
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                                [
-                                    'type' => ScalarNode::class,
-                                    'hash' => 2359274653,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::PLAIN_SCALAR,
-                                            'text' => 'lines',
-                                        ],
-                                    ],
-                                    'children' => [],
                                 ],
                             ],
                         ],
