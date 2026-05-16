@@ -16,11 +16,12 @@ namespace Aeliot\YamlToken\Parser\Dto;
 /**
  * Immutable parse context passed to flow builders. Defaults match flow-in-value
  * parsing (YAML 1.2.2 §7.4): parent indent sentinel -2, empty key/value allowed.
+ *
+ * TODO: consider to remove class ParseContext case no one `with-method` is used
  */
 final class ParseContext
 {
     public function __construct(
-        public readonly bool $afterJsonKey = false,
         public readonly bool $allowEmptyKey = true,
         public readonly bool $allowEmptyValue = true,
         public readonly bool $inFlow = true,
@@ -28,21 +29,9 @@ final class ParseContext
     ) {
     }
 
-    public function withAfterJsonKey(bool $afterJsonKey): self
-    {
-        return new self(
-            $afterJsonKey,
-            $this->allowEmptyKey,
-            $this->allowEmptyValue,
-            $this->inFlow,
-            $this->parentIndentLen,
-        );
-    }
-
     public function withAllowEmptyKey(bool $allowEmptyKey): self
     {
         return new self(
-            $this->afterJsonKey,
             $allowEmptyKey,
             $this->allowEmptyValue,
             $this->inFlow,
@@ -53,7 +42,6 @@ final class ParseContext
     public function withAllowEmptyValue(bool $allowEmptyValue): self
     {
         return new self(
-            $this->afterJsonKey,
             $this->allowEmptyKey,
             $allowEmptyValue,
             $this->inFlow,
@@ -64,7 +52,6 @@ final class ParseContext
     public function withInFlow(bool $inFlow): self
     {
         return new self(
-            $this->afterJsonKey,
             $this->allowEmptyKey,
             $this->allowEmptyValue,
             $inFlow,
@@ -75,7 +62,6 @@ final class ParseContext
     public function withParentIndentLen(int $parentIndentLen): self
     {
         return new self(
-            $this->afterJsonKey,
             $this->allowEmptyKey,
             $this->allowEmptyValue,
             $this->inFlow,

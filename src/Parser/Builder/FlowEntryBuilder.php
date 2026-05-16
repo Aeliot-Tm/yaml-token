@@ -26,7 +26,6 @@ use Aeliot\YamlToken\Parser\Driver\BuilderResult\Completed;
 use Aeliot\YamlToken\Parser\Driver\BuilderResult\Delegate;
 use Aeliot\YamlToken\Parser\Driver\Frame;
 use Aeliot\YamlToken\Parser\Dto\Harvester;
-use Aeliot\YamlToken\Parser\Dto\ParseContext;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
 use Aeliot\YamlToken\Parser\Flow\FlowHost;
 
@@ -42,7 +41,7 @@ final class FlowEntryBuilder implements BuilderInterface
 
     public function onChildCompleted(Harvester $harvester, Frame $self, Node $child): BuilderResultInterface
     {
-        return $this->finishPostOperand($harvester, $self->context, $child);
+        return $this->finishPostOperand($harvester, $child);
     }
 
     public function step(Harvester $harvester, Frame $self): BuilderResultInterface
@@ -65,7 +64,7 @@ final class FlowEntryBuilder implements BuilderInterface
         }
 
         if (TokenType::FLOW_MAPPING_START === $token?->type) {
-            return $this->finishPostOperand($harvester, $self->context, $this->host->parseFlowMapping($harvester));
+            return $this->finishPostOperand($harvester, $this->host->parseFlowMapping($harvester));
         }
 
         return new Delegate(new Frame(
@@ -87,17 +86,8 @@ final class FlowEntryBuilder implements BuilderInterface
         return new Completed($valueNode);
     }
 
-    private function finishPostOperand(Harvester $harvester, ParseContext $context, Node $operand): BuilderResultInterface
+    private function finishPostOperand(Harvester $harvester, Node $operand): BuilderResultInterface
     {
-        $context = $context->withAfterJsonKey($this->isJsonStyleOperand($operand));
-
-        if ($context->afterJsonKey) {
-            // YAML 1.2.2 §7.4.1 rule [153]: in flow sequences the lexer keeps the
-            // adjacent ":" glued onto a following PLAIN_SCALAR. Re-interpret it
-            // as VALUE_INDICATOR + payload so the flow-pair branch can take over.
-            $this->host->tryReinterpretFlowJsonAdjacentValueSeparator($harvester);
-        }
-
         if (!$this->peekFlowPairColon($harvester)) {
             return $this->completeOperandAsValue($operand);
         }
@@ -147,31 +137,6 @@ final class FlowEntryBuilder implements BuilderInterface
 
             return \in_array($peeked->type, [TokenType::FLOW_ENTRY, TokenType::FLOW_SEQUENCE_END], true);
         }
-    }
-
-    private function isJsonStyleOperand(Node $operand): bool
-    {
-        if ($operand instanceof FlowSequenceNode || $operand instanceof FlowMappingNode) {
-            return true;
-        }
-
-        if (!$operand instanceof ValueNode) {
-            return false;
-        }
-
-        if (null !== $operand->getFlowSequence() || null !== $operand->getFlowMapping()) {
-            return true;
-        }
-
-        $scalar = $operand->getScalar();
-        if (null === $scalar) {
-            return false;
-        }
-
-        return \in_array($scalar->getToken()->type, [
-            TokenType::DOUBLE_QUOTED_SCALAR,
-            TokenType::SINGLE_QUOTED_SCALAR,
-        ], true);
     }
 
     private function isLegacyFlowPairEntryStart(Harvester $harvester): bool

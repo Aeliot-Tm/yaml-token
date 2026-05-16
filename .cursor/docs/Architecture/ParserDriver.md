@@ -83,10 +83,6 @@ so each old recursion site maps to a single builder method.
 threading lexical-rule flags through frames. Defaults are tuned for "value
 inside flow context" parsing (YAML 1.2.2 §7.4):
 
-- `afterJsonKey` — the previous flow-pair key was a JSON-style node (quoted
-  scalar or flow collection). Enables YAML 1.2.2 production [153]
-  (`ns-flow-yaml-content` adjacent-value form), where `:` may appear without
-  surrounding whitespace immediately after such a key.
 - `allowEmptyKey` / `allowEmptyValue` — empty-node admissibility per
   §7.4.1 / §7.4.2.
 - `inFlow` — flow vs block context (currently always `true` for builders, but
@@ -94,7 +90,7 @@ inside flow context" parsing (YAML 1.2.2 §7.4):
 - `parentIndentLen` — passed to `Parser::parseValue()` for nested block-style
   values; uses the sentinel `FLOW_COLLECTION_VALUE_PARENT_INDENT` (`-2`).
 
-Mutations are produced by `withAfterJsonKey()`, `withAllowEmptyKey()`, …
+Mutations are produced by `withAllowEmptyKey()`, …
 returning a new instance. Frames hold their own `ParseContext`, so a child
 frame can carry a mutated context without leaking back to the parent.
 
@@ -116,7 +112,6 @@ on [`Parser`](../../../src/Parser/Parser.php). It is constructed by
 - `parseMergeInstructionAtCurrentPosition`
 - `postProcessKeyValueCouple` (for deep-anchor registration; see below)
 - `tryConsumeFlowMappingValueIndicator`
-- `tryReinterpretFlowJsonAdjacentValueSeparator`
 
 This keeps `Parser` private methods truly private (no public accessors leak
 out for builder needs) while letting builders call them through a single
@@ -136,13 +131,11 @@ All flow-collection builders live under
   on `]`.
 - [`FlowEntryBuilder`](../../../src/Parser/Builder/FlowEntryBuilder.php) parses
   a single flow-sequence entry, which per YAML 1.2.2 §7.4.1 is either a
-  flow node or a flow pair (legacy `key: value` form). It detects
-  JSON-style keys (`isJsonStyleOperand()`), updates the context with
-  `withAfterJsonKey(true)`, and asks `FlowHost` to split a `PLAIN_SCALAR`
-  starting with `:` into `VALUE_INDICATOR` + remaining payload via
-  `tryReinterpretFlowJsonAdjacentValueSeparator()` so the existing
-  `tryConsumeFlowMappingValueIndicator()` works uniformly. It also peeks
-  through layout tokens to detect entry/sequence-end boundaries
+  flow node or a flow pair (legacy `key: value` form). After a JSON-style
+  key operand (quoted scalar or flow collection), it peeks for
+  `VALUE_INDICATOR` and builds a `KeyValueCoupleNode` via
+  `tryConsumeFlowMappingValueIndicator()`. It also peeks through layout
+  tokens to detect entry/sequence-end boundaries
   (`isAtFlowSequenceEntryBoundary()`), enabling implicit empty values.
 - [`FlowOperandBuilder`](../../../src/Parser/Builder/FlowOperandBuilder.php)
   parses a single flow-sequence operand as a `ValueNode` via
@@ -183,14 +176,11 @@ and returns the shared `FlowHost` for the duration of a single driver run
 ## Token-stream interaction
 
 Builders observe and consume tokens through the `Harvester::tokens` proxy
-([`TokenStreamProxy`](../../../src/Parser/Dto/TokenStreamProxy.php)). The
-underlying [`TokenStream`](../../../src/Token/TokenStream.php) exposes
-`splitCurrent(headType, headLen, tailType)`, used by
-`Parser::tryReinterpretFlowJsonAdjacentValueSeparator()` to convert a
-`PLAIN_SCALAR(":value")` after a JSON-style key into `VALUE_INDICATOR(":")` +
-`PLAIN_SCALAR("value")`. The lexer cannot make this split itself in flow
-sequences because it does not know whether the previous operand was
-JSON-style; the parser disambiguates and rewrites two tokens in place.
+([`TokenStreamProxy`](../../../src/Parser/Dto/TokenStreamProxy.php)), which
+wraps the lexer [`TokenStream`](../../../src/Token/TokenStream.php). Adjacent
+`:` after a JSON-style key inside a flow sequence (production [153]) is
+emitted as `VALUE_INDICATOR` by the lexer (`FlowSequenceFrame` phase tracking);
+builders only peek and consume those tokens.
 
 ## Anchor declaration in complex keys
 

@@ -721,7 +721,6 @@ final class Parser
                 $this->postProcessKeyValueCouple($h, $couple);
             },
             fn (Harvester $h, KeyValueCoupleNode $couple): bool => $this->tryConsumeFlowMappingValueIndicator($h, $couple),
-            fn (Harvester $h): bool => $this->tryReinterpretFlowJsonAdjacentValueSeparator($h),
         );
     }
 
@@ -2531,32 +2530,6 @@ final class Parser
         $harvester->tokens->advance();
 
         $this->collectTypes($harvester, [TokenType::WHITESPACE], $couple);
-
-        return true;
-    }
-
-    /**
-     * YAML 1.2.2 §7.4.1 / rule [153] c-ns-flow-pair-json-key-entry: when an entry
-     * inside a flow sequence starts with a JSON-style key (quoted scalar or flow
-     * collection), the lexer cannot disambiguate the trailing {@code :} on its own
-     * (FlowSequenceFrame has no phase tracking) and emits {@code PLAIN_SCALAR(":...")}.
-     * Splits that scalar into a synthetic {@code VALUE_INDICATOR} plus the remaining
-     * payload so {@see Parser::tryConsumeFlowMappingValueIndicator()} can proceed.
-     */
-    private function tryReinterpretFlowJsonAdjacentValueSeparator(Harvester $harvester): bool
-    {
-        $current = $harvester->tokens->current();
-        if (
-            null === $current
-            || TokenType::PLAIN_SCALAR !== $current->type
-            || '' === $current->text
-            || ':' !== $current->text[0]
-            || \strlen($current->text) < 2
-        ) {
-            return false;
-        }
-
-        $harvester->tokens->splitCurrent(TokenType::VALUE_INDICATOR, 1, TokenType::PLAIN_SCALAR);
 
         return true;
     }

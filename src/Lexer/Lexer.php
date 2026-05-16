@@ -15,6 +15,7 @@ namespace Aeliot\YamlToken\Lexer;
 
 use Aeliot\YamlToken\Enum\BlockScalarChomping;
 use Aeliot\YamlToken\Enum\FlowMapPhase;
+use Aeliot\YamlToken\Enum\FlowSequencePhase;
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Lexer\Dto\Cursor;
 use Aeliot\YamlToken\Lexer\Dto\FlowMapFrame;
@@ -301,7 +302,8 @@ final class Lexer
      * that includes every non-whitespace char, so e.g. ":{", ":[", ':"', ":'", ":#" must stay part of
      * the scalar. In flow context (rule [129] ns-plain-safe-in = ns-char - c-flow-indicator), the
      * c-flow-indicator chars terminate the scalar and ':' becomes a value indicator. Additionally,
-     * when {@see Cursor::$flowCollectionStack} top map is in phase {@see FlowMapPhase::Colon} (K3WX),
+     * when {@see Cursor::$flowCollectionStack} top map is in phase {@see FlowMapPhase::Colon} (K3WX)
+     * or top sequence is in phase {@see FlowSequencePhase::Colon} (rule [153] JSON-style key),
      * ':' is a value indicator even if the value is adjacent (e.g. {@code :bar}).
      */
     private function isColonMappingValueIndicator(Harvester $harvester, int $colonPosition): bool
@@ -309,7 +311,7 @@ final class Lexer
         if ($colonPosition >= $harvester->length || ':' !== $harvester->input[$colonPosition]) {
             return false;
         }
-        if ($this->isFlowMapExpectsValueSeparatorColon($harvester->cursor)) {
+        if ($this->isFlowExpectsValueSeparatorColon($harvester->cursor)) {
             return true;
         }
         $afterColon = $colonPosition + 1;
@@ -343,11 +345,14 @@ final class Lexer
         return \in_array($harvester->input[$harvester->cursor->position - 1], self::CHARS_WHITESPACE, true);
     }
 
-    private function isFlowMapExpectsValueSeparatorColon(Cursor $cursor): bool
+    private function isFlowExpectsValueSeparatorColon(Cursor $cursor): bool
     {
         $top = end($cursor->flowCollectionStack) ?: null;
+        if ($top instanceof FlowMapFrame && FlowMapPhase::Colon === $top->phase) {
+            return true;
+        }
 
-        return $top instanceof FlowMapFrame && FlowMapPhase::Colon === $top->phase;
+        return $top instanceof FlowSequenceFrame && FlowSequencePhase::Colon === $top->phase;
     }
 
     private function isMappingKey(Harvester $harvester): bool
@@ -527,6 +532,13 @@ final class Lexer
         }
         $i = \count($stack) - 1;
         $parent = $stack[$i];
+        if ($parent instanceof FlowSequenceFrame) {
+            if (FlowSequencePhase::Entry === $parent->phase) {
+                $parent->phase = FlowSequencePhase::Colon;
+            }
+
+            return;
+        }
         if (!$parent instanceof FlowMapFrame) {
             return;
         }
@@ -545,6 +557,11 @@ final class Lexer
         }
         $i = \count($stack) - 1;
         $top = $stack[$i];
+        if ($top instanceof FlowSequenceFrame) {
+            $top->phase = FlowSequencePhase::Entry;
+
+            return;
+        }
         if (!$top instanceof FlowMapFrame || FlowMapPhase::Sep !== $top->phase) {
             return;
         }
@@ -569,6 +586,13 @@ final class Lexer
         $i = \count($stack) - 1;
         $top = $stack[$i];
         if ($top instanceof FlowSequenceFrame) {
+            if (
+                FlowSequencePhase::Entry === $top->phase
+                && \in_array($type, [TokenType::DOUBLE_QUOTED_SCALAR, TokenType::SINGLE_QUOTED_SCALAR], true)
+            ) {
+                $top->phase = FlowSequencePhase::Colon;
+            }
+
             return;
         }
         if (!$top instanceof FlowMapFrame) {
@@ -589,6 +613,13 @@ final class Lexer
         }
         $i = \count($stack) - 1;
         $top = $stack[$i];
+        if ($top instanceof FlowSequenceFrame) {
+            if (FlowSequencePhase::Colon === $top->phase) {
+                $top->phase = FlowSequencePhase::Value;
+            }
+
+            return;
+        }
         if (!$top instanceof FlowMapFrame || FlowMapPhase::Colon !== $top->phase) {
             return;
         }
@@ -1052,7 +1083,7 @@ final class Lexer
                 if ('{' === $char) {
                     $harvester->cursor->flowCollectionStack[] = new FlowMapFrame(FlowMapPhase::Key);
                 } else {
-                    $harvester->cursor->flowCollectionStack[] = new FlowSequenceFrame();
+                    $harvester->cursor->flowCollectionStack[] = new FlowSequenceFrame(FlowSequencePhase::Entry);
                 }
                 $harvester->stream->addToken(new Token(self::FLOW_INDICATOR_TOKEN_TYPES[$char], $char, $startLine, $startColumn));
 

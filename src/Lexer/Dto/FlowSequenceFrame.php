@@ -13,9 +13,14 @@ declare(strict_types=1);
 
 namespace Aeliot\YamlToken\Lexer\Dto;
 
+use Aeliot\YamlToken\Enum\FlowSequencePhase;
+
 /**
- * Lexer state frame for an open flow sequence {@code [...]} (reserved for future per-sequence lexer state).
+ * Lexer state frame for an open flow sequence {@code [...]}.
  */
-final readonly class FlowSequenceFrame implements FlowCollectionFrameInterface
+final class FlowSequenceFrame implements FlowCollectionFrameInterface
 {
+    public function __construct(public FlowSequencePhase $phase = FlowSequencePhase::Entry)
+    {
+    }
 }

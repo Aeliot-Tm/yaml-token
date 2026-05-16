@@ -6,32 +6,8 @@ use Aeliot\YamlToken\Enum\TokenType;
 
 return [
     [
-        'type' => TokenType::DOCUMENT_START,
-        'text' => '---',
-    ],
-    [
-        'type' => TokenType::NEWLINE,
-        'text' => "\n",
-    ],
-    [
-        'type' => TokenType::FLOW_SEQUENCE_START,
-        'text' => '[',
-    ],
-    [
-        'type' => TokenType::DOUBLE_QUOTED_SCALAR,
-        'text' => '"a"',
-    ],
-    [
-        'type' => TokenType::VALUE_INDICATOR,
-        'text' => ':',
-    ],
-    [
-        'type' => TokenType::PLAIN_SCALAR,
-        'text' => '1',
-    ],
-    [
-        'type' => TokenType::FLOW_ENTRY,
-        'text' => ',',
+        'type' => TokenType::SEQUENCE_ENTRY,
+        'text' => '-',
     ],
     [
         'type' => TokenType::WHITESPACE,
@@ -42,12 +18,56 @@ return [
         'text' => '[',
     ],
     [
+        'type' => TokenType::WHITESPACE,
+        'text' => ' ',
+    ],
+    [
         'type' => TokenType::PLAIN_SCALAR,
-        'text' => 'b',
+        'text' => 'YAML ',
+    ],
+    [
+        'type' => TokenType::VALUE_INDICATOR,
+        'text' => ':',
+    ],
+    [
+        'type' => TokenType::WHITESPACE,
+        'text' => ' ',
+    ],
+    [
+        'type' => TokenType::PLAIN_SCALAR,
+        'text' => 'separate',
+    ],
+    [
+        'type' => TokenType::WHITESPACE,
+        'text' => ' ',
     ],
     [
         'type' => TokenType::FLOW_SEQUENCE_END,
         'text' => ']',
+    ],
+    [
+        'type' => TokenType::NEWLINE,
+        'text' => "\n",
+    ],
+    [
+        'type' => TokenType::SEQUENCE_ENTRY,
+        'text' => '-',
+    ],
+    [
+        'type' => TokenType::WHITESPACE,
+        'text' => ' ',
+    ],
+    [
+        'type' => TokenType::FLOW_SEQUENCE_START,
+        'text' => '[',
+    ],
+    [
+        'type' => TokenType::WHITESPACE,
+        'text' => ' ',
+    ],
+    [
+        'type' => TokenType::DOUBLE_QUOTED_SCALAR,
+        'text' => '"JSON like"',
     ],
     [
         'type' => TokenType::VALUE_INDICATOR,
@@ -55,11 +75,31 @@ return [
     ],
     [
         'type' => TokenType::PLAIN_SCALAR,
-        'text' => '2',
+        'text' => 'adjacent',
     ],
     [
-        'type' => TokenType::FLOW_ENTRY,
-        'text' => ',',
+        'type' => TokenType::WHITESPACE,
+        'text' => ' ',
+    ],
+    [
+        'type' => TokenType::FLOW_SEQUENCE_END,
+        'text' => ']',
+    ],
+    [
+        'type' => TokenType::NEWLINE,
+        'text' => "\n",
+    ],
+    [
+        'type' => TokenType::SEQUENCE_ENTRY,
+        'text' => '-',
+    ],
+    [
+        'type' => TokenType::WHITESPACE,
+        'text' => ' ',
+    ],
+    [
+        'type' => TokenType::FLOW_SEQUENCE_START,
+        'text' => '[',
     ],
     [
         'type' => TokenType::WHITESPACE,
@@ -71,7 +111,7 @@ return [
     ],
     [
         'type' => TokenType::PLAIN_SCALAR,
-        'text' => 'x',
+        'text' => 'JSON',
     ],
     [
         'type' => TokenType::VALUE_INDICATOR,
@@ -83,7 +123,7 @@ return [
     ],
     [
         'type' => TokenType::PLAIN_SCALAR,
-        'text' => 'y',
+        'text' => 'like',
     ],
     [
         'type' => TokenType::FLOW_MAPPING_END,
@@ -95,7 +135,11 @@ return [
     ],
     [
         'type' => TokenType::PLAIN_SCALAR,
-        'text' => '3',
+        'text' => 'adjacent',
+    ],
+    [
+        'type' => TokenType::WHITESPACE,
+        'text' => ' ',
     ],
     [
         'type' => TokenType::FLOW_SEQUENCE_END,

@@ -18,18 +18,14 @@ exposes the few `Parser` private helpers builders need (via closures bound in
 are `Parser::runFlowSequenceDriver()` and `Parser::runFlowMappingDriver()`.
 
 The DTO [`ParseContext`](../../../src/Parser/Dto/ParseContext.php) threads
-lexical-rule flags (notably `afterJsonKey`, `allowEmptyKey`, `allowEmptyValue`,
-`parentIndentLen`) through frames so that JSON-style key adjacent value form
-(YAML 1.2.2 production [153]) and implicit empty values can be detected by
-peeking through layout tokens.
+lexical-rule flags (`allowEmptyKey`, `allowEmptyValue`, `parentIndentLen`)
+through frames so implicit empty values and nested block values can be
+detected by peeking through layout tokens.
 
-When a builder spots a JSON-style operand (quoted scalar or flow collection)
-followed by a `PLAIN_SCALAR` starting with `:`, it asks the host to call
-`Parser::tryReinterpretFlowJsonAdjacentValueSeparator()`, which uses
-`TokenStream::splitCurrent()` to rewrite that single token into `VALUE_INDICATOR`
-plus the remaining payload, so the existing
-`tryConsumeFlowMappingValueIndicator()` works uniformly across `{a:1}` and
-`[a:1]`.
+JSON-style flow-pair keys in sequences (YAML 1.2.2 production [153], e.g.
+`["key":value]` or `[{a: b}:c]`) are tokenized by the lexer as a separate
+`VALUE_INDICATOR` even when `:` is adjacent to the value; flow builders then
+use the same `tryConsumeFlowMappingValueIndicator()` path as for `{a:1}`.
 
 See [Parser Driver Architecture](../Architecture/ParserDriver.md) for the
 component-level description.

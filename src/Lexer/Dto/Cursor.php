@@ -76,8 +76,9 @@ final class Cursor
     public int $currentIndent = 0;
 
     /**
-     * One stack frame per open flow collection ({@see FlowMapFrame}, {@see FlowSequenceFrame}): a map frame tracks
-     * phase so ':' after a key is a {@see TokenType::VALUE_INDICATOR} even when the value is adjacent (K3WX {@code :bar}).
+     * One stack frame per open flow collection ({@see FlowMapFrame}, {@see FlowSequenceFrame}): map and sequence
+     * frames track phase so ':' after a key is a {@see TokenType::VALUE_INDICATOR} even when the value is adjacent
+     * (K3WX {@code :bar}, flow-sequence rule [153] {@code ["k":v]}).
      *
      * @var list<FlowCollectionFrameInterface>
      */
