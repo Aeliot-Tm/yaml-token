@@ -55,7 +55,7 @@ final class SequenceEntryMultilinePlainContinuationTest extends LexerMappingTest
                 'type' => TokenType::NEWLINE,
                 'text' => "\n",
             ],
-        ], __DIR__.'/../../fixture/go_yaml/sequence-entry-that-looks-like-two-with-wrong-indentation/sequence-entry-nested-after-plain.yaml'];
+        ], __DIR__.'/../../fixture/go_yaml/sequence-entry-that-looks-like-two-with-wrong-indentation/in.yaml'];
 
         yield 'nested sequence entry at two spaces' => [[
             [
@@ -94,6 +94,6 @@ final class SequenceEntryMultilinePlainContinuationTest extends LexerMappingTest
                 'type' => TokenType::NEWLINE,
                 'text' => "\n",
             ],
-        ], __DIR__.'/../../fixture/edge_cases/sequence-entry-nested-after-plain/sequence-entry-nested-after-plain.yaml'];
+        ], __DIR__.'/../../fixture/edge_cases/sequence-entry-nested-after-plain.yaml'];
     }
 }
