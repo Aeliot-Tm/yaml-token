@@ -49,6 +49,7 @@ use Aeliot\YamlToken\Node\TagDirectivePrefixNode;
 use Aeliot\YamlToken\Node\TagNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
+use Aeliot\YamlToken\Node\YamlDirectiveIndicatorNode;
 use Aeliot\YamlToken\Node\YamlDirectiveNode;
 use Aeliot\YamlToken\Node\YamlDirectiveVersionNode;
 use Aeliot\YamlToken\Parser\Builder\FlowMappingBuilder;
@@ -1645,7 +1646,7 @@ final class Parser
                 continue;
             }
 
-            if (TokenType::DIRECTIVE_YAML === $token->type) {
+            if (TokenType::DIRECTIVE_YAML_INDICATOR === $token->type) {
                 $document->addChild($this->parseYamlDirective($harvester));
                 continue;
             }
@@ -2367,11 +2368,12 @@ final class Parser
     private function parseYamlDirective(Harvester $harvester): YamlDirectiveNode
     {
         $token = $harvester->tokens->current();
-        if (TokenType::DIRECTIVE_YAML !== $token?->type) {
-            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Expected DIRECTIVE_YAML token, but %s given', $token?->type->value ?? '_nothing_'), $harvester->tokens));
+        if (TokenType::DIRECTIVE_YAML_INDICATOR !== $token?->type) {
+            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Expected DIRECTIVE_YAML_INDICATOR token, but %s given', $token?->type->value ?? '_nothing_'), $harvester->tokens));
         }
 
-        $yamlDirectiveNode = new YamlDirectiveNode($token);
+        $yamlDirectiveNode = new YamlDirectiveNode();
+        $yamlDirectiveNode->addChild(new YamlDirectiveIndicatorNode($token));
         $harvester->tokens->advance();
 
         while (true) {

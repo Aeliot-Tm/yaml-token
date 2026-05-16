@@ -13,28 +13,26 @@ declare(strict_types=1);
 
 namespace Aeliot\YamlToken\Node;
 
-use Aeliot\YamlToken\Token\Token;
-
-class YamlDirectiveNode extends AbstractNode implements TokenHolderInterface
+class YamlDirectiveNode extends AbstractNode
 {
+    private YamlDirectiveIndicatorNode $indicatorNode;
     private YamlDirectiveVersionNode $versionNode;
-
-    public function __construct(
-        private Token $token,
-    ) {
-    }
 
     public function addChild(Node $child): void
     {
+        if ($child instanceof YamlDirectiveIndicatorNode) {
+            $this->indicatorNode = $child;
+        }
         if ($child instanceof YamlDirectiveVersionNode) {
             $this->versionNode = $child;
         }
+
         parent::addChild($child);
     }
 
-    public function getToken(): Token
+    public function getIndicatorNode(): YamlDirectiveIndicatorNode
     {
-        return $this->token;
+        return $this->indicatorNode;
     }
 
     public function getVersionNode(): YamlDirectiveVersionNode

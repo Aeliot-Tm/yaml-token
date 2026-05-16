@@ -8,29 +8,36 @@ use Aeliot\YamlToken\Node\DocumentStartNode;
 use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
+use Aeliot\YamlToken\Node\YamlDirectiveIndicatorNode;
 use Aeliot\YamlToken\Node\YamlDirectiveNode;
 use Aeliot\YamlToken\Node\YamlDirectiveVersionNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 3291445621,
+    'hash' => 446936371,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 2936253716,
+            'hash' => 2955617723,
             'properties' => [],
             'children' => [
                 [
                     'type' => YamlDirectiveNode::class,
-                    'hash' => 2857162088,
-                    'properties' => [
-                        'token' => [
-                            'type' => TokenType::DIRECTIVE_YAML,
-                            'text' => '%YAML',
-                        ],
-                    ],
+                    'hash' => 2227101493,
+                    'properties' => [],
                     'children' => [
+                        [
+                            'type' => YamlDirectiveIndicatorNode::class,
+                            'hash' => 3872005402,
+                            'properties' => [
+                                'token' => [
+                                    'type' => TokenType::DIRECTIVE_YAML_INDICATOR,
+                                    'text' => '%YAML',
+                                ],
+                            ],
+                            'children' => [],
+                        ],
                         [
                             'type' => WhitespaceNode::class,
                             'hash' => 3308018566,

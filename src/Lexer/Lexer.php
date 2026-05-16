@@ -1518,7 +1518,7 @@ final class Lexer
         if (!$this->match($harvester, '%YAML')) {
             return;
         }
-        $harvester->stream->addToken(new Token(TokenType::DIRECTIVE_YAML, '%YAML', $directiveYamlLine, $directiveYamlColumn));
+        $harvester->stream->addToken(new Token(TokenType::DIRECTIVE_YAML_INDICATOR, '%YAML', $directiveYamlLine, $directiveYamlColumn));
 
         if ($harvester->cursor->position < $harvester->length && \in_array($harvester->input[$harvester->cursor->position], self::CHARS_HORIZONTAL_WHITESPACE, true)) {
             $wsLine = $harvester->cursor->line;

@@ -65,7 +65,8 @@ Because of this, the parser must not invent tokens that did not exist in the ori
 - Entry points: [`Parser::parse`](../../../src/Parser/Parser.php) (lexes input),
   [`Parser::parseStream`](../../../src/Parser/Parser.php) for an existing `TokenStream`.
 - `%YAML` directive: built as [`YamlDirectiveNode`](../../../src/Node/YamlDirectiveNode.php)
-  with the `DIRECTIVE_YAML` keyword token and child nodes for optional horizontal whitespace,
+  with [`YamlDirectiveIndicatorNode`](../../../src/Node/YamlDirectiveIndicatorNode.php) for the
+  `DIRECTIVE_YAML_INDICATOR` (`%YAML`) token and child nodes for optional horizontal whitespace,
   optional `VALUE_INDICATOR` (`:`), and required `DIRECTIVE_YAML_VERSION`
   (as [`YamlDirectiveVersionNode`](../../../src/Node/YamlDirectiveVersionNode.php)).
   Horizontal whitespace and comments after the version token stay at document level

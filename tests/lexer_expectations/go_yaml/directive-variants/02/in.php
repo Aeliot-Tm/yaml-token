@@ -6,7 +6,7 @@ use Aeliot\YamlToken\Enum\TokenType;
 
 return [
     [
-        'type' => TokenType::DIRECTIVE_YAML,
+        'type' => TokenType::DIRECTIVE_YAML_INDICATOR,
         'text' => '%YAML',
     ],
     [
