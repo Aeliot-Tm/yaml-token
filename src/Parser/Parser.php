@@ -841,7 +841,7 @@ final class Parser
             TokenType::LITERAL_BLOCK_SCALAR => new LiteralBlockScalarNode($token),
             TokenType::PLAIN_SCALAR => new PlainScalarNode($token),
             TokenType::SINGLE_QUOTED_SCALAR => new SingleQuotedScalarNode($token),
-            default => throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Not configured scalar node for token type: %s', $token->type->value), $token)),
+            default => throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Expected scalar token, got %s', $token->type->value), $token)),
         };
     }
 
