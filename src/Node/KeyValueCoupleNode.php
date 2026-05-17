@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Aeliot\YamlToken\Node;
 
+use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
+
 class KeyValueCoupleNode extends AbstractNode
 {
     private ?IndentationNode $indentation = null;
@@ -20,6 +22,28 @@ class KeyValueCoupleNode extends AbstractNode
     private ?MergeInstructionNode $mergeInstruction = null;
     private ?SyntaxTokenNode $mappingValueIndicator = null;
     private ?ValueNode $value = null;
+
+    public function addChild(Node $child): void
+    {
+        if ($child instanceof MergeInstructionNode) {
+            if (null !== $this->mergeInstruction) {
+                throw new UnexpectedStateException('Attempt to set merge instruction twice');
+            }
+            $this->mergeInstruction = $child;
+        // } elseif ($child instanceof KeyNode) {
+        //     if (null !== $this->key) {
+        //         throw new UnexpectedStateException('Attempt to set key twice');
+        //     }
+        //     $this->key = $child;
+        // } elseif ($child instanceof ValueNode) {
+        //     if (null !== $this->value) {
+        //         throw new UnexpectedStateException('Attempt to set value twice');
+        //     }
+        //     $this->value = $child;
+        }
+
+        parent::addChild($child);
+    }
 
     public function getIndentation(): ?IndentationNode
     {
@@ -46,12 +70,6 @@ class KeyValueCoupleNode extends AbstractNode
     public function getMergeInstruction(): ?MergeInstructionNode
     {
         return $this->mergeInstruction;
-    }
-
-    public function setMergeInstruction(MergeInstructionNode $node): void
-    {
-        $this->mergeInstruction = $node;
-        $this->addChild($node);
     }
 
     public function getMappingValueIndicator(): ?SyntaxTokenNode

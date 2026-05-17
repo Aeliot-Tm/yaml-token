@@ -207,7 +207,7 @@ final class FlowEntryBuilder implements BuilderInterface
 
         $valueNode = $operand;
         if (null !== ($properties = $valueNode->getProperties())) {
-            $keyNode->setProperties($properties);
+            $keyNode->addChild($properties);
         }
         $payload = $valueNode->getPayload();
         if (

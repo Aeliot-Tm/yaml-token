@@ -21,6 +21,23 @@ class KeyNode extends AbstractNode
     private ?Node $name = null;
     private ?NodePropertiesNode $properties = null;
 
+    public function addChild(Node $child): void
+    {
+        if ($child instanceof ExplicitKeyIndicatorNode) {
+            if (null !== $this->explicitKeyIndicatorNode) {
+                throw new UnexpectedStateException('Attempt to set explicit key indicator twice');
+            }
+            $this->explicitKeyIndicatorNode = $child;
+        } elseif ($child instanceof NodePropertiesNode) {
+            if (null !== $this->properties) {
+                throw new UnexpectedStateException('Attempt to set key indicator twice');
+            }
+            $this->properties = $child;
+        }
+
+        parent::addChild($child);
+    }
+
     public function getAnchor(): ?AnchorNode
     {
         return $this->properties?->getAnchor();
@@ -29,12 +46,6 @@ class KeyNode extends AbstractNode
     public function getExplicitKeyIndicatorNode(): ?ExplicitKeyIndicatorNode
     {
         return $this->explicitKeyIndicatorNode;
-    }
-
-    public function setExplicitKeyIndicator(ExplicitKeyIndicatorNode $node): void
-    {
-        $this->explicitKeyIndicatorNode = $node;
-        $this->addChild($node);
     }
 
     public function getName(): ?Node
@@ -55,12 +66,6 @@ class KeyNode extends AbstractNode
     public function getProperties(): ?NodePropertiesNode
     {
         return $this->properties;
-    }
-
-    public function setProperties(NodePropertiesNode $node): void
-    {
-        $this->properties = $node;
-        $this->addChild($node);
     }
 
     public function getTag(): ?TagNode

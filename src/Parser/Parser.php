@@ -408,7 +408,7 @@ final class Parser
         }
 
         if (null !== $properties) {
-            $keyNode->setProperties($properties);
+            $keyNode->addChild($properties);
         }
         foreach ($whitespaceBuffer as $whitespace) {
             $keyNode->addChild($whitespace);
@@ -850,7 +850,7 @@ final class Parser
         $token = $harvester->tokens->current();
 
         if (TokenType::EXPLICIT_KEY_INDICATOR === $token->type) {
-            $keyNode->setExplicitKeyIndicator(new ExplicitKeyIndicatorNode($token));
+            $keyNode->addChild(new ExplicitKeyIndicatorNode($token));
             $harvester->tokens->advance();
             $token = $harvester->tokens->current();
 
