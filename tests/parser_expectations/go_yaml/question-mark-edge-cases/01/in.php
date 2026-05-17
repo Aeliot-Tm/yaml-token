@@ -5,34 +5,35 @@ declare(strict_types=1);
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\ExplicitKeyIndicatorNode;
+use Aeliot\YamlToken\Node\FlowSequenceEndNode;
 use Aeliot\YamlToken\Node\FlowSequenceNode;
+use Aeliot\YamlToken\Node\FlowSequenceStartNode;
 use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\PlainScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
-use Aeliot\YamlToken\Node\SyntaxTokenNode;
 use Aeliot\YamlToken\Node\ValueIndicatorNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 2922883737,
+    'hash' => 1307963517,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 6528568,
+            'hash' => 173624367,
             'properties' => [],
             'children' => [
                 [
                     'type' => KeyValueCoupleNode::class,
-                    'hash' => 3499438969,
+                    'hash' => 401259666,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
-                            'hash' => 1702341192,
+                            'hash' => 1626364731,
                         ],
                         'valueIndicator' => [
                             'type' => ValueIndicatorNode::class,
@@ -46,7 +47,7 @@ return [
                     'children' => [
                         [
                             'type' => KeyNode::class,
-                            'hash' => 1702341192,
+                            'hash' => 1626364731,
                             'properties' => [
                                 'explicitKeyIndicatorNode' => [
                                     'type' => ExplicitKeyIndicatorNode::class,
@@ -54,7 +55,7 @@ return [
                                 ],
                                 'name' => [
                                     'type' => FlowSequenceNode::class,
-                                    'hash' => 2390742394,
+                                    'hash' => 4127089306,
                                 ],
                             ],
                             'children' => [
@@ -82,14 +83,14 @@ return [
                                 ],
                                 [
                                     'type' => FlowSequenceNode::class,
-                                    'hash' => 2390742394,
+                                    'hash' => 4127089306,
                                     'properties' => [
                                         'entries' => [],
                                     ],
                                     'children' => [
                                         [
-                                            'type' => SyntaxTokenNode::class,
-                                            'hash' => 3296102772,
+                                            'type' => FlowSequenceStartNode::class,
+                                            'hash' => 2336973104,
                                             'properties' => [
                                                 'token' => [
                                                     'type' => TokenType::FLOW_SEQUENCE_START,
@@ -99,8 +100,8 @@ return [
                                             'children' => [],
                                         ],
                                         [
-                                            'type' => SyntaxTokenNode::class,
-                                            'hash' => 2678523598,
+                                            'type' => FlowSequenceEndNode::class,
+                                            'hash' => 539304155,
                                             'properties' => [
                                                 'token' => [
                                                     'type' => TokenType::FLOW_SEQUENCE_END,

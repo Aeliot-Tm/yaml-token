@@ -41,6 +41,7 @@ final class FlowHost
      */
     public function __construct(
         private readonly \Closure $collectSpaceAndComments,
+        private readonly \Closure $createSimpleNode,
         private readonly \Closure $createSyntaxTokenNode,
         private readonly \Closure $getFlowEntryKeyNode,
         private readonly \Closure $isFlowMultilinePlainKeyStart,
@@ -56,6 +57,11 @@ final class FlowHost
     public function collectSpaceAndComments(Harvester $harvester, Node $root): void
     {
         ($this->collectSpaceAndComments)($harvester, $root);
+    }
+
+    public function createSimpleNode(Token $token): Node
+    {
+        return ($this->createSimpleNode)($token);
     }
 
     public function createSyntaxTokenNode(Token $token): SyntaxTokenNode

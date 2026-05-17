@@ -63,7 +63,7 @@ final class FlowSequenceBuilder implements BuilderInterface
                 throw new UnexpectedTokenException(\sprintf('There is no expected FLOW_SEQUENCE_END token, but %s given', $token?->type->value ?? '_nothing_'));
             }
 
-            $flowSequenceNode->addChild($this->host->createSyntaxTokenNode($token));
+            $flowSequenceNode->addChild($this->host->createSimpleNode($token));
             $harvester->tokens->advance();
             $this->host->collectSpaceAndComments($harvester, $flowSequenceNode);
 
@@ -71,7 +71,7 @@ final class FlowSequenceBuilder implements BuilderInterface
         }
 
         if (TokenType::FLOW_ENTRY === $token->type) {
-            $flowSequenceNode->addChild($this->host->createSyntaxTokenNode($token));
+            $flowSequenceNode->addChild($this->host->createSimpleNode($token));
             $harvester->tokens->advance();
 
             return new Continued();

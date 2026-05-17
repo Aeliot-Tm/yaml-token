@@ -31,8 +31,13 @@ use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\DocumentStartNode;
 use Aeliot\YamlToken\Node\DoubleQuotedScalarNode;
 use Aeliot\YamlToken\Node\ExplicitKeyIndicatorNode;
+use Aeliot\YamlToken\Node\FlowEntryNode;
+use Aeliot\YamlToken\Node\FlowMappingEndNode;
 use Aeliot\YamlToken\Node\FlowMappingNode;
+use Aeliot\YamlToken\Node\FlowMappingStartNode;
+use Aeliot\YamlToken\Node\FlowSequenceEndNode;
 use Aeliot\YamlToken\Node\FlowSequenceNode;
+use Aeliot\YamlToken\Node\FlowSequenceStartNode;
 use Aeliot\YamlToken\Node\FoldedBlockScalarNode;
 use Aeliot\YamlToken\Node\IndentationNode;
 use Aeliot\YamlToken\Node\KeyNode;
@@ -810,6 +815,7 @@ final class Parser
             function (Harvester $h, Node $root): void {
                 $this->collectSpaceAndComments($h, $root);
             },
+            fn (Token $t): Node => $this->createSimpleNode($t),
             fn (Token $t): SyntaxTokenNode => $this->createSyntaxTokenNode($t),
             fn (Harvester $h): KeyNode => $this->getKeyNode($h),
             fn (Harvester $h): bool => $this->isFlowMultilinePlainKeyStart($h),
@@ -849,6 +855,11 @@ final class Parser
             TokenType::BLOCK_SCALAR_INDENTATION_INDICATOR => new BlockScalarIndentationIndicatorNode($token),
             TokenType::COMMENT => new CommentNode($token),
             TokenType::DIRECTIVE_YAML_VERSION => new YamlDirectiveVersionNode($token),
+            TokenType::FLOW_ENTRY => new FlowEntryNode($token),
+            TokenType::FLOW_MAPPING_END => new FlowMappingEndNode($token),
+            TokenType::FLOW_MAPPING_START => new FlowMappingStartNode($token),
+            TokenType::FLOW_SEQUENCE_END => new FlowSequenceEndNode($token),
+            TokenType::FLOW_SEQUENCE_START => new FlowSequenceStartNode($token),
             TokenType::INDENTATION => new IndentationNode($token),
             TokenType::MERGE_INDICATOR => new MergeIndicatorNode($token),
             TokenType::NEWLINE => new NewLineNode($token),
@@ -2708,7 +2719,7 @@ final class Parser
             throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('There is no expected FLOW_MAPPING_START token, but %s given', $token?->type->value ?? '_nothing_'), $harvester->tokens));
         }
 
-        $flowMappingNode->addChild($this->createSyntaxTokenNode($token));
+        $flowMappingNode->addChild($this->createSimpleNode($token));
         $harvester->tokens->advance();
 
         /** @var FlowMappingNode $result */
@@ -2731,7 +2742,7 @@ final class Parser
             throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('There is no expected FLOW_SEQUENCE_START token, but %s given', $token?->type->value ?? '_nothing_'), $harvester->tokens));
         }
 
-        $flowSequenceNode->addChild($this->createSyntaxTokenNode($token));
+        $flowSequenceNode->addChild($this->createSimpleNode($token));
         $harvester->tokens->advance();
 
         /** @var FlowSequenceNode $result */

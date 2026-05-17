@@ -63,7 +63,7 @@ final class FlowMappingBuilder implements BuilderInterface
                 throw new UnexpectedTokenException(\sprintf('There is no expected FLOW_MAPPING_END token, but %s given', $token?->type->value ?? '_nothing_'));
             }
 
-            $flowMappingNode->addChild($this->host->createSyntaxTokenNode($token));
+            $flowMappingNode->addChild($this->host->createSimpleNode($token));
             $harvester->tokens->advance();
             $this->host->collectSpaceAndComments($harvester, $flowMappingNode);
 
@@ -71,7 +71,7 @@ final class FlowMappingBuilder implements BuilderInterface
         }
 
         if (TokenType::FLOW_ENTRY === $token->type) {
-            $flowMappingNode->addChild($this->host->createSyntaxTokenNode($token));
+            $flowMappingNode->addChild($this->host->createSimpleNode($token));
             $harvester->tokens->advance();
 
             return new Continued();

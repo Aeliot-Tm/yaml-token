@@ -56,7 +56,7 @@ final class FlowEntryBuilder implements BuilderInterface
         $token = $harvester->tokens->current();
         if (TokenType::FLOW_SEQUENCE_START === $token?->type) {
             $inner = new FlowSequenceNode();
-            $inner->addChild($this->host->createSyntaxTokenNode($token));
+            $inner->addChild($this->host->createSimpleNode($token));
             $harvester->tokens->advance();
 
             return new Delegate(new Frame(

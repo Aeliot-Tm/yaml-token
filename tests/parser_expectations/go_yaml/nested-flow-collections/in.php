@@ -5,26 +5,30 @@ declare(strict_types=1);
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\DocumentStartNode;
+use Aeliot\YamlToken\Node\FlowEntryNode;
+use Aeliot\YamlToken\Node\FlowMappingEndNode;
 use Aeliot\YamlToken\Node\FlowMappingNode;
+use Aeliot\YamlToken\Node\FlowMappingStartNode;
+use Aeliot\YamlToken\Node\FlowSequenceEndNode;
 use Aeliot\YamlToken\Node\FlowSequenceNode;
+use Aeliot\YamlToken\Node\FlowSequenceStartNode;
 use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\PlainScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
-use Aeliot\YamlToken\Node\SyntaxTokenNode;
 use Aeliot\YamlToken\Node\ValueIndicatorNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 2021456024,
+    'hash' => 2971627768,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 2584588892,
+            'hash' => 3690153697,
             'properties' => [],
             'children' => [
                 [
@@ -51,19 +55,19 @@ return [
                 ],
                 [
                     'type' => FlowMappingNode::class,
-                    'hash' => 2534578713,
+                    'hash' => 3127078728,
                     'properties' => [
                         'entries' => [
                             [
                                 'type' => KeyValueCoupleNode::class,
-                                'hash' => 3973219213,
+                                'hash' => 10644608,
                             ],
                         ],
                     ],
                     'children' => [
                         [
-                            'type' => SyntaxTokenNode::class,
-                            'hash' => 1300945157,
+                            'type' => FlowMappingStartNode::class,
+                            'hash' => 1553869732,
                             'properties' => [
                                 'token' => [
                                     'type' => TokenType::FLOW_MAPPING_START,
@@ -96,7 +100,7 @@ return [
                         ],
                         [
                             'type' => KeyValueCoupleNode::class,
-                            'hash' => 3973219213,
+                            'hash' => 10644608,
                             'properties' => [
                                 'key' => [
                                     'type' => KeyNode::class,
@@ -108,7 +112,7 @@ return [
                                 ],
                                 'value' => [
                                     'type' => ValueNode::class,
-                                    'hash' => 1677346336,
+                                    'hash' => 1294970119,
                                 ],
                             ],
                             'children' => [
@@ -159,17 +163,17 @@ return [
                                 ],
                                 [
                                     'type' => ValueNode::class,
-                                    'hash' => 1677346336,
+                                    'hash' => 1294970119,
                                     'properties' => [
                                         'payload' => [
                                             'type' => FlowSequenceNode::class,
-                                            'hash' => 2714102522,
+                                            'hash' => 2751457103,
                                         ],
                                     ],
                                     'children' => [
                                         [
                                             'type' => FlowSequenceNode::class,
-                                            'hash' => 2714102522,
+                                            'hash' => 2751457103,
                                             'properties' => [
                                                 'entries' => [
                                                     [
@@ -182,14 +186,14 @@ return [
                                                     ],
                                                     [
                                                         'type' => ValueNode::class,
-                                                        'hash' => 159847239,
+                                                        'hash' => 1935710387,
                                                     ],
                                                 ],
                                             ],
                                             'children' => [
                                                 [
-                                                    'type' => SyntaxTokenNode::class,
-                                                    'hash' => 3296102772,
+                                                    'type' => FlowSequenceStartNode::class,
+                                                    'hash' => 2336973104,
                                                     'properties' => [
                                                         'token' => [
                                                             'type' => TokenType::FLOW_SEQUENCE_START,
@@ -244,8 +248,8 @@ return [
                                                     ],
                                                 ],
                                                 [
-                                                    'type' => SyntaxTokenNode::class,
-                                                    'hash' => 3965909453,
+                                                    'type' => FlowEntryNode::class,
+                                                    'hash' => 1715075807,
                                                     'properties' => [
                                                         'token' => [
                                                             'type' => TokenType::FLOW_ENTRY,
@@ -289,8 +293,8 @@ return [
                                                     ],
                                                 ],
                                                 [
-                                                    'type' => SyntaxTokenNode::class,
-                                                    'hash' => 3965909453,
+                                                    'type' => FlowEntryNode::class,
+                                                    'hash' => 1715075807,
                                                     'properties' => [
                                                         'token' => [
                                                             'type' => TokenType::FLOW_ENTRY,
@@ -312,29 +316,29 @@ return [
                                                 ],
                                                 [
                                                     'type' => ValueNode::class,
-                                                    'hash' => 159847239,
+                                                    'hash' => 1935710387,
                                                     'properties' => [
                                                         'payload' => [
                                                             'type' => FlowMappingNode::class,
-                                                            'hash' => 3135538813,
+                                                            'hash' => 2634620720,
                                                         ],
                                                     ],
                                                     'children' => [
                                                         [
                                                             'type' => FlowMappingNode::class,
-                                                            'hash' => 3135538813,
+                                                            'hash' => 2634620720,
                                                             'properties' => [
                                                                 'entries' => [
                                                                     [
                                                                         'type' => KeyValueCoupleNode::class,
-                                                                        'hash' => 373843826,
+                                                                        'hash' => 3728696444,
                                                                     ],
                                                                 ],
                                                             ],
                                                             'children' => [
                                                                 [
-                                                                    'type' => SyntaxTokenNode::class,
-                                                                    'hash' => 1300945157,
+                                                                    'type' => FlowMappingStartNode::class,
+                                                                    'hash' => 1553869732,
                                                                     'properties' => [
                                                                         'token' => [
                                                                             'type' => TokenType::FLOW_MAPPING_START,
@@ -367,7 +371,7 @@ return [
                                                                 ],
                                                                 [
                                                                     'type' => KeyValueCoupleNode::class,
-                                                                    'hash' => 373843826,
+                                                                    'hash' => 3728696444,
                                                                     'properties' => [
                                                                         'key' => [
                                                                             'type' => KeyNode::class,
@@ -379,7 +383,7 @@ return [
                                                                         ],
                                                                         'value' => [
                                                                             'type' => ValueNode::class,
-                                                                            'hash' => 2293954833,
+                                                                            'hash' => 3252928202,
                                                                         ],
                                                                     ],
                                                                     'children' => [
@@ -430,17 +434,17 @@ return [
                                                                         ],
                                                                         [
                                                                             'type' => ValueNode::class,
-                                                                            'hash' => 2293954833,
+                                                                            'hash' => 3252928202,
                                                                             'properties' => [
                                                                                 'payload' => [
                                                                                     'type' => FlowSequenceNode::class,
-                                                                                    'hash' => 3689926281,
+                                                                                    'hash' => 1581048626,
                                                                                 ],
                                                                             ],
                                                                             'children' => [
                                                                                 [
                                                                                     'type' => FlowSequenceNode::class,
-                                                                                    'hash' => 3689926281,
+                                                                                    'hash' => 1581048626,
                                                                                     'properties' => [
                                                                                         'entries' => [
                                                                                             [
@@ -455,8 +459,8 @@ return [
                                                                                     ],
                                                                                     'children' => [
                                                                                         [
-                                                                                            'type' => SyntaxTokenNode::class,
-                                                                                            'hash' => 3296102772,
+                                                                                            'type' => FlowSequenceStartNode::class,
+                                                                                            'hash' => 2336973104,
                                                                                             'properties' => [
                                                                                                 'token' => [
                                                                                                     'type' => TokenType::FLOW_SEQUENCE_START,
@@ -489,8 +493,8 @@ return [
                                                                                             ],
                                                                                         ],
                                                                                         [
-                                                                                            'type' => SyntaxTokenNode::class,
-                                                                                            'hash' => 3965909453,
+                                                                                            'type' => FlowEntryNode::class,
+                                                                                            'hash' => 1715075807,
                                                                                             'properties' => [
                                                                                                 'token' => [
                                                                                                     'type' => TokenType::FLOW_ENTRY,
@@ -534,8 +538,8 @@ return [
                                                                                             ],
                                                                                         ],
                                                                                         [
-                                                                                            'type' => SyntaxTokenNode::class,
-                                                                                            'hash' => 2678523598,
+                                                                                            'type' => FlowSequenceEndNode::class,
+                                                                                            'hash' => 539304155,
                                                                                             'properties' => [
                                                                                                 'token' => [
                                                                                                     'type' => TokenType::FLOW_SEQUENCE_END,
@@ -573,8 +577,8 @@ return [
                                                                     ],
                                                                 ],
                                                                 [
-                                                                    'type' => SyntaxTokenNode::class,
-                                                                    'hash' => 2204982300,
+                                                                    'type' => FlowMappingEndNode::class,
+                                                                    'hash' => 1100359731,
                                                                     'properties' => [
                                                                         'token' => [
                                                                             'type' => TokenType::FLOW_MAPPING_END,
@@ -610,8 +614,8 @@ return [
                                                     ],
                                                 ],
                                                 [
-                                                    'type' => SyntaxTokenNode::class,
-                                                    'hash' => 2678523598,
+                                                    'type' => FlowSequenceEndNode::class,
+                                                    'hash' => 539304155,
                                                     'properties' => [
                                                         'token' => [
                                                             'type' => TokenType::FLOW_SEQUENCE_END,
@@ -638,8 +642,8 @@ return [
                             ],
                         ],
                         [
-                            'type' => SyntaxTokenNode::class,
-                            'hash' => 2204982300,
+                            'type' => FlowMappingEndNode::class,
+                            'hash' => 1100359731,
                             'properties' => [
                                 'token' => [
                                     'type' => TokenType::FLOW_MAPPING_END,
