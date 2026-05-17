@@ -14,9 +14,11 @@ declare(strict_types=1);
 namespace Aeliot\YamlToken\Parser\Dto;
 
 use Aeliot\YamlToken\Node\StreamNode;
+use Aeliot\YamlToken\Parser\Flow\FlowHost;
 
 final class Harvester
 {
+    public FlowHost $flowHost;
     public ParseRegistry $registry;
     public ParseState $state;
     public StreamNode $stream;

@@ -99,16 +99,12 @@ final class Parser
      */
     private const FLOW_COLLECTION_VALUE_PARENT_INDENT = -2;
 
-    private const TOKEN_TYPES_SPASE_AND_COMMENT = [
-        TokenType::COMMENT,
-        TokenType::WHITESPACE,
-    ];
+    private Consumer $consumer;
 
-    private const TOKEN_TYPES_SPASE_COMMENT_END = [
-        TokenType::COMMENT,
-        TokenType::NEWLINE,
-        TokenType::WHITESPACE,
-    ];
+    public function __construct()
+    {
+        $this->consumer = new Consumer();
+    }
 
     public function parse(string $input): StreamNode
     {
@@ -371,7 +367,7 @@ final class Parser
             $token = $harvester->tokens->current();
             $root->addChild(new IndentationNode($token));
             $harvester->tokens->advance();
-            $this->collectSpaceCommentEnds($harvester, $root);
+            $this->consumer->collectSpaceCommentEnds($harvester, $root);
         }
     }
 
@@ -469,47 +465,6 @@ final class Parser
         return $aliases;
     }
 
-    private function collectSpaceAndComments(Harvester $harvester, Node $root): void
-    {
-        $this->collectTypes($harvester, self::TOKEN_TYPES_SPASE_AND_COMMENT, $root);
-    }
-
-    private function collectSpaceCommentEnds(Harvester $harvester, Node $root): void
-    {
-        $this->collectTypes($harvester, self::TOKEN_TYPES_SPASE_COMMENT_END, $root);
-    }
-
-    /**
-     * @param TokenType[] $types
-     */
-    private function collectTypes(Harvester $harvester, array $types, Node $root): void
-    {
-        while (true) {
-            $token = $harvester->tokens->current();
-            if (null === $token) {
-                break;
-            }
-            if (\in_array($token->type, $types, true)) {
-                $root->addChild($this->createSimpleNode($token));
-                $harvester->tokens->advance();
-                continue;
-            }
-            break;
-        }
-    }
-
-    private function collectUntil(Harvester $harvester, TokenType $until, Node $root): void
-    {
-        while (true) {
-            $token = $harvester->tokens->current();
-            if (null === $token || $token->type === $until) {
-                break;
-            }
-            $root->addChild($this->createSimpleNode($token));
-            $harvester->tokens->advance();
-        }
-    }
-
     private function collectValueProperties(Harvester $harvester, ValueNode $valueNode): void
     {
         // Per YAML 1.2.2 rule [96] c-ns-properties(n,c), a node has at most one anchor and one tag.
@@ -585,7 +540,7 @@ final class Parser
         $keyNode->addChild(new BlockScalarIndicatorNode($token));
         $harvester->tokens->advance();
 
-        $this->collectUntil($harvester, TokenType::NEWLINE, $keyNode);
+        $this->consumer->collectUntil($harvester, TokenType::NEWLINE, $keyNode);
 
         $token = $harvester->tokens->current();
         if (null === $token || TokenType::NEWLINE !== $token->type) {
@@ -653,7 +608,7 @@ final class Parser
         $valueNode->addChild(new NewLineNode($harvester->tokens->current()));
         $harvester->tokens->advance();
 
-        $this->collectSpaceCommentEnds($harvester, $valueNode);
+        $this->consumer->collectSpaceCommentEnds($harvester, $valueNode);
         $this->collectInsignificantIndentationLines($harvester, $valueNode);
     }
 
@@ -829,7 +784,7 @@ final class Parser
             $harvester->registry->anchors[$anchor->getName()] = $anchor;
         }
 
-        $this->collectSpaceAndComments($harvester, $valueNode);
+        $this->consumer->collectSpaceAndComments($harvester, $valueNode);
 
         $scalarToken = $harvester->tokens->current();
         if (null === $scalarToken || !\in_array($scalarToken->type, [
@@ -890,10 +845,10 @@ final class Parser
     {
         return new FlowHost(
             function (Harvester $h, Node $root): void {
-                $this->collectSpaceAndComments($h, $root);
+                $this->consumer->collectSpaceAndComments($h, $root);
             },
             function (Harvester $h, Node $root): void {
-                $this->collectSpaceCommentEnds($h, $root);
+                $this->consumer->collectSpaceCommentEnds($h, $root);
             },
             fn (Token $t): Node => $this->createSimpleNode($t),
             fn (Harvester $h): KeyNode => $this->getKeyNode($h),
@@ -922,7 +877,7 @@ final class Parser
     }
 
     /**
-     * Wraps layout/indicator tokens collected by {@see collectTypes()} and {@see collectUntil()}
+     * Wraps layout/indicator tokens collected by {@see Consumer::collectTypes()} and {@see Consumer::collectUntil()}
      * with their corresponding nodes. Only token types that those collectors can deliver are
      * listed here; structural tokens (anchors, tags, block scalar indicators) are wrapped at
      * their dedicated parsing call sites and never reach this method.
@@ -1688,7 +1643,7 @@ final class Parser
                 break;
             }
 
-            $this->collectSpaceCommentEnds($harvester, $blockMapping);
+            $this->consumer->collectSpaceCommentEnds($harvester, $blockMapping);
             $this->collectInsignificantIndentationLines($harvester, $blockMapping);
 
             $token = $harvester->tokens->current();
@@ -1756,7 +1711,7 @@ final class Parser
                 break;
             }
 
-            $this->collectSpaceCommentEnds($harvester, $blockSequence);
+            $this->consumer->collectSpaceCommentEnds($harvester, $blockSequence);
             $this->collectInsignificantIndentationLines($harvester, $blockSequence);
 
             $token = $harvester->tokens->current();
@@ -1834,7 +1789,7 @@ final class Parser
                 break;
             }
 
-            $this->collectSpaceCommentEnds($harvester, $blockMapping);
+            $this->consumer->collectSpaceCommentEnds($harvester, $blockMapping);
             $this->collectInsignificantIndentationLines($harvester, $blockMapping);
 
             $token = $harvester->tokens->current();
@@ -1880,7 +1835,7 @@ final class Parser
                 break;
             }
 
-            $this->collectSpaceCommentEnds($harvester, $blockSequence);
+            $this->consumer->collectSpaceCommentEnds($harvester, $blockSequence);
             $this->collectInsignificantIndentationLines($harvester, $blockSequence);
 
             $token = $harvester->tokens->current();
@@ -2141,7 +2096,7 @@ final class Parser
                 $separatorContainer = $valueNode->getProperties() ?? $valueNode;
                 $separatorContainer->addChild(new NewLineNode($token));
                 $harvester->tokens->advance();
-                $this->collectSpaceCommentEnds($harvester, $separatorContainer);
+                $this->consumer->collectSpaceCommentEnds($harvester, $separatorContainer);
                 $this->collectInsignificantIndentationLines($harvester, $separatorContainer);
 
                 $indentationToken = $harvester->tokens->current();
@@ -2275,7 +2230,7 @@ final class Parser
             null !== $afterKey
             && null !== $keyValueCouple->getKey()->getExplicitKeyIndicatorNode()
         ) {
-            $this->collectTypes($harvester, [TokenType::WHITESPACE], $keyValueCouple);
+            $this->consumer->collectTypes($harvester, [TokenType::WHITESPACE], $keyValueCouple);
             $afterKey = $harvester->tokens->current();
 
             if (null === $afterKey || TokenType::NEWLINE !== $afterKey->type) {
@@ -2290,7 +2245,7 @@ final class Parser
             if (null !== $head) {
                 [$headIndentLen, $significantToken] = $head;
                 if (TokenType::VALUE_INDICATOR === $significantToken->type && $headIndentLen === $entryIndentLen) {
-                    $this->collectTypes($harvester, [
+                    $this->consumer->collectTypes($harvester, [
                         TokenType::COMMENT,
                         TokenType::INDENTATION,
                         TokenType::NEWLINE,
@@ -2308,10 +2263,10 @@ final class Parser
             && \strlen($afterKey->text) === $entryIndentLen
             && TokenType::VALUE_INDICATOR === $harvester->tokens->peek(1)?->type
         ) {
-            $this->collectTypes($harvester, [TokenType::INDENTATION], $keyValueCouple);
+            $this->consumer->collectTypes($harvester, [TokenType::INDENTATION], $keyValueCouple);
         }
 
-        $this->collectTypes($harvester, [TokenType::VALUE_INDICATOR, TokenType::WHITESPACE], $keyValueCouple);
+        $this->consumer->collectTypes($harvester, [TokenType::VALUE_INDICATOR, TokenType::WHITESPACE], $keyValueCouple);
         $keyValueCouple->addChild($this->parseValue($harvester, $indentLen));
         $this->postProcessKeyValueCouple($harvester, $keyValueCouple);
     }
@@ -2333,7 +2288,7 @@ final class Parser
         $mergeInstruction->addChild($this->createSimpleNode($token));
         $harvester->tokens->advance();
 
-        $this->collectTypes($harvester, [TokenType::VALUE_INDICATOR, TokenType::WHITESPACE], $mergeInstruction);
+        $this->consumer->collectTypes($harvester, [TokenType::VALUE_INDICATOR, TokenType::WHITESPACE], $mergeInstruction);
 
         $value = $this->parseValue($harvester, self::FLOW_COLLECTION_VALUE_PARENT_INDENT);
         $mergeInstruction->addChild($value);
@@ -2419,6 +2374,7 @@ final class Parser
     private function parseStream(TokenStream $tokens): StreamNode
     {
         $harvester = new Harvester(new TokenStreamProxy($tokens));
+        $harvester->flowHost = $this->createFlowHost();
         $harvester->registry = new ParseRegistry();
         $harvester->state = new ParseState();
         $harvester->stream = $stream = new StreamNode();
@@ -2472,7 +2428,7 @@ final class Parser
                 $tagDirectiveNode->addChild(new TagDirectivePrefixNode($token));
                 $harvester->tokens->advance();
 
-                $this->collectSpaceAndComments($harvester, $tagDirectiveNode);
+                $this->consumer->collectSpaceAndComments($harvester, $tagDirectiveNode);
 
                 return $tagDirectiveNode;
             }
@@ -2500,7 +2456,7 @@ final class Parser
             $harvester->registry->anchors[$anchor->getName()] = $anchor;
         }
 
-        $this->collectSpaceAndComments($harvester, $valueNode);
+        $this->consumer->collectSpaceAndComments($harvester, $valueNode);
 
         $token = $harvester->tokens->current();
         if (
@@ -2508,7 +2464,7 @@ final class Parser
             && TokenType::NEWLINE === $token->type
             && self::FLOW_COLLECTION_VALUE_PARENT_INDENT === $parentIndentLen
         ) {
-            $this->collectSpaceCommentEnds($harvester, $valueNode);
+            $this->consumer->collectSpaceCommentEnds($harvester, $valueNode);
         }
 
         $this->parseValuePrimaryPayload($harvester, $valueNode, $parentIndentLen);
@@ -2516,7 +2472,7 @@ final class Parser
         // Trailing s-separate / s-l-comments before ',', ']', or '}' belong to the enclosing
         // FlowSequenceBuilder / FlowMappingBuilder (YAML 1.2.2 §6.3, §7.1), not this ValueNode.
         if (self::FLOW_COLLECTION_VALUE_PARENT_INDENT !== $parentIndentLen) {
-            $this->collectSpaceAndComments($harvester, $valueNode);
+            $this->consumer->collectSpaceAndComments($harvester, $valueNode);
         }
 
         return $valueNode;
@@ -2547,7 +2503,7 @@ final class Parser
         if (\in_array($token->type, TokenType::BLOCK_SCALAR_INDICATORS, true)) {
             $valueNode->addChild(new BlockScalarIndicatorNode($token));
             $harvester->tokens->advance();
-            $this->collectUntil($harvester, TokenType::NEWLINE, $valueNode);
+            $this->consumer->collectUntil($harvester, TokenType::NEWLINE, $valueNode);
 
             $token = $harvester->tokens->current();
             if (!$token) {
@@ -2620,7 +2576,7 @@ final class Parser
             $this->appendMultilinePlainScalarContinuations($harvester, $valueNode, $parentIndentLen);
         } elseif (TokenType::NEWLINE === $token->type) {
             if (self::FLOW_COLLECTION_VALUE_PARENT_INDENT === $parentIndentLen) {
-                $this->collectSpaceCommentEnds($harvester, $valueNode);
+                $this->consumer->collectSpaceCommentEnds($harvester, $valueNode);
                 $this->parseValuePrimaryPayload($harvester, $valueNode, $parentIndentLen);
 
                 return;
@@ -2701,7 +2657,7 @@ final class Parser
                 $yamlDirectiveNode->addChild($this->createSimpleNode($token));
                 $harvester->tokens->advance();
 
-                $this->collectSpaceAndComments($harvester, $yamlDirectiveNode);
+                $this->consumer->collectSpaceAndComments($harvester, $yamlDirectiveNode);
 
                 return $yamlDirectiveNode;
             }
@@ -2814,7 +2770,7 @@ final class Parser
         $result = (new Driver())->run(
             $harvester,
             new Frame(
-                new FlowMappingBuilder($this->createFlowHost()),
+                new FlowMappingBuilder($harvester->flowHost),
                 $flowMappingNode,
             ),
         );
@@ -2837,7 +2793,7 @@ final class Parser
         $result = (new Driver())->run(
             $harvester,
             new Frame(
-                new FlowSequenceBuilder($this->createFlowHost()),
+                new FlowSequenceBuilder($harvester->flowHost),
                 $flowSequenceNode,
             ),
         );
@@ -2992,7 +2948,7 @@ final class Parser
 
     private function tryConsumeFlowMappingValueIndicator(Harvester $harvester, KeyValueCoupleNode $couple): bool
     {
-        $this->collectSpaceCommentEnds($harvester, $couple);
+        $this->consumer->collectSpaceCommentEnds($harvester, $couple);
 
         $token = $harvester->tokens->current();
         if (TokenType::VALUE_INDICATOR !== $token?->type) {
@@ -3002,7 +2958,7 @@ final class Parser
         $couple->addChild(new ValueIndicatorNode($token));
         $harvester->tokens->advance();
 
-        $this->collectTypes($harvester, [TokenType::WHITESPACE], $couple);
+        $this->consumer->collectTypes($harvester, [TokenType::WHITESPACE], $couple);
 
         return true;
     }
