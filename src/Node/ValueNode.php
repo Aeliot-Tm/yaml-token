@@ -13,53 +13,34 @@ declare(strict_types=1);
 
 namespace Aeliot\YamlToken\Node;
 
+use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
+
 /**
  * TODO: simplify interface & add easy way to get type of value.
  */
 class ValueNode extends AbstractNode
 {
-    private ?AliasNode $alias = null;
-    private ?BlockMappingNode $blockMapping = null;
-    private ?BlockSequenceNode $blockSequence = null;
-    private ?FlowMappingNode $flowMapping = null;
-    private ?FlowSequenceNode $flowSequence = null;
-    private ?KeyValueCoupleNode $keyValueCouple = null;
-    private ?MultilinePlainScalarNode $multilinePlainScalar = null;
+    private ?Node $payload = null;
     private ?NodePropertiesNode $properties = null;
-    private ?ScalarNode $scalar = null;
 
     public function addChild(Node $child): void
     {
-        if ($child instanceof AliasNode) {
-            $this->alias = $child;
-        }
-
-        if ($child instanceof BlockMappingNode) {
-            $this->blockMapping = $child;
-        }
-
-        if ($child instanceof BlockSequenceNode) {
-            $this->blockSequence = $child;
-        }
-
-        if ($child instanceof FlowMappingNode) {
-            $this->flowMapping = $child;
-        }
-
-        if ($child instanceof FlowSequenceNode) {
-            $this->flowSequence = $child;
-        }
-
-        if ($child instanceof KeyValueCoupleNode) {
-            $this->keyValueCouple = $child;
-        }
-
-        if ($child instanceof MultilinePlainScalarNode) {
-            $this->multilinePlainScalar = $child;
-        }
-
-        if ($child instanceof ScalarNode) {
-            $this->scalar = $child;
+        if (
+            $child instanceof AliasNode
+            || $child instanceof BlockMappingNode
+            || $child instanceof BlockSequenceNode
+            || $child instanceof FlowMappingNode
+            || $child instanceof FlowSequenceNode
+            || $child instanceof KeyValueCoupleNode
+            || $child instanceof MultilinePlainScalarNode
+            || $child instanceof ScalarNode
+        ) {
+            if (null !== $this->payload) {
+                throw new UnexpectedStateException('Attempt to set a value name twice');
+            }
+            $this->payload = $child;
+        } elseif ($child instanceof NodePropertiesNode) {
+            $this->properties = $child;
         }
 
         parent::addChild($child);
@@ -67,7 +48,7 @@ class ValueNode extends AbstractNode
 
     public function getAlias(): ?AliasNode
     {
-        return $this->alias;
+        return $this->payload instanceof AliasNode ? $this->payload : null;
     }
 
     public function getAnchor(): ?AnchorNode
@@ -77,32 +58,37 @@ class ValueNode extends AbstractNode
 
     public function getBlockMapping(): ?BlockMappingNode
     {
-        return $this->blockMapping;
+        return $this->payload instanceof BlockMappingNode ? $this->payload : null;
     }
 
     public function getBlockSequence(): ?BlockSequenceNode
     {
-        return $this->blockSequence;
+        return $this->payload instanceof BlockSequenceNode ? $this->payload : null;
     }
 
     public function getFlowMapping(): ?FlowMappingNode
     {
-        return $this->flowMapping;
+        return $this->payload instanceof FlowMappingNode ? $this->payload : null;
     }
 
     public function getFlowSequence(): ?FlowSequenceNode
     {
-        return $this->flowSequence;
+        return $this->payload instanceof FlowSequenceNode ? $this->payload : null;
     }
 
     public function getKeyValueCouple(): ?KeyValueCoupleNode
     {
-        return $this->keyValueCouple;
+        return $this->payload instanceof KeyValueCoupleNode ? $this->payload : null;
     }
 
     public function getMultilinePlainScalar(): ?MultilinePlainScalarNode
     {
-        return $this->multilinePlainScalar;
+        return $this->payload instanceof MultilinePlainScalarNode ? $this->payload : null;
+    }
+
+    public function getPayload(): ?Node
+    {
+        return $this->payload;
     }
 
     public function getProperties(): ?NodePropertiesNode
@@ -118,7 +104,7 @@ class ValueNode extends AbstractNode
 
     public function getScalar(): ?ScalarNode
     {
-        return $this->scalar;
+        return $this->payload instanceof ScalarNode ? $this->payload : null;
     }
 
     public function getTag(): ?TagNode
@@ -128,13 +114,17 @@ class ValueNode extends AbstractNode
 
     public function isEmpty(): bool
     {
-        return null === $this->alias
-            && null === $this->blockMapping
-            && null === $this->blockSequence
-            && null === $this->flowMapping
-            && null === $this->flowSequence
-            && null === $this->keyValueCouple
-            && null === $this->multilinePlainScalar
-            && null === $this->scalar;
+        return null === $this->payload;
+    }
+
+    public function removeChild(Node $child): void
+    {
+        if ($this->payload === $child) {
+            $this->payload = null;
+        } elseif ($this->properties === $child) {
+            $this->properties = null;
+        }
+
+        parent::removeChild($child);
     }
 }

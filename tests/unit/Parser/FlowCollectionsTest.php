@@ -172,8 +172,8 @@ YAML;
 
         $flowSequence = $this->getOnlyTopLevelFlowSequence($stream);
         $pairEntry = $flowSequence->getEntries()[0];
-        $couple = $pairEntry->getKeyValueCouple();
-        self::assertNotNull($couple);
+        $couple = $pairEntry->getPayload();
+        self::assertInstanceOf(KeyValueCoupleNode::class, $couple);
 
         $pairValue = $couple->getValue();
         self::assertNotNull($pairValue);
@@ -274,8 +274,9 @@ YAML;
             if ($child instanceof SequenceEntryNode) {
                 $entryValue = $child->getValue();
                 self::assertNotNull($entryValue);
-                $nested = $entryValue->getFlowSequence();
+                $nested = $entryValue->getPayload();
                 if (null !== $nested) {
+                    self::assertInstanceOf(FlowSequenceNode::class, $nested);
                     $flowSequences[] = $nested;
                 }
             }
@@ -302,7 +303,7 @@ YAML;
         return $couples[0];
     }
 
-    private function assertNoWhitespaceChildren(ValueNode $valueNode): void
+    private static function assertNoWhitespaceChildren(ValueNode $valueNode): void
     {
         foreach ($valueNode->getChildren() as $child) {
             self::assertNotInstanceOf(WhitespaceNode::class, $child);

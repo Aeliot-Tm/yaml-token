@@ -13,12 +13,15 @@ declare(strict_types=1);
 
 namespace Aeliot\YamlToken\Test\Unit\Parser;
 
+use Aeliot\YamlToken\Node\BlockMappingNode;
 use Aeliot\YamlToken\Node\BlockSequenceNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
+use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\SequenceEntryNode;
 use Aeliot\YamlToken\Node\StreamNode;
+use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Parser\Parser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -37,12 +40,12 @@ final class IndentLessSequenceWithScalarTest extends TestCase
 
         $aValue = $rootCouples[0]->getValue();
         self::assertNotNull($aValue);
-        $aCouples = $this->getKeyValueCouples($aValue->getBlockMapping());
+        $aCouples = $this->getKeyValueCouples($this->getBlockMapping($aValue));
         self::assertCount(1, $aCouples);
 
         $bValue = $aCouples[0]->getValue();
         self::assertNotNull($bValue);
-        $seq = $bValue->getBlockSequence();
+        $seq = $bValue->getPayload();
         self::assertInstanceOf(BlockSequenceNode::class, $seq);
 
         $entries = array_values(array_filter(
@@ -55,10 +58,18 @@ final class IndentLessSequenceWithScalarTest extends TestCase
         self::assertSame('value', $scalar->getToken()->text);
     }
 
+    private function getBlockMapping(ValueNode $value): BlockMappingNode
+    {
+        $blockMapping = $value->getPayload();
+        self::assertInstanceOf(BlockMappingNode::class, $blockMapping);
+
+        return $blockMapping;
+    }
+
     /**
      * @return KeyValueCoupleNode[]
      */
-    private function getKeyValueCouples(?object $node): array
+    private function getKeyValueCouples(?Node $node): array
     {
         self::assertNotNull($node);
 

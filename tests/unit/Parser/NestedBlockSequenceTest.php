@@ -63,7 +63,7 @@ YAML);
 
         $levelBValue = $levelACouples[0]->getValue();
         self::assertNotNull($levelBValue);
-        $seq = $levelBValue->getBlockSequence();
+        $seq = $levelBValue->getPayload();
         self::assertInstanceOf(BlockSequenceNode::class, $seq);
 
         $entries = array_values(array_filter(
@@ -108,7 +108,7 @@ YAML);
 
     private function getBlockMapping(ValueNode $value): BlockMappingNode
     {
-        $blockMapping = $value->getBlockMapping();
+        $blockMapping = $value->getPayload();
         self::assertInstanceOf(BlockMappingNode::class, $blockMapping);
 
         return $blockMapping;

@@ -14,11 +14,14 @@ declare(strict_types=1);
 namespace Aeliot\YamlToken\Parser\Builder;
 
 use Aeliot\YamlToken\Enum\TokenType;
+use Aeliot\YamlToken\Node\AliasNode;
 use Aeliot\YamlToken\Node\FlowMappingNode;
 use Aeliot\YamlToken\Node\FlowSequenceNode;
 use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
+use Aeliot\YamlToken\Node\MultilinePlainScalarNode;
 use Aeliot\YamlToken\Node\Node;
+use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Parser\Driver\BuilderInterface;
 use Aeliot\YamlToken\Parser\Driver\BuilderResult\BuilderResultInterface;
@@ -206,16 +209,15 @@ final class FlowEntryBuilder implements BuilderInterface
         if (null !== ($properties = $valueNode->getProperties())) {
             $keyNode->setProperties($properties);
         }
-        if (null !== ($flowMapping = $valueNode->getFlowMapping())) {
-            $keyNode->setName($flowMapping);
-        } elseif (null !== ($flowSequence = $valueNode->getFlowSequence())) {
-            $keyNode->setName($flowSequence);
-        } elseif (null !== ($scalar = $valueNode->getScalar())) {
-            $keyNode->setName($scalar);
-        } elseif (null !== ($multiline = $valueNode->getMultilinePlainScalar())) {
-            $keyNode->setName($multiline);
-        } elseif (null !== ($alias = $valueNode->getAlias())) {
-            $keyNode->setName($alias);
+        $payload = $valueNode->getPayload();
+        if (
+            $payload instanceof AliasNode
+            || $payload instanceof FlowMappingNode
+            || $payload instanceof FlowSequenceNode
+            || $payload instanceof MultilinePlainScalarNode
+            || $payload instanceof ScalarNode
+        ) {
+            $keyNode->setName($payload);
         }
     }
 }

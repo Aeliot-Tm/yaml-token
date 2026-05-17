@@ -44,7 +44,7 @@ final class IndentLessSequenceWithKeyValueCoupleTest extends TestCase
 
         $bValue = $aCouples[0]->getValue();
         self::assertNotNull($bValue);
-        $seq = $bValue->getBlockSequence();
+        $seq = $bValue->getPayload();
         self::assertInstanceOf(BlockSequenceNode::class, $seq);
 
         $entries = array_values(array_filter(
@@ -55,10 +55,8 @@ final class IndentLessSequenceWithKeyValueCoupleTest extends TestCase
 
         $entryValue = $entries[0]->getValue();
         self::assertInstanceOf(ValueNode::class, $entryValue);
-        $mapping = $entryValue->getBlockMapping();
-        self::assertInstanceOf(BlockMappingNode::class, $mapping);
 
-        $entryCouples = $this->getKeyValueCouples($mapping);
+        $entryCouples = $this->getKeyValueCouples($this->getBlockMapping($entryValue));
         self::assertCount(1, $entryCouples);
 
         $scalar = $entryCouples[0]->getValue()?->getScalar();
@@ -68,7 +66,7 @@ final class IndentLessSequenceWithKeyValueCoupleTest extends TestCase
 
     private function getBlockMapping(ValueNode $value): BlockMappingNode
     {
-        $blockMapping = $value->getBlockMapping();
+        $blockMapping = $value->getPayload();
         self::assertInstanceOf(BlockMappingNode::class, $blockMapping);
 
         return $blockMapping;

@@ -121,7 +121,7 @@ YAML);
 
     private function getBlockMapping(ValueNode $value): BlockMappingNode
     {
-        $blockMapping = $value->getBlockMapping();
+        $blockMapping = $value->getPayload();
         self::assertInstanceOf(BlockMappingNode::class, $blockMapping);
 
         return $blockMapping;
