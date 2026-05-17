@@ -15,7 +15,7 @@ namespace Aeliot\YamlToken\Parser\Dto;
 
 use Aeliot\YamlToken\Node\AnchorNode;
 
-final class ParseRegistry
+final class AnchorsRegistry
 {
     /**
      * @var array<string, AnchorNode>

@@ -18,8 +18,8 @@ use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Parser\Driver\Driver;
 use Aeliot\YamlToken\Parser\Driver\Frame;
+use Aeliot\YamlToken\Parser\Dto\AnchorsRegistry;
 use Aeliot\YamlToken\Parser\Dto\Harvester;
-use Aeliot\YamlToken\Parser\Dto\ParseRegistry;
 use Aeliot\YamlToken\Parser\Dto\ParseState;
 use Aeliot\YamlToken\Parser\Dto\TokenStreamProxy;
 use Aeliot\YamlToken\TestHelper\Parser\Driver\TestRootDelegateOnceBuilder;
@@ -66,7 +66,7 @@ final class DriverTest extends TestCase
     private function createHarvester(): Harvester
     {
         $harvester = new Harvester(new TokenStreamProxy((new Lexer())->tokenize('')));
-        $harvester->registry = new ParseRegistry();
+        $harvester->anchorsRegistry = new AnchorsRegistry();
         $harvester->state = new ParseState();
         $harvester->stream = new StreamNode();
 

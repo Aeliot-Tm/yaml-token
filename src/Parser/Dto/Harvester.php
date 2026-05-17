@@ -19,7 +19,7 @@ use Aeliot\YamlToken\Parser\Flow\FlowHost;
 final class Harvester
 {
     public FlowHost $flowHost;
-    public ParseRegistry $registry;
+    public AnchorsRegistry $anchorsRegistry;
     public ParseState $state;
     public StreamNode $stream;
 

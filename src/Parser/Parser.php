@@ -69,8 +69,8 @@ use Aeliot\YamlToken\Parser\Builder\FlowMappingBuilder;
 use Aeliot\YamlToken\Parser\Builder\FlowSequenceBuilder;
 use Aeliot\YamlToken\Parser\Driver\Driver;
 use Aeliot\YamlToken\Parser\Driver\Frame;
+use Aeliot\YamlToken\Parser\Dto\AnchorsRegistry;
 use Aeliot\YamlToken\Parser\Dto\Harvester;
-use Aeliot\YamlToken\Parser\Dto\ParseRegistry;
 use Aeliot\YamlToken\Parser\Dto\ParseState;
 use Aeliot\YamlToken\Parser\Dto\TokenStreamProxy;
 use Aeliot\YamlToken\Parser\Exception\AnchorUndefinedException;
@@ -115,7 +115,7 @@ final class Parser
     {
         $harvester = new Harvester(new TokenStreamProxy($tokens));
         $harvester->flowHost = $this->createFlowHost();
-        $harvester->registry = new ParseRegistry();
+        $harvester->anchorsRegistry = new AnchorsRegistry();
         $harvester->state = new ParseState();
         $harvester->stream = $stream = new StreamNode();
 
@@ -800,7 +800,7 @@ final class Parser
         $this->collectValueProperties($harvester, $valueNode);
 
         if ($anchor = $valueNode->getAnchor()) {
-            $harvester->registry->anchors[$anchor->getName()] = $anchor;
+            $harvester->anchorsRegistry->anchors[$anchor->getName()] = $anchor;
         }
 
         $this->consumer->collectSpaceAndComments($harvester, $valueNode);
@@ -1025,7 +1025,7 @@ final class Parser
         if (TokenType::ALIAS === $token->type) {
             $aliasNode = new AliasNode($token);
             $aliasName = $aliasNode->getName();
-            $anchor = $harvester->registry->anchors[$aliasName] ?? null;
+            $anchor = $harvester->anchorsRegistry->anchors[$aliasName] ?? null;
             if (null === $anchor) {
                 throw new AnchorUndefinedException($this->appendTokenLocation(\sprintf('Undefined alias "%s"', $aliasName), $token));
             }
@@ -2453,7 +2453,7 @@ final class Parser
         $this->collectValueProperties($harvester, $valueNode);
 
         if ($anchor = $valueNode->getAnchor()) {
-            $harvester->registry->anchors[$anchor->getName()] = $anchor;
+            $harvester->anchorsRegistry->anchors[$anchor->getName()] = $anchor;
         }
 
         $this->consumer->collectSpaceAndComments($harvester, $valueNode);
@@ -2612,7 +2612,7 @@ final class Parser
         } elseif (TokenType::ALIAS === $token->type) {
             $aliasNode = new AliasNode($token);
             $aliasName = $aliasNode->getName();
-            $anchor = $harvester->registry->anchors[$aliasName] ?? null;
+            $anchor = $harvester->anchorsRegistry->anchors[$aliasName] ?? null;
             if (null === $anchor) {
                 throw new AnchorUndefinedException($this->appendTokenLocation(\sprintf('Undefined alias "%s"', $aliasName), $token));
             }
@@ -2738,7 +2738,7 @@ final class Parser
 
         foreach ($anchors as $anchor) {
             $anchor->setDeclarationCouple($couple);
-            $harvester->registry->anchors[$anchor->getName()] = $anchor;
+            $harvester->anchorsRegistry->anchors[$anchor->getName()] = $anchor;
         }
     }
 
