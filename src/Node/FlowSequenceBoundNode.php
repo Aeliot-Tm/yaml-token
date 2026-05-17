@@ -13,6 +13,6 @@ declare(strict_types=1);
 
 namespace Aeliot\YamlToken\Node;
 
-abstract class FlowSequenceBoundNode extends SyntaxTokenNode
+abstract class FlowSequenceBoundNode extends SyntaxNode
 {
 }
