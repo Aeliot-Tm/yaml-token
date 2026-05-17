@@ -21,12 +21,12 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 1463808993,
+    'hash' => 1524098666,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 2578504981,
+            'hash' => 3896902301,
             'properties' => [],
             'children' => [
                 [
@@ -75,11 +75,11 @@ return [
                 ],
                 [
                     'type' => BlockSequenceEntryNode::class,
-                    'hash' => 4105312010,
+                    'hash' => 2932333570,
                     'properties' => [
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 1254104261,
+                            'hash' => 2723638346,
                         ],
                     ],
                     'children' => [
@@ -107,17 +107,17 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 1254104261,
+                            'hash' => 2723638346,
                             'properties' => [
                                 'payload' => [
                                     'type' => BlockMappingNode::class,
-                                    'hash' => 2348854746,
+                                    'hash' => 712739420,
                                 ],
                             ],
                             'children' => [
                                 [
                                     'type' => BlockMappingNode::class,
-                                    'hash' => 2348854746,
+                                    'hash' => 712739420,
                                     'properties' => [
                                         'entries' => [
                                             [
@@ -344,17 +344,6 @@ return [
                                                 ],
                                             ],
                                         ],
-                                        [
-                                            'type' => NewLineNode::class,
-                                            'hash' => 763369711,
-                                            'properties' => [
-                                                'token' => [
-                                                    'type' => TokenType::NEWLINE,
-                                                    'text' => "\n",
-                                                ],
-                                            ],
-                                            'children' => [],
-                                        ],
                                     ],
                                 ],
                             ],
@@ -362,12 +351,23 @@ return [
                     ],
                 ],
                 [
+                    'type' => NewLineNode::class,
+                    'hash' => 763369711,
+                    'properties' => [
+                        'token' => [
+                            'type' => TokenType::NEWLINE,
+                            'text' => "\n",
+                        ],
+                    ],
+                    'children' => [],
+                ],
+                [
                     'type' => BlockSequenceEntryNode::class,
-                    'hash' => 2313080443,
+                    'hash' => 4058623849,
                     'properties' => [
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 2691763644,
+                            'hash' => 727946581,
                         ],
                     ],
                     'children' => [
@@ -395,17 +395,17 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 2691763644,
+                            'hash' => 727946581,
                             'properties' => [
                                 'payload' => [
                                     'type' => BlockMappingNode::class,
-                                    'hash' => 3151010998,
+                                    'hash' => 3122029634,
                                 ],
                             ],
                             'children' => [
                                 [
                                     'type' => BlockMappingNode::class,
-                                    'hash' => 3151010998,
+                                    'hash' => 3122029634,
                                     'properties' => [
                                         'entries' => [
                                             [
@@ -632,17 +632,6 @@ return [
                                                 ],
                                             ],
                                         ],
-                                        [
-                                            'type' => NewLineNode::class,
-                                            'hash' => 763369711,
-                                            'properties' => [
-                                                'token' => [
-                                                    'type' => TokenType::NEWLINE,
-                                                    'text' => "\n",
-                                                ],
-                                            ],
-                                            'children' => [],
-                                        ],
                                     ],
                                 ],
                             ],
@@ -650,12 +639,23 @@ return [
                     ],
                 ],
                 [
+                    'type' => NewLineNode::class,
+                    'hash' => 763369711,
+                    'properties' => [
+                        'token' => [
+                            'type' => TokenType::NEWLINE,
+                            'text' => "\n",
+                        ],
+                    ],
+                    'children' => [],
+                ],
+                [
                     'type' => BlockSequenceEntryNode::class,
-                    'hash' => 65504057,
+                    'hash' => 222919725,
                     'properties' => [
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 3324599599,
+                            'hash' => 1175268414,
                         ],
                     ],
                     'children' => [
@@ -683,17 +683,17 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 3324599599,
+                            'hash' => 1175268414,
                             'properties' => [
                                 'payload' => [
                                     'type' => BlockMappingNode::class,
-                                    'hash' => 1591469689,
+                                    'hash' => 3313225509,
                                 ],
                             ],
                             'children' => [
                                 [
                                     'type' => BlockMappingNode::class,
-                                    'hash' => 1591469689,
+                                    'hash' => 3313225509,
                                     'properties' => [
                                         'entries' => [
                                             [
@@ -920,22 +920,22 @@ return [
                                                 ],
                                             ],
                                         ],
-                                        [
-                                            'type' => NewLineNode::class,
-                                            'hash' => 763369711,
-                                            'properties' => [
-                                                'token' => [
-                                                    'type' => TokenType::NEWLINE,
-                                                    'text' => "\n",
-                                                ],
-                                            ],
-                                            'children' => [],
-                                        ],
                                     ],
                                 ],
                             ],
                         ],
                     ],
+                ],
+                [
+                    'type' => NewLineNode::class,
+                    'hash' => 763369711,
+                    'properties' => [
+                        'token' => [
+                            'type' => TokenType::NEWLINE,
+                            'text' => "\n",
+                        ],
+                    ],
+                    'children' => [],
                 ],
             ],
         ],

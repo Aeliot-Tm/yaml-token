@@ -18,12 +18,12 @@ use Aeliot\YamlToken\Node\ValueNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 4015177854,
+    'hash' => 111774685,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 645037225,
+            'hash' => 155911945,
             'properties' => [],
             'children' => [
                 [
@@ -50,7 +50,7 @@ return [
                 ],
                 [
                     'type' => KeyValueCoupleNode::class,
-                    'hash' => 1384492832,
+                    'hash' => 2467978819,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
@@ -62,7 +62,7 @@ return [
                         ],
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 2080981166,
+                            'hash' => 2128592113,
                         ],
                     ],
                     'children' => [
@@ -102,11 +102,11 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 2080981166,
+                            'hash' => 2128592113,
                             'properties' => [
                                 'payload' => [
                                     'type' => BlockMappingNode::class,
-                                    'hash' => 1299718385,
+                                    'hash' => 3941678057,
                                 ],
                             ],
                             'children' => [
@@ -123,7 +123,7 @@ return [
                                 ],
                                 [
                                     'type' => BlockMappingNode::class,
-                                    'hash' => 1299718385,
+                                    'hash' => 3941678057,
                                     'properties' => [
                                         'entries' => [
                                             [
@@ -208,44 +208,44 @@ return [
                                                 ],
                                             ],
                                         ],
-                                        [
-                                            'type' => NewLineNode::class,
-                                            'hash' => 763369711,
-                                            'properties' => [
-                                                'token' => [
-                                                    'type' => TokenType::NEWLINE,
-                                                    'text' => "\n",
-                                                ],
-                                            ],
-                                            'children' => [],
-                                        ],
-                                        [
-                                            'type' => IndentationNode::class,
-                                            'hash' => 3551679428,
-                                            'properties' => [
-                                                'token' => [
-                                                    'type' => TokenType::INDENTATION,
-                                                    'text' => '    ',
-                                                ],
-                                            ],
-                                            'children' => [],
-                                        ],
-                                        [
-                                            'type' => CommentNode::class,
-                                            'hash' => 3518869618,
-                                            'properties' => [
-                                                'token' => [
-                                                    'type' => TokenType::COMMENT,
-                                                    'text' => '# comment',
-                                                ],
-                                            ],
-                                            'children' => [],
-                                        ],
                                     ],
                                 ],
                             ],
                         ],
                     ],
+                ],
+                [
+                    'type' => NewLineNode::class,
+                    'hash' => 763369711,
+                    'properties' => [
+                        'token' => [
+                            'type' => TokenType::NEWLINE,
+                            'text' => "\n",
+                        ],
+                    ],
+                    'children' => [],
+                ],
+                [
+                    'type' => IndentationNode::class,
+                    'hash' => 3551679428,
+                    'properties' => [
+                        'token' => [
+                            'type' => TokenType::INDENTATION,
+                            'text' => '    ',
+                        ],
+                    ],
+                    'children' => [],
+                ],
+                [
+                    'type' => CommentNode::class,
+                    'hash' => 3518869618,
+                    'properties' => [
+                        'token' => [
+                            'type' => TokenType::COMMENT,
+                            'text' => '# comment',
+                        ],
+                    ],
+                    'children' => [],
                 ],
             ],
         ],

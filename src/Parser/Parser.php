@@ -986,6 +986,11 @@ final class Parser
             return $keyNode;
         }
 
+        // YAML 1.2.2 §7.2 empty nodes: implicit key may be anchor/tag-only with no scalar before ':'.
+        if (TokenType::VALUE_INDICATOR === $token->type && null !== $keyNode->getProperties()) {
+            return $keyNode;
+        }
+
         if (!$token->type->isScalar() && !$token->type->isMergeIndicator()) {
             if (null !== $keyNode->getExplicitKeyIndicatorNode()) {
                 return $keyNode;
@@ -1592,6 +1597,11 @@ final class Parser
         $previousCoupleIndentLen = null;
 
         while (!$harvester->tokens->isEnd()) {
+            $head = $this->peekFirstSignificantBlockHead($harvester, 0);
+            if (null === $head || $head[0] <= $parentIndentLen) {
+                break;
+            }
+
             $this->collectSpaceCommentEnds($harvester, $blockMapping);
             $this->collectInsignificantIndentationLines($harvester, $blockMapping);
 
@@ -1655,6 +1665,11 @@ final class Parser
         $baseIndentLen = null;
 
         while (!$harvester->tokens->isEnd()) {
+            $head = $this->peekFirstSignificantBlockHead($harvester, 0);
+            if (null === $head || $head[0] <= $parentIndentLen) {
+                break;
+            }
+
             $this->collectSpaceCommentEnds($harvester, $blockSequence);
             $this->collectInsignificantIndentationLines($harvester, $blockSequence);
 
@@ -1728,6 +1743,11 @@ final class Parser
         $this->parseKeyValueCoupleAtCurrentPosition($harvester, $blockMapping, $indentLen);
 
         while (!$harvester->tokens->isEnd()) {
+            $head = $this->peekFirstSignificantBlockHead($harvester, 0);
+            if (null === $head || $head[0] !== $indentLen) {
+                break;
+            }
+
             $this->collectSpaceCommentEnds($harvester, $blockMapping);
             $this->collectInsignificantIndentationLines($harvester, $blockMapping);
 
@@ -1769,6 +1789,11 @@ final class Parser
         $firstEntry->addChild($this->parseSequenceEntryValue($harvester, $indentLen, $firstCompactIndent));
 
         while (!$harvester->tokens->isEnd()) {
+            $head = $this->peekFirstSignificantBlockHead($harvester, 0);
+            if (null === $head || $head[0] !== $indentLen) {
+                break;
+            }
+
             $this->collectSpaceCommentEnds($harvester, $blockSequence);
             $this->collectInsignificantIndentationLines($harvester, $blockSequence);
 
@@ -2420,8 +2445,8 @@ final class Parser
         if (null === $token) {
             return;
         }
-        // YAML 1.2.2 §7.2 e-node / §7.4: flow content may omit the scalar entirely right after
-        // tag/anchor (c-ns-properties); ',' / '}' / ']' ends the empty node immediately.
+        // YAML 1.2.2 §7.2 e-node / §7.4: in flow contexts, scalar content may be empty right
+        // after c-ns-properties (tag/anchor) — the next ',' / '}' / ']' terminates the entry.
         if (
             self::FLOW_COLLECTION_VALUE_PARENT_INDENT === $parentIndentLen
             && \in_array($token->type, [
@@ -2617,6 +2642,10 @@ final class Parser
      * skipped, since the lexer omits the leading INDENTATION token only
      * for the latter.
      *
+     * @param int $offset TokenStreamProxy peek offset of the first token to consider:
+     *                    0 - when layout from the current position must be included in the scan;
+     *                    1 - when the current token is already known, e.g. NEWLINE after ':';
+     *
      * @return array{int, Token, int}|null Tuple of [indentLen, significantToken, offset] pointing
      *                                     at the first significant line:
      *                                     - indentLen is the byte-length of that line's
@@ -2626,9 +2655,8 @@ final class Parser
      *                                     - offset is the TokenStreamProxy peek offset of significantToken.
      *                                     Returns null if the stream ends with only insignificant lines.
      */
-    private function peekFirstSignificantBlockHead(Harvester $harvester): ?array
+    private function peekFirstSignificantBlockHead(Harvester $harvester, int $offset = 1): ?array
     {
-        $offset = 1;
         while (true) {
             $token = $harvester->tokens->peek($offset);
             if (null === $token) {

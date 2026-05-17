@@ -24,12 +24,12 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 585748590,
+    'hash' => 1400657573,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 1909097780,
+            'hash' => 76144808,
             'properties' => [],
             'children' => [
                 [
@@ -122,7 +122,7 @@ return [
                 ],
                 [
                     'type' => KeyValueCoupleNode::class,
-                    'hash' => 2978241679,
+                    'hash' => 2121116597,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
@@ -134,7 +134,7 @@ return [
                         ],
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 2417488909,
+                            'hash' => 3444056223,
                         ],
                     ],
                     'children' => [
@@ -174,11 +174,11 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 2417488909,
+                            'hash' => 3444056223,
                             'properties' => [
                                 'payload' => [
                                     'type' => BlockMappingNode::class,
-                                    'hash' => 1713592929,
+                                    'hash' => 3984967504,
                                 ],
                             ],
                             'children' => [
@@ -195,7 +195,7 @@ return [
                                 ],
                                 [
                                     'type' => BlockMappingNode::class,
-                                    'hash' => 1713592929,
+                                    'hash' => 3984967504,
                                     'properties' => [
                                         'entries' => [
                                             [
@@ -770,22 +770,22 @@ return [
                                                 ],
                                             ],
                                         ],
-                                        [
-                                            'type' => NewLineNode::class,
-                                            'hash' => 763369711,
-                                            'properties' => [
-                                                'token' => [
-                                                    'type' => TokenType::NEWLINE,
-                                                    'text' => "\n",
-                                                ],
-                                            ],
-                                            'children' => [],
-                                        ],
                                     ],
                                 ],
                             ],
                         ],
                     ],
+                ],
+                [
+                    'type' => NewLineNode::class,
+                    'hash' => 763369711,
+                    'properties' => [
+                        'token' => [
+                            'type' => TokenType::NEWLINE,
+                            'text' => "\n",
+                        ],
+                    ],
+                    'children' => [],
                 ],
             ],
         ],
