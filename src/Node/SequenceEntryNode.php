@@ -36,4 +36,13 @@ class SequenceEntryNode extends AbstractNode
     {
         return $this->value;
     }
+
+    public function removeChild(Node $child): void
+    {
+        if ($this->value === $child) {
+            $this->value = null;
+        }
+
+        parent::removeChild($child);
+    }
 }
