@@ -37,6 +37,7 @@ use Aeliot\YamlToken\Node\IndentationNode;
 use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\LiteralBlockScalarNode;
+use Aeliot\YamlToken\Node\MergeIndicatorNode;
 use Aeliot\YamlToken\Node\MergeInstructionNode;
 use Aeliot\YamlToken\Node\MultilinePlainScalarNode;
 use Aeliot\YamlToken\Node\NewLineNode;
@@ -848,6 +849,7 @@ final class Parser
             TokenType::COMMENT => new CommentNode($token),
             TokenType::DIRECTIVE_YAML_VERSION => new YamlDirectiveVersionNode($token),
             TokenType::INDENTATION => new IndentationNode($token),
+            TokenType::MERGE_INDICATOR => new MergeIndicatorNode($token),
             TokenType::NEWLINE => new NewLineNode($token),
             TokenType::SEQUENCE_ENTRY => new SyntaxTokenNode($token),
             TokenType::VALUE_INDICATOR => new ValueIndicatorNode($token),
@@ -2231,7 +2233,7 @@ final class Parser
         if (TokenType::MERGE_INDICATOR !== $token?->type) {
             throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('There is no expected MERGE_INDICATOR token, but %s given', $token?->type->value ?? '_nothing_'), $harvester->tokens));
         }
-        $mergeInstruction->addChild(new SyntaxTokenNode($token));
+        $mergeInstruction->addChild($this->createSimpleNode($token));
         $harvester->tokens->advance();
 
         $this->collectTypes($harvester, [TokenType::VALUE_INDICATOR, TokenType::WHITESPACE], $mergeInstruction);

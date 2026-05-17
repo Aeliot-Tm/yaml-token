@@ -10,24 +10,24 @@ use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\IndentationNode;
 use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
+use Aeliot\YamlToken\Node\MergeIndicatorNode;
 use Aeliot\YamlToken\Node\MergeInstructionNode;
 use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\NodePropertiesNode;
 use Aeliot\YamlToken\Node\PlainScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
-use Aeliot\YamlToken\Node\SyntaxTokenNode;
 use Aeliot\YamlToken\Node\ValueIndicatorNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 682566045,
+    'hash' => 2089292644,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 855965616,
+            'hash' => 748969343,
             'properties' => [],
             'children' => [
                 [
@@ -394,7 +394,7 @@ return [
                 ],
                 [
                     'type' => KeyValueCoupleNode::class,
-                    'hash' => 374495331,
+                    'hash' => 1749250342,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
@@ -406,7 +406,7 @@ return [
                         ],
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 705101604,
+                            'hash' => 4113706664,
                         ],
                     ],
                     'children' => [
@@ -446,11 +446,11 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 705101604,
+                            'hash' => 4113706664,
                             'properties' => [
                                 'payload' => [
                                     'type' => BlockMappingNode::class,
-                                    'hash' => 662803634,
+                                    'hash' => 643651685,
                                 ],
                             ],
                             'children' => [
@@ -467,7 +467,7 @@ return [
                                 ],
                                 [
                                     'type' => BlockMappingNode::class,
-                                    'hash' => 662803634,
+                                    'hash' => 643651685,
                                     'properties' => [
                                         'entries' => [
                                             [
@@ -479,7 +479,7 @@ return [
                                     'children' => [
                                         [
                                             'type' => MergeInstructionNode::class,
-                                            'hash' => 4174729288,
+                                            'hash' => 1281926827,
                                             'properties' => [],
                                             'children' => [
                                                 [
@@ -494,8 +494,8 @@ return [
                                                     'children' => [],
                                                 ],
                                                 [
-                                                    'type' => SyntaxTokenNode::class,
-                                                    'hash' => 3666465458,
+                                                    'type' => MergeIndicatorNode::class,
+                                                    'hash' => 2115984575,
                                                     'properties' => [
                                                         'token' => [
                                                             'type' => TokenType::MERGE_INDICATOR,
