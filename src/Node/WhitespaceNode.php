@@ -13,17 +13,6 @@ declare(strict_types=1);
 
 namespace Aeliot\YamlToken\Node;
 
-use Aeliot\YamlToken\Token\Token;
-
-class WhitespaceNode extends AbstractNode implements TokenHolderInterface
+class WhitespaceNode extends SyntaxTokenNode
 {
-    public function __construct(
-        private readonly Token $token,
-    ) {
-    }
-
-    public function getToken(): Token
-    {
-        return $this->token;
-    }
 }
