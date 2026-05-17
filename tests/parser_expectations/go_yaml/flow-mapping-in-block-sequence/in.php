@@ -12,26 +12,27 @@ use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\SequenceEntryNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\SyntaxTokenNode;
+use Aeliot\YamlToken\Node\ValueIndicatorNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 1279816396,
+    'hash' => 1778207721,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 735937900,
+            'hash' => 796933723,
             'properties' => [],
             'children' => [
                 [
                     'type' => SequenceEntryNode::class,
-                    'hash' => 396201983,
+                    'hash' => 794012080,
                     'properties' => [
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 1535010637,
+                            'hash' => 1694386308,
                         ],
                     ],
                     'children' => [
@@ -59,22 +60,22 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 1535010637,
+                            'hash' => 1694386308,
                             'properties' => [
                                 'payload' => [
                                     'type' => FlowMappingNode::class,
-                                    'hash' => 1634658552,
+                                    'hash' => 2596822792,
                                 ],
                             ],
                             'children' => [
                                 [
                                     'type' => FlowMappingNode::class,
-                                    'hash' => 1634658552,
+                                    'hash' => 2596822792,
                                     'properties' => [
                                         'entries' => [
                                             [
                                                 'type' => KeyValueCoupleNode::class,
-                                                'hash' => 3307194874,
+                                                'hash' => 926609844,
                                             ],
                                         ],
                                     ],
@@ -92,15 +93,15 @@ return [
                                         ],
                                         [
                                             'type' => KeyValueCoupleNode::class,
-                                            'hash' => 3307194874,
+                                            'hash' => 926609844,
                                             'properties' => [
                                                 'key' => [
                                                     'type' => KeyNode::class,
                                                     'hash' => 874425984,
                                                 ],
-                                                'mappingValueIndicator' => [
-                                                    'type' => SyntaxTokenNode::class,
-                                                    'hash' => 675194587,
+                                                'valueIndicator' => [
+                                                    'type' => ValueIndicatorNode::class,
+                                                    'hash' => 3779730559,
                                                 ],
                                                 'value' => [
                                                     'type' => ValueNode::class,
@@ -132,8 +133,8 @@ return [
                                                     ],
                                                 ],
                                                 [
-                                                    'type' => SyntaxTokenNode::class,
-                                                    'hash' => 675194587,
+                                                    'type' => ValueIndicatorNode::class,
+                                                    'hash' => 3779730559,
                                                     'properties' => [
                                                         'token' => [
                                                             'type' => TokenType::VALUE_INDICATOR,

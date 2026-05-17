@@ -20,8 +20,8 @@ class KeyValueCoupleNode extends AbstractNode
     private ?IndentationNode $indentation = null;
     private ?KeyNode $key = null;
     private ?MergeInstructionNode $mergeInstruction = null;
-    private ?SyntaxTokenNode $mappingValueIndicator = null;
     private ?ValueNode $value = null;
+    private ?ValueIndicatorNode $valueIndicator = null;
 
     public function addChild(Node $child): void
     {
@@ -40,6 +40,11 @@ class KeyValueCoupleNode extends AbstractNode
         //         throw new UnexpectedStateException('Attempt to set value twice');
         //     }
         //     $this->value = $child;
+        } elseif ($child instanceof ValueIndicatorNode) {
+            if (null !== $this->valueIndicator) {
+                throw new UnexpectedStateException('Attempt to set merge instruction twice');
+            }
+            $this->valueIndicator = $child;
         }
 
         parent::addChild($child);
@@ -72,17 +77,6 @@ class KeyValueCoupleNode extends AbstractNode
         return $this->mergeInstruction;
     }
 
-    public function getMappingValueIndicator(): ?SyntaxTokenNode
-    {
-        return $this->mappingValueIndicator;
-    }
-
-    public function setMappingValueIndicator(SyntaxTokenNode $node): void
-    {
-        $this->mappingValueIndicator = $node;
-        $this->addChild($node);
-    }
-
     public function getValue(): ?ValueNode
     {
         return $this->value;
@@ -94,16 +88,21 @@ class KeyValueCoupleNode extends AbstractNode
         $this->addChild($node);
     }
 
+    public function getValueIndicator(): ?ValueIndicatorNode
+    {
+        return $this->valueIndicator;
+    }
+
     public function removeChild(Node $child): void
     {
         if ($this->indentation === $child) {
             $this->indentation = null;
         } elseif ($this->key === $child) {
             $this->key = null;
-        } elseif ($this->mappingValueIndicator === $child) {
-            $this->mappingValueIndicator = null;
         } elseif ($this->mergeInstruction === $child) {
             $this->mergeInstruction = null;
+        } elseif ($this->valueIndicator === $child) {
+            $this->valueIndicator = null;
         } elseif ($this->value === $child) {
             $this->value = null;
         }

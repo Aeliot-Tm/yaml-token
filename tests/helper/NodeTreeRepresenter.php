@@ -123,7 +123,7 @@ final class NodeTreeRepresenter
                 'indentation' => $node->getIndentation(),
                 'key' => $node->getKey(),
                 'mergeInstruction' => $node->getMergeInstruction(),
-                'mappingValueIndicator' => $node->getMappingValueIndicator(),
+                'valueIndicator' => $node->getValueIndicator(),
                 'value' => $node->getValue(),
             ],
             $node instanceof KeyNode => [

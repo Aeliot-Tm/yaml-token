@@ -75,13 +75,13 @@ final class FlowCollectionsTest extends TestCase
         self::assertCount(2, $flowCouples);
 
         self::assertSame('foo', $this->getKeyText($flowCouples[0]));
-        self::assertNotNull($flowCouples[0]->getMappingValueIndicator());
+        self::assertNotNull($flowCouples[0]->getValueIndicator());
         self::assertNotNull($flowCouples[0]->getValue());
         self::assertTrue($flowCouples[0]->getValue()->isEmpty());
 
         self::assertTrue($flowCouples[1]->getKey()->isEmpty());
         self::assertNotNull($flowCouples[1]->getKey()->getExplicitKeyIndicatorNode());
-        self::assertNotNull($flowCouples[1]->getMappingValueIndicator());
+        self::assertNotNull($flowCouples[1]->getValueIndicator());
         self::assertSame('bar', $this->getScalarValueText($flowCouples[1]));
     }
 
