@@ -82,10 +82,11 @@ builders (which live in their own namespace) and the private parsing helpers
 on [`Parser`](../../../src/Parser/Parser.php). It is constructed by
 `Parser::createFlowHost()` and receives one closure per exposed helper:
 
-- `appendFlowKeyMultilinePlainScalarContinuations`
 - `collectSpaceAndComments`
-- `createSyntaxTokenNode`
-- `getFlowEntryKeyNode`
+- `createSimpleNode` (closure parameter `createStructuralNode`; wraps structural tokens
+  into typed syntax nodes via `Parser::createSimpleNode()`)
+- `getFlowEntryKeyNode` (delegates to `Parser::getKeyNode()`; builds the
+  complete `KeyNode` including multiline plain-scalar handling)
 - `isScalarFollowedByValueIndicatorInFlow`
 - `parseFlowContextValue`
 - `parseFlowMapping` (allows `FlowEntryBuilder` to recurse into a nested mapping

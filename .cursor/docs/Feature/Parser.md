@@ -53,6 +53,90 @@ Because of this, the parser must not invent tokens that did not exist in the ori
   - If a value is syntactically present (e.g. `:` is present) but its content is empty (`e-node`),
     the parser keeps a `ValueNode` instance whose content is empty (`ValueNode::isEmpty()`).
 
+## Node class hierarchy
+
+The parser builds an AST from the following node types. Every node extends
+[`AbstractNode`](../../../src/Node/AbstractNode.php) (which implements
+[`Node`](../../../src/Node/Node.php) — `addChild`, `getChildren`, `getParent`)
+unless stated otherwise.
+
+### Base classes
+
+| Class | Role |
+|-------|------|
+| `AbstractNode` | Mutable children list (`addChild`, `removeChild`, `getChildren`, `setParent`). |
+| `SyntaxNode` *(abstract)* | Wraps a single structural `Token` (`getToken()`). Extends `AbstractNode`, implements `TokenHolderInterface`. |
+| `ScalarNode` *(abstract)* | Wraps a single scalar `Token` (`getToken()`). Extends `AbstractNode`, implements `TokenHolderInterface`. |
+
+### Scalar nodes
+
+All extend `ScalarNode` (constructor: `Token`; no extra methods).
+
+| Class | Token type |
+|-------|------------|
+| `DoubleQuotedScalarNode` | `DOUBLE_QUOTED_SCALAR` |
+| `FoldedBlockScalarNode` | `FOLDED_BLOCK_SCALAR` |
+| `LiteralBlockScalarNode` | `LITERAL_BLOCK_SCALAR` |
+| `PlainScalarNode` | `PLAIN_SCALAR` |
+| `SingleQuotedScalarNode` | `SINGLE_QUOTED_SCALAR` |
+
+### Structural (syntax) nodes
+
+All extend `SyntaxNode` (constructor: `Token`; no extra methods unless noted).
+
+| Class | Token / purpose |
+|-------|-----------------|
+| `IndentationNode` | `INDENTATION` |
+| `NewLineNode` | `NEWLINE` |
+| `WhitespaceNode` | `WHITESPACE` |
+| `CommentNode` | `COMMENT` |
+| `DocumentStartNode` | `DOCUMENT_START` (`---`) |
+| `DocumentEndNode` | `DOCUMENT_END` (`...`) |
+| `ValueIndicatorNode` | `VALUE_INDICATOR` (`:`) |
+| `ExplicitKeyIndicatorNode` | `EXPLICIT_KEY_INDICATOR` (`?`) |
+| `SequenceEntryNode` | `SEQUENCE_ENTRY` (`-`) |
+| `FlowEntryNode` | `FLOW_ENTRY` (`,`) |
+| `FlowSequenceBoundNode` *(abstract)* | Base for flow-sequence brackets. |
+| `FlowSequenceStartNode` | `FLOW_SEQUENCE_START` (`[`). Extends `FlowSequenceBoundNode`. |
+| `FlowSequenceEndNode` | `FLOW_SEQUENCE_END` (`]`). Extends `FlowSequenceBoundNode`. |
+| `FlowMappingBoundNode` *(abstract)* | Base for flow-mapping brackets. |
+| `FlowMappingStartNode` | `FLOW_MAPPING_START` (`{`). Extends `FlowMappingBoundNode`. |
+| `FlowMappingEndNode` | `FLOW_MAPPING_END` (`}`). Extends `FlowMappingBoundNode`. |
+| `BlockScalarIndicatorNode` | `BLOCK_SCALAR_INDICATOR` (`\|` / `>`) |
+| `BlockScalarChompingIndicatorNode` | `BLOCK_SCALAR_CHOMPING_INDICATOR` (`+` / `-`) |
+| `BlockScalarIndentationIndicatorNode` | `BLOCK_SCALAR_INDENTATION_INDICATOR` |
+| `MergeIndicatorNode` | `MERGE_INDICATOR` (`<<`) |
+| `ByteOrderNode` | `BYTE_ORDER` (BOM). Extends `AbstractNode`, implements `TokenHolderInterface`. |
+
+### Composite nodes
+
+| Class | Key methods |
+|-------|-------------|
+| `StreamNode` | Root of the tree (YAML rule l‑yaml‑stream :211). |
+| `DocumentNode` | One document (l‑any‑document :210). |
+| `BlockMappingNode` | `getEntries(): list<KeyValueCoupleNode>` — filters structural children. |
+| `BlockSequenceNode` | `getEntries(): list<BlockSequenceEntryNode>`. |
+| `BlockSequenceEntryNode` | `getValue(): ?ValueNode`. Typed `addChild()` / `removeChild()`. |
+| `FlowSequenceNode` | `getEntries(): list<ValueNode>`. |
+| `FlowMappingNode` | `getEntries(): list<KeyValueCoupleNode>`. |
+| `MultilinePlainScalarNode` | Groups `PLAIN_SCALAR` fragments across lines. |
+| `KeyValueCoupleNode` | `getKey()`, `getValue()`, `getValueIndicator()`, `getMergeInstruction()`, `getIndentation()` / `setIndentation()`. Typed `addChild()` / `removeChild()` with duplication guards. |
+| `KeyNode` | `getName(): ?Node`, `setName(Node)` *(throws on double set)*, `getExplicitKeyIndicatorNode()` / `setExplicitKeyIndicator()`, `getProperties()` / `setProperties()`, `getAnchor()`, `getTag()`, `isEmpty()`. |
+| `ValueNode` | `getScalar()`, `getMultilinePlainScalar()`, `getAlias()`, `getBlockMapping()`, `getBlockSequence()`, `getFlowMapping()`, `getFlowSequence()`, `getKeyValueCouple()`, `getProperties()` / `setProperties()`, `getAnchor()`, `getTag()`, `isEmpty()`. Typed `addChild()`. |
+| `NodePropertiesNode` | Groups `&anchor` and `!tag` metadata. `getAnchor()`, `getTag()`. Typed `addChild()` / `removeChild()`. |
+| `AnchorNode` | `getName()` (strips `&`), `getToken()`, `getDeclarationCouple()` / `setDeclarationCouple()`. |
+| `AliasNode` | `getName()` (strips `*`), `getToken()`, `getAnchor()` / `setAnchor()`. |
+| `TagNode` | `getToken()`. |
+| `MergeInstructionNode` | `addAlias(AliasNode)`, `getAliases(): list<AliasNode>`. |
+| `DirectiveNode` | Generic reserved directive. `getToken()`. |
+| `YamlDirectiveNode` | `getIndicatorNode()`, `getVersionNode()`. Typed `addChild()` / `removeChild()`. |
+| `YamlDirectiveIndicatorNode` | `getToken()` (`%YAML`). |
+| `YamlDirectiveVersionNode` | `getToken()`. |
+| `TagDirectiveNode` | `getIndicatorNode()`, `getHandleNode()`, `getPrefixNode()`, `getHandle(): ?string`, `getPrefix(): string`. Typed `addChild()` / `removeChild()`. |
+| `TagDirectiveIndicatorNode` | `getToken()` (`%TAG`). |
+| `TagDirectiveHandleNode` | `getHandle(): string`, `getToken()`. |
+| `TagDirectivePrefixNode` | `getPrefix(): string`, `getToken()`. |
+
 ## Technical details
 
 - Fixture regression: [`FixtureParserMappingTest`](../../../tests/unit/Parser/FixtureParserMappingTest.php)
@@ -110,13 +194,13 @@ Because of this, the parser must not invent tokens that did not exist in the ori
   - Plain-scalar **keys** in flow mappings (e.g. `{ multi\n  line, a: b}`) may also span
     multiple physical lines. Inside `{...}` the lexer emits `NEWLINE` + `WHITESPACE` + `PLAIN_SCALAR`
     for each continuation line (no `INDENTATION` token, since `INDENTATION` is only emitted at column 1
-    outside flow). The parser consumes those continuation chunks via
-    `appendFlowKeyMultilinePlainScalarContinuations()` and adds each fragment with
-    `KeyNode::addScalarName()`, which automatically wraps repeated `ScalarNode`s into a
-    `MultilinePlainScalarNode` exposed via `KeyNode::getName()`. Trailing `NEWLINE` + `WHITESPACE`
-    that precede `,`, `}`, or `:` on a separate continuation line stay as layout children of the
-    `KeyValueCoupleNode` (collected by `tryConsumeFlowMappingValueIndicator()`), so the source
-    round-trips byte-for-byte.
+    outside flow). The complete key node (including multiline handling) is built by
+    `FlowHost::getFlowEntryKeyNode()`, which delegates to `Parser::getKeyNode()`.
+    `KeyNode::setName(Node)` assigns the key name — a single `ScalarNode` subclass for simple keys,
+    or a `MultilinePlainScalarNode` for multiline plain keys, or a flow collection node.
+    Trailing `NEWLINE` + `WHITESPACE` that precede `,`, `}`, or `:` on a separate continuation
+    line stay as layout children of the `KeyValueCoupleNode` (collected by
+    `tryConsumeFlowMappingValueIndicator()`), so the source round-trips byte-for-byte.
 - Collections:
   - When a block collection (mapping or sequence) appears as a value after `:` on a new line,
     the opening layout tokens (the `NEWLINE` after `:`, any comment/empty lines, and whitespace
