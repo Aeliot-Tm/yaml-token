@@ -6,29 +6,29 @@ use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\FlowSequenceNode;
 use Aeliot\YamlToken\Node\NewLineNode;
-use Aeliot\YamlToken\Node\ScalarNode;
+use Aeliot\YamlToken\Node\PlainScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\SyntaxTokenNode;
 use Aeliot\YamlToken\Node\ValueNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 522863189,
+    'hash' => 2321249404,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 3201526853,
+            'hash' => 1473050710,
             'properties' => [],
             'children' => [
                 [
                     'type' => FlowSequenceNode::class,
-                    'hash' => 3389830068,
+                    'hash' => 1933196792,
                     'properties' => [
                         'entries' => [
                             [
                                 'type' => ValueNode::class,
-                                'hash' => 3413896526,
+                                'hash' => 1265199283,
                             ],
                         ],
                     ],
@@ -46,17 +46,17 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 3413896526,
+                            'hash' => 1265199283,
                             'properties' => [
                                 'payload' => [
-                                    'type' => ScalarNode::class,
-                                    'hash' => 1389757077,
+                                    'type' => PlainScalarNode::class,
+                                    'hash' => 4252295448,
                                 ],
                             ],
                             'children' => [
                                 [
-                                    'type' => ScalarNode::class,
-                                    'hash' => 1389757077,
+                                    'type' => PlainScalarNode::class,
+                                    'hash' => 4252295448,
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::PLAIN_SCALAR,

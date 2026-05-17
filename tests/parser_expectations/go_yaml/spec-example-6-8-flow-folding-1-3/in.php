@@ -5,19 +5,19 @@ declare(strict_types=1);
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\DocumentStartNode;
+use Aeliot\YamlToken\Node\DoubleQuotedScalarNode;
 use Aeliot\YamlToken\Node\NewLineNode;
-use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\ValueNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 895032364,
+    'hash' => 3380740784,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 3154149510,
+            'hash' => 828999396,
             'properties' => [],
             'children' => [
                 [
@@ -44,17 +44,17 @@ return [
                 ],
                 [
                     'type' => ValueNode::class,
-                    'hash' => 2038772635,
+                    'hash' => 91146385,
                     'properties' => [
                         'payload' => [
-                            'type' => ScalarNode::class,
-                            'hash' => 4141615557,
+                            'type' => DoubleQuotedScalarNode::class,
+                            'hash' => 1783019093,
                         ],
                     ],
                     'children' => [
                         [
-                            'type' => ScalarNode::class,
-                            'hash' => 4141615557,
+                            'type' => DoubleQuotedScalarNode::class,
+                            'hash' => 1783019093,
                             'properties' => [
                                 'token' => [
                                     'type' => TokenType::DOUBLE_QUOTED_SCALAR,

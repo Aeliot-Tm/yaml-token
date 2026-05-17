@@ -18,7 +18,7 @@ use Aeliot\YamlToken\Node\AliasNode;
 use Aeliot\YamlToken\Node\AnchorNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
-use Aeliot\YamlToken\Node\ScalarNode;
+use Aeliot\YamlToken\Node\PlainScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Parser\Parser;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -31,7 +31,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(DocumentNode::class)]
 #[UsesClass(KeyValueCoupleNode::class)]
 #[UsesClass(Lexer::class)]
-#[UsesClass(ScalarNode::class)]
+#[UsesClass(PlainScalarNode::class)]
 #[UsesClass(StreamNode::class)]
 final class AliasesInExplicitBlockMappingTest extends TestCase
 {
@@ -49,7 +49,7 @@ final class AliasesInExplicitBlockMappingTest extends TestCase
 
         $explicitKey = $explicitKeyCouple->getKey();
         self::assertNotNull($explicitKey->getExplicitKeyIndicatorNode());
-        self::assertInstanceOf(ScalarNode::class, $explicitKey->getName());
+        self::assertInstanceOf(PlainScalarNode::class, $explicitKey->getName());
 
         $declaredAnchor = $explicitKey->getAnchor();
         self::assertInstanceOf(AnchorNode::class, $declaredAnchor);

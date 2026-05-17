@@ -8,8 +8,9 @@ use Aeliot\YamlToken\Node\BlockScalarIndicatorNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
+use Aeliot\YamlToken\Node\LiteralBlockScalarNode;
 use Aeliot\YamlToken\Node\NewLineNode;
-use Aeliot\YamlToken\Node\ScalarNode;
+use Aeliot\YamlToken\Node\PlainScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\ValueIndicatorNode;
 use Aeliot\YamlToken\Node\ValueNode;
@@ -17,21 +18,21 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 531981330,
+    'hash' => 3029172834,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 107510281,
+            'hash' => 3776042246,
             'properties' => [],
             'children' => [
                 [
                     'type' => KeyValueCoupleNode::class,
-                    'hash' => 955074753,
+                    'hash' => 1080727821,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
-                            'hash' => 1885271233,
+                            'hash' => 3646687587,
                         ],
                         'valueIndicator' => [
                             'type' => ValueIndicatorNode::class,
@@ -39,23 +40,23 @@ return [
                         ],
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 3919265772,
+                            'hash' => 1593571675,
                         ],
                     ],
                     'children' => [
                         [
                             'type' => KeyNode::class,
-                            'hash' => 1885271233,
+                            'hash' => 3646687587,
                             'properties' => [
                                 'name' => [
-                                    'type' => ScalarNode::class,
-                                    'hash' => 3374620825,
+                                    'type' => PlainScalarNode::class,
+                                    'hash' => 1518534119,
                                 ],
                             ],
                             'children' => [
                                 [
-                                    'type' => ScalarNode::class,
-                                    'hash' => 3374620825,
+                                    'type' => PlainScalarNode::class,
+                                    'hash' => 1518534119,
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::PLAIN_SCALAR,
@@ -90,11 +91,11 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 3919265772,
+                            'hash' => 1593571675,
                             'properties' => [
                                 'payload' => [
-                                    'type' => ScalarNode::class,
-                                    'hash' => 2413956284,
+                                    'type' => LiteralBlockScalarNode::class,
+                                    'hash' => 3015207195,
                                 ],
                             ],
                             'children' => [
@@ -132,8 +133,8 @@ return [
                                     'children' => [],
                                 ],
                                 [
-                                    'type' => ScalarNode::class,
-                                    'hash' => 2413956284,
+                                    'type' => LiteralBlockScalarNode::class,
+                                    'hash' => 3015207195,
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::LITERAL_BLOCK_SCALAR,

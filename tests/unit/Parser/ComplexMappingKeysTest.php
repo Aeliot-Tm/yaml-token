@@ -19,13 +19,15 @@ use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\FlowMappingNode;
 use Aeliot\YamlToken\Node\FlowSequenceNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
-use Aeliot\YamlToken\Node\ScalarNode;
+use Aeliot\YamlToken\Node\PlainScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Parser\Parser;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Parser::class)]
+#[UsesClass(PlainScalarNode::class)]
 final class ComplexMappingKeysTest extends TestCase
 {
     public function testParsesBlockMappingAsExplicitKeyOnNextLine(): void
@@ -48,15 +50,16 @@ final class ComplexMappingKeysTest extends TestCase
 
         $couple = $this->getOnlyDocumentCouple($stream);
         self::assertFalse($couple->getKey()->isEmpty());
-        self::assertNotInstanceOf(BlockMappingNode::class, $couple->getKey()->getName());
-        self::assertInstanceOf(ScalarNode::class, $couple->getKey()->getName());
-        self::assertSame('true', $couple->getKey()->getName()->getToken()->text);
+
+        $name = $couple->getKey()->getName();
+        self::assertInstanceOf(PlainScalarNode::class, $name);
+        self::assertSame('true', $name->getToken()->text);
 
         $value = $couple->getValue();
         self::assertNotNull($value);
 
         $payload = $value->getPayload();
-        self::assertInstanceOf(ScalarNode::class, $payload);
+        self::assertInstanceOf(PlainScalarNode::class, $payload);
         self::assertSame('null', $payload->getToken()->text);
     }
 

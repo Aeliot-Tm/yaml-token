@@ -16,7 +16,7 @@ namespace Aeliot\YamlToken\Test\Unit\Parser;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\DocumentStartNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
-use Aeliot\YamlToken\Node\ScalarNode;
+use Aeliot\YamlToken\Node\PlainScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\YamlDirectiveIndicatorNode;
 use Aeliot\YamlToken\Node\YamlDirectiveNode;
@@ -130,7 +130,7 @@ YAML);
         self::assertCount(1, $couples);
 
         $name = $couples[0]->getKey()->getName();
-        self::assertInstanceOf(ScalarNode::class, $name);
+        self::assertInstanceOf(PlainScalarNode::class, $name);
         self::assertSame('key', $name->getToken()->text);
     }
 

@@ -28,19 +28,24 @@ use Aeliot\YamlToken\Node\DirectiveNode;
 use Aeliot\YamlToken\Node\DocumentEndNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\DocumentStartNode;
+use Aeliot\YamlToken\Node\DoubleQuotedScalarNode;
 use Aeliot\YamlToken\Node\ExplicitKeyIndicatorNode;
 use Aeliot\YamlToken\Node\FlowMappingNode;
 use Aeliot\YamlToken\Node\FlowSequenceNode;
+use Aeliot\YamlToken\Node\FoldedBlockScalarNode;
 use Aeliot\YamlToken\Node\IndentationNode;
 use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
+use Aeliot\YamlToken\Node\LiteralBlockScalarNode;
 use Aeliot\YamlToken\Node\MergeInstructionNode;
 use Aeliot\YamlToken\Node\MultilinePlainScalarNode;
 use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Node\NodePropertiesNode;
+use Aeliot\YamlToken\Node\PlainScalarNode;
 use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\SequenceEntryNode;
+use Aeliot\YamlToken\Node\SingleQuotedScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\SyntaxTokenNode;
 use Aeliot\YamlToken\Node\TagDirectiveHandleNode;
@@ -199,7 +204,7 @@ final class Parser
                     $contentHead = $harvester->tokens->current();
                 }
 
-                $targetNode->addChild(new ScalarNode($contentHead));
+                $targetNode->addChild($this->createScalarNode($contentHead));
                 $harvester->tokens->advance();
 
                 continue;
@@ -219,7 +224,7 @@ final class Parser
                     $contentHead = $harvester->tokens->current();
                 }
 
-                $targetNode->addChild(new ScalarNode($contentHead));
+                $targetNode->addChild($this->createScalarNode($contentHead));
                 $harvester->tokens->advance();
 
                 continue;
@@ -300,7 +305,7 @@ final class Parser
         ?int $entryIndentLen,
         bool $hasExplicitKeyIndicator,
     ): Node {
-        $head = new ScalarNode($headToken);
+        $head = $this->createScalarNode($headToken);
         $harvester->tokens->advance();
 
         if (TokenType::PLAIN_SCALAR !== $headToken->type) {
@@ -701,7 +706,7 @@ final class Parser
             foreach ($layoutBuffer as $layoutNode) {
                 $multiline->addChild($layoutNode);
             }
-            $multiline->addChild(new ScalarNode($scalarToken));
+            $multiline->addChild($this->createScalarNode($scalarToken));
             $harvester->tokens->advance();
             $this->appendMultilinePlainScalarContinuations($harvester, $multiline, $parentIndentLen);
             $valueNode->addChild($multiline);
@@ -710,7 +715,7 @@ final class Parser
             foreach ($layoutBuffer as $layoutNode) {
                 $valueNode->addChild($layoutNode);
             }
-            $valueNode->addChild(new ScalarNode($scalarToken));
+            $valueNode->addChild($this->createScalarNode($scalarToken));
             $harvester->tokens->advance();
         }
     }
@@ -756,12 +761,12 @@ final class Parser
             && $this->isMultilinePlainContinuationAhead($harvester, 1, $parentIndentLen)
         ) {
             $multiline = new MultilinePlainScalarNode();
-            $multiline->addChild(new ScalarNode($scalarToken));
+            $multiline->addChild($this->createScalarNode($scalarToken));
             $harvester->tokens->advance();
             $this->appendMultilinePlainScalarContinuations($harvester, $multiline, $parentIndentLen);
             $valueNode->addChild($multiline);
         } else {
-            $valueNode->addChild(new ScalarNode($scalarToken));
+            $valueNode->addChild($this->createScalarNode($scalarToken));
             $harvester->tokens->advance();
         }
     }
@@ -815,6 +820,18 @@ final class Parser
             },
             fn (Harvester $h, KeyValueCoupleNode $couple): bool => $this->tryConsumeFlowMappingValueIndicator($h, $couple),
         );
+    }
+
+    private function createScalarNode(Token $token): ScalarNode
+    {
+        return match ($token->type) {
+            TokenType::DOUBLE_QUOTED_SCALAR => new DoubleQuotedScalarNode($token),
+            TokenType::FOLDED_BLOCK_SCALAR => new FoldedBlockScalarNode($token),
+            TokenType::LITERAL_BLOCK_SCALAR => new LiteralBlockScalarNode($token),
+            TokenType::PLAIN_SCALAR => new PlainScalarNode($token),
+            TokenType::SINGLE_QUOTED_SCALAR => new SingleQuotedScalarNode($token),
+            default => throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Not configured scalar node for token type: %s', $token->type->value), $token)),
+        };
     }
 
     /**
@@ -2460,7 +2477,7 @@ final class Parser
                 throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Scalar expected, but %s given', $token?->type->value ?? '_nothing_'), $token));
             }
 
-            $valueNode->addChild(new ScalarNode($token));
+            $valueNode->addChild($this->createScalarNode($token));
             $harvester->tokens->advance();
 
             // YAML 1.2.2 §8.1.1.2 / rule [166]-[168] l-chomped-empty(n,t):
@@ -2517,7 +2534,7 @@ final class Parser
                 && $this->isMultilinePlainContinuationAhead($harvester, 1, $parentIndentLen)
             ) {
                 $multiline = new MultilinePlainScalarNode();
-                $multiline->addChild(new ScalarNode($token));
+                $multiline->addChild($this->createScalarNode($token));
                 $harvester->tokens->advance();
                 $this->appendMultilinePlainScalarContinuations($harvester, $multiline, $parentIndentLen);
                 $valueNode->addChild($multiline);
@@ -2525,7 +2542,7 @@ final class Parser
                 TokenType::PLAIN_SCALAR === $token->type
                 && self::FLOW_COLLECTION_VALUE_PARENT_INDENT === $parentIndentLen
             ) {
-                $head = new ScalarNode($token);
+                $head = $this->createScalarNode($token);
                 $harvester->tokens->advance();
                 $multiline = new MultilinePlainScalarNode();
                 $multiline->addChild($head);
@@ -2535,7 +2552,7 @@ final class Parser
                 }
                 $valueNode->addChild($consumedAny ? $multiline : $head);
             } else {
-                $valueNode->addChild(new ScalarNode($token));
+                $valueNode->addChild($this->createScalarNode($token));
                 $harvester->tokens->advance();
             }
         } elseif (TokenType::ALIAS === $token->type) {
@@ -2792,7 +2809,7 @@ final class Parser
             $contentHead = $harvester->tokens->current();
         }
 
-        $multiline->addChild(new ScalarNode($contentHead));
+        $multiline->addChild($this->createScalarNode($contentHead));
         $harvester->tokens->advance();
 
         return true;
@@ -2824,7 +2841,7 @@ final class Parser
             $contentHead = $harvester->tokens->current();
         }
 
-        $multiline->addChild(new ScalarNode($scalarToken));
+        $multiline->addChild($this->createScalarNode($scalarToken));
         $harvester->tokens->advance();
 
         return true;
@@ -2869,7 +2886,7 @@ final class Parser
             $contentHead = $harvester->tokens->current();
         }
 
-        $multiline->addChild(new ScalarNode($scalarToken));
+        $multiline->addChild($this->createScalarNode($scalarToken));
         $harvester->tokens->advance();
 
         return true;

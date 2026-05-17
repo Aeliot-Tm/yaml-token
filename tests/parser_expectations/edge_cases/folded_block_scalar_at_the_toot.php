@@ -8,20 +8,20 @@ use Aeliot\YamlToken\Node\BlockScalarIndicatorNode;
 use Aeliot\YamlToken\Node\DocumentEndNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\DocumentStartNode;
+use Aeliot\YamlToken\Node\FoldedBlockScalarNode;
 use Aeliot\YamlToken\Node\NewLineNode;
-use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 1096115725,
+    'hash' => 2305332603,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 330395658,
+            'hash' => 1600799539,
             'properties' => [],
             'children' => [
                 [
@@ -48,11 +48,11 @@ return [
                 ],
                 [
                     'type' => ValueNode::class,
-                    'hash' => 1526212757,
+                    'hash' => 2634993903,
                     'properties' => [
                         'payload' => [
-                            'type' => ScalarNode::class,
-                            'hash' => 61165995,
+                            'type' => FoldedBlockScalarNode::class,
+                            'hash' => 949161419,
                         ],
                     ],
                     'children' => [
@@ -90,8 +90,8 @@ return [
                             'children' => [],
                         ],
                         [
-                            'type' => ScalarNode::class,
-                            'hash' => 61165995,
+                            'type' => FoldedBlockScalarNode::class,
+                            'hash' => 949161419,
                             'properties' => [
                                 'token' => [
                                     'type' => TokenType::FOLDED_BLOCK_SCALAR,

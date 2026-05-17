@@ -6,9 +6,9 @@ use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\CommentNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\DocumentStartNode;
+use Aeliot\YamlToken\Node\DoubleQuotedScalarNode;
 use Aeliot\YamlToken\Node\IndentationNode;
 use Aeliot\YamlToken\Node\NewLineNode;
-use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
@@ -18,7 +18,7 @@ use Aeliot\YamlToken\Node\YamlDirectiveVersionNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 1155419705,
+    'hash' => 2018962919,
     'properties' => [],
     'children' => [
         [
@@ -136,7 +136,7 @@ return [
         ],
         [
             'type' => DocumentNode::class,
-            'hash' => 2543583230,
+            'hash' => 1593355364,
             'properties' => [],
             'children' => [
                 [
@@ -163,17 +163,17 @@ return [
                 ],
                 [
                     'type' => ValueNode::class,
-                    'hash' => 1648343293,
+                    'hash' => 1821703505,
                     'properties' => [
                         'payload' => [
-                            'type' => ScalarNode::class,
-                            'hash' => 2580060403,
+                            'type' => DoubleQuotedScalarNode::class,
+                            'hash' => 3374417092,
                         ],
                     ],
                     'children' => [
                         [
-                            'type' => ScalarNode::class,
-                            'hash' => 2580060403,
+                            'type' => DoubleQuotedScalarNode::class,
+                            'hash' => 3374417092,
                             'properties' => [
                                 'token' => [
                                     'type' => TokenType::DOUBLE_QUOTED_SCALAR,

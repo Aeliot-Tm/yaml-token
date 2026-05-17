@@ -8,20 +8,20 @@ use Aeliot\YamlToken\Node\BlockScalarIndicatorNode;
 use Aeliot\YamlToken\Node\DocumentEndNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\DocumentStartNode;
+use Aeliot\YamlToken\Node\LiteralBlockScalarNode;
 use Aeliot\YamlToken\Node\NewLineNode;
-use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 2888280279,
+    'hash' => 899176583,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 1352808478,
+            'hash' => 2570344403,
             'properties' => [],
             'children' => [
                 [
@@ -48,11 +48,11 @@ return [
                 ],
                 [
                     'type' => ValueNode::class,
-                    'hash' => 1932927325,
+                    'hash' => 2202553899,
                     'properties' => [
                         'payload' => [
-                            'type' => ScalarNode::class,
-                            'hash' => 2576075902,
+                            'type' => LiteralBlockScalarNode::class,
+                            'hash' => 2975909140,
                         ],
                     ],
                     'children' => [
@@ -90,8 +90,8 @@ return [
                             'children' => [],
                         ],
                         [
-                            'type' => ScalarNode::class,
-                            'hash' => 2576075902,
+                            'type' => LiteralBlockScalarNode::class,
+                            'hash' => 2975909140,
                             'properties' => [
                                 'token' => [
                                     'type' => TokenType::LITERAL_BLOCK_SCALAR,

@@ -7,9 +7,9 @@ use Aeliot\YamlToken\Node\CommentNode;
 use Aeliot\YamlToken\Node\DocumentEndNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\DocumentStartNode;
+use Aeliot\YamlToken\Node\DoubleQuotedScalarNode;
 use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\NodePropertiesNode;
-use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\TagDirectiveHandleNode;
 use Aeliot\YamlToken\Node\TagDirectiveIndicatorNode;
@@ -21,7 +21,7 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 276708365,
+    'hash' => 1910732422,
     'properties' => [],
     'children' => [
         [
@@ -55,7 +55,7 @@ return [
         ],
         [
             'type' => DocumentNode::class,
-            'hash' => 3178627394,
+            'hash' => 890807100,
             'properties' => [],
             'children' => [
                 [
@@ -82,15 +82,15 @@ return [
                 ],
                 [
                     'type' => ValueNode::class,
-                    'hash' => 2357886057,
+                    'hash' => 3722887642,
                     'properties' => [
                         'nodeProperties' => [
                             'type' => NodePropertiesNode::class,
                             'hash' => 2305273002,
                         ],
                         'payload' => [
-                            'type' => ScalarNode::class,
-                            'hash' => 2970868063,
+                            'type' => DoubleQuotedScalarNode::class,
+                            'hash' => 3791308136,
                         ],
                     ],
                     'children' => [
@@ -129,8 +129,8 @@ return [
                             'children' => [],
                         ],
                         [
-                            'type' => ScalarNode::class,
-                            'hash' => 2970868063,
+                            'type' => DoubleQuotedScalarNode::class,
+                            'hash' => 3791308136,
                             'properties' => [
                                 'token' => [
                                     'type' => TokenType::DOUBLE_QUOTED_SCALAR,
@@ -280,7 +280,7 @@ return [
         ],
         [
             'type' => DocumentNode::class,
-            'hash' => 517726379,
+            'hash' => 1433051128,
             'properties' => [],
             'children' => [
                 [
@@ -307,15 +307,15 @@ return [
                 ],
                 [
                     'type' => ValueNode::class,
-                    'hash' => 2357886057,
+                    'hash' => 3722887642,
                     'properties' => [
                         'nodeProperties' => [
                             'type' => NodePropertiesNode::class,
                             'hash' => 2305273002,
                         ],
                         'payload' => [
-                            'type' => ScalarNode::class,
-                            'hash' => 2970868063,
+                            'type' => DoubleQuotedScalarNode::class,
+                            'hash' => 3791308136,
                         ],
                     ],
                     'children' => [
@@ -354,8 +354,8 @@ return [
                             'children' => [],
                         ],
                         [
-                            'type' => ScalarNode::class,
-                            'hash' => 2970868063,
+                            'type' => DoubleQuotedScalarNode::class,
+                            'hash' => 3791308136,
                             'properties' => [
                                 'token' => [
                                     'type' => TokenType::DOUBLE_QUOTED_SCALAR,

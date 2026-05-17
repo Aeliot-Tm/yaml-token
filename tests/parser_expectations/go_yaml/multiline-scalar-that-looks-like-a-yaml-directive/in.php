@@ -6,7 +6,7 @@ use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\DocumentStartNode;
 use Aeliot\YamlToken\Node\NewLineNode;
-use Aeliot\YamlToken\Node\ScalarNode;
+use Aeliot\YamlToken\Node\PlainScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
@@ -16,12 +16,12 @@ use Aeliot\YamlToken\Node\YamlDirectiveVersionNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 3186673818,
+    'hash' => 2615693917,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 3094209521,
+            'hash' => 4075423172,
             'properties' => [],
             'children' => [
                 [
@@ -48,17 +48,17 @@ return [
                 ],
                 [
                     'type' => ValueNode::class,
-                    'hash' => 730039664,
+                    'hash' => 3089238441,
                     'properties' => [
                         'payload' => [
-                            'type' => ScalarNode::class,
-                            'hash' => 2874582845,
+                            'type' => PlainScalarNode::class,
+                            'hash' => 3315189552,
                         ],
                     ],
                     'children' => [
                         [
-                            'type' => ScalarNode::class,
-                            'hash' => 2874582845,
+                            'type' => PlainScalarNode::class,
+                            'hash' => 3315189552,
                             'properties' => [
                                 'token' => [
                                     'type' => TokenType::PLAIN_SCALAR,

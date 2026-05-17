@@ -9,7 +9,7 @@ use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\MultilinePlainScalarNode;
 use Aeliot\YamlToken\Node\NewLineNode;
-use Aeliot\YamlToken\Node\ScalarNode;
+use Aeliot\YamlToken\Node\PlainScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\ValueIndicatorNode;
 use Aeliot\YamlToken\Node\ValueNode;
@@ -17,21 +17,21 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 3320781975,
+    'hash' => 812236641,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 3381706039,
+            'hash' => 1372528869,
             'properties' => [],
             'children' => [
                 [
                     'type' => KeyValueCoupleNode::class,
-                    'hash' => 3087428909,
+                    'hash' => 3585287855,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
-                            'hash' => 2159240017,
+                            'hash' => 2475225114,
                         ],
                         'valueIndicator' => [
                             'type' => ValueIndicatorNode::class,
@@ -39,23 +39,23 @@ return [
                         ],
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 2387560921,
+                            'hash' => 1756299747,
                         ],
                     ],
                     'children' => [
                         [
                             'type' => KeyNode::class,
-                            'hash' => 2159240017,
+                            'hash' => 2475225114,
                             'properties' => [
                                 'name' => [
-                                    'type' => ScalarNode::class,
-                                    'hash' => 1459450029,
+                                    'type' => PlainScalarNode::class,
+                                    'hash' => 3788737227,
                                 ],
                             ],
                             'children' => [
                                 [
-                                    'type' => ScalarNode::class,
-                                    'hash' => 1459450029,
+                                    'type' => PlainScalarNode::class,
+                                    'hash' => 3788737227,
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::PLAIN_SCALAR,
@@ -90,22 +90,22 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 2387560921,
+                            'hash' => 1756299747,
                             'properties' => [
                                 'payload' => [
                                     'type' => MultilinePlainScalarNode::class,
-                                    'hash' => 2855622633,
+                                    'hash' => 3466312442,
                                 ],
                             ],
                             'children' => [
                                 [
                                     'type' => MultilinePlainScalarNode::class,
-                                    'hash' => 2855622633,
+                                    'hash' => 3466312442,
                                     'properties' => [],
                                     'children' => [
                                         [
-                                            'type' => ScalarNode::class,
-                                            'hash' => 3244228288,
+                                            'type' => PlainScalarNode::class,
+                                            'hash' => 1688480045,
                                             'properties' => [
                                                 'token' => [
                                                     'type' => TokenType::PLAIN_SCALAR,
@@ -137,8 +137,8 @@ return [
                                             'children' => [],
                                         ],
                                         [
-                                            'type' => ScalarNode::class,
-                                            'hash' => 2675831048,
+                                            'type' => PlainScalarNode::class,
+                                            'hash' => 1864333103,
                                             'properties' => [
                                                 'token' => [
                                                     'type' => TokenType::PLAIN_SCALAR,
@@ -166,11 +166,11 @@ return [
                 ],
                 [
                     'type' => KeyValueCoupleNode::class,
-                    'hash' => 257274020,
+                    'hash' => 3416430603,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
-                            'hash' => 1928758250,
+                            'hash' => 2316157998,
                         ],
                         'valueIndicator' => [
                             'type' => ValueIndicatorNode::class,
@@ -178,23 +178,23 @@ return [
                         ],
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 3646734891,
+                            'hash' => 2896634674,
                         ],
                     ],
                     'children' => [
                         [
                             'type' => KeyNode::class,
-                            'hash' => 1928758250,
+                            'hash' => 2316157998,
                             'properties' => [
                                 'name' => [
-                                    'type' => ScalarNode::class,
-                                    'hash' => 3821070368,
+                                    'type' => PlainScalarNode::class,
+                                    'hash' => 816738540,
                                 ],
                             ],
                             'children' => [
                                 [
-                                    'type' => ScalarNode::class,
-                                    'hash' => 3821070368,
+                                    'type' => PlainScalarNode::class,
+                                    'hash' => 816738540,
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::PLAIN_SCALAR,
@@ -229,17 +229,17 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 3646734891,
+                            'hash' => 2896634674,
                             'properties' => [
                                 'payload' => [
-                                    'type' => ScalarNode::class,
-                                    'hash' => 2501875378,
+                                    'type' => PlainScalarNode::class,
+                                    'hash' => 573664468,
                                 ],
                             ],
                             'children' => [
                                 [
-                                    'type' => ScalarNode::class,
-                                    'hash' => 2501875378,
+                                    'type' => PlainScalarNode::class,
+                                    'hash' => 573664468,
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::PLAIN_SCALAR,
@@ -265,11 +265,11 @@ return [
                 ],
                 [
                     'type' => KeyValueCoupleNode::class,
-                    'hash' => 3374577125,
+                    'hash' => 1697133099,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
-                            'hash' => 3891989102,
+                            'hash' => 1152039350,
                         ],
                         'valueIndicator' => [
                             'type' => ValueIndicatorNode::class,
@@ -277,23 +277,23 @@ return [
                         ],
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 1403365267,
+                            'hash' => 3345644466,
                         ],
                     ],
                     'children' => [
                         [
                             'type' => KeyNode::class,
-                            'hash' => 3891989102,
+                            'hash' => 1152039350,
                             'properties' => [
                                 'name' => [
-                                    'type' => ScalarNode::class,
-                                    'hash' => 2034490929,
+                                    'type' => PlainScalarNode::class,
+                                    'hash' => 630606354,
                                 ],
                             ],
                             'children' => [
                                 [
-                                    'type' => ScalarNode::class,
-                                    'hash' => 2034490929,
+                                    'type' => PlainScalarNode::class,
+                                    'hash' => 630606354,
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::PLAIN_SCALAR,
@@ -328,17 +328,17 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 1403365267,
+                            'hash' => 3345644466,
                             'properties' => [
                                 'payload' => [
-                                    'type' => ScalarNode::class,
-                                    'hash' => 3734397298,
+                                    'type' => PlainScalarNode::class,
+                                    'hash' => 1773706004,
                                 ],
                             ],
                             'children' => [
                                 [
-                                    'type' => ScalarNode::class,
-                                    'hash' => 3734397298,
+                                    'type' => PlainScalarNode::class,
+                                    'hash' => 1773706004,
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::PLAIN_SCALAR,
@@ -364,11 +364,11 @@ return [
                 ],
                 [
                     'type' => KeyValueCoupleNode::class,
-                    'hash' => 3607750487,
+                    'hash' => 2159704936,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
-                            'hash' => 3724239247,
+                            'hash' => 2267259324,
                         ],
                         'valueIndicator' => [
                             'type' => ValueIndicatorNode::class,
@@ -376,23 +376,23 @@ return [
                         ],
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 3229830319,
+                            'hash' => 2200578778,
                         ],
                     ],
                     'children' => [
                         [
                             'type' => KeyNode::class,
-                            'hash' => 3724239247,
+                            'hash' => 2267259324,
                             'properties' => [
                                 'name' => [
-                                    'type' => ScalarNode::class,
-                                    'hash' => 4118214515,
+                                    'type' => PlainScalarNode::class,
+                                    'hash' => 2475217096,
                                 ],
                             ],
                             'children' => [
                                 [
-                                    'type' => ScalarNode::class,
-                                    'hash' => 4118214515,
+                                    'type' => PlainScalarNode::class,
+                                    'hash' => 2475217096,
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::PLAIN_SCALAR,
@@ -427,17 +427,17 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 3229830319,
+                            'hash' => 2200578778,
                             'properties' => [
                                 'payload' => [
-                                    'type' => ScalarNode::class,
-                                    'hash' => 314054003,
+                                    'type' => PlainScalarNode::class,
+                                    'hash' => 2778132245,
                                 ],
                             ],
                             'children' => [
                                 [
-                                    'type' => ScalarNode::class,
-                                    'hash' => 314054003,
+                                    'type' => PlainScalarNode::class,
+                                    'hash' => 2778132245,
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::PLAIN_SCALAR,

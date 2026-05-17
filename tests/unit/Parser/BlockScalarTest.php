@@ -15,8 +15,9 @@ namespace Aeliot\YamlToken\Test\Unit\Parser;
 
 use Aeliot\YamlToken\Lexer\Lexer;
 use Aeliot\YamlToken\Node\DocumentNode;
+use Aeliot\YamlToken\Node\FoldedBlockScalarNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
-use Aeliot\YamlToken\Node\ScalarNode;
+use Aeliot\YamlToken\Node\LiteralBlockScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Parser\Parser;
@@ -27,9 +28,10 @@ use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Parser::class)]
 #[UsesClass(DocumentNode::class)]
+#[UsesClass(FoldedBlockScalarNode::class)]
 #[UsesClass(KeyValueCoupleNode::class)]
 #[UsesClass(Lexer::class)]
-#[UsesClass(ScalarNode::class)]
+#[UsesClass(LiteralBlockScalarNode::class)]
 #[UsesClass(StreamNode::class)]
 #[UsesClass(ValueNode::class)]
 final class BlockScalarTest extends TestCase
@@ -41,18 +43,20 @@ final class BlockScalarTest extends TestCase
     {
         return [
             [
-                'expected' => "  Line one\n  Line two\n  Line three\n",
+                'expectedScalarType' => LiteralBlockScalarNode::class,
+                'expectedValue' => "  Line one\n  Line two\n  Line three\n",
                 'fixture' => __DIR__.'/../../fixture/spec/1.2.2/literal-block_8.1.2.yaml',
             ],
             [
-                'expected' => "  This is a long line\n  that folds into space.\n\n  New paragraph here.\n",
+                'expectedScalarType' => FoldedBlockScalarNode::class,
+                'expectedValue' => "  This is a long line\n  that folds into space.\n\n  New paragraph here.\n",
                 'fixture' => __DIR__.'/../../fixture/spec/1.2.2/folded-block_8.1.3.yaml',
             ],
         ];
     }
 
     #[DataProvider('getDataForTestParsesBlockScalars')]
-    public function testParsesBlockScalars(string $fixture, string $expected): void
+    public function testParsesBlockScalars(string $expectedScalarType, string $expectedValue, string $fixture): void
     {
         $yaml = file_get_contents($fixture);
         self::assertNotFalse($yaml);
@@ -64,8 +68,9 @@ final class BlockScalarTest extends TestCase
         self::assertNotNull($value);
 
         $scalar = $value->getPayload();
-        self::assertInstanceOf(ScalarNode::class, $scalar);
-        self::assertSame($expected, $scalar->getToken()->text);
+        self::assertInstanceOf($expectedScalarType, $scalar);
+        /* @var LiteralBlockScalarNode|FoldedBlockScalarNode $scalar */
+        self::assertSame($expectedValue, $scalar->getToken()->text);
     }
 
     private function getOnlyCouple(StreamNode $stream): KeyValueCoupleNode

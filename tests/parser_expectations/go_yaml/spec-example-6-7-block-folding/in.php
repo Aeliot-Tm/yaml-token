@@ -5,28 +5,28 @@ declare(strict_types=1);
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\BlockScalarIndicatorNode;
 use Aeliot\YamlToken\Node\DocumentNode;
+use Aeliot\YamlToken\Node\FoldedBlockScalarNode;
 use Aeliot\YamlToken\Node\NewLineNode;
-use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\ValueNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 2089187133,
+    'hash' => 1432152931,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 1155829682,
+            'hash' => 1390621088,
             'properties' => [],
             'children' => [
                 [
                     'type' => ValueNode::class,
-                    'hash' => 3163048990,
+                    'hash' => 495140942,
                     'properties' => [
                         'payload' => [
-                            'type' => ScalarNode::class,
-                            'hash' => 371857456,
+                            'type' => FoldedBlockScalarNode::class,
+                            'hash' => 2654236560,
                         ],
                     ],
                     'children' => [
@@ -53,8 +53,8 @@ return [
                             'children' => [],
                         ],
                         [
-                            'type' => ScalarNode::class,
-                            'hash' => 371857456,
+                            'type' => FoldedBlockScalarNode::class,
+                            'hash' => 2654236560,
                             'properties' => [
                                 'token' => [
                                     'type' => TokenType::FOLDED_BLOCK_SCALAR,

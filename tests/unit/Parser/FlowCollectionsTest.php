@@ -21,7 +21,7 @@ use Aeliot\YamlToken\Node\FlowMappingNode;
 use Aeliot\YamlToken\Node\FlowSequenceNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\Node;
-use Aeliot\YamlToken\Node\ScalarNode;
+use Aeliot\YamlToken\Node\PlainScalarNode;
 use Aeliot\YamlToken\Node\SequenceEntryNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\SyntaxTokenNode;
@@ -38,7 +38,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(FlowSequenceNode::class)]
 #[UsesClass(KeyValueCoupleNode::class)]
 #[UsesClass(Lexer::class)]
-#[UsesClass(ScalarNode::class)]
+#[UsesClass(PlainScalarNode::class)]
 #[UsesClass(SequenceEntryNode::class)]
 #[UsesClass(StreamNode::class)]
 #[UsesClass(SyntaxTokenNode::class)]
@@ -262,7 +262,7 @@ YAML;
     private function getKeyText(KeyValueCoupleNode $couple): string
     {
         $name = $couple->getKey()->getName();
-        self::assertInstanceOf(ScalarNode::class, $name);
+        self::assertInstanceOf(PlainScalarNode::class, $name);
 
         return (string) $name->getToken()->text;
     }
@@ -333,7 +333,7 @@ YAML;
 
         self::assertNotNull($valueNode);
         $scalar = $valueNode->getPayload();
-        self::assertInstanceOf(ScalarNode::class, $scalar);
+        self::assertInstanceOf(PlainScalarNode::class, $scalar);
 
         return $scalar->getToken()->text;
     }

@@ -8,7 +8,7 @@ use Aeliot\YamlToken\Node\FlowSequenceNode;
 use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\NewLineNode;
-use Aeliot\YamlToken\Node\ScalarNode;
+use Aeliot\YamlToken\Node\PlainScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\SyntaxTokenNode;
 use Aeliot\YamlToken\Node\ValueIndicatorNode;
@@ -17,22 +17,22 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 437118074,
+    'hash' => 3573980549,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 3340576110,
+            'hash' => 533910689,
             'properties' => [],
             'children' => [
                 [
                     'type' => FlowSequenceNode::class,
-                    'hash' => 81757068,
+                    'hash' => 3396039730,
                     'properties' => [
                         'entries' => [
                             [
                                 'type' => ValueNode::class,
-                                'hash' => 3177082715,
+                                'hash' => 4108942548,
                             ],
                         ],
                     ],
@@ -61,21 +61,21 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 3177082715,
+                            'hash' => 4108942548,
                             'properties' => [
                                 'payload' => [
                                     'type' => KeyValueCoupleNode::class,
-                                    'hash' => 1937993525,
+                                    'hash' => 3822300413,
                                 ],
                             ],
                             'children' => [
                                 [
                                     'type' => KeyValueCoupleNode::class,
-                                    'hash' => 1937993525,
+                                    'hash' => 3822300413,
                                     'properties' => [
                                         'key' => [
                                             'type' => KeyNode::class,
-                                            'hash' => 2394387173,
+                                            'hash' => 622722214,
                                         ],
                                         'valueIndicator' => [
                                             'type' => ValueIndicatorNode::class,
@@ -83,23 +83,23 @@ return [
                                         ],
                                         'value' => [
                                             'type' => ValueNode::class,
-                                            'hash' => 1448341291,
+                                            'hash' => 3805844063,
                                         ],
                                     ],
                                     'children' => [
                                         [
                                             'type' => KeyNode::class,
-                                            'hash' => 2394387173,
+                                            'hash' => 622722214,
                                             'properties' => [
                                                 'name' => [
-                                                    'type' => ScalarNode::class,
-                                                    'hash' => 3095314157,
+                                                    'type' => PlainScalarNode::class,
+                                                    'hash' => 735634323,
                                                 ],
                                             ],
                                             'children' => [
                                                 [
-                                                    'type' => ScalarNode::class,
-                                                    'hash' => 3095314157,
+                                                    'type' => PlainScalarNode::class,
+                                                    'hash' => 735634323,
                                                     'properties' => [
                                                         'token' => [
                                                             'type' => TokenType::PLAIN_SCALAR,
@@ -134,17 +134,17 @@ return [
                                         ],
                                         [
                                             'type' => ValueNode::class,
-                                            'hash' => 1448341291,
+                                            'hash' => 3805844063,
                                             'properties' => [
                                                 'payload' => [
-                                                    'type' => ScalarNode::class,
-                                                    'hash' => 2534824452,
+                                                    'type' => PlainScalarNode::class,
+                                                    'hash' => 78645114,
                                                 ],
                                             ],
                                             'children' => [
                                                 [
-                                                    'type' => ScalarNode::class,
-                                                    'hash' => 2534824452,
+                                                    'type' => PlainScalarNode::class,
+                                                    'hash' => 78645114,
                                                     'properties' => [
                                                         'token' => [
                                                             'type' => TokenType::PLAIN_SCALAR,

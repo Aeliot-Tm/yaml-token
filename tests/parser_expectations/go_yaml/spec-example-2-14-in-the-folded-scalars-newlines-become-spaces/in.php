@@ -6,20 +6,20 @@ use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\BlockScalarIndicatorNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\DocumentStartNode;
+use Aeliot\YamlToken\Node\FoldedBlockScalarNode;
 use Aeliot\YamlToken\Node\NewLineNode;
-use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 1165037617,
+    'hash' => 475216227,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 272913178,
+            'hash' => 370297611,
             'properties' => [],
             'children' => [
                 [
@@ -46,11 +46,11 @@ return [
                 ],
                 [
                     'type' => ValueNode::class,
-                    'hash' => 816541687,
+                    'hash' => 1518155827,
                     'properties' => [
                         'payload' => [
-                            'type' => ScalarNode::class,
-                            'hash' => 1399511868,
+                            'type' => FoldedBlockScalarNode::class,
+                            'hash' => 406214681,
                         ],
                     ],
                     'children' => [
@@ -77,8 +77,8 @@ return [
                             'children' => [],
                         ],
                         [
-                            'type' => ScalarNode::class,
-                            'hash' => 1399511868,
+                            'type' => FoldedBlockScalarNode::class,
+                            'hash' => 406214681,
                             'properties' => [
                                 'token' => [
                                     'type' => TokenType::FOLDED_BLOCK_SCALAR,

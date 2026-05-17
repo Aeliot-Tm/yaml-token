@@ -8,7 +8,7 @@ use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\DocumentStartNode;
 use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\NodePropertiesNode;
-use Aeliot\YamlToken\Node\ScalarNode;
+use Aeliot\YamlToken\Node\PlainScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\TagDirectiveHandleNode;
 use Aeliot\YamlToken\Node\TagDirectiveIndicatorNode;
@@ -20,7 +20,7 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 389091067,
+    'hash' => 2356077309,
     'properties' => [],
     'children' => [
         [
@@ -105,7 +105,7 @@ return [
         ],
         [
             'type' => DocumentNode::class,
-            'hash' => 3988115542,
+            'hash' => 2645755225,
             'properties' => [],
             'children' => [
                 [
@@ -132,15 +132,15 @@ return [
                 ],
                 [
                     'type' => ValueNode::class,
-                    'hash' => 3756169335,
+                    'hash' => 935838048,
                     'properties' => [
                         'nodeProperties' => [
                             'type' => NodePropertiesNode::class,
                             'hash' => 3840819627,
                         ],
                         'payload' => [
-                            'type' => ScalarNode::class,
-                            'hash' => 2870020532,
+                            'type' => PlainScalarNode::class,
+                            'hash' => 259515171,
                         ],
                     ],
                     'children' => [
@@ -179,8 +179,8 @@ return [
                             'children' => [],
                         ],
                         [
-                            'type' => ScalarNode::class,
-                            'hash' => 2870020532,
+                            'type' => PlainScalarNode::class,
+                            'hash' => 259515171,
                             'properties' => [
                                 'token' => [
                                     'type' => TokenType::PLAIN_SCALAR,

@@ -7,15 +7,15 @@ use Aeliot\YamlToken\Node\BlockScalarIndicatorNode;
 use Aeliot\YamlToken\Node\CommentNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\DocumentStartNode;
+use Aeliot\YamlToken\Node\LiteralBlockScalarNode;
 use Aeliot\YamlToken\Node\NewLineNode;
-use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 2391332648,
+    'hash' => 390798995,
     'properties' => [],
     'children' => [
         [
@@ -49,7 +49,7 @@ return [
         ],
         [
             'type' => DocumentNode::class,
-            'hash' => 1464604508,
+            'hash' => 4192837002,
             'properties' => [],
             'children' => [
                 [
@@ -76,11 +76,11 @@ return [
                 ],
                 [
                     'type' => ValueNode::class,
-                    'hash' => 2207718802,
+                    'hash' => 3989684805,
                     'properties' => [
                         'payload' => [
-                            'type' => ScalarNode::class,
-                            'hash' => 589364901,
+                            'type' => LiteralBlockScalarNode::class,
+                            'hash' => 4011508132,
                         ],
                     ],
                     'children' => [
@@ -107,8 +107,8 @@ return [
                             'children' => [],
                         ],
                         [
-                            'type' => ScalarNode::class,
-                            'hash' => 589364901,
+                            'type' => LiteralBlockScalarNode::class,
+                            'hash' => 4011508132,
                             'properties' => [
                                 'token' => [
                                     'type' => TokenType::LITERAL_BLOCK_SCALAR,

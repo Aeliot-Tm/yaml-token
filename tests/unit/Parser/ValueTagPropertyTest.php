@@ -19,7 +19,7 @@ use Aeliot\YamlToken\Node\BlockMappingNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\Node;
-use Aeliot\YamlToken\Node\ScalarNode;
+use Aeliot\YamlToken\Node\PlainScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\TagNode;
 use Aeliot\YamlToken\Node\ValueNode;
@@ -33,7 +33,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(DocumentNode::class)]
 #[UsesClass(KeyValueCoupleNode::class)]
 #[UsesClass(Lexer::class)]
-#[UsesClass(ScalarNode::class)]
+#[UsesClass(PlainScalarNode::class)]
 #[UsesClass(StreamNode::class)]
 #[UsesClass(TagNode::class)]
 #[UsesClass(ValueNode::class)]
@@ -80,7 +80,7 @@ YAML));
         self::assertSame('!!str', $tag->getToken()->text);
 
         $scalar = $value->getPayload();
-        self::assertInstanceOf(ScalarNode::class, $scalar);
+        self::assertInstanceOf(PlainScalarNode::class, $scalar);
         self::assertSame('value', $scalar->getToken()->text);
     }
 

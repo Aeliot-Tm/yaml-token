@@ -21,7 +21,7 @@ use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\MergeInstructionNode;
 use Aeliot\YamlToken\Node\Node;
-use Aeliot\YamlToken\Node\ScalarNode;
+use Aeliot\YamlToken\Node\PlainScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Parser\Exception\AnchorUndefinedException;
@@ -38,7 +38,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(KeyValueCoupleNode::class)]
 #[UsesClass(Lexer::class)]
 #[UsesClass(MergeInstructionNode::class)]
-#[UsesClass(ScalarNode::class)]
+#[UsesClass(PlainScalarNode::class)]
 #[UsesClass(StreamNode::class)]
 #[UsesClass(ValueNode::class)]
 final class MergeInstructionTest extends TestCase
@@ -131,7 +131,7 @@ YAML);
     private function getKeyText(KeyValueCoupleNode $couple): string
     {
         $name = $couple->getKey()->getName();
-        self::assertInstanceOf(ScalarNode::class, $name);
+        self::assertInstanceOf(PlainScalarNode::class, $name);
 
         return (string) $name->getToken()->text;
     }
@@ -179,7 +179,7 @@ YAML);
         $valueNode = $couple->getValue();
         self::assertNotNull($valueNode);
         $scalar = $valueNode->getPayload();
-        self::assertInstanceOf(ScalarNode::class, $scalar);
+        self::assertInstanceOf(PlainScalarNode::class, $scalar);
 
         return $scalar->getToken()->text;
     }

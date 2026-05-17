@@ -18,7 +18,7 @@ use Aeliot\YamlToken\Node\BlockSequenceNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\Node;
-use Aeliot\YamlToken\Node\ScalarNode;
+use Aeliot\YamlToken\Node\PlainScalarNode;
 use Aeliot\YamlToken\Node\SequenceEntryNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\ValueNode;
@@ -62,7 +62,7 @@ final class IndentLessSequenceWithKeyValueCoupleTest extends TestCase
         self::assertCount(1, $entryCouples);
 
         $scalar = $entryCouples[0]->getValue()?->getPayload();
-        self::assertInstanceOf(ScalarNode::class, $scalar);
+        self::assertInstanceOf(PlainScalarNode::class, $scalar);
         self::assertSame('y', $scalar->getToken()->text);
     }
 

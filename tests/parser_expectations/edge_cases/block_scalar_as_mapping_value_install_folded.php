@@ -5,10 +5,11 @@ declare(strict_types=1);
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\BlockScalarIndicatorNode;
 use Aeliot\YamlToken\Node\DocumentNode;
+use Aeliot\YamlToken\Node\FoldedBlockScalarNode;
 use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\NewLineNode;
-use Aeliot\YamlToken\Node\ScalarNode;
+use Aeliot\YamlToken\Node\PlainScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\ValueIndicatorNode;
 use Aeliot\YamlToken\Node\ValueNode;
@@ -16,21 +17,21 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 33889335,
+    'hash' => 2464932185,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 3331131558,
+            'hash' => 1956255671,
             'properties' => [],
             'children' => [
                 [
                     'type' => KeyValueCoupleNode::class,
-                    'hash' => 3770042261,
+                    'hash' => 4148440262,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
-                            'hash' => 1061687304,
+                            'hash' => 1949426250,
                         ],
                         'valueIndicator' => [
                             'type' => ValueIndicatorNode::class,
@@ -38,23 +39,23 @@ return [
                         ],
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 1236074524,
+                            'hash' => 152950540,
                         ],
                     ],
                     'children' => [
                         [
                             'type' => KeyNode::class,
-                            'hash' => 1061687304,
+                            'hash' => 1949426250,
                             'properties' => [
                                 'name' => [
-                                    'type' => ScalarNode::class,
-                                    'hash' => 474597276,
+                                    'type' => PlainScalarNode::class,
+                                    'hash' => 1654027329,
                                 ],
                             ],
                             'children' => [
                                 [
-                                    'type' => ScalarNode::class,
-                                    'hash' => 474597276,
+                                    'type' => PlainScalarNode::class,
+                                    'hash' => 1654027329,
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::PLAIN_SCALAR,
@@ -89,11 +90,11 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 1236074524,
+                            'hash' => 152950540,
                             'properties' => [
                                 'payload' => [
-                                    'type' => ScalarNode::class,
-                                    'hash' => 3215220452,
+                                    'type' => FoldedBlockScalarNode::class,
+                                    'hash' => 3754069644,
                                 ],
                             ],
                             'children' => [
@@ -120,8 +121,8 @@ return [
                                     'children' => [],
                                 ],
                                 [
-                                    'type' => ScalarNode::class,
-                                    'hash' => 3215220452,
+                                    'type' => FoldedBlockScalarNode::class,
+                                    'hash' => 3754069644,
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::FOLDED_BLOCK_SCALAR,

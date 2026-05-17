@@ -8,18 +8,18 @@ use Aeliot\YamlToken\Node\DocumentStartNode;
 use Aeliot\YamlToken\Node\IndentationNode;
 use Aeliot\YamlToken\Node\MultilinePlainScalarNode;
 use Aeliot\YamlToken\Node\NewLineNode;
-use Aeliot\YamlToken\Node\ScalarNode;
+use Aeliot\YamlToken\Node\PlainScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\ValueNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 2963389685,
+    'hash' => 3256555960,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 2254846837,
+            'hash' => 1269759230,
             'properties' => [],
             'children' => [
                 [
@@ -46,22 +46,22 @@ return [
                 ],
                 [
                     'type' => ValueNode::class,
-                    'hash' => 2960977111,
+                    'hash' => 1159145289,
                     'properties' => [
                         'payload' => [
                             'type' => MultilinePlainScalarNode::class,
-                            'hash' => 901542566,
+                            'hash' => 892106735,
                         ],
                     ],
                     'children' => [
                         [
                             'type' => MultilinePlainScalarNode::class,
-                            'hash' => 901542566,
+                            'hash' => 892106735,
                             'properties' => [],
                             'children' => [
                                 [
-                                    'type' => ScalarNode::class,
-                                    'hash' => 2180763694,
+                                    'type' => PlainScalarNode::class,
+                                    'hash' => 4013207587,
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::PLAIN_SCALAR,
@@ -93,8 +93,8 @@ return [
                                     'children' => [],
                                 ],
                                 [
-                                    'type' => ScalarNode::class,
-                                    'hash' => 2358486340,
+                                    'type' => PlainScalarNode::class,
+                                    'hash' => 4065072793,
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::PLAIN_SCALAR,

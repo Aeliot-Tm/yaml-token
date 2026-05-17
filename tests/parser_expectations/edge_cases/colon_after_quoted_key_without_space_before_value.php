@@ -5,11 +5,12 @@ declare(strict_types=1);
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\CommentNode;
 use Aeliot\YamlToken\Node\DocumentNode;
+use Aeliot\YamlToken\Node\DoubleQuotedScalarNode;
 use Aeliot\YamlToken\Node\FlowMappingNode;
 use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\NewLineNode;
-use Aeliot\YamlToken\Node\ScalarNode;
+use Aeliot\YamlToken\Node\SingleQuotedScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\SyntaxTokenNode;
 use Aeliot\YamlToken\Node\ValueIndicatorNode;
@@ -18,26 +19,26 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 4206056074,
+    'hash' => 2600512934,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 2267108095,
+            'hash' => 2601858567,
             'properties' => [],
             'children' => [
                 [
                     'type' => FlowMappingNode::class,
-                    'hash' => 2012887712,
+                    'hash' => 614410866,
                     'properties' => [
                         'entries' => [
                             [
                                 'type' => KeyValueCoupleNode::class,
-                                'hash' => 2626125304,
+                                'hash' => 373148734,
                             ],
                             [
                                 'type' => KeyValueCoupleNode::class,
-                                'hash' => 3325414993,
+                                'hash' => 540461958,
                             ],
                         ],
                     ],
@@ -66,11 +67,11 @@ return [
                         ],
                         [
                             'type' => KeyValueCoupleNode::class,
-                            'hash' => 2626125304,
+                            'hash' => 373148734,
                             'properties' => [
                                 'key' => [
                                     'type' => KeyNode::class,
-                                    'hash' => 1077785601,
+                                    'hash' => 3659550284,
                                 ],
                                 'valueIndicator' => [
                                     'type' => ValueIndicatorNode::class,
@@ -78,23 +79,23 @@ return [
                                 ],
                                 'value' => [
                                     'type' => ValueNode::class,
-                                    'hash' => 2034035920,
+                                    'hash' => 3873271328,
                                 ],
                             ],
                             'children' => [
                                 [
                                     'type' => KeyNode::class,
-                                    'hash' => 1077785601,
+                                    'hash' => 3659550284,
                                     'properties' => [
                                         'name' => [
-                                            'type' => ScalarNode::class,
-                                            'hash' => 463732826,
+                                            'type' => DoubleQuotedScalarNode::class,
+                                            'hash' => 1681260419,
                                         ],
                                     ],
                                     'children' => [
                                         [
-                                            'type' => ScalarNode::class,
-                                            'hash' => 463732826,
+                                            'type' => DoubleQuotedScalarNode::class,
+                                            'hash' => 1681260419,
                                             'properties' => [
                                                 'token' => [
                                                     'type' => TokenType::DOUBLE_QUOTED_SCALAR,
@@ -162,17 +163,17 @@ return [
                                 ],
                                 [
                                     'type' => ValueNode::class,
-                                    'hash' => 2034035920,
+                                    'hash' => 3873271328,
                                     'properties' => [
                                         'payload' => [
-                                            'type' => ScalarNode::class,
-                                            'hash' => 2970868063,
+                                            'type' => DoubleQuotedScalarNode::class,
+                                            'hash' => 3791308136,
                                         ],
                                     ],
                                     'children' => [
                                         [
-                                            'type' => ScalarNode::class,
-                                            'hash' => 2970868063,
+                                            'type' => DoubleQuotedScalarNode::class,
+                                            'hash' => 3791308136,
                                             'properties' => [
                                                 'token' => [
                                                     'type' => TokenType::DOUBLE_QUOTED_SCALAR,
@@ -209,11 +210,11 @@ return [
                         ],
                         [
                             'type' => KeyValueCoupleNode::class,
-                            'hash' => 3325414993,
+                            'hash' => 540461958,
                             'properties' => [
                                 'key' => [
                                     'type' => KeyNode::class,
-                                    'hash' => 3262153118,
+                                    'hash' => 3429998964,
                                 ],
                                 'valueIndicator' => [
                                     'type' => ValueIndicatorNode::class,
@@ -221,23 +222,23 @@ return [
                                 ],
                                 'value' => [
                                     'type' => ValueNode::class,
-                                    'hash' => 486081001,
+                                    'hash' => 3814840568,
                                 ],
                             ],
                             'children' => [
                                 [
                                     'type' => KeyNode::class,
-                                    'hash' => 3262153118,
+                                    'hash' => 3429998964,
                                     'properties' => [
                                         'name' => [
-                                            'type' => ScalarNode::class,
-                                            'hash' => 3410990900,
+                                            'type' => SingleQuotedScalarNode::class,
+                                            'hash' => 813548568,
                                         ],
                                     ],
                                     'children' => [
                                         [
-                                            'type' => ScalarNode::class,
-                                            'hash' => 3410990900,
+                                            'type' => SingleQuotedScalarNode::class,
+                                            'hash' => 813548568,
                                             'properties' => [
                                                 'token' => [
                                                     'type' => TokenType::SINGLE_QUOTED_SCALAR,
@@ -305,17 +306,17 @@ return [
                                 ],
                                 [
                                     'type' => ValueNode::class,
-                                    'hash' => 486081001,
+                                    'hash' => 3814840568,
                                     'properties' => [
                                         'payload' => [
-                                            'type' => ScalarNode::class,
-                                            'hash' => 3194894567,
+                                            'type' => SingleQuotedScalarNode::class,
+                                            'hash' => 3321197623,
                                         ],
                                     ],
                                     'children' => [
                                         [
-                                            'type' => ScalarNode::class,
-                                            'hash' => 3194894567,
+                                            'type' => SingleQuotedScalarNode::class,
+                                            'hash' => 3321197623,
                                             'properties' => [
                                                 'token' => [
                                                     'type' => TokenType::SINGLE_QUOTED_SCALAR,

@@ -7,29 +7,29 @@ use Aeliot\YamlToken\Node\BlockScalarChompingIndicatorNode;
 use Aeliot\YamlToken\Node\BlockScalarIndicatorNode;
 use Aeliot\YamlToken\Node\DocumentEndNode;
 use Aeliot\YamlToken\Node\DocumentNode;
+use Aeliot\YamlToken\Node\LiteralBlockScalarNode;
 use Aeliot\YamlToken\Node\NewLineNode;
-use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 3175046013,
+    'hash' => 557390683,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 2393128102,
+            'hash' => 3500242301,
             'properties' => [],
             'children' => [
                 [
                     'type' => ValueNode::class,
-                    'hash' => 143116409,
+                    'hash' => 1175095073,
                     'properties' => [
                         'payload' => [
-                            'type' => ScalarNode::class,
-                            'hash' => 2756229390,
+                            'type' => LiteralBlockScalarNode::class,
+                            'hash' => 803262548,
                         ],
                     ],
                     'children' => [
@@ -67,8 +67,8 @@ return [
                             'children' => [],
                         ],
                         [
-                            'type' => ScalarNode::class,
-                            'hash' => 2756229390,
+                            'type' => LiteralBlockScalarNode::class,
+                            'hash' => 803262548,
                             'properties' => [
                                 'token' => [
                                     'type' => TokenType::LITERAL_BLOCK_SCALAR,

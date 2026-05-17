@@ -5,9 +5,9 @@ declare(strict_types=1);
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\DocumentStartNode;
+use Aeliot\YamlToken\Node\DoubleQuotedScalarNode;
 use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\NodePropertiesNode;
-use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\TagDirectiveHandleNode;
 use Aeliot\YamlToken\Node\TagDirectiveIndicatorNode;
@@ -19,7 +19,7 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 3355595071,
+    'hash' => 3782623127,
     'properties' => [],
     'children' => [
         [
@@ -104,7 +104,7 @@ return [
         ],
         [
             'type' => DocumentNode::class,
-            'hash' => 3031620263,
+            'hash' => 3431235864,
             'properties' => [],
             'children' => [
                 [
@@ -131,15 +131,15 @@ return [
                 ],
                 [
                     'type' => ValueNode::class,
-                    'hash' => 3855938398,
+                    'hash' => 960067191,
                     'properties' => [
                         'nodeProperties' => [
                             'type' => NodePropertiesNode::class,
                             'hash' => 2219280949,
                         ],
                         'payload' => [
-                            'type' => ScalarNode::class,
-                            'hash' => 2580060403,
+                            'type' => DoubleQuotedScalarNode::class,
+                            'hash' => 3374417092,
                         ],
                     ],
                     'children' => [
@@ -178,8 +178,8 @@ return [
                             'children' => [],
                         ],
                         [
-                            'type' => ScalarNode::class,
-                            'hash' => 2580060403,
+                            'type' => DoubleQuotedScalarNode::class,
+                            'hash' => 3374417092,
                             'properties' => [
                                 'token' => [
                                     'type' => TokenType::DOUBLE_QUOTED_SCALAR,

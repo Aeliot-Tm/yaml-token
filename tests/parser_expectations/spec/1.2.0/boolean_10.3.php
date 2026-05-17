@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\NewLineNode;
-use Aeliot\YamlToken\Node\ScalarNode;
+use Aeliot\YamlToken\Node\PlainScalarNode;
 use Aeliot\YamlToken\Node\SequenceEntryNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\SyntaxTokenNode;
@@ -14,21 +14,21 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 4024215111,
+    'hash' => 2369560503,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 3284113916,
+            'hash' => 1519982765,
             'properties' => [],
             'children' => [
                 [
                     'type' => SequenceEntryNode::class,
-                    'hash' => 59773158,
+                    'hash' => 2134201602,
                     'properties' => [
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 1465160866,
+                            'hash' => 1506685266,
                         ],
                     ],
                     'children' => [
@@ -56,17 +56,17 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 1465160866,
+                            'hash' => 1506685266,
                             'properties' => [
                                 'payload' => [
-                                    'type' => ScalarNode::class,
-                                    'hash' => 1286682637,
+                                    'type' => PlainScalarNode::class,
+                                    'hash' => 4221551211,
                                 ],
                             ],
                             'children' => [
                                 [
-                                    'type' => ScalarNode::class,
-                                    'hash' => 1286682637,
+                                    'type' => PlainScalarNode::class,
+                                    'hash' => 4221551211,
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::PLAIN_SCALAR,
@@ -92,11 +92,11 @@ return [
                 ],
                 [
                     'type' => SequenceEntryNode::class,
-                    'hash' => 2769820099,
+                    'hash' => 4127625403,
                     'properties' => [
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 2945143336,
+                            'hash' => 3215175251,
                         ],
                     ],
                     'children' => [
@@ -124,17 +124,17 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 2945143336,
+                            'hash' => 3215175251,
                             'properties' => [
                                 'payload' => [
-                                    'type' => ScalarNode::class,
-                                    'hash' => 3595312582,
+                                    'type' => PlainScalarNode::class,
+                                    'hash' => 1915418449,
                                 ],
                             ],
                             'children' => [
                                 [
-                                    'type' => ScalarNode::class,
-                                    'hash' => 3595312582,
+                                    'type' => PlainScalarNode::class,
+                                    'hash' => 1915418449,
                                     'properties' => [
                                         'token' => [
                                             'type' => TokenType::PLAIN_SCALAR,

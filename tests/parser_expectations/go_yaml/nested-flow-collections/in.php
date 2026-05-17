@@ -10,7 +10,7 @@ use Aeliot\YamlToken\Node\FlowSequenceNode;
 use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\NewLineNode;
-use Aeliot\YamlToken\Node\ScalarNode;
+use Aeliot\YamlToken\Node\PlainScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\SyntaxTokenNode;
 use Aeliot\YamlToken\Node\ValueIndicatorNode;
@@ -19,12 +19,12 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 766330597,
+    'hash' => 2021456024,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 309704119,
+            'hash' => 2584588892,
             'properties' => [],
             'children' => [
                 [
@@ -51,12 +51,12 @@ return [
                 ],
                 [
                     'type' => FlowMappingNode::class,
-                    'hash' => 3741572204,
+                    'hash' => 2534578713,
                     'properties' => [
                         'entries' => [
                             [
                                 'type' => KeyValueCoupleNode::class,
-                                'hash' => 4053857291,
+                                'hash' => 3973219213,
                             ],
                         ],
                     ],
@@ -96,11 +96,11 @@ return [
                         ],
                         [
                             'type' => KeyValueCoupleNode::class,
-                            'hash' => 4053857291,
+                            'hash' => 3973219213,
                             'properties' => [
                                 'key' => [
                                     'type' => KeyNode::class,
-                                    'hash' => 874425984,
+                                    'hash' => 1763095533,
                                 ],
                                 'valueIndicator' => [
                                     'type' => ValueIndicatorNode::class,
@@ -108,23 +108,23 @@ return [
                                 ],
                                 'value' => [
                                     'type' => ValueNode::class,
-                                    'hash' => 3697666225,
+                                    'hash' => 1677346336,
                                 ],
                             ],
                             'children' => [
                                 [
                                     'type' => KeyNode::class,
-                                    'hash' => 874425984,
+                                    'hash' => 1763095533,
                                     'properties' => [
                                         'name' => [
-                                            'type' => ScalarNode::class,
-                                            'hash' => 1583972959,
+                                            'type' => PlainScalarNode::class,
+                                            'hash' => 4136715254,
                                         ],
                                     ],
                                     'children' => [
                                         [
-                                            'type' => ScalarNode::class,
-                                            'hash' => 1583972959,
+                                            'type' => PlainScalarNode::class,
+                                            'hash' => 4136715254,
                                             'properties' => [
                                                 'token' => [
                                                     'type' => TokenType::PLAIN_SCALAR,
@@ -159,30 +159,30 @@ return [
                                 ],
                                 [
                                     'type' => ValueNode::class,
-                                    'hash' => 3697666225,
+                                    'hash' => 1677346336,
                                     'properties' => [
                                         'payload' => [
                                             'type' => FlowSequenceNode::class,
-                                            'hash' => 3026265643,
+                                            'hash' => 2714102522,
                                         ],
                                     ],
                                     'children' => [
                                         [
                                             'type' => FlowSequenceNode::class,
-                                            'hash' => 3026265643,
+                                            'hash' => 2714102522,
                                             'properties' => [
                                                 'entries' => [
                                                     [
                                                         'type' => ValueNode::class,
-                                                        'hash' => 4011367628,
+                                                        'hash' => 1154444269,
                                                     ],
                                                     [
                                                         'type' => ValueNode::class,
-                                                        'hash' => 2814916836,
+                                                        'hash' => 897038269,
                                                     ],
                                                     [
                                                         'type' => ValueNode::class,
-                                                        'hash' => 226355089,
+                                                        'hash' => 159847239,
                                                     ],
                                                 ],
                                             ],
@@ -222,17 +222,17 @@ return [
                                                 ],
                                                 [
                                                     'type' => ValueNode::class,
-                                                    'hash' => 4011367628,
+                                                    'hash' => 1154444269,
                                                     'properties' => [
                                                         'payload' => [
-                                                            'type' => ScalarNode::class,
-                                                            'hash' => 4248765686,
+                                                            'type' => PlainScalarNode::class,
+                                                            'hash' => 1439155551,
                                                         ],
                                                     ],
                                                     'children' => [
                                                         [
-                                                            'type' => ScalarNode::class,
-                                                            'hash' => 4248765686,
+                                                            'type' => PlainScalarNode::class,
+                                                            'hash' => 1439155551,
                                                             'properties' => [
                                                                 'token' => [
                                                                     'type' => TokenType::PLAIN_SCALAR,
@@ -267,17 +267,17 @@ return [
                                                 ],
                                                 [
                                                     'type' => ValueNode::class,
-                                                    'hash' => 2814916836,
+                                                    'hash' => 897038269,
                                                     'properties' => [
                                                         'payload' => [
-                                                            'type' => ScalarNode::class,
-                                                            'hash' => 719160494,
+                                                            'type' => PlainScalarNode::class,
+                                                            'hash' => 2183480583,
                                                         ],
                                                     ],
                                                     'children' => [
                                                         [
-                                                            'type' => ScalarNode::class,
-                                                            'hash' => 719160494,
+                                                            'type' => PlainScalarNode::class,
+                                                            'hash' => 2183480583,
                                                             'properties' => [
                                                                 'token' => [
                                                                     'type' => TokenType::PLAIN_SCALAR,
@@ -312,22 +312,22 @@ return [
                                                 ],
                                                 [
                                                     'type' => ValueNode::class,
-                                                    'hash' => 226355089,
+                                                    'hash' => 159847239,
                                                     'properties' => [
                                                         'payload' => [
                                                             'type' => FlowMappingNode::class,
-                                                            'hash' => 1144715858,
+                                                            'hash' => 3135538813,
                                                         ],
                                                     ],
                                                     'children' => [
                                                         [
                                                             'type' => FlowMappingNode::class,
-                                                            'hash' => 1144715858,
+                                                            'hash' => 3135538813,
                                                             'properties' => [
                                                                 'entries' => [
                                                                     [
                                                                         'type' => KeyValueCoupleNode::class,
-                                                                        'hash' => 940075531,
+                                                                        'hash' => 373843826,
                                                                     ],
                                                                 ],
                                                             ],
@@ -367,11 +367,11 @@ return [
                                                                 ],
                                                                 [
                                                                     'type' => KeyValueCoupleNode::class,
-                                                                    'hash' => 940075531,
+                                                                    'hash' => 373843826,
                                                                     'properties' => [
                                                                         'key' => [
                                                                             'type' => KeyNode::class,
-                                                                            'hash' => 2803649668,
+                                                                            'hash' => 122510353,
                                                                         ],
                                                                         'valueIndicator' => [
                                                                             'type' => ValueIndicatorNode::class,
@@ -379,23 +379,23 @@ return [
                                                                         ],
                                                                         'value' => [
                                                                             'type' => ValueNode::class,
-                                                                            'hash' => 271566974,
+                                                                            'hash' => 2293954833,
                                                                         ],
                                                                     ],
                                                                     'children' => [
                                                                         [
                                                                             'type' => KeyNode::class,
-                                                                            'hash' => 2803649668,
+                                                                            'hash' => 122510353,
                                                                             'properties' => [
                                                                                 'name' => [
-                                                                                    'type' => ScalarNode::class,
-                                                                                    'hash' => 1625493477,
+                                                                                    'type' => PlainScalarNode::class,
+                                                                                    'hash' => 3357265484,
                                                                                 ],
                                                                             ],
                                                                             'children' => [
                                                                                 [
-                                                                                    'type' => ScalarNode::class,
-                                                                                    'hash' => 1625493477,
+                                                                                    'type' => PlainScalarNode::class,
+                                                                                    'hash' => 3357265484,
                                                                                     'properties' => [
                                                                                         'token' => [
                                                                                             'type' => TokenType::PLAIN_SCALAR,
@@ -430,26 +430,26 @@ return [
                                                                         ],
                                                                         [
                                                                             'type' => ValueNode::class,
-                                                                            'hash' => 271566974,
+                                                                            'hash' => 2293954833,
                                                                             'properties' => [
                                                                                 'payload' => [
                                                                                     'type' => FlowSequenceNode::class,
-                                                                                    'hash' => 2463430220,
+                                                                                    'hash' => 3689926281,
                                                                                 ],
                                                                             ],
                                                                             'children' => [
                                                                                 [
                                                                                     'type' => FlowSequenceNode::class,
-                                                                                    'hash' => 2463430220,
+                                                                                    'hash' => 3689926281,
                                                                                     'properties' => [
                                                                                         'entries' => [
                                                                                             [
                                                                                                 'type' => ValueNode::class,
-                                                                                                'hash' => 2861256049,
+                                                                                                'hash' => 2507953995,
                                                                                             ],
                                                                                             [
                                                                                                 'type' => ValueNode::class,
-                                                                                                'hash' => 1584509619,
+                                                                                                'hash' => 2622256201,
                                                                                             ],
                                                                                         ],
                                                                                     ],
@@ -467,17 +467,17 @@ return [
                                                                                         ],
                                                                                         [
                                                                                             'type' => ValueNode::class,
-                                                                                            'hash' => 2861256049,
+                                                                                            'hash' => 2507953995,
                                                                                             'properties' => [
                                                                                                 'payload' => [
-                                                                                                    'type' => ScalarNode::class,
-                                                                                                    'hash' => 3070332861,
+                                                                                                    'type' => PlainScalarNode::class,
+                                                                                                    'hash' => 536432148,
                                                                                                 ],
                                                                                             ],
                                                                                             'children' => [
                                                                                                 [
-                                                                                                    'type' => ScalarNode::class,
-                                                                                                    'hash' => 3070332861,
+                                                                                                    'type' => PlainScalarNode::class,
+                                                                                                    'hash' => 536432148,
                                                                                                     'properties' => [
                                                                                                         'token' => [
                                                                                                             'type' => TokenType::PLAIN_SCALAR,
@@ -512,17 +512,17 @@ return [
                                                                                         ],
                                                                                         [
                                                                                             'type' => ValueNode::class,
-                                                                                            'hash' => 1584509619,
+                                                                                            'hash' => 2622256201,
                                                                                             'properties' => [
                                                                                                 'payload' => [
-                                                                                                    'type' => ScalarNode::class,
-                                                                                                    'hash' => 341248276,
+                                                                                                    'type' => PlainScalarNode::class,
+                                                                                                    'hash' => 3165636797,
                                                                                                 ],
                                                                                             ],
                                                                                             'children' => [
                                                                                                 [
-                                                                                                    'type' => ScalarNode::class,
-                                                                                                    'hash' => 341248276,
+                                                                                                    'type' => PlainScalarNode::class,
+                                                                                                    'hash' => 3165636797,
                                                                                                     'properties' => [
                                                                                                         'token' => [
                                                                                                             'type' => TokenType::PLAIN_SCALAR,
