@@ -14,25 +14,25 @@ use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\LiteralBlockScalarNode;
 use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\PlainScalarNode;
+use Aeliot\YamlToken\Node\SequenceEntryNode;
 use Aeliot\YamlToken\Node\StreamNode;
-use Aeliot\YamlToken\Node\SyntaxTokenNode;
 use Aeliot\YamlToken\Node\ValueIndicatorNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 2258093237,
+    'hash' => 1187890842,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 2419110677,
+            'hash' => 1062350367,
             'properties' => [],
             'children' => [
                 [
                     'type' => BlockSequenceEntryNode::class,
-                    'hash' => 452681014,
+                    'hash' => 661366624,
                     'properties' => [
                         'value' => [
                             'type' => ValueNode::class,
@@ -41,8 +41,8 @@ return [
                     ],
                     'children' => [
                         [
-                            'type' => SyntaxTokenNode::class,
-                            'hash' => 990219541,
+                            'type' => SequenceEntryNode::class,
+                            'hash' => 4074150559,
                             'properties' => [
                                 'token' => [
                                     'type' => TokenType::SEQUENCE_ENTRY,

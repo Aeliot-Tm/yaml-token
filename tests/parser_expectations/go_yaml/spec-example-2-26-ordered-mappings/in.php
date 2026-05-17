@@ -14,8 +14,8 @@ use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\NodePropertiesNode;
 use Aeliot\YamlToken\Node\PlainScalarNode;
+use Aeliot\YamlToken\Node\SequenceEntryNode;
 use Aeliot\YamlToken\Node\StreamNode;
-use Aeliot\YamlToken\Node\SyntaxTokenNode;
 use Aeliot\YamlToken\Node\TagNode;
 use Aeliot\YamlToken\Node\ValueIndicatorNode;
 use Aeliot\YamlToken\Node\ValueNode;
@@ -23,7 +23,7 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 1838849885,
+    'hash' => 1406555559,
     'properties' => [],
     'children' => [
         [
@@ -189,7 +189,7 @@ return [
         ],
         [
             'type' => DocumentNode::class,
-            'hash' => 3666909759,
+            'hash' => 3889126093,
             'properties' => [],
             'children' => [
                 [
@@ -216,7 +216,7 @@ return [
                 ],
                 [
                     'type' => ValueNode::class,
-                    'hash' => 2008565935,
+                    'hash' => 3438287634,
                     'properties' => [
                         'nodeProperties' => [
                             'type' => NodePropertiesNode::class,
@@ -224,7 +224,7 @@ return [
                         ],
                         'payload' => [
                             'type' => BlockSequenceNode::class,
-                            'hash' => 1201467710,
+                            'hash' => 238078500,
                         ],
                     ],
                     'children' => [
@@ -264,27 +264,27 @@ return [
                         ],
                         [
                             'type' => BlockSequenceNode::class,
-                            'hash' => 1201467710,
+                            'hash' => 238078500,
                             'properties' => [
                                 'entries' => [
                                     [
                                         'type' => BlockSequenceEntryNode::class,
-                                        'hash' => 2406480569,
+                                        'hash' => 378833271,
                                     ],
                                     [
                                         'type' => BlockSequenceEntryNode::class,
-                                        'hash' => 3288687094,
+                                        'hash' => 2851808065,
                                     ],
                                     [
                                         'type' => BlockSequenceEntryNode::class,
-                                        'hash' => 3234303538,
+                                        'hash' => 2664745135,
                                     ],
                                 ],
                             ],
                             'children' => [
                                 [
                                     'type' => BlockSequenceEntryNode::class,
-                                    'hash' => 2406480569,
+                                    'hash' => 378833271,
                                     'properties' => [
                                         'value' => [
                                             'type' => ValueNode::class,
@@ -293,8 +293,8 @@ return [
                                     ],
                                     'children' => [
                                         [
-                                            'type' => SyntaxTokenNode::class,
-                                            'hash' => 990219541,
+                                            'type' => SequenceEntryNode::class,
+                                            'hash' => 4074150559,
                                             'properties' => [
                                                 'token' => [
                                                     'type' => TokenType::SEQUENCE_ENTRY,
@@ -443,7 +443,7 @@ return [
                                 ],
                                 [
                                     'type' => BlockSequenceEntryNode::class,
-                                    'hash' => 3288687094,
+                                    'hash' => 2851808065,
                                     'properties' => [
                                         'value' => [
                                             'type' => ValueNode::class,
@@ -452,8 +452,8 @@ return [
                                     ],
                                     'children' => [
                                         [
-                                            'type' => SyntaxTokenNode::class,
-                                            'hash' => 990219541,
+                                            'type' => SequenceEntryNode::class,
+                                            'hash' => 4074150559,
                                             'properties' => [
                                                 'token' => [
                                                     'type' => TokenType::SEQUENCE_ENTRY,
@@ -602,7 +602,7 @@ return [
                                 ],
                                 [
                                     'type' => BlockSequenceEntryNode::class,
-                                    'hash' => 3234303538,
+                                    'hash' => 2664745135,
                                     'properties' => [
                                         'value' => [
                                             'type' => ValueNode::class,
@@ -611,8 +611,8 @@ return [
                                     ],
                                     'children' => [
                                         [
-                                            'type' => SyntaxTokenNode::class,
-                                            'hash' => 990219541,
+                                            'type' => SequenceEntryNode::class,
+                                            'hash' => 4074150559,
                                             'properties' => [
                                                 'token' => [
                                                     'type' => TokenType::SEQUENCE_ENTRY,

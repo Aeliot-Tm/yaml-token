@@ -46,6 +46,7 @@ use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Node\NodePropertiesNode;
 use Aeliot\YamlToken\Node\PlainScalarNode;
 use Aeliot\YamlToken\Node\ScalarNode;
+use Aeliot\YamlToken\Node\SequenceEntryNode;
 use Aeliot\YamlToken\Node\SingleQuotedScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\SyntaxTokenNode;
@@ -786,7 +787,7 @@ final class Parser
             throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('SEQUENCE_ENTRY expected, but %s given', $token?->type->value ?? '_nothing_'), $harvester->tokens));
         }
 
-        $target->addChild(new SyntaxTokenNode($token));
+        $target->addChild($this->createSimpleNode($token));
         $harvester->tokens->advance();
         $consumed = \strlen($token->text);
 
@@ -851,7 +852,7 @@ final class Parser
             TokenType::INDENTATION => new IndentationNode($token),
             TokenType::MERGE_INDICATOR => new MergeIndicatorNode($token),
             TokenType::NEWLINE => new NewLineNode($token),
-            TokenType::SEQUENCE_ENTRY => new SyntaxTokenNode($token),
+            TokenType::SEQUENCE_ENTRY => new SequenceEntryNode($token),
             TokenType::VALUE_INDICATOR => new ValueIndicatorNode($token),
             TokenType::WHITESPACE => new WhitespaceNode($token),
             default => throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Not configured node for token type: %s', $token->type->value), $token)),
