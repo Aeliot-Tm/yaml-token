@@ -31,7 +31,7 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 717927157,
+    'hash' => 136204940,
     'properties' => [],
     'children' => [
         [
@@ -116,7 +116,7 @@ return [
         ],
         [
             'type' => DocumentNode::class,
-            'hash' => 3293149520,
+            'hash' => 2656282942,
             'properties' => [],
             'children' => [
                 [
@@ -143,7 +143,7 @@ return [
                 ],
                 [
                     'type' => ValueNode::class,
-                    'hash' => 821266807,
+                    'hash' => 549268903,
                     'properties' => [
                         'nodeProperties' => [
                             'type' => NodePropertiesNode::class,
@@ -151,7 +151,7 @@ return [
                         ],
                         'payload' => [
                             'type' => BlockSequenceNode::class,
-                            'hash' => 419137630,
+                            'hash' => 2462603899,
                         ],
                     ],
                     'children' => [
@@ -257,31 +257,31 @@ return [
                         ],
                         [
                             'type' => BlockSequenceNode::class,
-                            'hash' => 419137630,
+                            'hash' => 2462603899,
                             'properties' => [
                                 'entries' => [
                                     [
                                         'type' => SequenceEntryNode::class,
-                                        'hash' => 941354599,
+                                        'hash' => 148831719,
                                     ],
                                     [
                                         'type' => SequenceEntryNode::class,
-                                        'hash' => 3642043383,
+                                        'hash' => 1093946747,
                                     ],
                                     [
                                         'type' => SequenceEntryNode::class,
-                                        'hash' => 4267938073,
+                                        'hash' => 2633233094,
                                     ],
                                 ],
                             ],
                             'children' => [
                                 [
                                     'type' => SequenceEntryNode::class,
-                                    'hash' => 941354599,
+                                    'hash' => 148831719,
                                     'properties' => [
                                         'value' => [
                                             'type' => ValueNode::class,
-                                            'hash' => 424893130,
+                                            'hash' => 2774735791,
                                         ],
                                     ],
                                     'children' => [
@@ -309,7 +309,7 @@ return [
                                         ],
                                         [
                                             'type' => ValueNode::class,
-                                            'hash' => 424893130,
+                                            'hash' => 2774735791,
                                             'properties' => [
                                                 'nodeProperties' => [
                                                     'type' => NodePropertiesNode::class,
@@ -317,7 +317,7 @@ return [
                                                 ],
                                                 'payload' => [
                                                     'type' => BlockMappingNode::class,
-                                                    'hash' => 2994656245,
+                                                    'hash' => 494534617,
                                                 ],
                                             ],
                                             'children' => [
@@ -357,23 +357,23 @@ return [
                                                 ],
                                                 [
                                                     'type' => BlockMappingNode::class,
-                                                    'hash' => 2994656245,
+                                                    'hash' => 494534617,
                                                     'properties' => [
                                                         'entries' => [
                                                             [
                                                                 'type' => KeyValueCoupleNode::class,
-                                                                'hash' => 3473370936,
+                                                                'hash' => 1086088310,
                                                             ],
                                                             [
                                                                 'type' => KeyValueCoupleNode::class,
-                                                                'hash' => 954225556,
+                                                                'hash' => 2796243487,
                                                             ],
                                                         ],
                                                     ],
                                                     'children' => [
                                                         [
                                                             'type' => KeyValueCoupleNode::class,
-                                                            'hash' => 3473370936,
+                                                            'hash' => 1086088310,
                                                             'properties' => [
                                                                 'indentation' => [
                                                                     'type' => IndentationNode::class,
@@ -382,6 +382,10 @@ return [
                                                                 'key' => [
                                                                     'type' => KeyNode::class,
                                                                     'hash' => 1785621168,
+                                                                ],
+                                                                'valueIndicator' => [
+                                                                    'type' => ValueIndicatorNode::class,
+                                                                    'hash' => 3779730559,
                                                                 ],
                                                                 'value' => [
                                                                     'type' => ValueNode::class,
@@ -424,8 +428,8 @@ return [
                                                                     ],
                                                                 ],
                                                                 [
-                                                                    'type' => SyntaxTokenNode::class,
-                                                                    'hash' => 675194587,
+                                                                    'type' => ValueIndicatorNode::class,
+                                                                    'hash' => 3779730559,
                                                                     'properties' => [
                                                                         'token' => [
                                                                             'type' => TokenType::VALUE_INDICATOR,
@@ -749,7 +753,7 @@ return [
                                                         ],
                                                         [
                                                             'type' => KeyValueCoupleNode::class,
-                                                            'hash' => 954225556,
+                                                            'hash' => 2796243487,
                                                             'properties' => [
                                                                 'indentation' => [
                                                                     'type' => IndentationNode::class,
@@ -758,6 +762,10 @@ return [
                                                                 'key' => [
                                                                     'type' => KeyNode::class,
                                                                     'hash' => 472096762,
+                                                                ],
+                                                                'valueIndicator' => [
+                                                                    'type' => ValueIndicatorNode::class,
+                                                                    'hash' => 3779730559,
                                                                 ],
                                                                 'value' => [
                                                                     'type' => ValueNode::class,
@@ -800,8 +808,8 @@ return [
                                                                     ],
                                                                 ],
                                                                 [
-                                                                    'type' => SyntaxTokenNode::class,
-                                                                    'hash' => 675194587,
+                                                                    'type' => ValueIndicatorNode::class,
+                                                                    'hash' => 3779730559,
                                                                     'properties' => [
                                                                         'token' => [
                                                                             'type' => TokenType::VALUE_INDICATOR,
@@ -865,11 +873,11 @@ return [
                                 ],
                                 [
                                     'type' => SequenceEntryNode::class,
-                                    'hash' => 3642043383,
+                                    'hash' => 1093946747,
                                     'properties' => [
                                         'value' => [
                                             'type' => ValueNode::class,
-                                            'hash' => 4193269563,
+                                            'hash' => 1493404783,
                                         ],
                                     ],
                                     'children' => [
@@ -897,7 +905,7 @@ return [
                                         ],
                                         [
                                             'type' => ValueNode::class,
-                                            'hash' => 4193269563,
+                                            'hash' => 1493404783,
                                             'properties' => [
                                                 'nodeProperties' => [
                                                     'type' => NodePropertiesNode::class,
@@ -905,7 +913,7 @@ return [
                                                 ],
                                                 'payload' => [
                                                     'type' => BlockMappingNode::class,
-                                                    'hash' => 3335197336,
+                                                    'hash' => 1161217088,
                                                 ],
                                             ],
                                             'children' => [
@@ -945,23 +953,23 @@ return [
                                                 ],
                                                 [
                                                     'type' => BlockMappingNode::class,
-                                                    'hash' => 3335197336,
+                                                    'hash' => 1161217088,
                                                     'properties' => [
                                                         'entries' => [
                                                             [
                                                                 'type' => KeyValueCoupleNode::class,
-                                                                'hash' => 2513550859,
+                                                                'hash' => 3070742386,
                                                             ],
                                                             [
                                                                 'type' => KeyValueCoupleNode::class,
-                                                                'hash' => 4149620178,
+                                                                'hash' => 1049645590,
                                                             ],
                                                         ],
                                                     ],
                                                     'children' => [
                                                         [
                                                             'type' => KeyValueCoupleNode::class,
-                                                            'hash' => 2513550859,
+                                                            'hash' => 3070742386,
                                                             'properties' => [
                                                                 'indentation' => [
                                                                     'type' => IndentationNode::class,
@@ -970,6 +978,10 @@ return [
                                                                 'key' => [
                                                                     'type' => KeyNode::class,
                                                                     'hash' => 2729784649,
+                                                                ],
+                                                                'valueIndicator' => [
+                                                                    'type' => ValueIndicatorNode::class,
+                                                                    'hash' => 3779730559,
                                                                 ],
                                                                 'value' => [
                                                                     'type' => ValueNode::class,
@@ -1012,8 +1024,8 @@ return [
                                                                     ],
                                                                 ],
                                                                 [
-                                                                    'type' => SyntaxTokenNode::class,
-                                                                    'hash' => 675194587,
+                                                                    'type' => ValueIndicatorNode::class,
+                                                                    'hash' => 3779730559,
                                                                     'properties' => [
                                                                         'token' => [
                                                                             'type' => TokenType::VALUE_INDICATOR,
@@ -1073,7 +1085,7 @@ return [
                                                         ],
                                                         [
                                                             'type' => KeyValueCoupleNode::class,
-                                                            'hash' => 4149620178,
+                                                            'hash' => 1049645590,
                                                             'properties' => [
                                                                 'indentation' => [
                                                                     'type' => IndentationNode::class,
@@ -1082,6 +1094,10 @@ return [
                                                                 'key' => [
                                                                     'type' => KeyNode::class,
                                                                     'hash' => 3405804123,
+                                                                ],
+                                                                'valueIndicator' => [
+                                                                    'type' => ValueIndicatorNode::class,
+                                                                    'hash' => 3779730559,
                                                                 ],
                                                                 'value' => [
                                                                     'type' => ValueNode::class,
@@ -1124,8 +1140,8 @@ return [
                                                                     ],
                                                                 ],
                                                                 [
-                                                                    'type' => SyntaxTokenNode::class,
-                                                                    'hash' => 675194587,
+                                                                    'type' => ValueIndicatorNode::class,
+                                                                    'hash' => 3779730559,
                                                                     'properties' => [
                                                                         'token' => [
                                                                             'type' => TokenType::VALUE_INDICATOR,
@@ -1438,11 +1454,11 @@ return [
                                 ],
                                 [
                                     'type' => SequenceEntryNode::class,
-                                    'hash' => 4267938073,
+                                    'hash' => 2633233094,
                                     'properties' => [
                                         'value' => [
                                             'type' => ValueNode::class,
-                                            'hash' => 2040645778,
+                                            'hash' => 910395403,
                                         ],
                                     ],
                                     'children' => [
@@ -1470,7 +1486,7 @@ return [
                                         ],
                                         [
                                             'type' => ValueNode::class,
-                                            'hash' => 2040645778,
+                                            'hash' => 910395403,
                                             'properties' => [
                                                 'nodeProperties' => [
                                                     'type' => NodePropertiesNode::class,
@@ -1478,7 +1494,7 @@ return [
                                                 ],
                                                 'payload' => [
                                                     'type' => BlockMappingNode::class,
-                                                    'hash' => 9023295,
+                                                    'hash' => 2298230435,
                                                 ],
                                             ],
                                             'children' => [
@@ -1518,27 +1534,27 @@ return [
                                                 ],
                                                 [
                                                     'type' => BlockMappingNode::class,
-                                                    'hash' => 9023295,
+                                                    'hash' => 2298230435,
                                                     'properties' => [
                                                         'entries' => [
                                                             [
                                                                 'type' => KeyValueCoupleNode::class,
-                                                                'hash' => 2513550859,
+                                                                'hash' => 3070742386,
                                                             ],
                                                             [
                                                                 'type' => KeyValueCoupleNode::class,
-                                                                'hash' => 1047194616,
+                                                                'hash' => 3228764775,
                                                             ],
                                                             [
                                                                 'type' => KeyValueCoupleNode::class,
-                                                                'hash' => 853717252,
+                                                                'hash' => 2666738361,
                                                             ],
                                                         ],
                                                     ],
                                                     'children' => [
                                                         [
                                                             'type' => KeyValueCoupleNode::class,
-                                                            'hash' => 2513550859,
+                                                            'hash' => 3070742386,
                                                             'properties' => [
                                                                 'indentation' => [
                                                                     'type' => IndentationNode::class,
@@ -1547,6 +1563,10 @@ return [
                                                                 'key' => [
                                                                     'type' => KeyNode::class,
                                                                     'hash' => 2729784649,
+                                                                ],
+                                                                'valueIndicator' => [
+                                                                    'type' => ValueIndicatorNode::class,
+                                                                    'hash' => 3779730559,
                                                                 ],
                                                                 'value' => [
                                                                     'type' => ValueNode::class,
@@ -1589,8 +1609,8 @@ return [
                                                                     ],
                                                                 ],
                                                                 [
-                                                                    'type' => SyntaxTokenNode::class,
-                                                                    'hash' => 675194587,
+                                                                    'type' => ValueIndicatorNode::class,
+                                                                    'hash' => 3779730559,
                                                                     'properties' => [
                                                                         'token' => [
                                                                             'type' => TokenType::VALUE_INDICATOR,
@@ -1650,7 +1670,7 @@ return [
                                                         ],
                                                         [
                                                             'type' => KeyValueCoupleNode::class,
-                                                            'hash' => 1047194616,
+                                                            'hash' => 3228764775,
                                                             'properties' => [
                                                                 'indentation' => [
                                                                     'type' => IndentationNode::class,
@@ -1659,6 +1679,10 @@ return [
                                                                 'key' => [
                                                                     'type' => KeyNode::class,
                                                                     'hash' => 4151421375,
+                                                                ],
+                                                                'valueIndicator' => [
+                                                                    'type' => ValueIndicatorNode::class,
+                                                                    'hash' => 3779730559,
                                                                 ],
                                                                 'value' => [
                                                                     'type' => ValueNode::class,
@@ -1701,8 +1725,8 @@ return [
                                                                     ],
                                                                 ],
                                                                 [
-                                                                    'type' => SyntaxTokenNode::class,
-                                                                    'hash' => 675194587,
+                                                                    'type' => ValueIndicatorNode::class,
+                                                                    'hash' => 3779730559,
                                                                     'properties' => [
                                                                         'token' => [
                                                                             'type' => TokenType::VALUE_INDICATOR,
@@ -1760,7 +1784,7 @@ return [
                                                         ],
                                                         [
                                                             'type' => KeyValueCoupleNode::class,
-                                                            'hash' => 853717252,
+                                                            'hash' => 2666738361,
                                                             'properties' => [
                                                                 'indentation' => [
                                                                     'type' => IndentationNode::class,
@@ -1769,6 +1793,10 @@ return [
                                                                 'key' => [
                                                                     'type' => KeyNode::class,
                                                                     'hash' => 2039182595,
+                                                                ],
+                                                                'valueIndicator' => [
+                                                                    'type' => ValueIndicatorNode::class,
+                                                                    'hash' => 3779730559,
                                                                 ],
                                                                 'value' => [
                                                                     'type' => ValueNode::class,
@@ -1811,8 +1839,8 @@ return [
                                                                     ],
                                                                 ],
                                                                 [
-                                                                    'type' => SyntaxTokenNode::class,
-                                                                    'hash' => 675194587,
+                                                                    'type' => ValueIndicatorNode::class,
+                                                                    'hash' => 3779730559,
                                                                     'properties' => [
                                                                         'token' => [
                                                                             'type' => TokenType::VALUE_INDICATOR,

@@ -832,8 +832,8 @@ final class Parser
             TokenType::DIRECTIVE_YAML_VERSION => new YamlDirectiveVersionNode($token),
             TokenType::INDENTATION => new IndentationNode($token),
             TokenType::NEWLINE => new NewLineNode($token),
-            TokenType::SEQUENCE_ENTRY,
-            TokenType::VALUE_INDICATOR => new SyntaxTokenNode($token),
+            TokenType::SEQUENCE_ENTRY => new SyntaxTokenNode($token),
+            TokenType::VALUE_INDICATOR => new ValueIndicatorNode($token),
             TokenType::WHITESPACE => new WhitespaceNode($token),
             default => throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Not configured node for token type: %s', $token->type->value), $token)),
         };

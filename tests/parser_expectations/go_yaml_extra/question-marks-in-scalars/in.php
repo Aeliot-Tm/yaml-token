@@ -20,12 +20,12 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 2787303620,
+    'hash' => 2746925098,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 201578612,
+            'hash' => 2948123676,
             'properties' => [],
             'children' => [
                 [
@@ -166,11 +166,11 @@ return [
                 ],
                 [
                     'type' => SequenceEntryNode::class,
-                    'hash' => 174705209,
+                    'hash' => 1557531407,
                     'properties' => [
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 2110773532,
+                            'hash' => 1873765243,
                         ],
                     ],
                     'children' => [
@@ -198,33 +198,37 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 2110773532,
+                            'hash' => 1873765243,
                             'properties' => [
                                 'payload' => [
                                     'type' => BlockMappingNode::class,
-                                    'hash' => 209079301,
+                                    'hash' => 148831273,
                                 ],
                             ],
                             'children' => [
                                 [
                                     'type' => BlockMappingNode::class,
-                                    'hash' => 209079301,
+                                    'hash' => 148831273,
                                     'properties' => [
                                         'entries' => [
                                             [
                                                 'type' => KeyValueCoupleNode::class,
-                                                'hash' => 1477624181,
+                                                'hash' => 3332428020,
                                             ],
                                         ],
                                     ],
                                     'children' => [
                                         [
                                             'type' => KeyValueCoupleNode::class,
-                                            'hash' => 1477624181,
+                                            'hash' => 3332428020,
                                             'properties' => [
                                                 'key' => [
                                                     'type' => KeyNode::class,
                                                     'hash' => 1885271233,
+                                                ],
+                                                'valueIndicator' => [
+                                                    'type' => ValueIndicatorNode::class,
+                                                    'hash' => 3779730559,
                                                 ],
                                                 'value' => [
                                                     'type' => ValueNode::class,
@@ -256,8 +260,8 @@ return [
                                                     ],
                                                 ],
                                                 [
-                                                    'type' => SyntaxTokenNode::class,
-                                                    'hash' => 675194587,
+                                                    'type' => ValueIndicatorNode::class,
+                                                    'hash' => 3779730559,
                                                     'properties' => [
                                                         'token' => [
                                                             'type' => TokenType::VALUE_INDICATOR,
