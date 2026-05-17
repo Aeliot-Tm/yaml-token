@@ -55,6 +55,12 @@ class KeyValueCoupleNode extends AbstractNode
         return $this->indentation;
     }
 
+    /**
+     * NOTE: used separate method case Lexer produces INDENTATION token
+     *       for spaces before value putted to the next line. And it has to be
+     *       a part of couple. Only indentation before couple have to be
+     *       identified as real indentation.
+     */
     public function setIndentation(IndentationNode $node): void
     {
         $this->indentation = $node;
