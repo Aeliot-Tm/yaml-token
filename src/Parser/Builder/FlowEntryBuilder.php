@@ -147,7 +147,8 @@ final class FlowEntryBuilder implements BuilderInterface
             return true;
         }
 
-        return $this->host->isScalarFollowedByValueIndicatorInFlow($harvester);
+        return $this->host->isScalarFollowedByValueIndicatorInFlow($harvester)
+            || $this->host->isFlowMultilinePlainKeyStart($harvester);
     }
 
     private function parseLegacyFlowPair(Harvester $harvester): BuilderResultInterface

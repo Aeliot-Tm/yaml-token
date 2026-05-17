@@ -43,6 +43,7 @@ final class FlowHost
         private readonly \Closure $collectSpaceAndComments,
         private readonly \Closure $createSyntaxTokenNode,
         private readonly \Closure $getFlowEntryKeyNode,
+        private readonly \Closure $isFlowMultilinePlainKeyStart,
         private readonly \Closure $isScalarFollowedByValueIndicatorInFlow,
         private readonly \Closure $parseFlowContextValue,
         private readonly \Closure $parseFlowMapping,
@@ -65,6 +66,11 @@ final class FlowHost
     public function getFlowEntryKeyNode(Harvester $harvester): KeyNode
     {
         return ($this->getFlowEntryKeyNode)($harvester);
+    }
+
+    public function isFlowMultilinePlainKeyStart(Harvester $harvester): bool
+    {
+        return ($this->isFlowMultilinePlainKeyStart)($harvester);
     }
 
     public function isScalarFollowedByValueIndicatorInFlow(Harvester $harvester): bool

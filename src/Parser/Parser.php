@@ -804,6 +804,7 @@ final class Parser
             },
             fn (Token $t): SyntaxTokenNode => $this->createSyntaxTokenNode($t),
             fn (Harvester $h): KeyNode => $this->getKeyNode($h, true),
+            fn (Harvester $h): bool => $this->isFlowMultilinePlainKeyStart($h),
             fn (Harvester $h): bool => $this->isScalarFollowedByValueIndicator($h, true),
             fn (Harvester $h): ValueNode => $this->parseFlowContextValue($h),
             fn (Harvester $h): FlowMappingNode => $this->runFlowMappingDriver($h),
@@ -1077,6 +1078,50 @@ final class Parser
         }
 
         return TokenType::FLOW_MAPPING_START === $token?->type;
+    }
+
+    /**
+     * In flow context, checks if the current PLAIN_SCALAR is the start of a multiline
+     * implicit key: PLAIN_SCALAR (NEWLINE WS* PLAIN_SCALAR)+ WS* VALUE_INDICATOR.
+     */
+    private function isFlowMultilinePlainKeyStart(Harvester $harvester): bool
+    {
+        if (TokenType::PLAIN_SCALAR !== $harvester->tokens->current()?->type) {
+            return false;
+        }
+
+        $offset = 1;
+        $hasContinuation = false;
+
+        while (true) {
+            while (TokenType::WHITESPACE === $harvester->tokens->peek($offset)?->type) {
+                ++$offset;
+            }
+
+            $peeked = $harvester->tokens->peek($offset);
+            if (null === $peeked) {
+                return false;
+            }
+
+            if (TokenType::VALUE_INDICATOR === $peeked->type) {
+                return $hasContinuation;
+            }
+
+            if (TokenType::NEWLINE !== $peeked->type) {
+                return false;
+            }
+            ++$offset;
+
+            while (TokenType::WHITESPACE === $harvester->tokens->peek($offset)?->type) {
+                ++$offset;
+            }
+
+            if (TokenType::PLAIN_SCALAR !== $harvester->tokens->peek($offset)?->type) {
+                return false;
+            }
+            ++$offset;
+            $hasContinuation = true;
+        }
     }
 
     private function isFlowSequenceStart(Harvester $harvester): bool
@@ -2476,6 +2521,19 @@ final class Parser
                 $harvester->tokens->advance();
                 $this->appendMultilinePlainScalarContinuations($harvester, $multiline, $parentIndentLen);
                 $valueNode->addChild($multiline);
+            } elseif (
+                TokenType::PLAIN_SCALAR === $token->type
+                && self::FLOW_COLLECTION_VALUE_PARENT_INDENT === $parentIndentLen
+            ) {
+                $head = new ScalarNode($token);
+                $harvester->tokens->advance();
+                $multiline = new MultilinePlainScalarNode();
+                $multiline->addChild($head);
+                $consumedAny = false;
+                while ($this->tryConsumeFlowValueMultilinePlainScalarLine($harvester, $multiline)) {
+                    $consumedAny = true;
+                }
+                $valueNode->addChild($consumedAny ? $multiline : $head);
             } else {
                 $valueNode->addChild(new ScalarNode($token));
                 $harvester->tokens->advance();
@@ -2756,6 +2814,51 @@ final class Parser
             return false;
         }
 
+        $multiline->addChild(new NewLineNode($newLine));
+        $harvester->tokens->advance();
+
+        $contentHead = $harvester->tokens->current();
+        while (TokenType::WHITESPACE === $contentHead->type) {
+            $multiline->addChild(new WhitespaceNode($contentHead));
+            $harvester->tokens->advance();
+            $contentHead = $harvester->tokens->current();
+        }
+
+        $multiline->addChild(new ScalarNode($scalarToken));
+        $harvester->tokens->advance();
+
+        return true;
+    }
+
+    /**
+     * Flow-context multiline plain value (YAML 1.2.2 §7.3.3 / §7.4.1): NEWLINE WHITESPACE* PLAIN_SCALAR
+     * fragments may follow the first scalar. Unlike {@see tryConsumeFlowKeyMultilinePlainScalarLine},
+     * the continuation must not be a flow-pair key (PLAIN_SCALAR followed by VALUE_INDICATOR).
+     */
+    private function tryConsumeFlowValueMultilinePlainScalarLine(Harvester $harvester, MultilinePlainScalarNode $multiline): bool
+    {
+        if (TokenType::NEWLINE !== $harvester->tokens->current()?->type) {
+            return false;
+        }
+
+        $scalarOffset = 1;
+        while (TokenType::WHITESPACE === $harvester->tokens->peek($scalarOffset)?->type) {
+            ++$scalarOffset;
+        }
+        $scalarToken = $harvester->tokens->peek($scalarOffset);
+        if (TokenType::PLAIN_SCALAR !== $scalarToken?->type) {
+            return false;
+        }
+
+        $afterScalar = $scalarOffset + 1;
+        while (TokenType::WHITESPACE === $harvester->tokens->peek($afterScalar)?->type) {
+            ++$afterScalar;
+        }
+        if (TokenType::VALUE_INDICATOR === $harvester->tokens->peek($afterScalar)?->type) {
+            return false;
+        }
+
+        $newLine = $harvester->tokens->current();
         $multiline->addChild(new NewLineNode($newLine));
         $harvester->tokens->advance();
 
