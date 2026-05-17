@@ -23,7 +23,7 @@ class SequenceEntryNode extends AbstractNode
     {
         if ($child instanceof ValueNode) {
             if (null !== $this->value) {
-                throw new UnexpectedStateException('Attempt to set a value name twice');
+                throw new UnexpectedStateException('Attempt to set value name twice');
             }
 
             $this->value = $child;

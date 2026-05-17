@@ -56,7 +56,7 @@ class KeyNode extends AbstractNode
     public function setName(Node $node): void
     {
         if (null !== $this->name) {
-            throw new UnexpectedStateException('Attempt to set a key name twice');
+            throw new UnexpectedStateException('Attempt to set key name twice');
         }
 
         $this->name = $node;

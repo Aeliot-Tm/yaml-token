@@ -33,7 +33,7 @@ class ValueNode extends AbstractNode
             || $child instanceof ScalarNode
         ) {
             if (null !== $this->payload) {
-                throw new UnexpectedStateException('Attempt to set a value name twice');
+                throw new UnexpectedStateException('Attempt to set value name twice');
             }
             $this->payload = $child;
         } elseif ($child instanceof NodePropertiesNode) {
