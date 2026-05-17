@@ -18,8 +18,6 @@ use Aeliot\YamlToken\Lexer\Lexer;
 use Aeliot\YamlToken\Node\AliasNode;
 use Aeliot\YamlToken\Node\AnchorNode;
 use Aeliot\YamlToken\Node\BlockMappingNode;
-use Aeliot\YamlToken\Node\BlockScalarChompingIndicatorNode;
-use Aeliot\YamlToken\Node\BlockScalarIndentationIndicatorNode;
 use Aeliot\YamlToken\Node\BlockScalarIndicatorNode;
 use Aeliot\YamlToken\Node\BlockSequenceEntryNode;
 use Aeliot\YamlToken\Node\BlockSequenceNode;
@@ -29,21 +27,12 @@ use Aeliot\YamlToken\Node\DirectiveNode;
 use Aeliot\YamlToken\Node\DocumentEndNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\DocumentStartNode;
-use Aeliot\YamlToken\Node\DoubleQuotedScalarNode;
 use Aeliot\YamlToken\Node\ExplicitKeyIndicatorNode;
-use Aeliot\YamlToken\Node\FlowEntryNode;
-use Aeliot\YamlToken\Node\FlowMappingEndNode;
 use Aeliot\YamlToken\Node\FlowMappingNode;
-use Aeliot\YamlToken\Node\FlowMappingStartNode;
-use Aeliot\YamlToken\Node\FlowSequenceEndNode;
 use Aeliot\YamlToken\Node\FlowSequenceNode;
-use Aeliot\YamlToken\Node\FlowSequenceStartNode;
-use Aeliot\YamlToken\Node\FoldedBlockScalarNode;
 use Aeliot\YamlToken\Node\IndentationNode;
 use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
-use Aeliot\YamlToken\Node\LiteralBlockScalarNode;
-use Aeliot\YamlToken\Node\MergeIndicatorNode;
 use Aeliot\YamlToken\Node\MergeInstructionNode;
 use Aeliot\YamlToken\Node\MultilinePlainScalarNode;
 use Aeliot\YamlToken\Node\NewLineNode;
@@ -51,8 +40,6 @@ use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Node\NodePropertiesNode;
 use Aeliot\YamlToken\Node\PlainScalarNode;
 use Aeliot\YamlToken\Node\ScalarNode;
-use Aeliot\YamlToken\Node\SequenceEntryNode;
-use Aeliot\YamlToken\Node\SingleQuotedScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\TagDirectiveHandleNode;
 use Aeliot\YamlToken\Node\TagDirectiveIndicatorNode;
@@ -64,7 +51,6 @@ use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 use Aeliot\YamlToken\Node\YamlDirectiveIndicatorNode;
 use Aeliot\YamlToken\Node\YamlDirectiveNode;
-use Aeliot\YamlToken\Node\YamlDirectiveVersionNode;
 use Aeliot\YamlToken\Parser\Builder\FlowMappingBuilder;
 use Aeliot\YamlToken\Parser\Builder\FlowSequenceBuilder;
 use Aeliot\YamlToken\Parser\Driver\Driver;
@@ -81,6 +67,7 @@ use Aeliot\YamlToken\Parser\Exception\UnexpectedEndException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Flow\FlowHost;
+use Aeliot\YamlToken\Parser\Helper\NodeFactory;
 use Aeliot\YamlToken\Token\Token;
 use Aeliot\YamlToken\Token\TokenStream;
 
@@ -101,9 +88,12 @@ final class Parser
 
     private Consumer $consumer;
 
+    private NodeFactory $nodeFactory;
+
     public function __construct()
     {
         $this->consumer = new Consumer();
+        $this->nodeFactory = new NodeFactory();
     }
 
     public function parse(string $input): StreamNode
@@ -885,42 +875,12 @@ final class Parser
 
     private function createScalarNode(Token $token): ScalarNode
     {
-        return match ($token->type) {
-            TokenType::DOUBLE_QUOTED_SCALAR => new DoubleQuotedScalarNode($token),
-            TokenType::FOLDED_BLOCK_SCALAR => new FoldedBlockScalarNode($token),
-            TokenType::LITERAL_BLOCK_SCALAR => new LiteralBlockScalarNode($token),
-            TokenType::PLAIN_SCALAR => new PlainScalarNode($token),
-            TokenType::SINGLE_QUOTED_SCALAR => new SingleQuotedScalarNode($token),
-            default => throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Expected scalar token, got %s', $token->type->value), $token)),
-        };
+        return $this->nodeFactory->createScalarNode($token);
     }
 
-    /**
-     * Wraps layout/indicator tokens collected by {@see Consumer::collectTypes()} and {@see Consumer::collectUntil()}
-     * with their corresponding nodes. Only token types that those collectors can deliver are
-     * listed here; structural tokens (anchors, tags, block scalar indicators) are wrapped at
-     * their dedicated parsing call sites and never reach this method.
-     */
     private function createSimpleNode(Token $token): Node
     {
-        return match ($token->type) {
-            TokenType::BLOCK_SCALAR_CHOMPING_INDICATOR => new BlockScalarChompingIndicatorNode($token),
-            TokenType::BLOCK_SCALAR_INDENTATION_INDICATOR => new BlockScalarIndentationIndicatorNode($token),
-            TokenType::COMMENT => new CommentNode($token),
-            TokenType::DIRECTIVE_YAML_VERSION => new YamlDirectiveVersionNode($token),
-            TokenType::FLOW_ENTRY => new FlowEntryNode($token),
-            TokenType::FLOW_MAPPING_END => new FlowMappingEndNode($token),
-            TokenType::FLOW_MAPPING_START => new FlowMappingStartNode($token),
-            TokenType::FLOW_SEQUENCE_END => new FlowSequenceEndNode($token),
-            TokenType::FLOW_SEQUENCE_START => new FlowSequenceStartNode($token),
-            TokenType::INDENTATION => new IndentationNode($token),
-            TokenType::MERGE_INDICATOR => new MergeIndicatorNode($token),
-            TokenType::NEWLINE => new NewLineNode($token),
-            TokenType::SEQUENCE_ENTRY => new SequenceEntryNode($token),
-            TokenType::VALUE_INDICATOR => new ValueIndicatorNode($token),
-            TokenType::WHITESPACE => new WhitespaceNode($token),
-            default => throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Not configured node for token type: %s', $token->type->value), $token)),
-        };
+        return $this->nodeFactory->createSimpleNode($token);
     }
 
     private function getKeyNode(Harvester $harvester, ?int $entryIndentLen = null): KeyNode
