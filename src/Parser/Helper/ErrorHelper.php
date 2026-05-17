@@ -1,0 +1,39 @@
+<?php
+
+declare(strict_types=1);
+
+/*
+ * This file is part of the YAML Token project.
+ *
+ * (c) Anatoliy Melnikov <5785276@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
+namespace Aeliot\YamlToken\Parser\Helper;
+
+use Aeliot\YamlToken\Parser\Dto\TokenStreamProxy;
+use Aeliot\YamlToken\Token\Token;
+
+final readonly class ErrorHelper
+{
+    public function appendTokenLocation(string $message, Token|TokenStreamProxy $tokens): string
+    {
+        $line = $tokens instanceof Token ? $tokens->line : $tokens->getLine();
+        $column = $tokens instanceof Token ? $tokens->column : $tokens->getColumn();
+        if (null !== $line && null !== $column) {
+            $message .= \sprintf(' in line %d column %d', $line, $column);
+        }
+
+        return $message;
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function wrapParseStateIndentationException(\Exception $previous, TokenStreamProxy $tokens): never
+    {
+        throw new ($previous::class)($this->appendTokenLocation($previous->getMessage(), $tokens), (int) $previous->getCode(), $previous);
+    }
+}

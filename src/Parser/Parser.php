@@ -67,6 +67,7 @@ use Aeliot\YamlToken\Parser\Exception\UnexpectedEndException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Flow\FlowHost;
+use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
 use Aeliot\YamlToken\Token\Token;
 use Aeliot\YamlToken\Token\TokenStream;
@@ -88,10 +89,13 @@ final class Parser
 
     private Consumer $consumer;
 
+    private ErrorHelper $errorHelper;
+
     private NodeFactory $nodeFactory;
 
     public function __construct()
     {
+        $this->errorHelper = new ErrorHelper();
         $this->nodeFactory = new NodeFactory();
         $this->consumer = new Consumer($this->nodeFactory);
     }
@@ -252,13 +256,7 @@ final class Parser
 
     private function appendTokenLocation(string $message, Token|TokenStreamProxy $tokens): string
     {
-        $line = $tokens instanceof Token ? $tokens->line : $tokens->getLine();
-        $column = $tokens instanceof Token ? $tokens->column : $tokens->getColumn();
-        if (null !== $line && null !== $column) {
-            $message .= \sprintf(' in line %d column %d', $line, $column);
-        }
-
-        return $message;
+        return $this->errorHelper->appendTokenLocation($message, $tokens);
     }
 
     private function assertIndentLenIsValid(Harvester $harvester, int $indentLen): void
@@ -2919,8 +2917,8 @@ final class Parser
         return true;
     }
 
-    private function wrapParseStateIndentationException(\Exception $previous, TokenStreamProxy $tokens): void
+    private function wrapParseStateIndentationException(\Exception $previous, TokenStreamProxy $tokens): never
     {
-        throw new ($previous::class)($this->appendTokenLocation($previous->getMessage(), $tokens), (int) $previous->getCode(), $previous);
+        $this->errorHelper->wrapParseStateIndentationException($previous, $tokens);
     }
 }
