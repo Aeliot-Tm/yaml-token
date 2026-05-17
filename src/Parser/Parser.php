@@ -262,7 +262,7 @@ final class Parser
      */
     private function buildExplicitBlockKeyMultilinePlainScalarName(
         Harvester $harvester,
-        ScalarNode $head,
+        PlainScalarNode $head,
         int $entryIndentLen,
     ): Node {
         $multiline = new MultilinePlainScalarNode();
@@ -281,7 +281,7 @@ final class Parser
      * fragments may follow the first scalar. Returns the head scalar when no continuation is consumed,
      * otherwise a {@see MultilinePlainScalarNode} that wraps the head plus consumed fragments.
      */
-    private function buildFlowKeyMultilinePlainScalarName(Harvester $harvester, ScalarNode $head): Node
+    private function buildFlowKeyMultilinePlainScalarName(Harvester $harvester, PlainScalarNode $head): Node
     {
         $multiline = new MultilinePlainScalarNode();
         $multiline->addChild($head);
@@ -309,7 +309,7 @@ final class Parser
         $head = $this->createScalarNode($headToken);
         $harvester->tokens->advance();
 
-        if (TokenType::PLAIN_SCALAR !== $headToken->type) {
+        if (!$head instanceof PlainScalarNode) {
             return $head;
         }
 
