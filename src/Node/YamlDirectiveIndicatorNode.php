@@ -13,6 +13,17 @@ declare(strict_types=1);
 
 namespace Aeliot\YamlToken\Node;
 
-class YamlDirectiveIndicatorNode extends SyntaxTokenNode
+use Aeliot\YamlToken\Token\Token;
+
+class YamlDirectiveIndicatorNode extends AbstractNode implements TokenHolderInterface
 {
+    public function __construct(
+        private readonly Token $token,
+    ) {
+    }
+
+    public function getToken(): Token
+    {
+        return $this->token;
+    }
 }
