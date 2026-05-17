@@ -13,6 +13,6 @@ declare(strict_types=1);
 
 namespace Aeliot\YamlToken\Node;
 
-class FlowMappingStartNode extends FlowSequenceBoundNode
+class FlowMappingStartNode extends FlowMappingBoundNode
 {
 }
