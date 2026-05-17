@@ -211,15 +211,17 @@ def main() -> int:
         ),
     )
     ap.add_argument("--dry-run", action="store_true")
-    ap.add_argument("--limit", type=int, default=0, metavar="N", help="Import at most N files (after filters).")
-    ap.add_argument("--offset", type=int, default=0, metavar="N", help="Skip the first N sources (after offset).")
+    ap.add_argument("--limit", type=int, default=0, metavar="N", help="Import at most N files.")
+    ap.add_argument("--offset", type=int, default=0, metavar="N", help="Skip the first N sources.")
     ap.add_argument(
         "--from-path",
         default="",
+        nargs="?",
         metavar="REL",
         help=(
             "Only import sources whose path relative to yaml-test-suite is "
-            "lexicographically >= REL (e.g. blank-lines or blank-lines/in.yaml)."
+            "lexicographically >= REL (e.g. blank-lines or blank-lines/in.yaml). "
+            "May appear before or after other flags; use --from-path=REL if REL starts with '-'."
         ),
     )
     ap.add_argument(
@@ -228,13 +230,14 @@ def main() -> int:
         default="all",
         help="edge: exclude case dirs named spec-example-*; spec: only those case dirs.",
     )
-    args = ap.parse_args()
+    args = ap.parse_intermixed_args()
     if args.offset < 0:
         ap.error("--offset must be non-negative")
 
+    from_path = (args.from_path or "").strip()
     sources = _list_sources()
-    if args.from_path:
-        key = args.from_path.strip().replace("\\", "/").lstrip("./")
+    if from_path:
+        key = from_path.replace("\\", "/").lstrip("./")
         sources = [p for p in sources if _rel_under_yaml_test_suite(p) >= key]
 
     if args.suite_filter == "edge":
