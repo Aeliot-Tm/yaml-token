@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Aeliot\YamlToken\Node;
 
+use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
+
 abstract class AbstractNode implements Node
 {
     /**
@@ -24,7 +26,12 @@ abstract class AbstractNode implements Node
 
     public function addChild(Node $child): void
     {
-        $this->children[] = $child;
+        $objectId = spl_object_id($child);
+        if (isset($this->children[$objectId])) {
+            throw new UnexpectedStateException('Attempt to add same child twice');
+        }
+
+        $this->children[$objectId] = $child;
         if ($child instanceof self) {
             $child->setParent($this);
         }
@@ -32,7 +39,7 @@ abstract class AbstractNode implements Node
 
     public function getChildren(): array
     {
-        return $this->children;
+        return array_values($this->children);
     }
 
     /**
@@ -41,13 +48,8 @@ abstract class AbstractNode implements Node
      */
     public function removeChild(Node $child): void
     {
-        $index = array_search($child, $this->children, true);
-        if (false === $index) {
-            return;
-        }
-
-        unset($this->children[$index]);
-        $this->children = array_values($this->children);
+        $objectId = spl_object_id($child);
+        unset($this->children[$objectId]);
     }
 
     public function getParent(): ?Node
