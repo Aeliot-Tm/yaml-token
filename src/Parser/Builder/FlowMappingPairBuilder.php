@@ -50,13 +50,13 @@ final class FlowMappingPairBuilder implements BuilderInterface
             throw new UnexpectedStateException('FlowMappingPairBuilder frame node must be KeyValueCoupleNode');
         }
 
-        $couple->setKey($this->host->getFlowEntryKeyNode($harvester));
+        $couple->addChild($this->host->getFlowEntryKeyNode($harvester));
 
         if ($this->host->tryConsumeFlowMappingValueIndicator($harvester, $couple)) {
             if ($this->isAtFlowMappingEntryBoundary($harvester)) {
-                $couple->setValue(new ValueNode());
+                $couple->addChild(new ValueNode());
             } else {
-                $couple->setValue($this->host->parseFlowContextValue($harvester));
+                $couple->addChild($this->host->parseFlowContextValue($harvester));
             }
         }
 

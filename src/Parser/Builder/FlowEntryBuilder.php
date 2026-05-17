@@ -96,16 +96,16 @@ final class FlowEntryBuilder implements BuilderInterface
         $couple = new KeyValueCoupleNode();
         $keyNode = new KeyNode();
         $this->promoteOperandToKey($operand, $keyNode);
-        $couple->setKey($keyNode);
+        $couple->addChild($keyNode);
 
         if (!$this->host->tryConsumeFlowMappingValueIndicator($harvester, $couple)) {
             throw new UnexpectedStateException('Expected VALUE_INDICATOR after flow complex key');
         }
 
         if ($this->isAtFlowSequenceEntryBoundary($harvester)) {
-            $couple->setValue(new ValueNode());
+            $couple->addChild(new ValueNode());
         } else {
-            $couple->setValue($this->host->parseFlowContextValue($harvester));
+            $couple->addChild($this->host->parseFlowContextValue($harvester));
         }
 
         $this->host->postProcessKeyValueCouple($harvester, $couple);
@@ -157,14 +157,14 @@ final class FlowEntryBuilder implements BuilderInterface
     private function parseLegacyFlowPair(Harvester $harvester): BuilderResultInterface
     {
         $couple = new KeyValueCoupleNode();
-        $couple->setKey($this->host->getFlowEntryKeyNode($harvester));
+        $couple->addChild($this->host->getFlowEntryKeyNode($harvester));
 
         $this->host->tryConsumeFlowMappingValueIndicator($harvester, $couple);
 
         if ($this->isAtFlowSequenceEntryBoundary($harvester)) {
-            $couple->setValue(new ValueNode());
+            $couple->addChild(new ValueNode());
         } else {
-            $couple->setValue($this->host->parseFlowContextValue($harvester));
+            $couple->addChild($this->host->parseFlowContextValue($harvester));
         }
 
         $this->host->postProcessKeyValueCouple($harvester, $couple);

@@ -30,16 +30,16 @@ class KeyValueCoupleNode extends AbstractNode
                 throw new UnexpectedStateException('Attempt to set merge instruction twice');
             }
             $this->mergeInstruction = $child;
-        // } elseif ($child instanceof KeyNode) {
-        //     if (null !== $this->key) {
-        //         throw new UnexpectedStateException('Attempt to set key twice');
-        //     }
-        //     $this->key = $child;
-        // } elseif ($child instanceof ValueNode) {
-        //     if (null !== $this->value) {
-        //         throw new UnexpectedStateException('Attempt to set value twice');
-        //     }
-        //     $this->value = $child;
+        } elseif ($child instanceof KeyNode) {
+            if (null !== $this->key) {
+                throw new UnexpectedStateException('Attempt to set key twice');
+            }
+            $this->key = $child;
+        } elseif ($child instanceof ValueNode) {
+            if (null !== $this->value) {
+                throw new UnexpectedStateException('Attempt to set value twice');
+            }
+            $this->value = $child;
         } elseif ($child instanceof ValueIndicatorNode) {
             if (null !== $this->valueIndicator) {
                 throw new UnexpectedStateException('Attempt to set merge instruction twice');
@@ -72,12 +72,6 @@ class KeyValueCoupleNode extends AbstractNode
         return $this->key;
     }
 
-    public function setKey(KeyNode $node): void
-    {
-        $this->key = $node;
-        $this->addChild($node);
-    }
-
     public function getMergeInstruction(): ?MergeInstructionNode
     {
         return $this->mergeInstruction;
@@ -86,12 +80,6 @@ class KeyValueCoupleNode extends AbstractNode
     public function getValue(): ?ValueNode
     {
         return $this->value;
-    }
-
-    public function setValue(ValueNode $node): void
-    {
-        $this->value = $node;
-        $this->addChild($node);
     }
 
     public function getValueIndicator(): ?ValueIndicatorNode

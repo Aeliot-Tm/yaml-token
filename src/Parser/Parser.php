@@ -2147,7 +2147,7 @@ final class Parser
             $harvester->tokens->advance();
         }
 
-        $keyValueCouple->setKey($this->getKeyNode($harvester, true, $entryIndentLen));
+        $keyValueCouple->addChild($this->getKeyNode($harvester, true, $entryIndentLen));
 
         // YAML 1.2.2 explicit block mapping entry may put ':' on the next line:
         //   ? key
@@ -2196,7 +2196,7 @@ final class Parser
         }
 
         $this->collectTypes($harvester, [TokenType::VALUE_INDICATOR, TokenType::WHITESPACE], $keyValueCouple);
-        $keyValueCouple->setValue($this->parseValue($harvester, $indentLen));
+        $keyValueCouple->addChild($this->parseValue($harvester, $indentLen));
         $this->postProcessKeyValueCouple($harvester, $keyValueCouple);
     }
 
