@@ -203,7 +203,6 @@ def import_one(
     content_by_hash[source_hash] = dest_extra
     return ImportResult(source=source, dest=dest_extra, bucket="go_yaml_extra", yamllint_ok=False, created=True)
 
-
 def main() -> int:
     ap = argparse.ArgumentParser(
         description=(
