@@ -111,6 +111,25 @@ final class Parser
         return $this->parseStream((new Lexer())->tokenize($input));
     }
 
+    public function parseStream(TokenStream $tokens): StreamNode
+    {
+        $harvester = new Harvester(new TokenStreamProxy($tokens));
+        $harvester->flowHost = $this->createFlowHost();
+        $harvester->registry = new ParseRegistry();
+        $harvester->state = new ParseState();
+        $harvester->stream = $stream = new StreamNode();
+
+        $token = $harvester->tokens->current();
+        if (null !== $token && TokenType::BYTE_ORDER_MARK === $token->type) {
+            $harvester->stream->addChild(new ByteOrderNode($token));
+            $harvester->tokens->advance();
+        }
+
+        $this->parseDocuments($harvester, $stream);
+
+        return $stream;
+    }
+
     /**
      * Appends NEWLINE / INDENTATION / scalar chunks for multiline plain scalars and for | / > block bodies.
      *
@@ -2369,25 +2388,6 @@ final class Parser
         }
 
         return $this->parseValue($harvester, $parentIndentLen);
-    }
-
-    private function parseStream(TokenStream $tokens): StreamNode
-    {
-        $harvester = new Harvester(new TokenStreamProxy($tokens));
-        $harvester->flowHost = $this->createFlowHost();
-        $harvester->registry = new ParseRegistry();
-        $harvester->state = new ParseState();
-        $harvester->stream = $stream = new StreamNode();
-
-        $token = $harvester->tokens->current();
-        if (null !== $token && TokenType::BYTE_ORDER_MARK === $token->type) {
-            $harvester->stream->addChild(new ByteOrderNode($token));
-            $harvester->tokens->advance();
-        }
-
-        $this->parseDocuments($harvester, $stream);
-
-        return $stream;
     }
 
     private function parseTagDirective(Harvester $harvester): TagDirectiveNode
