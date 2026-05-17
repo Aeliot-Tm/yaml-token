@@ -18,6 +18,7 @@ use Aeliot\YamlToken\Node\BlockMappingNode;
 use Aeliot\YamlToken\Node\BlockSequenceNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
+use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\SequenceEntryNode;
 use Aeliot\YamlToken\Node\StreamNode;
@@ -66,6 +67,7 @@ YAML);
         $seq = $levelBValue->getPayload();
         self::assertInstanceOf(BlockSequenceNode::class, $seq);
 
+        /** @var SequenceEntryNode[] $entries */
         $entries = array_values(array_filter(
             $seq->getChildren(),
             static fn ($n): bool => $n instanceof SequenceEntryNode,
@@ -125,7 +127,7 @@ YAML);
     /**
      * @return KeyValueCoupleNode[]
      */
-    private function getKeyValueCouples(object $node): array
+    private function getKeyValueCouples(Node $node): array
     {
         $children = $node->getChildren();
 

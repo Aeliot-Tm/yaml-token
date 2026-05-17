@@ -80,12 +80,14 @@ final class ComplexMappingKeysTest extends TestCase
         $rootValue = $rootCouple->getValue();
         self::assertNotNull($rootValue);
 
+        /** @var FlowMappingNode[] $flowMappings */
         $flowMappings = array_values(array_filter(
             $rootValue->getChildren(),
             static fn ($n): bool => $n instanceof FlowMappingNode,
         ));
         self::assertCount(1, $flowMappings);
 
+        /** @var KeyValueCoupleNode[] $couples */
         $couples = array_values(array_filter(
             $flowMappings[0]->getChildren(),
             static fn ($n): bool => $n instanceof KeyValueCoupleNode,
@@ -99,6 +101,7 @@ final class ComplexMappingKeysTest extends TestCase
 
     private function getOnlyDocumentCouple(StreamNode $stream): KeyValueCoupleNode
     {
+        /** @var DocumentNode[] $documents */
         $documents = array_values(array_filter(
             $stream->getChildren(),
             static fn ($n): bool => $n instanceof DocumentNode,

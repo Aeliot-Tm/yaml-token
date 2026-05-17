@@ -83,6 +83,8 @@ YAML);
         $directive = $first->getChildren()[0];
         self::assertInstanceOf(YamlDirectiveNode::class, $directive);
         self::assertSame('%YAML', $directive->getIndicatorNode()->getToken()->text);
+
+        /** @var YamlDirectiveVersionNode[] $versionNodes */
         $versionNodes = array_values(array_filter(
             $directive->getChildren(),
             static fn ($n): bool => $n instanceof YamlDirectiveVersionNode,
@@ -106,6 +108,8 @@ YAML);
         self::assertInstanceOf(YamlDirectiveNode::class, $children[0]);
         $directive = $children[0];
         self::assertSame('%YAML', $directive->getIndicatorNode()->getToken()->text);
+
+        /** @var YamlDirectiveVersionNode[] $versionNodes */
         $versionNodes = array_values(array_filter(
             $directive->getChildren(),
             static fn ($n): bool => $n instanceof YamlDirectiveVersionNode,
@@ -118,11 +122,13 @@ YAML);
         self::assertNotEmpty($secondChildren);
         self::assertInstanceOf(DocumentStartNode::class, $secondChildren[0]);
 
+        /** @var KeyValueCoupleNode[] $couples */
         $couples = array_values(array_filter(
             $secondChildren,
             static fn ($n): bool => $n instanceof KeyValueCoupleNode,
         ));
         self::assertCount(1, $couples);
+
         $name = $couples[0]->getKey()->getName();
         self::assertInstanceOf(ScalarNode::class, $name);
         self::assertSame('key', $name->getToken()->text);

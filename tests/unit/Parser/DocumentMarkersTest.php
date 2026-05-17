@@ -47,6 +47,8 @@ final class DocumentMarkersTest extends TestCase
         self::assertNotFalse($yaml);
 
         $stream = (new Parser())->parse($yaml);
+
+        /** @var DocumentNode[] $documents */
         $documents = array_values(array_filter(
             $stream->getChildren(),
             static fn ($n): bool => $n instanceof DocumentNode,

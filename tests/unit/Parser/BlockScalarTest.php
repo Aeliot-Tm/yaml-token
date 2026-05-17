@@ -70,6 +70,7 @@ final class BlockScalarTest extends TestCase
 
     private function getOnlyCouple(StreamNode $stream): KeyValueCoupleNode
     {
+        /** @var DocumentNode[] $documents */
         $documents = array_values(array_filter(
             $stream->getChildren(),
             static fn ($n): bool => $n instanceof DocumentNode,

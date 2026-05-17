@@ -18,6 +18,7 @@ use Aeliot\YamlToken\Lexer\Lexer;
 use Aeliot\YamlToken\Node\BlockMappingNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
+use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\TagNode;
@@ -125,13 +126,13 @@ YAML);
     }
 
     /**
-     * @template T of object
+     * @template T of Node
      *
      * @param class-string<T> $class
      *
      * @return T|null
      */
-    private function getFirstChildOfType(ValueNode $value, string $class): ?object
+    private function getFirstChildOfType(ValueNode $value, string $class): ?Node
     {
         foreach ($value->getChildren() as $child) {
             if ($child instanceof $class) {

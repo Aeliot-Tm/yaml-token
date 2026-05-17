@@ -60,6 +60,7 @@ final class FlowCollectionsTest extends TestCase
         $value = $couple->getValue();
         self::assertNotNull($value);
 
+        /** @var FlowMappingNode[] $flows */
         $flows = array_values(array_filter(
             $value->getChildren(),
             static fn ($n): bool => $n instanceof FlowMappingNode,
@@ -94,15 +95,16 @@ YAML);
         $value = $couple->getValue();
         self::assertNotNull($value);
 
+        /** @var FlowMappingNode[] $flows */
         $flows = array_values(array_filter(
             $value->getChildren(),
             static fn ($n): bool => $n instanceof FlowMappingNode,
         ));
         self::assertCount(1, $flows);
 
-        $flowMapping = $flows[0];
+        /** @var KeyValueCoupleNode[] $flowCouples */
         $flowCouples = array_values(array_filter(
-            $flowMapping->getChildren(),
+            $flows[0]->getChildren(),
             static fn ($n): bool => $n instanceof KeyValueCoupleNode,
         ));
 
@@ -122,12 +124,14 @@ YAML);
         $value = $couple->getValue();
         self::assertNotNull($value);
 
+        /** @var FlowMappingNode[] $flows */
         $flows = array_values(array_filter(
             $value->getChildren(),
             static fn ($n): bool => $n instanceof FlowMappingNode,
         ));
         self::assertCount(1, $flows);
 
+        /** @var KeyValueCoupleNode[] $flowCouples */
         $flowCouples = array_values(array_filter(
             $flows[0]->getChildren(),
             static fn ($n): bool => $n instanceof KeyValueCoupleNode,
@@ -148,6 +152,7 @@ YAML);
         $value = $couple->getValue();
         self::assertNotNull($value);
 
+        /** @var FlowSequenceNode[] $flows */
         $flows = array_values(array_filter(
             $value->getChildren(),
             static fn ($n): bool => $n instanceof FlowSequenceNode,
@@ -264,6 +269,7 @@ YAML;
 
     private function getOnlyTopLevelFlowSequence(StreamNode $stream): FlowSequenceNode
     {
+        /** @var DocumentNode[] $documents */
         $documents = array_values(array_filter(
             $stream->getChildren(),
             static fn ($n): bool => $n instanceof DocumentNode,
@@ -292,12 +298,14 @@ YAML;
 
     private function getOnlyCouple(StreamNode $stream): KeyValueCoupleNode
     {
+        /** @var DocumentNode[] $documents */
         $documents = array_values(array_filter(
             $stream->getChildren(),
             static fn ($n): bool => $n instanceof DocumentNode,
         ));
         self::assertCount(1, $documents);
 
+        /** @var KeyValueCoupleNode[] $couples */
         $couples = array_values(array_filter(
             $documents[0]->getChildren(),
             static fn ($n): bool => $n instanceof KeyValueCoupleNode,

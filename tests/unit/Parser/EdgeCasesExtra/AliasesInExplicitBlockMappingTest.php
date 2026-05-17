@@ -61,11 +61,12 @@ final class AliasesInExplicitBlockMappingTest extends TestCase
 
         $value = $emptyKeyCouple->getValue();
         self::assertNotNull($value);
+
+        /* @var list<AliasNode> $aliases */
         $aliases = array_values(array_filter(
             $value->getChildren(),
             static fn ($n): bool => $n instanceof AliasNode,
         ));
-        /* @var list<AliasNode> $aliases */
         self::assertCount(1, $aliases);
         self::assertSame('a', $aliases[0]->getName());
         self::assertSame($declaredAnchor, $aliases[0]->getAnchor());

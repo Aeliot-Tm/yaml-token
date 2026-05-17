@@ -58,6 +58,7 @@ YAML);
 
         $bValue = $b->getValue();
         self::assertNotNull($bValue);
+        /** @var AliasNode[] $aliases */
         $aliases = array_values(array_filter(
             $bValue->getChildren(),
             static fn ($n): bool => $n instanceof AliasNode,

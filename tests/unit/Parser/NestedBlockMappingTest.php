@@ -17,6 +17,7 @@ use Aeliot\YamlToken\Lexer\Lexer;
 use Aeliot\YamlToken\Node\BlockMappingNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
+use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\ValueNode;
@@ -214,7 +215,7 @@ YAML);
     /**
      * @return KeyValueCoupleNode[]
      */
-    private function getKeyValueCouples(object $node): array
+    private function getKeyValueCouples(Node $node): array
     {
         $children = $node->getChildren();
 
