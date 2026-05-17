@@ -12,6 +12,7 @@ Download descriptions from files IF you need to understand the work:
 2. Features:
    - [Lexer](../docs/Feature/Lexer.md)
    - [Parser](../docs/Feature/Parser.md)
+   - [Parser Refactoring: Migration Plan](../docs/Feature/ParserRefactoring-MigrationPlan.md)
    - [Showing of problematic position](../docs/Feature/ShowingProblematicPosition.md)
    - [Specification Cover Fixtures Structure](../docs/Feature/SpecificationCoverFixtures.md)
 
