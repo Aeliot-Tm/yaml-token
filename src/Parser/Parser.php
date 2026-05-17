@@ -2445,6 +2445,19 @@ final class Parser
         if (null === $token) {
             return;
         }
+        // YAML 1.2.2 §7.2 e-node / §7.4: flow content may omit the scalar entirely right after
+        // tag/anchor (c-ns-properties); ',' / '}' / ']' ends the empty node immediately.
+        if (
+            self::FLOW_COLLECTION_VALUE_PARENT_INDENT === $parentIndentLen
+            && \in_array($token->type, [
+                TokenType::FLOW_ENTRY,
+                TokenType::FLOW_MAPPING_END,
+                TokenType::FLOW_SEQUENCE_END,
+            ], true)
+        ) {
+            return;
+        }
+
         if (\in_array($token->type, TokenType::BLOCK_SCALAR_INDICATORS, true)) {
             $valueNode->addChild(new BlockScalarIndicatorNode($token));
             $harvester->tokens->advance();
