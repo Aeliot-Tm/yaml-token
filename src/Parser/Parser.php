@@ -61,13 +61,12 @@ use Aeliot\YamlToken\Parser\Dto\ParseState;
 use Aeliot\YamlToken\Parser\Dto\TokenStreamProxy;
 use Aeliot\YamlToken\Parser\Exception\AnchorUndefinedException;
 use Aeliot\YamlToken\Parser\Exception\IndentationInvalidException;
-use Aeliot\YamlToken\Parser\Exception\IndentationOverrideException;
-use Aeliot\YamlToken\Parser\Exception\IndentationUndefinedException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedEndException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Flow\FlowHost;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
+use Aeliot\YamlToken\Parser\Helper\IndentationHelper;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
 use Aeliot\YamlToken\Token\Token;
 use Aeliot\YamlToken\Token\TokenStream;
@@ -91,11 +90,14 @@ final class Parser
 
     private ErrorHelper $errorHelper;
 
+    private IndentationHelper $indentationHelper;
+
     private NodeFactory $nodeFactory;
 
     public function __construct()
     {
         $this->errorHelper = new ErrorHelper();
+        $this->indentationHelper = new IndentationHelper($this->errorHelper);
         $this->nodeFactory = new NodeFactory();
         $this->consumer = new Consumer($this->nodeFactory);
     }
@@ -261,11 +263,7 @@ final class Parser
 
     private function assertIndentLenIsValid(Harvester $harvester, int $indentLen): void
     {
-        try {
-            $harvester->state->assertIndentLenIsValid($indentLen);
-        } catch (IndentationInvalidException|IndentationUndefinedException $e) {
-            $this->wrapParseStateIndentationException($e, $harvester->tokens);
-        }
+        $this->indentationHelper->assertIndentLenIsValid($harvester->state, $harvester->tokens, $indentLen);
     }
 
     /**
@@ -2698,15 +2696,7 @@ final class Parser
 
     private function registerIndentStepIfNeeded(Harvester $harvester, int $indentLen): void
     {
-        if ($harvester->state->isIndentLenRegistered()) {
-            return;
-        }
-
-        try {
-            $harvester->state->registerIndentStepLen($indentLen);
-        } catch (IndentationInvalidException|IndentationOverrideException $e) {
-            $this->wrapParseStateIndentationException($e, $harvester->tokens);
-        }
+        $this->indentationHelper->registerIndentStepIfNeeded($harvester->state, $harvester->tokens, $indentLen);
     }
 
     private function runFlowMappingDriver(Harvester $harvester): FlowMappingNode
@@ -2915,10 +2905,5 @@ final class Parser
         $this->consumer->collectTypes($harvester->tokens, [TokenType::WHITESPACE], $couple);
 
         return true;
-    }
-
-    private function wrapParseStateIndentationException(\Exception $previous, TokenStreamProxy $tokens): never
-    {
-        $this->errorHelper->wrapParseStateIndentationException($previous, $tokens);
     }
 }
