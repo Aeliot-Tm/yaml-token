@@ -68,6 +68,7 @@ use Aeliot\YamlToken\Parser\Flow\FlowHost;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
 use Aeliot\YamlToken\Parser\Helper\IndentationHelper;
 use Aeliot\YamlToken\Parser\Helper\LookAheadHelper;
+use Aeliot\YamlToken\Parser\Helper\MultilineContinuationHelper;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
 use Aeliot\YamlToken\Token\Token;
 use Aeliot\YamlToken\Token\TokenStream;
@@ -95,12 +96,15 @@ final class Parser
 
     private LookAheadHelper $lookAheadHelper;
 
+    private MultilineContinuationHelper $multilineContinuationHelper;
+
     private NodeFactory $nodeFactory;
 
     public function __construct()
     {
         $this->errorHelper = new ErrorHelper();
         $this->indentationHelper = new IndentationHelper($this->errorHelper);
+        $this->multilineContinuationHelper = new MultilineContinuationHelper();
         $this->nodeFactory = new NodeFactory();
         $this->consumer = new Consumer($this->nodeFactory);
         $this->lookAheadHelper = new LookAheadHelper($this->consumer);
@@ -1029,16 +1033,7 @@ final class Parser
      */
     private function isBareDocumentFlushMultilinePlainContinuationAt(Harvester $harvester, int $scalarPeekOffset): bool
     {
-        $offset = $scalarPeekOffset;
-        while (TokenType::WHITESPACE === $harvester->tokens->peek($offset)?->type) {
-            ++$offset;
-        }
-        $scalarToken = $harvester->tokens->peek($offset);
-        if (!$scalarToken?->type->isScalar()) {
-            return false;
-        }
-
-        return !$this->isImplicitYamlKeyOnContinuationLine($harvester, $offset);
+        return $this->multilineContinuationHelper->isBareDocumentFlushMultilinePlainContinuationAt($harvester->tokens, $scalarPeekOffset);
     }
 
     private function isBlockScalarStartAtDocumentRoot(Harvester $harvester): bool
@@ -1183,19 +1178,7 @@ final class Parser
      */
     private function isImplicitYamlKeyOnContinuationLine(Harvester $harvester, int $scalarPeekOffset): bool
     {
-        $offset = $scalarPeekOffset + 1;
-        while (true) {
-            $peeked = $harvester->tokens->peek($offset);
-            if (null === $peeked || TokenType::NEWLINE === $peeked->type) {
-                return false;
-            }
-            if (TokenType::WHITESPACE === $peeked->type) {
-                ++$offset;
-                continue;
-            }
-
-            return TokenType::VALUE_INDICATOR === $peeked->type;
-        }
+        return $this->multilineContinuationHelper->isImplicitYamlKeyOnContinuationLine($harvester->tokens, $scalarPeekOffset);
     }
 
     /**
@@ -1207,29 +1190,7 @@ final class Parser
      */
     private function isIndentedMultilinePlainContinuationAt(Harvester $harvester, int $indentPeekOffset, int $parentIndentLen): bool
     {
-        $indentation = $harvester->tokens->peek($indentPeekOffset);
-        if (TokenType::INDENTATION !== $indentation?->type) {
-            return false;
-        }
-        if (\strlen($indentation->text) <= $parentIndentLen) {
-            return false;
-        }
-
-        $scalarOffset = $indentPeekOffset + 1;
-        while (TokenType::WHITESPACE === $harvester->tokens->peek($scalarOffset)?->type) {
-            ++$scalarOffset;
-        }
-        $scalarToken = $harvester->tokens->peek($scalarOffset);
-        if (!$scalarToken?->type->isScalar()) {
-            return false;
-        }
-
-        $keyProbe = $scalarOffset + 1;
-        while (TokenType::WHITESPACE === $harvester->tokens->peek($keyProbe)?->type) {
-            ++$keyProbe;
-        }
-
-        return TokenType::VALUE_INDICATOR !== $harvester->tokens->peek($keyProbe)?->type;
+        return $this->multilineContinuationHelper->isIndentedMultilinePlainContinuationAt($harvester->tokens, $indentPeekOffset, $parentIndentLen);
     }
 
     /**
@@ -1286,46 +1247,7 @@ final class Parser
      */
     private function isMultilinePlainContinuationAhead(Harvester $harvester, int $peekOffset, int $parentIndentLen): bool
     {
-        $offset = $peekOffset;
-        if (TokenType::WHITESPACE === $harvester->tokens->peek($offset)?->type) {
-            if (TokenType::NEWLINE !== $harvester->tokens->peek($offset + 1)?->type) {
-                return false;
-            }
-            ++$offset;
-        }
-
-        if (TokenType::NEWLINE !== $harvester->tokens->peek($offset)?->type) {
-            return false;
-        }
-
-        if (TokenType::NEWLINE === $harvester->tokens->peek($offset + 1)?->type) {
-            return $this->isIndentedMultilinePlainContinuationAt($harvester, $offset + 2, $parentIndentLen)
-                || (
-                    self::BARE_DOCUMENT_BLOCK_PARENT_INDENT === $parentIndentLen
-                    && $this->isBareDocumentFlushMultilinePlainContinuationAt($harvester, $offset + 2)
-                );
-        }
-
-        $maybeIndent = $harvester->tokens->peek($offset + 1);
-        if (TokenType::INDENTATION === $maybeIndent?->type && \strlen($maybeIndent->text) > $parentIndentLen) {
-            $afterIndentOffset = $offset + 2;
-            while (TokenType::WHITESPACE === $harvester->tokens->peek($afterIndentOffset)?->type) {
-                ++$afterIndentOffset;
-            }
-            if (TokenType::NEWLINE === $harvester->tokens->peek($afterIndentOffset)?->type) {
-                return $this->isIndentedMultilinePlainContinuationAt($harvester, $afterIndentOffset + 1, $parentIndentLen)
-                    || (
-                        self::BARE_DOCUMENT_BLOCK_PARENT_INDENT === $parentIndentLen
-                        && $this->isBareDocumentFlushMultilinePlainContinuationAt($harvester, $afterIndentOffset + 1)
-                    );
-            }
-        }
-
-        return $this->isIndentedMultilinePlainContinuationAt($harvester, $offset + 1, $parentIndentLen)
-            || (
-                self::BARE_DOCUMENT_BLOCK_PARENT_INDENT === $parentIndentLen
-                && $this->isBareDocumentFlushMultilinePlainContinuationAt($harvester, $offset + 1)
-            );
+        return $this->multilineContinuationHelper->isMultilinePlainContinuationAhead($harvester->tokens, $peekOffset, $parentIndentLen);
     }
 
     /**
