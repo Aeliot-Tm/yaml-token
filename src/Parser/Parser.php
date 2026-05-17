@@ -857,7 +857,6 @@ final class Parser
             if (TokenType::WHITESPACE === $token->type) {
                 $keyNode->addChild(new WhitespaceNode($token));
                 $harvester->tokens->advance();
-                $token = $harvester->tokens->current();
             }
 
             // YAML 1.2.2 §8.2.2 c-l-block-map-explicit-key(n) uses
