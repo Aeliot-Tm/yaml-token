@@ -18,7 +18,6 @@ use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\MergeInstructionNode;
 use Aeliot\YamlToken\Node\Node;
-use Aeliot\YamlToken\Node\SyntaxTokenNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Parser\Dto\Harvester;
 use Aeliot\YamlToken\Token\Token;
@@ -30,7 +29,6 @@ final class FlowHost
 {
     /**
      * @param \Closure(Harvester, Node): void $collectSpaceAndComments
-     * @param \Closure(Token): SyntaxTokenNode $createSyntaxTokenNode
      * @param \Closure(Harvester): KeyNode $getFlowEntryKeyNode
      * @param \Closure(Harvester): bool $isScalarFollowedByValueIndicatorInFlow
      * @param \Closure(Harvester): ValueNode $parseFlowContextValue
@@ -42,7 +40,6 @@ final class FlowHost
     public function __construct(
         private readonly \Closure $collectSpaceAndComments,
         private readonly \Closure $createSimpleNode,
-        private readonly \Closure $createSyntaxTokenNode,
         private readonly \Closure $getFlowEntryKeyNode,
         private readonly \Closure $isFlowMultilinePlainKeyStart,
         private readonly \Closure $isScalarFollowedByValueIndicatorInFlow,
@@ -62,11 +59,6 @@ final class FlowHost
     public function createSimpleNode(Token $token): Node
     {
         return ($this->createSimpleNode)($token);
-    }
-
-    public function createSyntaxTokenNode(Token $token): SyntaxTokenNode
-    {
-        return ($this->createSyntaxTokenNode)($token);
     }
 
     public function getFlowEntryKeyNode(Harvester $harvester): KeyNode

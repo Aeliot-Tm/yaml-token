@@ -54,7 +54,6 @@ use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\SequenceEntryNode;
 use Aeliot\YamlToken\Node\SingleQuotedScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
-use Aeliot\YamlToken\Node\SyntaxTokenNode;
 use Aeliot\YamlToken\Node\TagDirectiveHandleNode;
 use Aeliot\YamlToken\Node\TagDirectiveIndicatorNode;
 use Aeliot\YamlToken\Node\TagDirectiveNode;
@@ -816,7 +815,6 @@ final class Parser
                 $this->collectSpaceAndComments($h, $root);
             },
             fn (Token $t): Node => $this->createSimpleNode($t),
-            fn (Token $t): SyntaxTokenNode => $this->createSyntaxTokenNode($t),
             fn (Harvester $h): KeyNode => $this->getKeyNode($h),
             fn (Harvester $h): bool => $this->isFlowMultilinePlainKeyStart($h),
             fn (Harvester $h): bool => $this->isScalarFollowedByValueIndicator($h, true),
@@ -868,11 +866,6 @@ final class Parser
             TokenType::WHITESPACE => new WhitespaceNode($token),
             default => throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Not configured node for token type: %s', $token->type->value), $token)),
         };
-    }
-
-    private function createSyntaxTokenNode(Token $token): SyntaxTokenNode
-    {
-        return new SyntaxTokenNode($token);
     }
 
     private function getKeyNode(Harvester $harvester, ?int $entryIndentLen = null): KeyNode
