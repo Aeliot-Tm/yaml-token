@@ -14,17 +14,17 @@ declare(strict_types=1);
 namespace Aeliot\YamlToken\Test\Unit\Parser;
 
 use Aeliot\YamlToken\Emitter\YamlEmitter;
-use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Lexer\Lexer;
 use Aeliot\YamlToken\Node\BlockSequenceEntryNode;
 use Aeliot\YamlToken\Node\DocumentNode;
+use Aeliot\YamlToken\Node\FlowEntryNode;
 use Aeliot\YamlToken\Node\FlowMappingNode;
+use Aeliot\YamlToken\Node\FlowSequenceEndNode;
 use Aeliot\YamlToken\Node\FlowSequenceNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Node\PlainScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
-use Aeliot\YamlToken\Node\SyntaxTokenNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 use Aeliot\YamlToken\Parser\Parser;
@@ -34,14 +34,15 @@ use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Parser::class)]
 #[UsesClass(DocumentNode::class)]
+#[UsesClass(FlowEntryNode::class)]
 #[UsesClass(FlowMappingNode::class)]
 #[UsesClass(FlowSequenceNode::class)]
+#[UsesClass(FlowSequenceEndNode::class)]
 #[UsesClass(KeyValueCoupleNode::class)]
 #[UsesClass(Lexer::class)]
 #[UsesClass(PlainScalarNode::class)]
 #[UsesClass(BlockSequenceEntryNode::class)]
 #[UsesClass(StreamNode::class)]
-#[UsesClass(SyntaxTokenNode::class)]
 #[UsesClass(ValueNode::class)]
 #[UsesClass(WhitespaceNode::class)]
 #[UsesClass(YamlEmitter::class)]
@@ -206,7 +207,7 @@ YAML;
         $children = $flowSequence->getChildren();
         $commaIndex = null;
         foreach ($children as $index => $child) {
-            if ($child instanceof SyntaxTokenNode && TokenType::FLOW_ENTRY === $child->getToken()->type) {
+            if ($child instanceof FlowEntryNode) {
                 $commaIndex = $index;
                 break;
             }
@@ -248,7 +249,7 @@ YAML;
         $children = $flowSequence->getChildren();
         $endIndex = null;
         foreach ($children as $index => $child) {
-            if ($child instanceof SyntaxTokenNode && TokenType::FLOW_SEQUENCE_END === $child->getToken()->type) {
+            if ($child instanceof FlowSequenceEndNode) {
                 $endIndex = $index;
                 break;
             }
