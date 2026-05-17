@@ -15,9 +15,9 @@ namespace Aeliot\YamlToken\Node;
 
 class TagDirectiveNode extends AbstractNode
 {
-    private TagDirectiveHandleNode $handleNode;
-    private TagDirectiveIndicatorNode $indicatorNode;
-    private TagDirectivePrefixNode $prefixNode;
+    private ?TagDirectiveHandleNode $handleNode = null;
+    private ?TagDirectiveIndicatorNode $indicatorNode = null;
+    private ?TagDirectivePrefixNode $prefixNode = null;
 
     public function addChild(Node $child): void
     {
@@ -34,17 +34,17 @@ class TagDirectiveNode extends AbstractNode
         parent::addChild($child);
     }
 
-    public function getHandle(): string
+    public function getHandle(): ?string
     {
-        return $this->handleNode->getHandle();
+        return $this->handleNode?->getHandle();
     }
 
-    public function getHandleNode(): TagDirectiveHandleNode
+    public function getHandleNode(): ?TagDirectiveHandleNode
     {
         return $this->handleNode;
     }
 
-    public function getIndicatorNode(): TagDirectiveIndicatorNode
+    public function getIndicatorNode(): ?TagDirectiveIndicatorNode
     {
         return $this->indicatorNode;
     }
@@ -54,8 +54,21 @@ class TagDirectiveNode extends AbstractNode
         return $this->prefixNode->getPrefix();
     }
 
-    public function getPrefixNode(): TagDirectivePrefixNode
+    public function getPrefixNode(): ?TagDirectivePrefixNode
     {
         return $this->prefixNode;
+    }
+
+    public function removeChild(Node $child): void
+    {
+        if ($this->handleNode === $child) {
+            $this->handleNode = null;
+        } elseif ($this->indicatorNode === $child) {
+            $this->indicatorNode = null;
+        } elseif ($this->prefixNode === $child) {
+            $this->prefixNode = null;
+        }
+
+        parent::removeChild($child);
     }
 }

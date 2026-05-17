@@ -44,4 +44,15 @@ class NodePropertiesNode extends AbstractNode
         $this->tag = $node;
         $this->addChild($node);
     }
+
+    public function removeChild(Node $child): void
+    {
+        if ($this->anchor === $child) {
+            $this->anchor = null;
+        } elseif ($this->tag === $child) {
+            $this->tag = null;
+        }
+
+        parent::removeChild($child);
+    }
 }

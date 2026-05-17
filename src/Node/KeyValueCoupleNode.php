@@ -16,7 +16,7 @@ namespace Aeliot\YamlToken\Node;
 class KeyValueCoupleNode extends AbstractNode
 {
     private ?IndentationNode $indentation = null;
-    private KeyNode $key;
+    private ?KeyNode $key = null;
     private ?MergeInstructionNode $mergeInstruction = null;
     private ?SyntaxTokenNode $mappingValueIndicator = null;
     private ?ValueNode $value = null;
@@ -32,7 +32,7 @@ class KeyValueCoupleNode extends AbstractNode
         $this->addChild($node);
     }
 
-    public function getKey(): KeyNode
+    public function getKey(): ?KeyNode
     {
         return $this->key;
     }
@@ -74,5 +74,22 @@ class KeyValueCoupleNode extends AbstractNode
     {
         $this->value = $node;
         $this->addChild($node);
+    }
+
+    public function removeChild(Node $child): void
+    {
+        if ($this->indentation === $child) {
+            $this->indentation = null;
+        } elseif ($this->key === $child) {
+            $this->key = null;
+        } elseif ($this->mappingValueIndicator === $child) {
+            $this->mappingValueIndicator = null;
+        } elseif ($this->mergeInstruction === $child) {
+            $this->mergeInstruction = null;
+        } elseif ($this->value === $child) {
+            $this->value = null;
+        }
+
+        parent::removeChild($child);
     }
 }

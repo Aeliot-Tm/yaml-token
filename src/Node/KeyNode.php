@@ -72,4 +72,17 @@ class KeyNode extends AbstractNode
     {
         return null === $this->name;
     }
+
+    public function removeChild(Node $child): void
+    {
+        if ($this->explicitKeyIndicatorNode === $child) {
+            $this->explicitKeyIndicatorNode = null;
+        } elseif ($this->name === $child) {
+            $this->name = null;
+        } elseif ($this->properties === $child) {
+            $this->properties = null;
+        }
+
+        parent::removeChild($child);
+    }
 }
