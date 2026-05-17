@@ -213,6 +213,7 @@ def main() -> int:
     )
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--limit", type=int, default=0, metavar="N", help="Import at most N files (after filters).")
+    ap.add_argument("--offset", type=int, default=0, metavar="N", help="Skip the first N sources (after offset).")
     ap.add_argument(
         "--from-path",
         default="",
@@ -229,6 +230,8 @@ def main() -> int:
         help="edge: exclude case dirs named spec-example-*; spec: only those case dirs.",
     )
     args = ap.parse_args()
+    if args.offset < 0:
+        ap.error("--offset must be non-negative")
 
     sources = _list_sources()
     if args.from_path:
@@ -240,6 +243,8 @@ def main() -> int:
     elif args.suite_filter == "spec":
         sources = [p for p in sources if _first_case_dir_name(p).startswith("spec-example-")]
 
+    if args.offset > 0:
+        sources = sources[args.offset :]
     if args.limit > 0:
         sources = sources[: args.limit]
 
