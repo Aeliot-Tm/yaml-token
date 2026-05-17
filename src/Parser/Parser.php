@@ -572,6 +572,82 @@ final class Parser
         }
     }
 
+    /**
+     * Consumes a block scalar (literal | or folded >) used as an explicit mapping key
+     * (YAML 1.2.2 §8.2.2 c-l-block-map-explicit-key). Tokens consumed:
+     * BLOCK_SCALAR_INDICATOR, optional sub-indicators (chomping/indentation), NEWLINE,
+     * optional leading empty lines, optional INDENTATION, and the scalar payload.
+     * The resulting scalar node is set as the {@see KeyNode::setName() name} of the key.
+     */
+    private function consumeBlockScalarKeyName(Harvester $harvester, KeyNode $keyNode): void
+    {
+        $token = $harvester->tokens->current();
+        $keyNode->addChild(new BlockScalarIndicatorNode($token));
+        $harvester->tokens->advance();
+
+        $this->collectUntil($harvester, TokenType::NEWLINE, $keyNode);
+
+        $token = $harvester->tokens->current();
+        if (null === $token || TokenType::NEWLINE !== $token->type) {
+            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Expected NEWLINE after block scalar indicator in key, got %s', $token?->type->value ?? '_nothing_'), $harvester->tokens));
+        }
+        $keyNode->addChild(new NewLineNode($token));
+        $harvester->tokens->advance();
+
+        while (TokenType::NEWLINE === $harvester->tokens->current()?->type) {
+            $keyNode->addChild(new NewLineNode($harvester->tokens->current()));
+            $harvester->tokens->advance();
+        }
+
+        if (TokenType::INDENTATION === $harvester->tokens->current()?->type) {
+            $keyNode->addChild(new IndentationNode($harvester->tokens->current()));
+            $harvester->tokens->advance();
+        }
+
+        $token = $harvester->tokens->current();
+        if (null === $token || !$token->type->isScalar()) {
+            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Expected scalar payload for block scalar key, got %s', $token?->type->value ?? '_nothing_'), $harvester->tokens));
+        }
+
+        $scalarNode = $this->createScalarNode($token);
+        $keyNode->setName($scalarNode);
+        $harvester->tokens->advance();
+
+        while (true) {
+            $newLineToken = $harvester->tokens->current();
+            if (TokenType::NEWLINE !== $newLineToken?->type) {
+                break;
+            }
+
+            $indentationToken = $harvester->tokens->peek(1);
+            if (TokenType::INDENTATION !== $indentationToken?->type) {
+                break;
+            }
+
+            $probe = 2;
+            while (TokenType::WHITESPACE === $harvester->tokens->peek($probe)?->type) {
+                ++$probe;
+            }
+
+            $afterIndentation = $harvester->tokens->peek($probe);
+            if (null !== $afterIndentation && TokenType::NEWLINE !== $afterIndentation->type) {
+                break;
+            }
+
+            $keyNode->addChild(new NewLineNode($newLineToken));
+            $harvester->tokens->advance();
+            $keyNode->addChild(new IndentationNode($indentationToken));
+            $harvester->tokens->advance();
+
+            $emptyLineSpace = $harvester->tokens->current();
+            while (TokenType::WHITESPACE === $emptyLineSpace?->type) {
+                $keyNode->addChild(new WhitespaceNode($emptyLineSpace));
+                $harvester->tokens->advance();
+                $emptyLineSpace = $harvester->tokens->current();
+            }
+        }
+    }
+
     private function consumeBlockValueOpeningLayout(Harvester $harvester, ValueNode $valueNode): void
     {
         $valueNode->addChild(new NewLineNode($harvester->tokens->current()));
@@ -988,6 +1064,16 @@ final class Parser
 
         // YAML 1.2.2 §7.2 empty nodes: implicit key may be anchor/tag-only with no scalar before ':'.
         if (TokenType::VALUE_INDICATOR === $token->type && null !== $keyNode->getProperties()) {
+            return $keyNode;
+        }
+
+        // YAML 1.2.2 §8.2.2 c-l-block-map-explicit-key(n): block scalar (| or >) used as mapping key.
+        if (
+            null !== $keyNode->getExplicitKeyIndicatorNode()
+            && \in_array($token->type, TokenType::BLOCK_SCALAR_INDICATORS, true)
+        ) {
+            $this->consumeBlockScalarKeyName($harvester, $keyNode);
+
             return $keyNode;
         }
 
