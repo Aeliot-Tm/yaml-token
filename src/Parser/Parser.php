@@ -1685,7 +1685,7 @@ final class Parser
             }
 
             $compactIndent = $indentLen + $this->consumeSequenceEntryIndicatorAndSpaces($harvester, $sequenceEntry);
-            $sequenceEntry->setValue($this->parseSequenceEntryValue($harvester, $indentLen, $compactIndent));
+            $sequenceEntry->addChild($this->parseSequenceEntryValue($harvester, $indentLen, $compactIndent));
         }
 
         if (null === $baseIndentLen) {
@@ -1753,7 +1753,7 @@ final class Parser
         $firstEntry = new SequenceEntryNode();
         $blockSequence->addChild($firstEntry);
         $firstCompactIndent = $indentLen + $this->consumeSequenceEntryIndicatorAndSpaces($harvester, $firstEntry);
-        $firstEntry->setValue($this->parseSequenceEntryValue($harvester, $indentLen, $firstCompactIndent));
+        $firstEntry->addChild($this->parseSequenceEntryValue($harvester, $indentLen, $firstCompactIndent));
 
         while (!$harvester->tokens->isEnd()) {
             $this->collectTypes($harvester, [
@@ -1780,7 +1780,7 @@ final class Parser
             $harvester->tokens->advance();
 
             $compactIndent = $indentLen + $this->consumeSequenceEntryIndicatorAndSpaces($harvester, $sequenceEntry);
-            $sequenceEntry->setValue($this->parseSequenceEntryValue($harvester, $indentLen, $compactIndent));
+            $sequenceEntry->addChild($this->parseSequenceEntryValue($harvester, $indentLen, $compactIndent));
         }
 
         return $blockSequence;
@@ -1900,7 +1900,7 @@ final class Parser
                 }
 
                 $compactIndent = $leadingIndent + $this->consumeSequenceEntryIndicatorAndSpaces($harvester, $sequenceEntry);
-                $sequenceEntry->setValue($this->parseSequenceEntryValue($harvester, $leadingIndent, $compactIndent));
+                $sequenceEntry->addChild($this->parseSequenceEntryValue($harvester, $leadingIndent, $compactIndent));
                 continue;
             }
 

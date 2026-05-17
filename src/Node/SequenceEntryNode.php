@@ -13,18 +13,27 @@ declare(strict_types=1);
 
 namespace Aeliot\YamlToken\Node;
 
+use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
+
 class SequenceEntryNode extends AbstractNode
 {
-    private ValueNode $value;
+    private ?ValueNode $value = null;
 
-    public function getValue(): ValueNode
+    public function addChild(Node $child): void
     {
-        return $this->value;
+        if ($child instanceof ValueNode) {
+            if (null !== $this->value) {
+                throw new UnexpectedStateException('Attempt to set a value name twice');
+            }
+
+            $this->value = $child;
+        }
+
+        parent::addChild($child);
     }
 
-    public function setValue(ValueNode $node): void
+    public function getValue(): ?ValueNode
     {
-        $this->value = $node;
-        $this->addChild($node);
+        return $this->value;
     }
 }
