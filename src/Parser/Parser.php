@@ -386,7 +386,7 @@ final class Parser
                     $properties->addChild($whitespace);
                 }
                 $whitespaceBuffer = [];
-                $properties->setAnchor(new AnchorNode($token));
+                $properties->addChild(new AnchorNode($token));
                 $harvester->tokens->advance();
                 continue;
             }
@@ -400,7 +400,7 @@ final class Parser
                     $properties->addChild($whitespace);
                 }
                 $whitespaceBuffer = [];
-                $properties->setTag(new TagNode($token));
+                $properties->addChild(new TagNode($token));
                 $harvester->tokens->advance();
                 continue;
             }
@@ -525,7 +525,7 @@ final class Parser
                     $properties->addChild($whitespace);
                 }
                 $whitespaceBuffer = [];
-                $properties->setAnchor(new AnchorNode($token));
+                $properties->addChild(new AnchorNode($token));
                 $harvester->tokens->advance();
                 continue;
             }
@@ -539,7 +539,7 @@ final class Parser
                     $properties->addChild($whitespace);
                 }
                 $whitespaceBuffer = [];
-                $properties->setTag(new TagNode($token));
+                $properties->addChild(new TagNode($token));
                 $harvester->tokens->advance();
                 continue;
             }

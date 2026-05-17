@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Aeliot\YamlToken\Node;
 
+use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
+
 /**
  * Node properties (c-ns-properties :96): an optional !tag and/or &anchor with
  * an optional s-separate between them. Groups the property tokens so that the
@@ -23,26 +25,31 @@ class NodePropertiesNode extends AbstractNode
     private ?AnchorNode $anchor = null;
     private ?TagNode $tag = null;
 
+    public function addChild(Node $child): void
+    {
+        if ($child instanceof AnchorNode) {
+            if (null !== $this->anchor) {
+                throw new UnexpectedStateException('Attempt to set anchor twice');
+            }
+            $this->anchor = $child;
+        } elseif ($child instanceof TagNode) {
+            if (null !== $this->tag) {
+                throw new UnexpectedStateException('Attempt to set tag twice');
+            }
+            $this->tag = $child;
+        }
+
+        parent::addChild($child);
+    }
+
     public function getAnchor(): ?AnchorNode
     {
         return $this->anchor;
     }
 
-    public function setAnchor(AnchorNode $node): void
-    {
-        $this->anchor = $node;
-        $this->addChild($node);
-    }
-
     public function getTag(): ?TagNode
     {
         return $this->tag;
-    }
-
-    public function setTag(TagNode $node): void
-    {
-        $this->tag = $node;
-        $this->addChild($node);
     }
 
     public function removeChild(Node $child): void
