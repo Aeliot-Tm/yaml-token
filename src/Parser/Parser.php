@@ -811,7 +811,7 @@ final class Parser
                 $this->collectSpaceAndComments($h, $root);
             },
             fn (Token $t): SyntaxTokenNode => $this->createSyntaxTokenNode($t),
-            fn (Harvester $h): KeyNode => $this->getKeyNode($h, true),
+            fn (Harvester $h): KeyNode => $this->getKeyNode($h),
             fn (Harvester $h): bool => $this->isFlowMultilinePlainKeyStart($h),
             fn (Harvester $h): bool => $this->isScalarFollowedByValueIndicator($h, true),
             fn (Harvester $h): ValueNode => $this->parseFlowContextValue($h),
@@ -864,7 +864,7 @@ final class Parser
         return new SyntaxTokenNode($token);
     }
 
-    private function getKeyNode(Harvester $harvester, bool $allowEmptyImplicitKey, ?int $entryIndentLen = null): KeyNode
+    private function getKeyNode(Harvester $harvester, ?int $entryIndentLen = null): KeyNode
     {
         $keyNode = new KeyNode();
         $this->collectKeyProperties($harvester, $keyNode);
@@ -933,10 +933,6 @@ final class Parser
         }
 
         if (TokenType::VALUE_INDICATOR === $token->type) {
-            if (!$allowEmptyImplicitKey && null === $keyNode->getExplicitKeyIndicatorNode()) {
-                throw new UnexpectedTokenException($this->appendTokenLocation('Empty implicit key is not allowed in this context', $token));
-            }
-
             return $keyNode;
         }
 
@@ -2167,7 +2163,7 @@ final class Parser
             $harvester->tokens->advance();
         }
 
-        $keyValueCouple->addChild($this->getKeyNode($harvester, true, $entryIndentLen));
+        $keyValueCouple->addChild($this->getKeyNode($harvester, $entryIndentLen));
 
         // YAML 1.2.2 explicit block mapping entry may put ':' on the next line:
         //   ? key
