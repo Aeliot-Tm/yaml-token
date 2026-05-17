@@ -3,10 +3,10 @@
 declare(strict_types=1);
 
 use Aeliot\YamlToken\Enum\TokenType;
+use Aeliot\YamlToken\Node\BlockSequenceEntryNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\PlainScalarNode;
-use Aeliot\YamlToken\Node\SequenceEntryNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\SyntaxTokenNode;
 use Aeliot\YamlToken\Node\ValueNode;
@@ -14,17 +14,17 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 1250193900,
+    'hash' => 409115451,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 1662363401,
+            'hash' => 2712266263,
             'properties' => [],
             'children' => [
                 [
-                    'type' => SequenceEntryNode::class,
-                    'hash' => 2655177173,
+                    'type' => BlockSequenceEntryNode::class,
+                    'hash' => 938523373,
                     'properties' => [
                         'value' => [
                             'type' => ValueNode::class,

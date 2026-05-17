@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Aeliot\YamlToken\Enum\TokenType;
+use Aeliot\YamlToken\Node\BlockSequenceEntryNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\DocumentStartNode;
 use Aeliot\YamlToken\Node\FlowMappingNode;
@@ -11,7 +12,6 @@ use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\MultilinePlainScalarNode;
 use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\PlainScalarNode;
-use Aeliot\YamlToken\Node\SequenceEntryNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\SyntaxTokenNode;
 use Aeliot\YamlToken\Node\ValueIndicatorNode;
@@ -20,12 +20,12 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 4235924193,
+    'hash' => 1570488493,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 3746591539,
+            'hash' => 3327972158,
             'properties' => [],
             'children' => [
                 [
@@ -51,8 +51,8 @@ return [
                     'children' => [],
                 ],
                 [
-                    'type' => SequenceEntryNode::class,
-                    'hash' => 2306671405,
+                    'type' => BlockSequenceEntryNode::class,
+                    'hash' => 3317373266,
                     'properties' => [
                         'value' => [
                             'type' => ValueNode::class,
@@ -304,8 +304,8 @@ return [
                     ],
                 ],
                 [
-                    'type' => SequenceEntryNode::class,
-                    'hash' => 3980962516,
+                    'type' => BlockSequenceEntryNode::class,
+                    'hash' => 3389162059,
                     'properties' => [
                         'value' => [
                             'type' => ValueNode::class,

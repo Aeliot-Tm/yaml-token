@@ -16,6 +16,7 @@ namespace Aeliot\YamlToken\TestHelper;
 use Aeliot\YamlToken\Node\AliasNode;
 use Aeliot\YamlToken\Node\AnchorNode;
 use Aeliot\YamlToken\Node\BlockMappingNode;
+use Aeliot\YamlToken\Node\BlockSequenceEntryNode;
 use Aeliot\YamlToken\Node\BlockSequenceNode;
 use Aeliot\YamlToken\Node\FlowMappingNode;
 use Aeliot\YamlToken\Node\FlowSequenceNode;
@@ -23,7 +24,6 @@ use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Node\NodePropertiesNode;
-use Aeliot\YamlToken\Node\SequenceEntryNode;
 use Aeliot\YamlToken\Node\TokenHolderInterface;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Token\Token;
@@ -135,7 +135,7 @@ final class NodeTreeRepresenter
                 'anchor' => $node->getAnchor(),
                 'tag' => $node->getTag(),
             ],
-            $node instanceof SequenceEntryNode => [
+            $node instanceof BlockSequenceEntryNode => [
                 'value' => $node->getValue(),
             ],
             $node instanceof ValueNode => [

@@ -15,12 +15,12 @@ namespace Aeliot\YamlToken\Test\Unit\Parser;
 
 use Aeliot\YamlToken\Lexer\Lexer;
 use Aeliot\YamlToken\Node\BlockMappingNode;
+use Aeliot\YamlToken\Node\BlockSequenceEntryNode;
 use Aeliot\YamlToken\Node\BlockSequenceNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Node\PlainScalarNode;
-use Aeliot\YamlToken\Node\SequenceEntryNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Parser\Exception\IndentationInvalidException;
@@ -36,7 +36,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(KeyValueCoupleNode::class)]
 #[UsesClass(Lexer::class)]
 #[UsesClass(PlainScalarNode::class)]
-#[UsesClass(SequenceEntryNode::class)]
+#[UsesClass(BlockSequenceEntryNode::class)]
 #[UsesClass(StreamNode::class)]
 #[UsesClass(ValueNode::class)]
 final class NestedBlockSequenceTest extends TestCase
@@ -67,10 +67,10 @@ YAML);
         $seq = $levelBValue->getPayload();
         self::assertInstanceOf(BlockSequenceNode::class, $seq);
 
-        /** @var SequenceEntryNode[] $entries */
+        /** @var BlockSequenceEntryNode[] $entries */
         $entries = array_values(array_filter(
             $seq->getChildren(),
-            static fn ($n): bool => $n instanceof SequenceEntryNode,
+            static fn ($n): bool => $n instanceof BlockSequenceEntryNode,
         ));
         self::assertCount(2, $entries);
         self::assertSame('valueA', $this->getSequenceScalarText($entries[0]));
@@ -149,7 +149,7 @@ YAML);
         return $documents[0];
     }
 
-    private function getSequenceScalarText(SequenceEntryNode $entry): string
+    private function getSequenceScalarText(BlockSequenceEntryNode $entry): string
     {
         $value = $entry->getValue();
         $scalar = $value->getPayload();

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\BlockMappingNode;
+use Aeliot\YamlToken\Node\BlockSequenceEntryNode;
 use Aeliot\YamlToken\Node\BlockSequenceNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\IndentationNode;
@@ -11,7 +12,6 @@ use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\PlainScalarNode;
-use Aeliot\YamlToken\Node\SequenceEntryNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\SyntaxTokenNode;
 use Aeliot\YamlToken\Node\ValueIndicatorNode;
@@ -20,17 +20,17 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 3246885513,
+    'hash' => 473937137,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 3135961671,
+            'hash' => 3316263376,
             'properties' => [],
             'children' => [
                 [
-                    'type' => SequenceEntryNode::class,
-                    'hash' => 131605707,
+                    'type' => BlockSequenceEntryNode::class,
+                    'hash' => 1626795869,
                     'properties' => [
                         'value' => [
                             'type' => ValueNode::class,
@@ -188,12 +188,12 @@ return [
                     ],
                 ],
                 [
-                    'type' => SequenceEntryNode::class,
-                    'hash' => 3758353264,
+                    'type' => BlockSequenceEntryNode::class,
+                    'hash' => 1081218435,
                     'properties' => [
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 830821119,
+                            'hash' => 3411392069,
                         ],
                     ],
                     'children' => [
@@ -221,33 +221,33 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 830821119,
+                            'hash' => 3411392069,
                             'properties' => [
                                 'payload' => [
                                     'type' => BlockSequenceNode::class,
-                                    'hash' => 1676554685,
+                                    'hash' => 352381270,
                                 ],
                             ],
                             'children' => [
                                 [
                                     'type' => BlockSequenceNode::class,
-                                    'hash' => 1676554685,
+                                    'hash' => 352381270,
                                     'properties' => [
                                         'entries' => [
                                             [
-                                                'type' => SequenceEntryNode::class,
-                                                'hash' => 1311123670,
+                                                'type' => BlockSequenceEntryNode::class,
+                                                'hash' => 3885259758,
                                             ],
                                             [
-                                                'type' => SequenceEntryNode::class,
-                                                'hash' => 940418521,
+                                                'type' => BlockSequenceEntryNode::class,
+                                                'hash' => 2549058531,
                                             ],
                                         ],
                                     ],
                                     'children' => [
                                         [
-                                            'type' => SequenceEntryNode::class,
-                                            'hash' => 1311123670,
+                                            'type' => BlockSequenceEntryNode::class,
+                                            'hash' => 3885259758,
                                             'properties' => [
                                                 'value' => [
                                                     'type' => ValueNode::class,
@@ -314,8 +314,8 @@ return [
                                             'children' => [],
                                         ],
                                         [
-                                            'type' => SequenceEntryNode::class,
-                                            'hash' => 940418521,
+                                            'type' => BlockSequenceEntryNode::class,
+                                            'hash' => 2549058531,
                                             'properties' => [
                                                 'value' => [
                                                     'type' => ValueNode::class,

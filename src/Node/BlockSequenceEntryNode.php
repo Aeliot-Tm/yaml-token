@@ -15,7 +15,7 @@ namespace Aeliot\YamlToken\Node;
 
 use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
 
-class SequenceEntryNode extends AbstractNode
+class BlockSequenceEntryNode extends AbstractNode
 {
     private ?ValueNode $value = null;
 

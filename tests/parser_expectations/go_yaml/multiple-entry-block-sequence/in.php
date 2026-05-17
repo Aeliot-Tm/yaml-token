@@ -3,10 +3,10 @@
 declare(strict_types=1);
 
 use Aeliot\YamlToken\Enum\TokenType;
+use Aeliot\YamlToken\Node\BlockSequenceEntryNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\PlainScalarNode;
-use Aeliot\YamlToken\Node\SequenceEntryNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\SyntaxTokenNode;
 use Aeliot\YamlToken\Node\ValueNode;
@@ -14,17 +14,17 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 1731482746,
+    'hash' => 1918298695,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 1027465952,
+            'hash' => 3321067629,
             'properties' => [],
             'children' => [
                 [
-                    'type' => SequenceEntryNode::class,
-                    'hash' => 2655177173,
+                    'type' => BlockSequenceEntryNode::class,
+                    'hash' => 938523373,
                     'properties' => [
                         'value' => [
                             'type' => ValueNode::class,
@@ -91,8 +91,8 @@ return [
                     'children' => [],
                 ],
                 [
-                    'type' => SequenceEntryNode::class,
-                    'hash' => 3794345844,
+                    'type' => BlockSequenceEntryNode::class,
+                    'hash' => 1268477004,
                     'properties' => [
                         'value' => [
                             'type' => ValueNode::class,
@@ -159,8 +159,8 @@ return [
                     'children' => [],
                 ],
                 [
-                    'type' => SequenceEntryNode::class,
-                    'hash' => 3440064705,
+                    'type' => BlockSequenceEntryNode::class,
+                    'hash' => 3852481068,
                     'properties' => [
                         'value' => [
                             'type' => ValueNode::class,

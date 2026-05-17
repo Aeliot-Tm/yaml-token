@@ -3,10 +3,10 @@
 declare(strict_types=1);
 
 use Aeliot\YamlToken\Enum\TokenType;
+use Aeliot\YamlToken\Node\BlockSequenceEntryNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\PlainScalarNode;
-use Aeliot\YamlToken\Node\SequenceEntryNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\SyntaxTokenNode;
 use Aeliot\YamlToken\Node\ValueNode;
@@ -14,17 +14,17 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 3827123160,
+    'hash' => 2654340454,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 3164138397,
+            'hash' => 395434682,
             'properties' => [],
             'children' => [
                 [
-                    'type' => SequenceEntryNode::class,
-                    'hash' => 3648845701,
+                    'type' => BlockSequenceEntryNode::class,
+                    'hash' => 3887275411,
                     'properties' => [
                         'value' => [
                             'type' => ValueNode::class,
@@ -91,8 +91,8 @@ return [
                     'children' => [],
                 ],
                 [
-                    'type' => SequenceEntryNode::class,
-                    'hash' => 244130805,
+                    'type' => BlockSequenceEntryNode::class,
+                    'hash' => 809683427,
                     'properties' => [
                         'value' => [
                             'type' => ValueNode::class,
@@ -159,8 +159,8 @@ return [
                     'children' => [],
                 ],
                 [
-                    'type' => SequenceEntryNode::class,
-                    'hash' => 3007169253,
+                    'type' => BlockSequenceEntryNode::class,
+                    'hash' => 81582430,
                     'properties' => [
                         'value' => [
                             'type' => ValueNode::class,

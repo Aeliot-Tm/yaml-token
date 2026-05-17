@@ -21,6 +21,7 @@ use Aeliot\YamlToken\Node\BlockMappingNode;
 use Aeliot\YamlToken\Node\BlockScalarChompingIndicatorNode;
 use Aeliot\YamlToken\Node\BlockScalarIndentationIndicatorNode;
 use Aeliot\YamlToken\Node\BlockScalarIndicatorNode;
+use Aeliot\YamlToken\Node\BlockSequenceEntryNode;
 use Aeliot\YamlToken\Node\BlockSequenceNode;
 use Aeliot\YamlToken\Node\ByteOrderNode;
 use Aeliot\YamlToken\Node\CommentNode;
@@ -45,7 +46,6 @@ use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Node\NodePropertiesNode;
 use Aeliot\YamlToken\Node\PlainScalarNode;
 use Aeliot\YamlToken\Node\ScalarNode;
-use Aeliot\YamlToken\Node\SequenceEntryNode;
 use Aeliot\YamlToken\Node\SingleQuotedScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\SyntaxTokenNode;
@@ -1696,7 +1696,7 @@ final class Parser
                 throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Sequence entry expected while parsing block sequence value, but %s given', $harvester->tokens->current()?->type->value ?? '_nothing_'), $token));
             }
 
-            $sequenceEntry = new SequenceEntryNode();
+            $sequenceEntry = new BlockSequenceEntryNode();
             $blockSequence->addChild($sequenceEntry);
             if (TokenType::INDENTATION === $token->type) {
                 $sequenceEntry->addChild(new IndentationNode($token));
@@ -1769,7 +1769,7 @@ final class Parser
     {
         $blockSequence = new BlockSequenceNode();
 
-        $firstEntry = new SequenceEntryNode();
+        $firstEntry = new BlockSequenceEntryNode();
         $blockSequence->addChild($firstEntry);
         $firstCompactIndent = $indentLen + $this->consumeSequenceEntryIndicatorAndSpaces($harvester, $firstEntry);
         $firstEntry->addChild($this->parseSequenceEntryValue($harvester, $indentLen, $firstCompactIndent));
@@ -1793,7 +1793,7 @@ final class Parser
                 break;
             }
 
-            $sequenceEntry = new SequenceEntryNode();
+            $sequenceEntry = new BlockSequenceEntryNode();
             $blockSequence->addChild($sequenceEntry);
             $sequenceEntry->addChild(new IndentationNode($token));
             $harvester->tokens->advance();
@@ -1908,7 +1908,7 @@ final class Parser
             }
 
             if ($this->isSequenceStart($harvester)) {
-                $sequenceEntry = new SequenceEntryNode();
+                $sequenceEntry = new BlockSequenceEntryNode();
                 $document->addChild($sequenceEntry);
 
                 $leadingIndent = 0;

@@ -16,13 +16,13 @@ namespace Aeliot\YamlToken\Test\Unit\Parser;
 use Aeliot\YamlToken\Emitter\YamlEmitter;
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Lexer\Lexer;
+use Aeliot\YamlToken\Node\BlockSequenceEntryNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\FlowMappingNode;
 use Aeliot\YamlToken\Node\FlowSequenceNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Node\PlainScalarNode;
-use Aeliot\YamlToken\Node\SequenceEntryNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\SyntaxTokenNode;
 use Aeliot\YamlToken\Node\ValueNode;
@@ -39,7 +39,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(KeyValueCoupleNode::class)]
 #[UsesClass(Lexer::class)]
 #[UsesClass(PlainScalarNode::class)]
-#[UsesClass(SequenceEntryNode::class)]
+#[UsesClass(BlockSequenceEntryNode::class)]
 #[UsesClass(StreamNode::class)]
 #[UsesClass(SyntaxTokenNode::class)]
 #[UsesClass(ValueNode::class)]
@@ -281,7 +281,7 @@ YAML;
             if ($child instanceof FlowSequenceNode) {
                 $flowSequences[] = $child;
             }
-            if ($child instanceof SequenceEntryNode) {
+            if ($child instanceof BlockSequenceEntryNode) {
                 $entryValue = $child->getValue();
                 self::assertNotNull($entryValue);
                 $nested = $entryValue->getPayload();

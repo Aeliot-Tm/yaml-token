@@ -14,12 +14,12 @@ declare(strict_types=1);
 namespace Aeliot\YamlToken\Test\Unit\Parser;
 
 use Aeliot\YamlToken\Node\BlockMappingNode;
+use Aeliot\YamlToken\Node\BlockSequenceEntryNode;
 use Aeliot\YamlToken\Node\BlockSequenceNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Node\PlainScalarNode;
-use Aeliot\YamlToken\Node\SequenceEntryNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Parser\Parser;
@@ -48,10 +48,10 @@ final class IndentLessSequenceWithKeyValueCoupleTest extends TestCase
         $seq = $bValue->getPayload();
         self::assertInstanceOf(BlockSequenceNode::class, $seq);
 
-        /** @var SequenceEntryNode[] $entries */
+        /** @var BlockSequenceEntryNode[] $entries */
         $entries = array_values(array_filter(
             $seq->getChildren(),
-            static fn ($n): bool => $n instanceof SequenceEntryNode,
+            static fn ($n): bool => $n instanceof BlockSequenceEntryNode,
         ));
         self::assertCount(1, $entries);
 

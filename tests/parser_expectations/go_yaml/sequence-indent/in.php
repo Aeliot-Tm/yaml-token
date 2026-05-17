@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Aeliot\YamlToken\Enum\TokenType;
+use Aeliot\YamlToken\Node\BlockSequenceEntryNode;
 use Aeliot\YamlToken\Node\BlockSequenceNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\IndentationNode;
@@ -10,7 +11,6 @@ use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\PlainScalarNode;
-use Aeliot\YamlToken\Node\SequenceEntryNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\SyntaxTokenNode;
 use Aeliot\YamlToken\Node\ValueIndicatorNode;
@@ -19,12 +19,12 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 3984790941,
+    'hash' => 1708895865,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 2967914714,
+            'hash' => 2428441061,
             'properties' => [],
             'children' => [
                 [
@@ -99,8 +99,8 @@ return [
                     'children' => [],
                 ],
                 [
-                    'type' => SequenceEntryNode::class,
-                    'hash' => 3440064705,
+                    'type' => BlockSequenceEntryNode::class,
+                    'hash' => 3852481068,
                     'properties' => [
                         'value' => [
                             'type' => ValueNode::class,
@@ -168,7 +168,7 @@ return [
                 ],
                 [
                     'type' => KeyValueCoupleNode::class,
-                    'hash' => 198321933,
+                    'hash' => 2363599135,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
@@ -180,7 +180,7 @@ return [
                         ],
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 95279052,
+                            'hash' => 4276319674,
                         ],
                     ],
                     'children' => [
@@ -220,11 +220,11 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 95279052,
+                            'hash' => 4276319674,
                             'properties' => [
                                 'payload' => [
                                     'type' => BlockSequenceNode::class,
-                                    'hash' => 1888873356,
+                                    'hash' => 268236127,
                                 ],
                             ],
                             'children' => [
@@ -241,19 +241,19 @@ return [
                                 ],
                                 [
                                     'type' => BlockSequenceNode::class,
-                                    'hash' => 1888873356,
+                                    'hash' => 268236127,
                                     'properties' => [
                                         'entries' => [
                                             [
-                                                'type' => SequenceEntryNode::class,
-                                                'hash' => 3351990720,
+                                                'type' => BlockSequenceEntryNode::class,
+                                                'hash' => 1747550202,
                                             ],
                                         ],
                                     ],
                                     'children' => [
                                         [
-                                            'type' => SequenceEntryNode::class,
-                                            'hash' => 3351990720,
+                                            'type' => BlockSequenceEntryNode::class,
+                                            'hash' => 1747550202,
                                             'properties' => [
                                                 'value' => [
                                                     'type' => ValueNode::class,
