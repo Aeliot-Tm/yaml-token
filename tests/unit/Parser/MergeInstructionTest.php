@@ -177,7 +177,7 @@ YAML);
     {
         $valueNode = $couple->getValue();
         self::assertNotNull($valueNode);
-        $scalar = $valueNode->getScalar();
+        $scalar = $valueNode->getPayload();
         self::assertInstanceOf(ScalarNode::class, $scalar);
 
         return $scalar->getToken()->text;

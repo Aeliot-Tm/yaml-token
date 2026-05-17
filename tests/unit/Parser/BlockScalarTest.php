@@ -63,7 +63,7 @@ final class BlockScalarTest extends TestCase
         $value = $couple->getValue();
         self::assertNotNull($value);
 
-        $scalar = $value->getScalar();
+        $scalar = $value->getPayload();
         self::assertInstanceOf(ScalarNode::class, $scalar);
         self::assertSame($expected, $scalar->getToken()->text);
     }

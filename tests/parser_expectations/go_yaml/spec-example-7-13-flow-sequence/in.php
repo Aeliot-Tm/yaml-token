@@ -15,21 +15,21 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 4021216634,
+    'hash' => 574055273,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 1239345671,
+            'hash' => 3631340117,
             'properties' => [],
             'children' => [
                 [
                     'type' => SequenceEntryNode::class,
-                    'hash' => 1692578927,
+                    'hash' => 1246299398,
                     'properties' => [
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 627387003,
+                            'hash' => 516944303,
                         ],
                     ],
                     'children' => [
@@ -57,26 +57,26 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 627387003,
+                            'hash' => 516944303,
                             'properties' => [
-                                'flowSequence' => [
+                                'payload' => [
                                     'type' => FlowSequenceNode::class,
-                                    'hash' => 302588445,
+                                    'hash' => 285786144,
                                 ],
                             ],
                             'children' => [
                                 [
                                     'type' => FlowSequenceNode::class,
-                                    'hash' => 302588445,
+                                    'hash' => 285786144,
                                     'properties' => [
                                         'entries' => [
                                             [
                                                 'type' => ValueNode::class,
-                                                'hash' => 3669709017,
+                                                'hash' => 445968435,
                                             ],
                                             [
                                                 'type' => ValueNode::class,
-                                                'hash' => 268489493,
+                                                'hash' => 1648864180,
                                             ],
                                         ],
                                     ],
@@ -105,9 +105,9 @@ return [
                                         ],
                                         [
                                             'type' => ValueNode::class,
-                                            'hash' => 3669709017,
+                                            'hash' => 445968435,
                                             'properties' => [
-                                                'scalar' => [
+                                                'payload' => [
                                                     'type' => ScalarNode::class,
                                                     'hash' => 438572087,
                                                 ],
@@ -150,9 +150,9 @@ return [
                                         ],
                                         [
                                             'type' => ValueNode::class,
-                                            'hash' => 268489493,
+                                            'hash' => 1648864180,
                                             'properties' => [
-                                                'scalar' => [
+                                                'payload' => [
                                                     'type' => ScalarNode::class,
                                                     'hash' => 1782829291,
                                                 ],
@@ -223,11 +223,11 @@ return [
                 ],
                 [
                     'type' => SequenceEntryNode::class,
-                    'hash' => 875148630,
+                    'hash' => 775889181,
                     'properties' => [
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 704937159,
+                            'hash' => 2694815757,
                         ],
                     ],
                     'children' => [
@@ -255,26 +255,26 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 704937159,
+                            'hash' => 2694815757,
                             'properties' => [
-                                'flowSequence' => [
+                                'payload' => [
                                     'type' => FlowSequenceNode::class,
-                                    'hash' => 4149419768,
+                                    'hash' => 2356741923,
                                 ],
                             ],
                             'children' => [
                                 [
                                     'type' => FlowSequenceNode::class,
-                                    'hash' => 4149419768,
+                                    'hash' => 2356741923,
                                     'properties' => [
                                         'entries' => [
                                             [
                                                 'type' => ValueNode::class,
-                                                'hash' => 4102506316,
+                                                'hash' => 491078061,
                                             ],
                                             [
                                                 'type' => ValueNode::class,
-                                                'hash' => 510985023,
+                                                'hash' => 3218528057,
                                             ],
                                         ],
                                     ],
@@ -292,9 +292,9 @@ return [
                                         ],
                                         [
                                             'type' => ValueNode::class,
-                                            'hash' => 4102506316,
+                                            'hash' => 491078061,
                                             'properties' => [
-                                                'scalar' => [
+                                                'payload' => [
                                                     'type' => ScalarNode::class,
                                                     'hash' => 1745691151,
                                                 ],
@@ -337,9 +337,9 @@ return [
                                         ],
                                         [
                                             'type' => ValueNode::class,
-                                            'hash' => 510985023,
+                                            'hash' => 3218528057,
                                             'properties' => [
-                                                'scalar' => [
+                                                'payload' => [
                                                     'type' => ScalarNode::class,
                                                     'hash' => 1902090034,
                                                 ],

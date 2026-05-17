@@ -15,17 +15,17 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 4152564631,
+    'hash' => 1152734015,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 947603505,
+            'hash' => 3887182563,
             'properties' => [],
             'children' => [
                 [
                     'type' => KeyValueCoupleNode::class,
-                    'hash' => 2771938575,
+                    'hash' => 3780679545,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
@@ -33,7 +33,7 @@ return [
                         ],
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 1672515678,
+                            'hash' => 922655370,
                         ],
                     ],
                     'children' => [
@@ -84,9 +84,9 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 1672515678,
+                            'hash' => 922655370,
                             'properties' => [
-                                'scalar' => [
+                                'payload' => [
                                     'type' => ScalarNode::class,
                                     'hash' => 922748883,
                                 ],
@@ -120,7 +120,7 @@ return [
                 ],
                 [
                     'type' => KeyValueCoupleNode::class,
-                    'hash' => 776970836,
+                    'hash' => 72768503,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
@@ -128,7 +128,7 @@ return [
                         ],
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 1087047134,
+                            'hash' => 2835940159,
                         ],
                     ],
                     'children' => [
@@ -179,9 +179,9 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 1087047134,
+                            'hash' => 2835940159,
                             'properties' => [
-                                'scalar' => [
+                                'payload' => [
                                     'type' => ScalarNode::class,
                                     'hash' => 1394411103,
                                 ],

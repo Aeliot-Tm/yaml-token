@@ -17,17 +17,17 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 2230718416,
+    'hash' => 841839793,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 909202476,
+            'hash' => 848866709,
             'properties' => [],
             'children' => [
                 [
                     'type' => KeyValueCoupleNode::class,
-                    'hash' => 143213173,
+                    'hash' => 2482382282,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
@@ -35,7 +35,7 @@ return [
                         ],
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 3265320622,
+                            'hash' => 3919265772,
                         ],
                     ],
                     'children' => [
@@ -86,9 +86,9 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 3265320622,
+                            'hash' => 3919265772,
                             'properties' => [
-                                'scalar' => [
+                                'payload' => [
                                     'type' => ScalarNode::class,
                                     'hash' => 2413956284,
                                 ],

@@ -18,17 +18,17 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 3405430141,
+    'hash' => 2977035773,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 3040409952,
+            'hash' => 2119192561,
             'properties' => [],
             'children' => [
                 [
                     'type' => KeyValueCoupleNode::class,
-                    'hash' => 2265641913,
+                    'hash' => 59632757,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
@@ -36,7 +36,7 @@ return [
                         ],
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 3894148911,
+                            'hash' => 1016026792,
                         ],
                     ],
                     'children' => [
@@ -87,13 +87,13 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 3894148911,
+                            'hash' => 1016026792,
                             'properties' => [
                                 'nodeProperties' => [
                                     'type' => NodePropertiesNode::class,
                                     'hash' => 2790603932,
                                 ],
-                                'scalar' => [
+                                'payload' => [
                                     'type' => ScalarNode::class,
                                     'hash' => 1394411103,
                                 ],
@@ -162,7 +162,7 @@ return [
                 ],
                 [
                     'type' => KeyValueCoupleNode::class,
-                    'hash' => 2953029400,
+                    'hash' => 2217057667,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
@@ -170,7 +170,7 @@ return [
                         ],
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 3241613696,
+                            'hash' => 3250420447,
                         ],
                     ],
                     'children' => [
@@ -221,9 +221,9 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 3241613696,
+                            'hash' => 3250420447,
                             'properties' => [
-                                'alias' => [
+                                'payload' => [
                                     'type' => AliasNode::class,
                                     'hash' => 87509641,
                                 ],

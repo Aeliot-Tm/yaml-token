@@ -54,8 +54,10 @@ final class ComplexMappingKeysTest extends TestCase
 
         $value = $couple->getValue();
         self::assertNotNull($value);
-        self::assertNotNull($value->getScalar());
-        self::assertSame('null', $value->getScalar()->getToken()->text);
+
+        $payload = $value->getPayload();
+        self::assertInstanceOf(ScalarNode::class, $payload);
+        self::assertSame('null', $payload->getToken()->text);
     }
 
     public function testParsesBlockSequenceAsExplicitKeyOnNextLine(): void

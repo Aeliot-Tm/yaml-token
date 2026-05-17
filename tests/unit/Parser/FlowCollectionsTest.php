@@ -66,6 +66,7 @@ final class FlowCollectionsTest extends TestCase
         ));
         self::assertCount(1, $flows);
 
+        /** @var KeyValueCoupleNode[] $flowCouples */
         $flowCouples = array_values(array_filter(
             $flows[0]->getChildren(),
             static fn ($n): bool => $n instanceof KeyValueCoupleNode,
@@ -153,13 +154,14 @@ YAML);
         ));
         self::assertCount(1, $flows);
 
+        /** @var ValueNode[] $entries */
         $entries = array_values(array_filter(
             $flows[0]->getEntries(),
             static fn ($n): bool => $n instanceof ValueNode,
         ));
         self::assertCount(2, $entries);
-        self::assertSame('one', $entries[0]->getScalar()?->getToken()->text);
-        self::assertSame('two', $entries[1]->getScalar()?->getToken()->text);
+        self::assertSame('one', $entries[0]->getPayload()?->getToken()->text);
+        self::assertSame('two', $entries[1]->getPayload()?->getToken()->text);
     }
 
     public function testFlowPairValueTrailingWhitespaceBelongsToFlowSequence(): void
@@ -177,7 +179,7 @@ YAML;
 
         $pairValue = $couple->getValue();
         self::assertNotNull($pairValue);
-        self::assertSame('separate', $pairValue->getScalar()?->getToken()->text);
+        self::assertSame('separate', $this->getScalarValueText($pairValue));
         self::assertNoWhitespaceChildren($pairValue);
 
         self::assertInstanceOf(WhitespaceNode::class, $this->getChildBeforeFlowSequenceEnd($flowSequence));
@@ -193,7 +195,7 @@ YAML;
 
         $flowSequence = $this->getOnlyTopLevelFlowSequence($stream);
         $firstEntry = $flowSequence->getEntries()[0];
-        self::assertSame('three', $firstEntry->getScalar()?->getToken()->text);
+        self::assertSame('three', $this->getScalarValueText($firstEntry));
         self::assertNoWhitespaceChildren($firstEntry);
 
         $children = $flowSequence->getChildren();
@@ -218,20 +220,22 @@ YAML;
         $value = $couple->getValue();
         self::assertNotNull($value);
 
+        /** @var FlowSequenceNode[] $flows */
         $flows = array_values(array_filter(
             $value->getChildren(),
             static fn ($n): bool => $n instanceof FlowSequenceNode,
         ));
         self::assertCount(1, $flows);
 
+        /** @var ValueNode[] $entries */
         $entries = array_values(array_filter(
             $flows[0]->getEntries(),
             static fn ($n): bool => $n instanceof ValueNode,
         ));
         self::assertCount(3, $entries);
-        self::assertSame('a', $entries[0]->getScalar()?->getToken()->text);
-        self::assertSame('b', $entries[1]->getScalar()?->getToken()->text);
-        self::assertSame('c', $entries[2]->getScalar()?->getToken()->text);
+        self::assertSame('a', $this->getScalarValueText($entries[0]));
+        self::assertSame('b', $this->getScalarValueText($entries[1]));
+        self::assertSame('c', $this->getScalarValueText($entries[2]));
     }
 
     private function getChildBeforeFlowSequenceEnd(FlowSequenceNode $flowSequence): Node
@@ -310,11 +314,17 @@ YAML;
         }
     }
 
-    private function getScalarValueText(KeyValueCoupleNode $couple): string
+    private function getScalarValueText(KeyValueCoupleNode|ValueNode $couple): string
     {
-        $valueNode = $couple->getValue();
+        $valueNode = null;
+        if ($couple instanceof ValueNode) {
+            $valueNode = $couple;
+        } elseif ($couple instanceof KeyValueCoupleNode) {
+            $valueNode = $couple->getValue();
+        }
+
         self::assertNotNull($valueNode);
-        $scalar = $valueNode->getScalar();
+        $scalar = $valueNode->getPayload();
         self::assertInstanceOf(ScalarNode::class, $scalar);
 
         return $scalar->getToken()->text;

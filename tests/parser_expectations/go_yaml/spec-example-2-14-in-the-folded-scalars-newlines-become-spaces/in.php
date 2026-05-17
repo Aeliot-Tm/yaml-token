@@ -14,12 +14,12 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 2801457491,
+    'hash' => 1165037617,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 3355148698,
+            'hash' => 272913178,
             'properties' => [],
             'children' => [
                 [
@@ -46,9 +46,9 @@ return [
                 ],
                 [
                     'type' => ValueNode::class,
-                    'hash' => 1867739882,
+                    'hash' => 816541687,
                     'properties' => [
-                        'scalar' => [
+                        'payload' => [
                             'type' => ScalarNode::class,
                             'hash' => 1399511868,
                         ],

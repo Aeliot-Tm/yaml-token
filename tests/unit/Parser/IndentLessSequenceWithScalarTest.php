@@ -48,12 +48,13 @@ final class IndentLessSequenceWithScalarTest extends TestCase
         $seq = $bValue->getPayload();
         self::assertInstanceOf(BlockSequenceNode::class, $seq);
 
+        /** @var SequenceEntryNode[] $entries */
         $entries = array_values(array_filter(
             $seq->getChildren(),
             static fn ($n): bool => $n instanceof SequenceEntryNode,
         ));
         self::assertCount(1, $entries);
-        $scalar = $entries[0]->getValue()->getScalar();
+        $scalar = $entries[0]->getValue()->getPayload();
         self::assertInstanceOf(ScalarNode::class, $scalar);
         self::assertSame('value', $scalar->getToken()->text);
     }

@@ -19,7 +19,7 @@ namespace Aeliot\YamlToken\Node;
  *
  * Each entry is wrapped in a {@see ValueNode}. A flow-node entry is exposed via
  * the usual ValueNode getters (scalar, flowMapping, etc.); a flow-pair entry
- * (YAML 1.2.2 §7.4.1 ns-flow-pair) is exposed via {@see ValueNode::getKeyValueCouple()}.
+ * (YAML 1.2.2 §7.4.1 ns-flow-pair) is exposed via {@see ValueNode::getPayload()}.
  */
 class FlowSequenceNode extends AbstractNode
 {

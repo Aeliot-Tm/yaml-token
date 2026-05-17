@@ -15,9 +15,6 @@ namespace Aeliot\YamlToken\Node;
 
 use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
 
-/**
- * TODO: simplify interface & add easy way to get type of value.
- */
 class ValueNode extends AbstractNode
 {
     private ?Node $payload = null;
@@ -46,44 +43,9 @@ class ValueNode extends AbstractNode
         parent::addChild($child);
     }
 
-    public function getAlias(): ?AliasNode
-    {
-        return $this->payload instanceof AliasNode ? $this->payload : null;
-    }
-
     public function getAnchor(): ?AnchorNode
     {
         return $this->properties?->getAnchor();
-    }
-
-    public function getBlockMapping(): ?BlockMappingNode
-    {
-        return $this->payload instanceof BlockMappingNode ? $this->payload : null;
-    }
-
-    public function getBlockSequence(): ?BlockSequenceNode
-    {
-        return $this->payload instanceof BlockSequenceNode ? $this->payload : null;
-    }
-
-    public function getFlowMapping(): ?FlowMappingNode
-    {
-        return $this->payload instanceof FlowMappingNode ? $this->payload : null;
-    }
-
-    public function getFlowSequence(): ?FlowSequenceNode
-    {
-        return $this->payload instanceof FlowSequenceNode ? $this->payload : null;
-    }
-
-    public function getKeyValueCouple(): ?KeyValueCoupleNode
-    {
-        return $this->payload instanceof KeyValueCoupleNode ? $this->payload : null;
-    }
-
-    public function getMultilinePlainScalar(): ?MultilinePlainScalarNode
-    {
-        return $this->payload instanceof MultilinePlainScalarNode ? $this->payload : null;
     }
 
     public function getPayload(): ?Node
@@ -96,19 +58,54 @@ class ValueNode extends AbstractNode
         return $this->properties;
     }
 
-    public function getScalar(): ?ScalarNode
-    {
-        return $this->payload instanceof ScalarNode ? $this->payload : null;
-    }
-
     public function getTag(): ?TagNode
     {
         return $this->properties?->getTag();
     }
 
+    public function isAlias(): bool
+    {
+        return $this->payload instanceof AliasNode;
+    }
+
+    public function isBlockMapping(): bool
+    {
+        return $this->payload instanceof BlockMappingNode;
+    }
+
+    public function isBlockSequence(): bool
+    {
+        return $this->payload instanceof BlockSequenceNode;
+    }
+
     public function isEmpty(): bool
     {
         return null === $this->payload;
+    }
+
+    public function isFlowMapping(): bool
+    {
+        return $this->payload instanceof FlowMappingNode;
+    }
+
+    public function isFlowSequence(): bool
+    {
+        return $this->payload instanceof FlowSequenceNode;
+    }
+
+    public function isKeyValueCouple(): bool
+    {
+        return $this->payload instanceof KeyValueCoupleNode;
+    }
+
+    public function isMultilinePlainScalar(): bool
+    {
+        return $this->payload instanceof MultilinePlainScalarNode;
+    }
+
+    public function isScalar(): bool
+    {
+        return $this->payload instanceof ScalarNode;
     }
 
     public function removeChild(Node $child): void

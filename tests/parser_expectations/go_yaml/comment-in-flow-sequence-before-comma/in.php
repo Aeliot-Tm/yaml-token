@@ -16,12 +16,12 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 4004010620,
+    'hash' => 2849699496,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 1280527233,
+            'hash' => 4250149619,
             'properties' => [],
             'children' => [
                 [
@@ -48,16 +48,16 @@ return [
                 ],
                 [
                     'type' => FlowSequenceNode::class,
-                    'hash' => 1512808224,
+                    'hash' => 3685089629,
                     'properties' => [
                         'entries' => [
                             [
                                 'type' => ValueNode::class,
-                                'hash' => 1190360590,
+                                'hash' => 2939252975,
                             ],
                             [
                                 'type' => ValueNode::class,
-                                'hash' => 1066435604,
+                                'hash' => 1306000565,
                             ],
                         ],
                     ],
@@ -86,9 +86,9 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 1190360590,
+                            'hash' => 2939252975,
                             'properties' => [
-                                'scalar' => [
+                                'payload' => [
                                     'type' => ScalarNode::class,
                                     'hash' => 2843002100,
                                 ],
@@ -164,9 +164,9 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 1066435604,
+                            'hash' => 1306000565,
                             'properties' => [
-                                'scalar' => [
+                                'payload' => [
                                     'type' => ScalarNode::class,
                                     'hash' => 170017373,
                                 ],

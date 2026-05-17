@@ -78,7 +78,7 @@ YAML));
         self::assertSame(TokenType::TAG, $tag->getToken()->type);
         self::assertSame('!!str', $tag->getToken()->text);
 
-        $scalar = $value->getScalar();
+        $scalar = $value->getPayload();
         self::assertInstanceOf(ScalarNode::class, $scalar);
         self::assertSame('value', $scalar->getToken()->text);
     }

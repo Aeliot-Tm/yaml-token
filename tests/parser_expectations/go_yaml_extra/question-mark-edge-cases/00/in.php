@@ -18,21 +18,21 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 2131184397,
+    'hash' => 4167340263,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 2260128760,
+            'hash' => 377245797,
             'properties' => [],
             'children' => [
                 [
                     'type' => SequenceEntryNode::class,
-                    'hash' => 1200802397,
+                    'hash' => 3679494978,
                     'properties' => [
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 3003719355,
+                            'hash' => 3043954852,
                         ],
                     ],
                     'children' => [
@@ -60,29 +60,29 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 3003719355,
+                            'hash' => 3043954852,
                             'properties' => [
-                                'blockMapping' => [
+                                'payload' => [
                                     'type' => BlockMappingNode::class,
-                                    'hash' => 4099782976,
+                                    'hash' => 2173997852,
                                 ],
                             ],
                             'children' => [
                                 [
                                     'type' => BlockMappingNode::class,
-                                    'hash' => 4099782976,
+                                    'hash' => 2173997852,
                                     'properties' => [
                                         'entries' => [
                                             [
                                                 'type' => KeyValueCoupleNode::class,
-                                                'hash' => 411222059,
+                                                'hash' => 1271111887,
                                             ],
                                         ],
                                     ],
                                     'children' => [
                                         [
                                             'type' => KeyValueCoupleNode::class,
-                                            'hash' => 411222059,
+                                            'hash' => 1271111887,
                                             'properties' => [
                                                 'key' => [
                                                     'type' => KeyNode::class,
@@ -90,7 +90,7 @@ return [
                                                 ],
                                                 'value' => [
                                                     'type' => ValueNode::class,
-                                                    'hash' => 2986156478,
+                                                    'hash' => 1909621076,
                                                 ],
                                             ],
                                             'children' => [
@@ -152,9 +152,9 @@ return [
                                                 ],
                                                 [
                                                     'type' => ValueNode::class,
-                                                    'hash' => 2986156478,
+                                                    'hash' => 1909621076,
                                                     'properties' => [
-                                                        'scalar' => [
+                                                        'payload' => [
                                                             'type' => ScalarNode::class,
                                                             'hash' => 2473075848,
                                                         ],

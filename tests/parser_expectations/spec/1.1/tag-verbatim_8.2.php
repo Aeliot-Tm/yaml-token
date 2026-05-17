@@ -19,17 +19,17 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 651976273,
+    'hash' => 2582136863,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 1747033240,
+            'hash' => 3893407702,
             'properties' => [],
             'children' => [
                 [
                     'type' => KeyValueCoupleNode::class,
-                    'hash' => 1328877110,
+                    'hash' => 182572496,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
@@ -37,7 +37,7 @@ return [
                         ],
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 3303188539,
+                            'hash' => 1836392336,
                         ],
                     ],
                     'children' => [
@@ -88,15 +88,15 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 3303188539,
+                            'hash' => 1836392336,
                             'properties' => [
                                 'nodeProperties' => [
                                     'type' => NodePropertiesNode::class,
                                     'hash' => 3675476179,
                                 ],
-                                'blockMapping' => [
+                                'payload' => [
                                     'type' => BlockMappingNode::class,
-                                    'hash' => 3208460422,
+                                    'hash' => 2629213270,
                                 ],
                             ],
                             'children' => [
@@ -136,19 +136,19 @@ return [
                                 ],
                                 [
                                     'type' => BlockMappingNode::class,
-                                    'hash' => 3208460422,
+                                    'hash' => 2629213270,
                                     'properties' => [
                                         'entries' => [
                                             [
                                                 'type' => KeyValueCoupleNode::class,
-                                                'hash' => 3846954408,
+                                                'hash' => 1573245506,
                                             ],
                                         ],
                                     ],
                                     'children' => [
                                         [
                                             'type' => KeyValueCoupleNode::class,
-                                            'hash' => 3846954408,
+                                            'hash' => 1573245506,
                                             'properties' => [
                                                 'indentation' => [
                                                     'type' => IndentationNode::class,
@@ -160,7 +160,7 @@ return [
                                                 ],
                                                 'value' => [
                                                     'type' => ValueNode::class,
-                                                    'hash' => 777438552,
+                                                    'hash' => 1544666617,
                                                 ],
                                             ],
                                             'children' => [
@@ -222,9 +222,9 @@ return [
                                                 ],
                                                 [
                                                     'type' => ValueNode::class,
-                                                    'hash' => 777438552,
+                                                    'hash' => 1544666617,
                                                     'properties' => [
-                                                        'scalar' => [
+                                                        'payload' => [
                                                             'type' => ScalarNode::class,
                                                             'hash' => 3010506099,
                                                         ],

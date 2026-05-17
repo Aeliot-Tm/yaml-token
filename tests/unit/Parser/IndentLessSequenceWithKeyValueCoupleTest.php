@@ -59,7 +59,7 @@ final class IndentLessSequenceWithKeyValueCoupleTest extends TestCase
         $entryCouples = $this->getKeyValueCouples($this->getBlockMapping($entryValue));
         self::assertCount(1, $entryCouples);
 
-        $scalar = $entryCouples[0]->getValue()?->getScalar();
+        $scalar = $entryCouples[0]->getValue()?->getPayload();
         self::assertInstanceOf(ScalarNode::class, $scalar);
         self::assertSame('y', $scalar->getToken()->text);
     }

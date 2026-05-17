@@ -15,17 +15,17 @@ use Aeliot\YamlToken\Node\ValueNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 371884224,
+    'hash' => 4185390846,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 1246697044,
+            'hash' => 2288739974,
             'properties' => [],
             'children' => [
                 [
                     'type' => KeyValueCoupleNode::class,
-                    'hash' => 3222607734,
+                    'hash' => 255171916,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
@@ -33,7 +33,7 @@ return [
                         ],
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 1921122696,
+                            'hash' => 1614577434,
                         ],
                     ],
                     'children' => [
@@ -73,9 +73,9 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 1921122696,
+                            'hash' => 1614577434,
                             'properties' => [
-                                'scalar' => [
+                                'payload' => [
                                     'type' => ScalarNode::class,
                                     'hash' => 474157382,
                                 ],

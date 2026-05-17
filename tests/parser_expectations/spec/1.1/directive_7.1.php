@@ -19,7 +19,7 @@ use Aeliot\YamlToken\Node\YamlDirectiveVersionNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 972221475,
+    'hash' => 1011145134,
     'properties' => [],
     'children' => [
         [
@@ -82,7 +82,7 @@ return [
         ],
         [
             'type' => DocumentNode::class,
-            'hash' => 3461266102,
+            'hash' => 721668310,
             'properties' => [],
             'children' => [
                 [
@@ -109,7 +109,7 @@ return [
                 ],
                 [
                     'type' => KeyValueCoupleNode::class,
-                    'hash' => 2571471221,
+                    'hash' => 383971711,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
@@ -117,7 +117,7 @@ return [
                         ],
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 1087047134,
+                            'hash' => 2835940159,
                         ],
                     ],
                     'children' => [
@@ -168,9 +168,9 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 1087047134,
+                            'hash' => 2835940159,
                             'properties' => [
-                                'scalar' => [
+                                'payload' => [
                                     'type' => ScalarNode::class,
                                     'hash' => 1394411103,
                                 ],

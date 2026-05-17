@@ -76,7 +76,7 @@ YAML);
 
         $levelCValue = $levelACouples[1]->getValue();
         self::assertNotNull($levelCValue);
-        $levelCScalar = $levelCValue->getScalar();
+        $levelCScalar = $levelCValue->getPayload();
         self::assertNull($levelCScalar);
     }
 
@@ -150,7 +150,7 @@ YAML);
     private function getSequenceScalarText(SequenceEntryNode $entry): string
     {
         $value = $entry->getValue();
-        $scalar = $value->getScalar();
+        $scalar = $value->getPayload();
         self::assertInstanceOf(ScalarNode::class, $scalar);
 
         return $scalar->getToken()->text;

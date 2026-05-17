@@ -19,17 +19,17 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 3733692105,
+    'hash' => 1880154744,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 4019079876,
+            'hash' => 1048468061,
             'properties' => [],
             'children' => [
                 [
                     'type' => KeyValueCoupleNode::class,
-                    'hash' => 1649342996,
+                    'hash' => 3258910523,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
@@ -37,7 +37,7 @@ return [
                         ],
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 4122198677,
+                            'hash' => 71062828,
                         ],
                     ],
                     'children' => [
@@ -77,11 +77,11 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 4122198677,
+                            'hash' => 71062828,
                             'properties' => [
-                                'blockSequence' => [
+                                'payload' => [
                                     'type' => BlockSequenceNode::class,
-                                    'hash' => 1461315283,
+                                    'hash' => 2149436911,
                                 ],
                             ],
                             'children' => [
@@ -98,23 +98,23 @@ return [
                                 ],
                                 [
                                     'type' => BlockSequenceNode::class,
-                                    'hash' => 1461315283,
+                                    'hash' => 2149436911,
                                     'properties' => [
                                         'entries' => [
                                             [
                                                 'type' => SequenceEntryNode::class,
-                                                'hash' => 3222893508,
+                                                'hash' => 2300405283,
                                             ],
                                         ],
                                     ],
                                     'children' => [
                                         [
                                             'type' => SequenceEntryNode::class,
-                                            'hash' => 3222893508,
+                                            'hash' => 2300405283,
                                             'properties' => [
                                                 'value' => [
                                                     'type' => ValueNode::class,
-                                                    'hash' => 520954038,
+                                                    'hash' => 3060723099,
                                                 ],
                                             ],
                                             'children' => [
@@ -153,9 +153,9 @@ return [
                                                 ],
                                                 [
                                                     'type' => ValueNode::class,
-                                                    'hash' => 520954038,
+                                                    'hash' => 3060723099,
                                                     'properties' => [
-                                                        'multilinePlainScalar' => [
+                                                        'payload' => [
                                                             'type' => MultilinePlainScalarNode::class,
                                                             'hash' => 1226370933,
                                                         ],

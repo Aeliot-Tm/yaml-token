@@ -140,14 +140,7 @@ final class NodeTreeRepresenter
             ],
             $node instanceof ValueNode => [
                 'nodeProperties' => $node->getProperties(),
-                'alias' => $node->getAlias(),
-                'blockMapping' => $node->getBlockMapping(),
-                'blockSequence' => $node->getBlockSequence(),
-                'flowMapping' => $node->getFlowMapping(),
-                'flowSequence' => $node->getFlowSequence(),
-                'keyValueCouple' => $node->getKeyValueCouple(),
-                'multilinePlainScalar' => $node->getMultilinePlainScalar(),
-                'scalar' => $node->getScalar(),
+                'payload' => $node->getPayload(),
             ],
             default => [],
         };

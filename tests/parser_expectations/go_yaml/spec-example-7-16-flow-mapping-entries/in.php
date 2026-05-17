@@ -17,26 +17,26 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 3089355667,
+    'hash' => 268262043,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 3874301860,
+            'hash' => 1257896100,
             'properties' => [],
             'children' => [
                 [
                     'type' => FlowMappingNode::class,
-                    'hash' => 2302638026,
+                    'hash' => 2994944569,
                     'properties' => [
                         'entries' => [
                             [
                                 'type' => KeyValueCoupleNode::class,
-                                'hash' => 3260239617,
+                                'hash' => 1438055812,
                             ],
                             [
                                 'type' => KeyValueCoupleNode::class,
-                                'hash' => 1042557414,
+                                'hash' => 3217929672,
                             ],
                             [
                                 'type' => KeyValueCoupleNode::class,
@@ -69,7 +69,7 @@ return [
                         ],
                         [
                             'type' => KeyValueCoupleNode::class,
-                            'hash' => 3260239617,
+                            'hash' => 1438055812,
                             'properties' => [
                                 'key' => [
                                     'type' => KeyNode::class,
@@ -81,7 +81,7 @@ return [
                                 ],
                                 'value' => [
                                     'type' => ValueNode::class,
-                                    'hash' => 1332614422,
+                                    'hash' => 2796295159,
                                 ],
                             ],
                             'children' => [
@@ -158,9 +158,9 @@ return [
                                 ],
                                 [
                                     'type' => ValueNode::class,
-                                    'hash' => 1332614422,
+                                    'hash' => 2796295159,
                                     'properties' => [
-                                        'scalar' => [
+                                        'payload' => [
                                             'type' => ScalarNode::class,
                                             'hash' => 2227779338,
                                         ],
@@ -205,7 +205,7 @@ return [
                         ],
                         [
                             'type' => KeyValueCoupleNode::class,
-                            'hash' => 1042557414,
+                            'hash' => 3217929672,
                             'properties' => [
                                 'key' => [
                                     'type' => KeyNode::class,
@@ -217,7 +217,7 @@ return [
                                 ],
                                 'value' => [
                                     'type' => ValueNode::class,
-                                    'hash' => 1332614422,
+                                    'hash' => 2796295159,
                                 ],
                             ],
                             'children' => [
@@ -268,9 +268,9 @@ return [
                                 ],
                                 [
                                     'type' => ValueNode::class,
-                                    'hash' => 1332614422,
+                                    'hash' => 2796295159,
                                     'properties' => [
-                                        'scalar' => [
+                                        'payload' => [
                                             'type' => ScalarNode::class,
                                             'hash' => 2227779338,
                                         ],
