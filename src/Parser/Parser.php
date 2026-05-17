@@ -67,6 +67,7 @@ use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Flow\FlowHost;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
 use Aeliot\YamlToken\Parser\Helper\IndentationHelper;
+use Aeliot\YamlToken\Parser\Helper\LookAheadHelper;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
 use Aeliot\YamlToken\Token\Token;
 use Aeliot\YamlToken\Token\TokenStream;
@@ -92,6 +93,8 @@ final class Parser
 
     private IndentationHelper $indentationHelper;
 
+    private LookAheadHelper $lookAheadHelper;
+
     private NodeFactory $nodeFactory;
 
     public function __construct()
@@ -100,6 +103,7 @@ final class Parser
         $this->indentationHelper = new IndentationHelper($this->errorHelper);
         $this->nodeFactory = new NodeFactory();
         $this->consumer = new Consumer($this->nodeFactory);
+        $this->lookAheadHelper = new LookAheadHelper($this->consumer);
     }
 
     public function parse(string $input): StreamNode
@@ -368,12 +372,7 @@ final class Parser
      */
     private function collectInsignificantIndentationLines(Harvester $harvester, Node $root): void
     {
-        while ($this->isInsignificantIndentationLine($harvester)) {
-            $token = $harvester->tokens->current();
-            $root->addChild(new IndentationNode($token));
-            $harvester->tokens->advance();
-            $this->consumer->collectSpaceCommentEnds($harvester->tokens, $root);
-        }
+        $this->lookAheadHelper->collectInsignificantIndentationLines($harvester->tokens, $root);
     }
 
     private function collectKeyProperties(Harvester $harvester, KeyNode $keyNode): void
@@ -1240,23 +1239,6 @@ final class Parser
      * of s-separate-in-line, not of block s-indent(n), and must not be
      * registered as the document's indent step nor validated against it.
      */
-    private function isInsignificantIndentationLine(Harvester $harvester): bool
-    {
-        if (TokenType::INDENTATION !== $harvester->tokens->current()?->type) {
-            return false;
-        }
-
-        for ($offset = 1;; ++$offset) {
-            $token = $harvester->tokens->peek($offset);
-            if (null === $token || TokenType::NEWLINE === $token->type) {
-                return true;
-            }
-            if (TokenType::COMMENT !== $token->type && TokenType::WHITESPACE !== $token->type) {
-                return false;
-            }
-        }
-    }
-
     private function isKeyValueCoupleStart(Harvester $harvester): bool
     {
         $contentPeekOffset = 0;
@@ -2651,33 +2633,7 @@ final class Parser
      */
     private function peekFirstSignificantBlockHead(Harvester $harvester, int $offset = 1): ?array
     {
-        while (true) {
-            $token = $harvester->tokens->peek($offset);
-            if (null === $token) {
-                return null;
-            }
-
-            if (TokenType::NEWLINE === $token->type) {
-                ++$offset;
-                continue;
-            }
-
-            $hasIndentation = TokenType::INDENTATION === $token->type;
-            $indentLen = $hasIndentation ? \strlen($token->text) : 0;
-            $probe = $hasIndentation ? $offset + 1 : $offset;
-
-            while (true) {
-                $candidate = $harvester->tokens->peek($probe);
-                if (null === $candidate || TokenType::NEWLINE === $candidate->type) {
-                    $offset = null === $candidate ? $probe : $probe + 1;
-                    continue 2;
-                }
-                if (TokenType::COMMENT !== $candidate->type && TokenType::WHITESPACE !== $candidate->type) {
-                    return [$indentLen, $candidate, $probe];
-                }
-                ++$probe;
-            }
-        }
+        return $this->lookAheadHelper->peekFirstSignificantBlockHead($harvester->tokens, $offset);
     }
 
     private function postProcessKeyValueCouple(Harvester $harvester, KeyValueCoupleNode $couple): void
