@@ -96,12 +96,6 @@ class ValueNode extends AbstractNode
         return $this->properties;
     }
 
-    public function setProperties(NodePropertiesNode $node): void
-    {
-        $this->properties = $node;
-        $this->addChild($node);
-    }
-
     public function getScalar(): ?ScalarNode
     {
         return $this->payload instanceof ScalarNode ? $this->payload : null;

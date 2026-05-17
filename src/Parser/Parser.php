@@ -547,7 +547,7 @@ final class Parser
         }
 
         if (null !== $properties && !$hadProperties) {
-            $valueNode->setProperties($properties);
+            $valueNode->addChild($properties);
         }
         foreach ($whitespaceBuffer as $whitespace) {
             $valueNode->addChild($whitespace);
