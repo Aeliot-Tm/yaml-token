@@ -55,7 +55,7 @@ final class FlowSequenceBuilder implements BuilderInterface
             throw new UnexpectedTokenException('FlowSequenceBuilder frame node must be FlowSequenceNode');
         }
 
-        $this->host->collectSpaceAndComments($harvester, $flowSequenceNode);
+        $this->host->collectSpaceCommentEnds($harvester, $flowSequenceNode);
 
         $token = $harvester->tokens->current();
         if (null === $token || TokenType::FLOW_SEQUENCE_END === $token->type) {

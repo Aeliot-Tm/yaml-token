@@ -14,17 +14,17 @@ use Aeliot\YamlToken\Node\ValueNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 531220709,
+    'hash' => 3518091932,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 2563718505,
+            'hash' => 2210700588,
             'properties' => [],
             'children' => [
                 [
                     'type' => FlowSequenceNode::class,
-                    'hash' => 3102467102,
+                    'hash' => 2907307283,
                     'properties' => [
                         'entries' => [
                             [
@@ -79,18 +79,18 @@ return [
                             ],
                             'children' => [],
                         ],
-                        [
-                            'type' => NewLineNode::class,
-                            'hash' => 763369711,
-                            'properties' => [
-                                'token' => [
-                                    'type' => TokenType::NEWLINE,
-                                    'text' => "\n",
-                                ],
-                            ],
-                            'children' => [],
+                    ],
+                ],
+                [
+                    'type' => NewLineNode::class,
+                    'hash' => 763369711,
+                    'properties' => [
+                        'token' => [
+                            'type' => TokenType::NEWLINE,
+                            'text' => "\n",
                         ],
                     ],
+                    'children' => [],
                 ],
             ],
         ],

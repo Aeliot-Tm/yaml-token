@@ -21,7 +21,7 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 648664252,
+    'hash' => 1921220940,
     'properties' => [],
     'children' => [
         [
@@ -236,7 +236,7 @@ return [
         ],
         [
             'type' => DocumentNode::class,
-            'hash' => 1798827226,
+            'hash' => 3863793907,
             'properties' => [],
             'children' => [
                 [
@@ -263,7 +263,7 @@ return [
                 ],
                 [
                     'type' => FlowMappingNode::class,
-                    'hash' => 407841031,
+                    'hash' => 1977782293,
                     'properties' => [
                         'entries' => [
                             [
@@ -513,18 +513,18 @@ return [
                             ],
                             'children' => [],
                         ],
-                        [
-                            'type' => NewLineNode::class,
-                            'hash' => 763369711,
-                            'properties' => [
-                                'token' => [
-                                    'type' => TokenType::NEWLINE,
-                                    'text' => "\n",
-                                ],
-                            ],
-                            'children' => [],
+                    ],
+                ],
+                [
+                    'type' => NewLineNode::class,
+                    'hash' => 763369711,
+                    'properties' => [
+                        'token' => [
+                            'type' => TokenType::NEWLINE,
+                            'text' => "\n",
                         ],
                     ],
+                    'children' => [],
                 ],
             ],
         ],
@@ -635,7 +635,7 @@ return [
         ],
         [
             'type' => DocumentNode::class,
-            'hash' => 849879623,
+            'hash' => 3432031782,
             'properties' => [],
             'children' => [
                 [
@@ -684,7 +684,7 @@ return [
                 ],
                 [
                     'type' => FlowMappingNode::class,
-                    'hash' => 825455888,
+                    'hash' => 3665961027,
                     'properties' => [
                         'entries' => [
                             [
@@ -781,18 +781,18 @@ return [
                             ],
                             'children' => [],
                         ],
-                        [
-                            'type' => NewLineNode::class,
-                            'hash' => 763369711,
-                            'properties' => [
-                                'token' => [
-                                    'type' => TokenType::NEWLINE,
-                                    'text' => "\n",
-                                ],
-                            ],
-                            'children' => [],
+                    ],
+                ],
+                [
+                    'type' => NewLineNode::class,
+                    'hash' => 763369711,
+                    'properties' => [
+                        'token' => [
+                            'type' => TokenType::NEWLINE,
+                            'text' => "\n",
                         ],
                     ],
+                    'children' => [],
                 ],
             ],
         ],

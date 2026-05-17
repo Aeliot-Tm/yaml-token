@@ -29,6 +29,7 @@ final class FlowHost
 {
     /**
      * @param \Closure(Harvester, Node): void $collectSpaceAndComments
+     * @param \Closure(Harvester, Node): void $collectSpaceCommentEnds
      * @param \Closure(Harvester): KeyNode $getFlowEntryKeyNode
      * @param \Closure(Harvester): bool $isScalarFollowedByValueIndicatorInFlow
      * @param \Closure(Harvester): ValueNode $parseFlowContextValue
@@ -39,6 +40,7 @@ final class FlowHost
      */
     public function __construct(
         private readonly \Closure $collectSpaceAndComments,
+        private readonly \Closure $collectSpaceCommentEnds,
         private readonly \Closure $createSimpleNode,
         private readonly \Closure $getFlowEntryKeyNode,
         private readonly \Closure $isFlowMultilinePlainKeyStart,
@@ -54,6 +56,11 @@ final class FlowHost
     public function collectSpaceAndComments(Harvester $harvester, Node $root): void
     {
         ($this->collectSpaceAndComments)($harvester, $root);
+    }
+
+    public function collectSpaceCommentEnds(Harvester $harvester, Node $root): void
+    {
+        ($this->collectSpaceCommentEnds)($harvester, $root);
     }
 
     public function createSimpleNode(Token $token): Node

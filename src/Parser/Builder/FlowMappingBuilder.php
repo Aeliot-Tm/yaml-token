@@ -55,7 +55,7 @@ final class FlowMappingBuilder implements BuilderInterface
             throw new UnexpectedTokenException('FlowMappingBuilder frame node must be FlowMappingNode');
         }
 
-        $this->host->collectSpaceAndComments($harvester, $flowMappingNode);
+        $this->host->collectSpaceCommentEnds($harvester, $flowMappingNode);
 
         $token = $harvester->tokens->current();
         if (null === $token || TokenType::FLOW_MAPPING_END === $token->type) {
