@@ -27,7 +27,6 @@ use Aeliot\YamlToken\Node\DirectiveNode;
 use Aeliot\YamlToken\Node\DocumentEndNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\DocumentStartNode;
-use Aeliot\YamlToken\Node\ExplicitKeyIndicatorNode;
 use Aeliot\YamlToken\Node\FlowSequenceNode;
 use Aeliot\YamlToken\Node\IndentationNode;
 use Aeliot\YamlToken\Node\KeyNode;
@@ -91,6 +90,11 @@ final class Parser
         private NodeFactory $nodeFactory,
         private ParserRegistry $parserRegistry,
     ) {
+        $this->parserRegistry->setBlockParserBridge(
+            fn (Harvester $h, int $indent): BlockMappingNode => $this->parseBlockMappingValue($h, $indent),
+            fn (Harvester $h, int $indent): BlockSequenceNode => $this->parseBlockSequenceValue($h, $indent),
+            fn (Harvester $h, int $indent): BlockSequenceNode => $this->parseCompactBlockSequence($h, $indent),
+        );
     }
 
     public function parse(string $input): StreamNode
@@ -121,59 +125,6 @@ final class Parser
     private function appendTokenLocation(string $message, Token|TokenStreamProxy $tokens): string
     {
         return $this->errorHelper->appendTokenLocation($message, $tokens);
-    }
-
-    private function collectKeyProperties(Harvester $harvester, KeyNode $keyNode): void
-    {
-        $properties = null;
-        $whitespaceBuffer = [];
-
-        while (!$harvester->tokens->isEnd()) {
-            $token = $harvester->tokens->current();
-            if (TokenType::WHITESPACE === $token->type) {
-                if (null === $properties) {
-                    $keyNode->addChild(new WhitespaceNode($token));
-                } else {
-                    $whitespaceBuffer[] = new WhitespaceNode($token);
-                }
-                $harvester->tokens->advance();
-                continue;
-            }
-
-            if (TokenType::ANCHOR === $token->type) {
-                $properties ??= new NodePropertiesNode();
-                foreach ($whitespaceBuffer as $whitespace) {
-                    $properties->addChild($whitespace);
-                }
-                $whitespaceBuffer = [];
-                $properties->addChild(new AnchorNode($token));
-                $harvester->tokens->advance();
-                continue;
-            }
-
-            if ($this->isNodePropertyToken($token)) {
-                if (null !== $properties?->getTag()) {
-                    throw new UnexpectedStateException($this->appendTokenLocation('Only one tag is supported per key node', $token));
-                }
-                $properties ??= new NodePropertiesNode();
-                foreach ($whitespaceBuffer as $whitespace) {
-                    $properties->addChild($whitespace);
-                }
-                $whitespaceBuffer = [];
-                $properties->addChild(new TagNode($token));
-                $harvester->tokens->advance();
-                continue;
-            }
-
-            break;
-        }
-
-        if (null !== $properties) {
-            $keyNode->addChild($properties);
-        }
-        foreach ($whitespaceBuffer as $whitespace) {
-            $keyNode->addChild($whitespace);
-        }
     }
 
     /**
@@ -474,162 +425,12 @@ final class Parser
     private function createFlowHost(): FlowHost
     {
         return new FlowHost(
-            fn (Harvester $h): KeyNode => $this->getKeyNode($h),
+            fn (Harvester $h): KeyNode => $this->parserRegistry->getKeyParser()->getKeyNode($h),
             fn (Harvester $h): bool => $this->isFlowMultilinePlainKeyStart($h),
             fn (Harvester $h): bool => $this->isScalarFollowedByValueIndicator($h, true),
             fn (Harvester $h): ValueNode => $this->parseFlowContextValue($h),
             fn (Harvester $h): MergeInstructionNode => $this->parseMergeInstructionAtCurrentPosition($h),
         );
-    }
-
-    private function getKeyNode(Harvester $harvester, ?int $entryIndentLen = null): KeyNode
-    {
-        $keyNode = new KeyNode();
-        $this->collectKeyProperties($harvester, $keyNode);
-        $token = $harvester->tokens->current();
-
-        if (TokenType::EXPLICIT_KEY_INDICATOR === $token->type) {
-            $keyNode->addChild(new ExplicitKeyIndicatorNode($token));
-            $harvester->tokens->advance();
-            $token = $harvester->tokens->current();
-
-            if (TokenType::WHITESPACE === $token->type) {
-                $keyNode->addChild(new WhitespaceNode($token));
-                $harvester->tokens->advance();
-            }
-
-            // YAML 1.2.2 §8.2.2 c-l-block-map-explicit-key(n) uses
-            // s-l+block-indented(n, BLOCK-OUT) which allows node properties
-            // (anchor/tag) after the '?' indicator.
-            $this->collectKeyProperties($harvester, $keyNode);
-            $token = $harvester->tokens->current();
-        }
-
-        if (
-            null !== $keyNode->getExplicitKeyIndicatorNode()
-            && null !== $entryIndentLen
-            && TokenType::NEWLINE === $token->type
-        ) {
-            $head = $this->lookAheadHelper->peekFirstSignificantBlockHead($harvester->tokens, 1);
-            if (null === $head) {
-                return $keyNode;
-            }
-
-            [$indentLen, $significantToken, $scalarPeekOffset] = $head;
-            if ($indentLen <= $entryIndentLen) {
-                return $keyNode;
-            }
-
-            if (TokenType::SEQUENCE_ENTRY === $significantToken->type) {
-                $keyNode->setName($this->parseBlockSequenceValue($harvester, $entryIndentLen));
-
-                return $keyNode;
-            }
-
-            if (
-                TokenType::EXPLICIT_KEY_INDICATOR === $significantToken->type
-                || TokenType::MERGE_INDICATOR === $significantToken->type
-            ) {
-                $keyNode->setName($this->parseBlockMappingValue($harvester, $entryIndentLen));
-
-                return $keyNode;
-            }
-
-            if ($significantToken->type->isScalar()) {
-                // TODO: refactor confusing place
-                //       1) consider continuing of consuming (consume value outside of the method)
-                if ($this->multilineContinuationHelper->isImplicitYamlKeyOnContinuationLine($harvester->tokens, $scalarPeekOffset)) {
-                    $keyNode->setName($this->parseBlockMappingValue($harvester, $entryIndentLen));
-                } else {
-                    $this->parserRegistry->getBlockScalarParser()->consumeExplicitKeyMultilinePlainScalar($harvester->tokens, $keyNode, $entryIndentLen);
-                }
-
-                return $keyNode;
-            }
-
-            return $keyNode;
-        }
-
-        if (TokenType::VALUE_INDICATOR === $token->type) {
-            return $keyNode;
-        }
-
-        if (
-            null !== $keyNode->getExplicitKeyIndicatorNode()
-            && TokenType::SEQUENCE_ENTRY === $token->type
-        ) {
-            // YAML 1.2.2 §8.2.2 rule [190] c-l-block-map-explicit-key(n):
-            //   "?" s-l+block-indented(n, BLOCK-OUT)
-            // Compact in-line form where '-' directly follows "? " on the
-            // same line (Example 8.17). The nested block-sequence body
-            // becomes a child of the KeyNode so the emitter preserves the
-            // original text verbatim.
-            $keyNode->setName($this->parseCompactBlockSequence($harvester, $token->column - 1));
-
-            return $keyNode;
-        }
-
-        if (TokenType::FLOW_MAPPING_START === $token->type) {
-            $keyNode->setName($this->parserRegistry->getFlowMappingParser()->parse($harvester));
-
-            return $keyNode;
-        }
-
-        if (TokenType::FLOW_SEQUENCE_START === $token->type) {
-            $keyNode->setName($this->parserRegistry->getFlowSequenceParser()->parse($harvester));
-
-            return $keyNode;
-        }
-
-        if (TokenType::ALIAS === $token->type) {
-            $aliasNode = new AliasNode($token);
-            $aliasName = $aliasNode->getName();
-            $anchor = $harvester->anchorsRegistry->anchors[$aliasName] ?? null;
-            if (null === $anchor) {
-                throw new AnchorUndefinedException($this->appendTokenLocation(\sprintf('Undefined alias "%s"', $aliasName), $token));
-            }
-            $aliasNode->setAnchor($anchor);
-            $keyNode->setName($aliasNode);
-            $harvester->tokens->advance();
-
-            return $keyNode;
-        }
-
-        // YAML 1.2.2 §7.2 empty nodes: implicit key may be anchor/tag-only with no scalar before ':'.
-        if (TokenType::VALUE_INDICATOR === $token->type && null !== $keyNode->getProperties()) {
-            return $keyNode;
-        }
-
-        // YAML 1.2.2 §8.2.2 c-l-block-map-explicit-key(n): block scalar (| or >) used as mapping key.
-        if (
-            null !== $keyNode->getExplicitKeyIndicatorNode()
-            && \in_array($token->type, TokenType::BLOCK_SCALAR_INDICATORS, true)
-        ) {
-            $this->parserRegistry->getBlockScalarParser()->consumeBlockScalarKeyName($harvester->tokens, $keyNode);
-
-            return $keyNode;
-        }
-
-        if (!$token->type->isScalar() && !$token->type->isMergeIndicator()) {
-            if (null !== $keyNode->getExplicitKeyIndicatorNode()) {
-                return $keyNode;
-            }
-
-            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Key scalar expected, but %s given', $token->type->value), $token));
-        }
-
-        $keyNode->setName(
-            $this->parserRegistry
-                ->getMultilinePlainScalarParser()
-                ->buildScalarKeyName(
-                    $harvester->tokens,
-                    $token,
-                    $entryIndentLen,
-                    null !== $keyNode->getExplicitKeyIndicatorNode(),
-                )
-        );
-
-        return $keyNode;
     }
 
     private function isBlockScalarStartAtDocumentRoot(Harvester $harvester): bool
@@ -1657,7 +1458,7 @@ final class Parser
             $harvester->tokens->advance();
         }
 
-        $keyValueCouple->addChild($this->getKeyNode($harvester, $entryIndentLen));
+        $keyValueCouple->addChild($this->parserRegistry->getKeyParser()->getKeyNode($harvester, $entryIndentLen));
 
         // YAML 1.2.2 explicit block mapping entry may put ':' on the next line:
         //   ? key

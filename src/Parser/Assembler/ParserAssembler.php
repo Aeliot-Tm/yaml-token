@@ -21,6 +21,7 @@ use Aeliot\YamlToken\Parser\Helper\LookAheadHelper;
 use Aeliot\YamlToken\Parser\Helper\MultilineContinuationHelper;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
 use Aeliot\YamlToken\Parser\ParserRegistry;
+use Aeliot\YamlToken\Parser\SubParser\Block\KeyParser;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowEntryParser;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowMappingPairParser;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowMappingParser;
@@ -45,6 +46,23 @@ final class ParserAssembler
     public function createBlockScalarParser(ParserRegistry $registry): BlockScalarParser
     {
         return new BlockScalarParser($this->consumer, $this->errorHelper, $this->nodeFactory);
+    }
+
+    public function createKeyParser(
+        ParserRegistry $registry,
+        \Closure $parseBlockMappingValue,
+        \Closure $parseBlockSequenceValue,
+        \Closure $parseCompactBlockSequence,
+    ): KeyParser {
+        return new KeyParser(
+            $this->errorHelper,
+            $this->lookAheadHelper,
+            $this->multilineContinuationHelper,
+            $parseBlockMappingValue,
+            $parseBlockSequenceValue,
+            $parseCompactBlockSequence,
+            $registry,
+        );
     }
 
     public function createFlowEntryParser(ParserRegistry $registry): FlowEntryParser

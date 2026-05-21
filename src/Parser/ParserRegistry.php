@@ -16,6 +16,7 @@ namespace Aeliot\YamlToken\Parser;
 use Aeliot\YamlToken\Parser\Assembler\ParserAssembler;
 use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
 use Aeliot\YamlToken\Parser\Enum\StructureType;
+use Aeliot\YamlToken\Parser\SubParser\Block\KeyParser;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowEntryParser;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowMappingPairParser;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowMappingParser;
@@ -28,6 +29,10 @@ final class ParserRegistry
 {
     private ?BlockScalarParser $blockScalarParser = null;
     private ?FlowEntryParser $flowEntryParser = null;
+    private ?KeyParser $keyParser = null;
+    private ?\Closure $parseBlockMappingValue = null;
+    private ?\Closure $parseBlockSequenceValue = null;
+    private ?\Closure $parseCompactBlockSequence = null;
     private ?FlowMappingPairParser $flowMappingPairParser = null;
     private ?FlowMappingParser $flowMappingParser = null;
     private ?FlowSequenceParser $flowSequenceParser = null;
@@ -74,6 +79,16 @@ final class ParserRegistry
         return $this->flowSequenceParser ??= $this->assembler->createFlowSequenceParser($this);
     }
 
+    public function getKeyParser(): KeyParser
+    {
+        return $this->keyParser ??= $this->assembler->createKeyParser(
+            $this,
+            $this->parseBlockMappingValue ?? throw new \LogicException('Block mapping parser bridge not set'),
+            $this->parseBlockSequenceValue ?? throw new \LogicException('Block sequence parser bridge not set'),
+            $this->parseCompactBlockSequence ?? throw new \LogicException('Block compact parser bridge not set'),
+        );
+    }
+
     public function getMultilinePlainScalarParser(): MultilinePlainScalarParser
     {
         return $this->multilinePlainScalarParser ??= $this->assembler->createMultilinePlainScalarParser($this);
@@ -82,5 +97,15 @@ final class ParserRegistry
     public function getSimpleScalarParser(): SimpleScalarParser
     {
         return $this->simpleScalarParser ??= $this->assembler->createSimpleScalarParser($this);
+    }
+
+    public function setBlockParserBridge(
+        \Closure $parseBlockMappingValue,
+        \Closure $parseBlockSequenceValue,
+        \Closure $parseCompactBlockSequence,
+    ): void {
+        $this->parseBlockMappingValue = $parseBlockMappingValue;
+        $this->parseBlockSequenceValue = $parseBlockSequenceValue;
+        $this->parseCompactBlockSequence = $parseCompactBlockSequence;
     }
 }
