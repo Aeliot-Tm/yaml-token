@@ -28,7 +28,6 @@ use Aeliot\YamlToken\Node\DocumentEndNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\DocumentStartNode;
 use Aeliot\YamlToken\Node\ExplicitKeyIndicatorNode;
-use Aeliot\YamlToken\Node\FlowMappingNode;
 use Aeliot\YamlToken\Node\FlowSequenceNode;
 use Aeliot\YamlToken\Node\IndentationNode;
 use Aeliot\YamlToken\Node\KeyNode;
@@ -44,7 +43,6 @@ use Aeliot\YamlToken\Node\TagDirectiveIndicatorNode;
 use Aeliot\YamlToken\Node\TagDirectiveNode;
 use Aeliot\YamlToken\Node\TagDirectivePrefixNode;
 use Aeliot\YamlToken\Node\TagNode;
-use Aeliot\YamlToken\Node\ValueIndicatorNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 use Aeliot\YamlToken\Node\YamlDirectiveIndicatorNode;
@@ -476,19 +474,11 @@ final class Parser
     private function createFlowHost(): FlowHost
     {
         return new FlowHost(
-            fn (Harvester $h, Node $root) => $this->consumer->collectSpaceAndComments($h->tokens, $root),
-            fn (Harvester $h, Node $root) => $this->consumer->collectSpaceCommentEnds($h->tokens, $root),
-            fn (Token $t): Node => $this->nodeFactory->createSimpleNode($t),
             fn (Harvester $h): KeyNode => $this->getKeyNode($h),
             fn (Harvester $h): bool => $this->isFlowMultilinePlainKeyStart($h),
             fn (Harvester $h): bool => $this->isScalarFollowedByValueIndicator($h, true),
             fn (Harvester $h): ValueNode => $this->parseFlowContextValue($h),
-            fn (Harvester $h): FlowMappingNode => $this->parserRegistry->getFlowMappingParser()->parse($h),
             fn (Harvester $h): MergeInstructionNode => $this->parseMergeInstructionAtCurrentPosition($h),
-            function (Harvester $h, KeyValueCoupleNode $couple): void {
-                $this->anchorPostProcessor->postProcessKeyValueCouple($h->anchorsRegistry, $couple);
-            },
-            fn (Harvester $h, KeyValueCoupleNode $couple): bool => $this->tryConsumeFlowMappingValueIndicator($h, $couple),
         );
     }
 
@@ -2114,22 +2104,5 @@ final class Parser
 
         $stream->addChild($document);
         $addedDocs[$objectId] = true;
-    }
-
-    private function tryConsumeFlowMappingValueIndicator(Harvester $harvester, KeyValueCoupleNode $couple): bool
-    {
-        $this->consumer->collectSpaceCommentEnds($harvester->tokens, $couple);
-
-        $token = $harvester->tokens->current();
-        if (TokenType::VALUE_INDICATOR !== $token?->type) {
-            return false;
-        }
-
-        $couple->addChild(new ValueIndicatorNode($token));
-        $harvester->tokens->advance();
-
-        $this->consumer->collectTypes($harvester->tokens, [TokenType::WHITESPACE], $couple);
-
-        return true;
     }
 }

@@ -13,59 +13,33 @@ declare(strict_types=1);
 
 namespace Aeliot\YamlToken\Parser\Flow;
 
-use Aeliot\YamlToken\Node\FlowMappingNode;
 use Aeliot\YamlToken\Node\KeyNode;
-use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\MergeInstructionNode;
-use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Parser\Dto\Harvester;
-use Aeliot\YamlToken\Token\Token;
 
 /**
- * Bridges flow-collection builders to {@see \Aeliot\YamlToken\Parser\Parser} private methods via closures.
+ * Temporary bridge: provides flow sub-parsers with access to {@see \Aeliot\YamlToken\Parser\Parser}
+ * private methods that have not yet been extracted into sub-parsers.
+ *
+ * Will be removed once all bridged methods are extracted (Commits 15+).
  */
 final class FlowHost
 {
     /**
-     * @param \Closure(Harvester, Node): void $collectSpaceAndComments
-     * @param \Closure(Harvester, Node): void $collectSpaceCommentEnds
      * @param \Closure(Harvester): KeyNode $getFlowEntryKeyNode
+     * @param \Closure(Harvester): bool $isFlowMultilinePlainKeyStart
      * @param \Closure(Harvester): bool $isScalarFollowedByValueIndicatorInFlow
      * @param \Closure(Harvester): ValueNode $parseFlowContextValue
-     * @param \Closure(Harvester): FlowMappingNode $parseFlowMapping
      * @param \Closure(Harvester): MergeInstructionNode $parseMergeInstructionAtCurrentPosition
-     * @param \Closure(Harvester, KeyValueCoupleNode): void $postProcessKeyValueCouple
-     * @param \Closure(Harvester, KeyValueCoupleNode): bool $tryConsumeFlowMappingValueIndicator
      */
     public function __construct(
-        private readonly \Closure $collectSpaceAndComments,
-        private readonly \Closure $collectSpaceCommentEnds,
-        private readonly \Closure $createSimpleNode,
         private readonly \Closure $getFlowEntryKeyNode,
         private readonly \Closure $isFlowMultilinePlainKeyStart,
         private readonly \Closure $isScalarFollowedByValueIndicatorInFlow,
         private readonly \Closure $parseFlowContextValue,
-        private readonly \Closure $parseFlowMapping,
         private readonly \Closure $parseMergeInstructionAtCurrentPosition,
-        private readonly \Closure $postProcessKeyValueCouple,
-        private readonly \Closure $tryConsumeFlowMappingValueIndicator,
     ) {
-    }
-
-    public function collectSpaceAndComments(Harvester $harvester, Node $root): void
-    {
-        ($this->collectSpaceAndComments)($harvester, $root);
-    }
-
-    public function collectSpaceCommentEnds(Harvester $harvester, Node $root): void
-    {
-        ($this->collectSpaceCommentEnds)($harvester, $root);
-    }
-
-    public function createSimpleNode(Token $token): Node
-    {
-        return ($this->createSimpleNode)($token);
     }
 
     public function getFlowEntryKeyNode(Harvester $harvester): KeyNode
@@ -88,23 +62,8 @@ final class FlowHost
         return ($this->parseFlowContextValue)($harvester);
     }
 
-    public function parseFlowMapping(Harvester $harvester): FlowMappingNode
-    {
-        return ($this->parseFlowMapping)($harvester);
-    }
-
     public function parseMergeInstructionAtCurrentPosition(Harvester $harvester): MergeInstructionNode
     {
         return ($this->parseMergeInstructionAtCurrentPosition)($harvester);
-    }
-
-    public function postProcessKeyValueCouple(Harvester $harvester, KeyValueCoupleNode $couple): void
-    {
-        ($this->postProcessKeyValueCouple)($harvester, $couple);
-    }
-
-    public function tryConsumeFlowMappingValueIndicator(Harvester $harvester, KeyValueCoupleNode $couple): bool
-    {
-        return ($this->tryConsumeFlowMappingValueIndicator)($harvester, $couple);
     }
 }
