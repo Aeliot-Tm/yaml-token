@@ -56,7 +56,6 @@ use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Flow\FlowHost;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
-use Aeliot\YamlToken\Parser\Helper\IndentationHelper;
 use Aeliot\YamlToken\Parser\Helper\LookAheadHelper;
 use Aeliot\YamlToken\Parser\Helper\MultilineContinuationHelper;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
@@ -69,7 +68,7 @@ final class Parser
      * Bare-document block parent indent (YAML 1.2.2 rule [211], grammar uses n = -1). Not a column count;
      * keeps “$lineIndent <= $parentIndent” checks uniform: no non-negative indent is <= this value.
      */
-    private const BARE_DOCUMENT_BLOCK_PARENT_INDENT = -1;
+    private const BARE_DOCUMENT_BLOCK_PARENT_INDENT = MultilineContinuationHelper::BARE_DOCUMENT_BLOCK_PARENT_INDENT;
 
     /**
      * Sentinel for {@see parseValue()} when the value is parsed inside a flow collection or merge RHS.
@@ -81,7 +80,6 @@ final class Parser
     public function __construct(
         private Consumer $consumer,
         private ErrorHelper $errorHelper,
-        private IndentationHelper $indentationHelper,
         private LookAheadHelper $lookAheadHelper,
         private MultilineContinuationHelper $multilineContinuationHelper,
         private NodeFactory $nodeFactory,
@@ -89,11 +87,14 @@ final class Parser
     ) {
         $this->parserRegistry->setBlockParserBridge(
             fn (Harvester $h, int $offset): bool => $this->isFlowCollectionFollowedByBlockValueIndicatorOnSameLine($h, $offset),
+            fn (Harvester $h): bool => $this->isKeyValueCoupleStart($h),
+            fn (Harvester $h): bool => $this->isKeyValueCoupleStartAllowingNodeProperties($h),
             fn (Harvester $h, bool $allowFlowSeparation = false): bool => $this->isScalarFollowedByValueIndicator($h, $allowFlowSeparation),
-            fn (Harvester $h, int $indent): BlockMappingNode => $this->parseBlockMappingValue($h, $indent),
-            fn (Harvester $h, int $indent): BlockSequenceNode => $this->parseBlockSequenceValue($h, $indent),
+            fn (Harvester $h, int $indent): BlockMappingNode => $this->parserRegistry->getBlockMappingParser()->parseBlockMappingValue($h, $indent),
+            fn (Harvester $h, int $indent): BlockSequenceNode => $this->parserRegistry->getBlockSequenceParser()->parseBlockSequenceValue($h, $indent),
             fn (Harvester $h, int $indent): BlockMappingNode => $this->parseCompactBlockMapping($h, $indent),
             fn (Harvester $h, int $indent): BlockSequenceNode => $this->parseCompactBlockSequence($h, $indent),
+            fn (Harvester $h): MergeInstructionNode => $this->parseMergeInstructionAtCurrentPosition($h),
             fn (Harvester $h, int $parentIndentLen): ValueNode => $this->parseValue($h, $parentIndentLen),
         );
     }
@@ -839,153 +840,6 @@ final class Parser
         return TokenType::SEQUENCE_ENTRY === $token?->type;
     }
 
-    private function parseBlockMappingValue(Harvester $harvester, int $parentIndentLen): BlockMappingNode
-    {
-        $blockMapping = new BlockMappingNode();
-
-        $baseIndentLen = null;
-        $previousCoupleIndentLen = null;
-
-        while (!$harvester->tokens->isEnd()) {
-            $head = $this->lookAheadHelper->peekFirstSignificantBlockHead($harvester->tokens, 0);
-            if (null === $head || $head[0] <= $parentIndentLen) {
-                break;
-            }
-
-            $this->consumer->collectSpaceCommentEnds($harvester->tokens, $blockMapping);
-            $this->lookAheadHelper->collectInsignificantIndentationLines($harvester->tokens, $blockMapping);
-
-            $token = $harvester->tokens->current();
-            if (null === $token) {
-                break;
-            }
-
-            // Column-0 entries at the bare document root (YAML 1.2.2 rule [211]) have no INDENTATION token.
-            if (TokenType::INDENTATION === $token->type) {
-                $indentLen = \strlen($token->text);
-            } elseif (self::BARE_DOCUMENT_BLOCK_PARENT_INDENT === $parentIndentLen && $this->isKeyValueCoupleStart($harvester)) {
-                $indentLen = 0;
-            } else {
-                break;
-            }
-
-            if ($indentLen > 0) {
-                $this->indentationHelper->registerIndentStepIfNeeded($harvester->state, $harvester->tokens, $indentLen);
-                $this->indentationHelper->assertIndentLenIsValid($harvester->state, $harvester->tokens, $indentLen);
-            }
-
-            if ($indentLen <= $parentIndentLen) {
-                break;
-            }
-
-            if (null === $baseIndentLen) {
-                $baseIndentLen = $indentLen;
-            } elseif ($indentLen < $baseIndentLen) {
-                throw new IndentationInvalidException($this->appendTokenLocation(\sprintf('Unexpected indentation %d while base indentation is %d', $indentLen, $baseIndentLen), $token));
-            } elseif ($indentLen > $baseIndentLen && $previousCoupleIndentLen === $baseIndentLen) {
-                throw new IndentationInvalidException($this->appendTokenLocation(\sprintf('Unexpected indentation %d for next key/value couple; expected %d', $indentLen, $baseIndentLen), $token));
-            }
-
-            if (false === $this->isKeyValueCoupleStartAllowingNodeProperties($harvester)) {
-                throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Key/value couple expected while parsing block mapping value, but %s given', $harvester->tokens->current()?->type->value ?? '_nothing_'), $token));
-            }
-
-            $previousCoupleIndentLen = $indentLen;
-            $mergeCandidate = TokenType::INDENTATION === $token->type
-                ? $harvester->tokens->peek(1)
-                : $token;
-            if (TokenType::MERGE_INDICATOR === $mergeCandidate?->type) {
-                $blockMapping->addChild($this->parseMergeInstructionAtCurrentPosition($harvester));
-                continue;
-            }
-            $this->parserRegistry
-                ->getKeyValueCoupleParser()
-                ->parseKeyValueCoupleAtCurrentPosition($harvester, $blockMapping, $indentLen);
-        }
-
-        if (null === $baseIndentLen) {
-            throw new UnexpectedStateException('Empty block mapping value is not supported');
-        }
-
-        return $blockMapping;
-    }
-
-    private function parseBlockSequenceValue(Harvester $harvester, int $parentIndentLen, bool $allowNonSequenceAtBaseIndentAsTerminator = false): BlockSequenceNode
-    {
-        $blockSequence = new BlockSequenceNode();
-
-        $baseIndentLen = null;
-
-        while (!$harvester->tokens->isEnd()) {
-            $head = $this->lookAheadHelper->peekFirstSignificantBlockHead($harvester->tokens, 0);
-            if (null === $head || $head[0] <= $parentIndentLen) {
-                break;
-            }
-
-            $this->consumer->collectSpaceCommentEnds($harvester->tokens, $blockSequence);
-            $this->lookAheadHelper->collectInsignificantIndentationLines($harvester->tokens, $blockSequence);
-
-            $token = $harvester->tokens->current();
-            if (null === $token) {
-                break;
-            }
-
-            // Column-0 entries at the bare document root (YAML 1.2.2 rule [211]) have no INDENTATION token.
-            if (TokenType::INDENTATION === $token->type) {
-                $indentLen = \strlen($token->text);
-            } elseif (self::BARE_DOCUMENT_BLOCK_PARENT_INDENT === $parentIndentLen && TokenType::SEQUENCE_ENTRY === $token->type) {
-                $indentLen = 0;
-            } else {
-                break;
-            }
-
-            if ($indentLen > 0) {
-                $this->indentationHelper->registerIndentStepIfNeeded($harvester->state, $harvester->tokens, $indentLen);
-                $this->indentationHelper->assertIndentLenIsValid($harvester->state, $harvester->tokens, $indentLen);
-            }
-
-            if ($indentLen <= $parentIndentLen) {
-                break;
-            }
-
-            if (null === $baseIndentLen) {
-                $baseIndentLen = $indentLen;
-            } elseif ($indentLen !== $baseIndentLen) {
-                throw new IndentationInvalidException($this->appendTokenLocation(\sprintf('Unexpected indentation %d while base indentation is %d', $indentLen, $baseIndentLen), $token));
-            }
-
-            if (false === $this->isSequenceStart($harvester)) {
-                if ($allowNonSequenceAtBaseIndentAsTerminator && $indentLen === $baseIndentLen) {
-                    break;
-                }
-                throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Sequence entry expected while parsing block sequence value, but %s given', $harvester->tokens->current()?->type->value ?? '_nothing_'), $token));
-            }
-
-            $sequenceEntry = new BlockSequenceEntryNode();
-            $blockSequence->addChild($sequenceEntry);
-            if (TokenType::INDENTATION === $token->type) {
-                $sequenceEntry->addChild(new IndentationNode($token));
-                $harvester->tokens->advance();
-            }
-
-            $compactIndent = $indentLen + $this->parserRegistry
-                    ->getSequenceEntryParser()
-                    ->consumeSequenceEntryIndicatorAndSpaces($harvester, $sequenceEntry);
-
-            $sequenceEntry->addChild(
-                $this->parserRegistry
-                    ->getSequenceEntryParser()
-                    ->parseSequenceEntryValue($harvester, $indentLen, $compactIndent),
-            );
-        }
-
-        if (null === $baseIndentLen) {
-            throw new UnexpectedStateException('Empty block sequence value is not supported');
-        }
-
-        return $blockSequence;
-    }
-
     /**
      * YAML 1.2.2 §8.2.2 rule [195] ns-l-compact-mapping(n):
      *   ns-l-block-map-entry(n) ( s-indent(n) ns-l-block-map-entry(n) )*
@@ -1316,7 +1170,7 @@ final class Parser
             // Here $indentLen equals $parentIndentLen (indentation of the key line).
             if ($indentLen === $parentIndentLen && TokenType::SEQUENCE_ENTRY === $afterIndent->type) {
                 $this->consumeBlockValueOpeningLayout($harvester, $valueNode);
-                $valueNode->addChild($this->parseBlockSequenceValue($harvester, $parentIndentLen - 1, true));
+                $valueNode->addChild($this->parserRegistry->getBlockSequenceParser()->parseBlockSequenceValue($harvester, $parentIndentLen - 1, true));
 
                 return;
             }
@@ -1365,7 +1219,7 @@ final class Parser
 
             if (TokenType::SEQUENCE_ENTRY === $afterIndent->type) {
                 $this->consumeBlockValueOpeningLayout($harvester, $valueNode);
-                $valueNode->addChild($this->parseBlockSequenceValue($harvester, $parentIndentLen));
+                $valueNode->addChild($this->parserRegistry->getBlockSequenceParser()->parseBlockSequenceValue($harvester, $parentIndentLen));
 
                 return;
             }
@@ -1422,7 +1276,7 @@ final class Parser
             }
 
             $this->consumeBlockValueOpeningLayout($harvester, $valueNode);
-            $valueNode->addChild($this->parseBlockMappingValue($harvester, $parentIndentLen));
+            $valueNode->addChild($this->parserRegistry->getBlockMappingParser()->parseBlockMappingValue($harvester, $parentIndentLen));
 
             return;
         }
@@ -1432,7 +1286,7 @@ final class Parser
         if (self::BARE_DOCUMENT_BLOCK_PARENT_INDENT === $parentIndentLen) {
             if (TokenType::SEQUENCE_ENTRY === $afterIndent->type) {
                 $this->consumeBlockValueOpeningLayout($harvester, $valueNode);
-                $valueNode->addChild($this->parseBlockSequenceValue($harvester, self::BARE_DOCUMENT_BLOCK_PARENT_INDENT));
+                $valueNode->addChild($this->parserRegistry->getBlockSequenceParser()->parseBlockSequenceValue($harvester, self::BARE_DOCUMENT_BLOCK_PARENT_INDENT));
 
                 return;
             }
@@ -1442,7 +1296,7 @@ final class Parser
                 || $afterIndent->type->isScalar()
             ) {
                 $this->consumeBlockValueOpeningLayout($harvester, $valueNode);
-                $valueNode->addChild($this->parseBlockMappingValue($harvester, self::BARE_DOCUMENT_BLOCK_PARENT_INDENT));
+                $valueNode->addChild($this->parserRegistry->getBlockMappingParser()->parseBlockMappingValue($harvester, self::BARE_DOCUMENT_BLOCK_PARENT_INDENT));
             }
         }
     }

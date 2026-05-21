@@ -21,6 +21,8 @@ use Aeliot\YamlToken\Parser\Helper\LookAheadHelper;
 use Aeliot\YamlToken\Parser\Helper\MultilineContinuationHelper;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
 use Aeliot\YamlToken\Parser\ParserRegistry;
+use Aeliot\YamlToken\Parser\SubParser\Block\BlockMappingParser;
+use Aeliot\YamlToken\Parser\SubParser\Block\BlockSequenceParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\KeyParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\KeyValueCoupleParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\SequenceEntryParser;
@@ -45,9 +47,38 @@ final class ParserAssembler
     ) {
     }
 
+    public function createBlockMappingParser(
+        ParserRegistry $registry,
+        \Closure $isKeyValueCoupleStart,
+        \Closure $isKeyValueCoupleStartAllowingNodeProperties,
+        \Closure $parseMergeInstructionAtCurrentPosition,
+    ): BlockMappingParser {
+        return new BlockMappingParser(
+            $this->consumer,
+            $this->errorHelper,
+            $this->indentationHelper,
+            $isKeyValueCoupleStart,
+            $isKeyValueCoupleStartAllowingNodeProperties,
+            $this->lookAheadHelper,
+            $parseMergeInstructionAtCurrentPosition,
+            $registry,
+        );
+    }
+
     public function createBlockScalarParser(ParserRegistry $registry): BlockScalarParser
     {
         return new BlockScalarParser($this->consumer, $this->errorHelper, $this->nodeFactory);
+    }
+
+    public function createBlockSequenceParser(ParserRegistry $registry): BlockSequenceParser
+    {
+        return new BlockSequenceParser(
+            $this->consumer,
+            $this->errorHelper,
+            $this->indentationHelper,
+            $this->lookAheadHelper,
+            $registry,
+        );
     }
 
     public function createKeyParser(
