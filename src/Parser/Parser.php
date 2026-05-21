@@ -97,6 +97,7 @@ final class Parser
         private LookAheadHelper $lookAheadHelper,
         private MultilineContinuationHelper $multilineContinuationHelper,
         private NodeFactory $nodeFactory,
+        private ParserRegistry $parserRegistry,
     ) {
     }
 

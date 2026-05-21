@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Aeliot\YamlToken\Parser;
 
+use Aeliot\YamlToken\Parser\Assembler\ParserAssembler;
 use Aeliot\YamlToken\Parser\Helper\AnchorPostProcessor;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
 use Aeliot\YamlToken\Parser\Helper\IndentationHelper;
@@ -24,6 +25,23 @@ final class ParserBuilder
 {
     public function createParser(): Parser
     {
+        $assembler = $this->createAssembler();
+        $parserRegistry = new ParserRegistry($assembler);
+
+        return new Parser(
+            $assembler->getAnchorPostProcessor(),
+            $assembler->getConsumer(),
+            $assembler->getErrorHelper(),
+            $assembler->getIndentationHelper(),
+            $assembler->getLookAheadHelper(),
+            $assembler->getMultilineContinuationHelper(),
+            $assembler->getNodeFactory(),
+            $parserRegistry,
+        );
+    }
+
+    private function createAssembler(): ParserAssembler
+    {
         $anchorPostProcessor = new AnchorPostProcessor();
         $errorHelper = new ErrorHelper();
         $indentationHelper = new IndentationHelper($errorHelper);
@@ -32,7 +50,7 @@ final class ParserBuilder
         $consumer = new Consumer($nodeFactory);
         $lookAheadHelper = new LookAheadHelper($consumer);
 
-        return new Parser(
+        return new ParserAssembler(
             $anchorPostProcessor,
             $consumer,
             $errorHelper,
