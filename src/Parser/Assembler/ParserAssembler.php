@@ -23,6 +23,9 @@ use Aeliot\YamlToken\Parser\Helper\NodeFactory;
 use Aeliot\YamlToken\Parser\ParserRegistry;
 use Aeliot\YamlToken\Parser\SubParser\Block\BlockMappingParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\BlockSequenceParser;
+use Aeliot\YamlToken\Parser\SubParser\Block\CompactBlockMappingParser;
+use Aeliot\YamlToken\Parser\SubParser\Block\CompactBlockSequenceParser;
+use Aeliot\YamlToken\Parser\SubParser\Block\IndentedBlockValueParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\KeyParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\KeyValueCoupleParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\SequenceEntryParser;
@@ -81,6 +84,64 @@ final class ParserAssembler
         );
     }
 
+    public function createCompactBlockMappingParser(
+        ParserRegistry $registry,
+        \Closure $isKeyValueCoupleStartAllowingNodeProperties,
+    ): CompactBlockMappingParser {
+        return new CompactBlockMappingParser(
+            $this->consumer,
+            $isKeyValueCoupleStartAllowingNodeProperties,
+            $this->lookAheadHelper,
+            $registry,
+        );
+    }
+
+    public function createCompactBlockSequenceParser(ParserRegistry $registry): CompactBlockSequenceParser
+    {
+        return new CompactBlockSequenceParser(
+            $this->consumer,
+            $this->lookAheadHelper,
+            $registry,
+        );
+    }
+
+    public function createFlowEntryParser(ParserRegistry $registry): FlowEntryParser
+    {
+        return new FlowEntryParser($this->anchorPostProcessor, $registry);
+    }
+
+    public function createFlowMappingPairParser(): FlowMappingPairParser
+    {
+        return new FlowMappingPairParser($this->anchorPostProcessor, $this->consumer);
+    }
+
+    public function createFlowMappingParser(ParserRegistry $registry): FlowMappingParser
+    {
+        return new FlowMappingParser($this->consumer, $this->errorHelper, $this->nodeFactory, $registry);
+    }
+
+    public function createFlowSequenceParser(ParserRegistry $registry): FlowSequenceParser
+    {
+        return new FlowSequenceParser($this->consumer, $this->errorHelper, $this->nodeFactory, $registry);
+    }
+
+    public function createIndentedBlockValueParser(
+        ParserRegistry $registry,
+        \Closure $collectValueProperties,
+        \Closure $isNodePropertiesFollowedByImplicitKeyFromOffset,
+    ): IndentedBlockValueParser {
+        return new IndentedBlockValueParser(
+            $collectValueProperties,
+            $this->consumer,
+            $this->errorHelper,
+            $isNodePropertiesFollowedByImplicitKeyFromOffset,
+            $this->lookAheadHelper,
+            $this->multilineContinuationHelper,
+            $this->nodeFactory,
+            $registry,
+        );
+    }
+
     public function createKeyParser(
         ParserRegistry $registry,
         \Closure $parseBlockMappingValue,
@@ -129,26 +190,6 @@ final class ParserAssembler
             $parseCompactBlockSequence,
             $parseValue,
         );
-    }
-
-    public function createFlowEntryParser(ParserRegistry $registry): FlowEntryParser
-    {
-        return new FlowEntryParser($this->anchorPostProcessor, $registry);
-    }
-
-    public function createFlowMappingPairParser(): FlowMappingPairParser
-    {
-        return new FlowMappingPairParser($this->anchorPostProcessor, $this->consumer);
-    }
-
-    public function createFlowMappingParser(ParserRegistry $registry): FlowMappingParser
-    {
-        return new FlowMappingParser($this->consumer, $this->errorHelper, $this->nodeFactory, $registry);
-    }
-
-    public function createFlowSequenceParser(ParserRegistry $registry): FlowSequenceParser
-    {
-        return new FlowSequenceParser($this->consumer, $this->errorHelper, $this->nodeFactory, $registry);
     }
 
     public function createMultilinePlainScalarParser(ParserRegistry $registry): MultilinePlainScalarParser

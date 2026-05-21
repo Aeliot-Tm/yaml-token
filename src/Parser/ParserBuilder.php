@@ -31,7 +31,6 @@ final class ParserBuilder
         return new Parser(
             $assembler->getConsumer(),
             $assembler->getErrorHelper(),
-            $assembler->getLookAheadHelper(),
             $assembler->getMultilineContinuationHelper(),
             $assembler->getNodeFactory(),
             $parserRegistry,
