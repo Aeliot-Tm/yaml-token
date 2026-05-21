@@ -112,6 +112,7 @@ final class Parser
         $harvester->flowHost = $this->createFlowHost();
         $harvester->anchorsRegistry = new AnchorsRegistry();
         $harvester->state = new ParseState();
+        $harvester->parseContext = new ParseContext($harvester->tokens, $harvester->anchorsRegistry, $harvester->state);
         $harvester->stream = $stream = new StreamNode();
 
         $token = $harvester->tokens->current();
@@ -2428,8 +2429,7 @@ final class Parser
                 }
                 $valueNode->addChild($consumedAny ? $multiline : $head);
             } else {
-                $valueNode->addChild($this->createScalarNode($token));
-                $harvester->tokens->advance();
+                $valueNode->addChild($this->parserRegistry->getSimpleScalarParser()->parse($harvester->parseContext));
             }
         } elseif (TokenType::ALIAS === $token->type) {
             $aliasNode = new AliasNode($token);

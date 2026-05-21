@@ -20,6 +20,8 @@ use Aeliot\YamlToken\Parser\Helper\IndentationHelper;
 use Aeliot\YamlToken\Parser\Helper\LookAheadHelper;
 use Aeliot\YamlToken\Parser\Helper\MultilineContinuationHelper;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
+use Aeliot\YamlToken\Parser\ParserRegistry;
+use Aeliot\YamlToken\Parser\SubParser\Scalar\SimpleScalarParser;
 
 final class ParserAssembler
 {
@@ -32,6 +34,11 @@ final class ParserAssembler
         private MultilineContinuationHelper $multilineContinuationHelper,
         private NodeFactory $nodeFactory,
     ) {
+    }
+
+    public function createSimpleScalarParser(ParserRegistry $registry): SimpleScalarParser
+    {
+        return new SimpleScalarParser($this->nodeFactory);
     }
 
     public function getAnchorPostProcessor(): AnchorPostProcessor

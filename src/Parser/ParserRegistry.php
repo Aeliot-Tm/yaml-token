@@ -16,9 +16,12 @@ namespace Aeliot\YamlToken\Parser;
 use Aeliot\YamlToken\Parser\Assembler\ParserAssembler;
 use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
 use Aeliot\YamlToken\Parser\Enum\StructureType;
+use Aeliot\YamlToken\Parser\SubParser\Scalar\SimpleScalarParser;
 
 final class ParserRegistry
 {
+    private ?SimpleScalarParser $simpleScalarParser = null;
+
     public function __construct(
         private readonly ParserAssembler $assembler,
     ) {
@@ -26,6 +29,16 @@ final class ParserRegistry
 
     public function getByType(StructureType $type): SubParserInterface
     {
-        throw new \LogicException(\sprintf('No sub-parser registered for structure type "%s" in assembler %s', $type->value, $this->assembler::class));
+        return match ($type) {
+            StructureType::DOUBLE_QUOTED_SCALAR,
+            StructureType::PLAIN_SCALAR,
+            StructureType::SINGLE_QUOTED_SCALAR => $this->getSimpleScalarParser(),
+            default => throw new \LogicException(\sprintf('No sub-parser registered for structure type "%s"', $type->value)),
+        };
+    }
+
+    public function getSimpleScalarParser(): SimpleScalarParser
+    {
+        return $this->simpleScalarParser ??= $this->assembler->createSimpleScalarParser($this);
     }
 }
