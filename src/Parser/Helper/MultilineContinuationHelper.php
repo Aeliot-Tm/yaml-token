@@ -38,6 +38,12 @@ final readonly class MultilineContinuationHelper
         return !$this->isImplicitYamlKeyOnContinuationLine($tokens, $offset);
     }
 
+    /**
+     * True when the token at peek offset $scalarPeekOffset is a scalar and the same
+     * logical line contains ':' as implicit YAML key (nested block mapping entry).
+     *
+     * @see Parser::parseValue() Plain scalar continuation guard (~1633–1639)
+     */
     public function isImplicitYamlKeyOnContinuationLine(TokenStreamProxy $tokens, int $scalarPeekOffset): bool
     {
         $offset = $scalarPeekOffset + 1;

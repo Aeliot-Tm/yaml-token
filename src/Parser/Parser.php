@@ -38,7 +38,6 @@ use Aeliot\YamlToken\Node\MultilinePlainScalarNode;
 use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Node\NodePropertiesNode;
-use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\TagDirectiveHandleNode;
 use Aeliot\YamlToken\Node\TagDirectiveIndicatorNode;
@@ -128,22 +127,6 @@ final class Parser
     private function appendTokenLocation(string $message, Token|TokenStreamProxy $tokens): string
     {
         return $this->errorHelper->appendTokenLocation($message, $tokens);
-    }
-
-    private function assertIndentLenIsValid(Harvester $harvester, int $indentLen): void
-    {
-        $this->indentationHelper->assertIndentLenIsValid($harvester->state, $harvester->tokens, $indentLen);
-    }
-
-    /**
-     * Consume one or more consecutive l-empty / l-comment lines whose
-     * leading INDENTATION must not contribute to the surrounding block's
-     * s-indent(n). Tokens are still attached to $root verbatim so the
-     * emitter can reproduce the original text.
-     */
-    private function collectInsignificantIndentationLines(Harvester $harvester, Node $root): void
-    {
-        $this->lookAheadHelper->collectInsignificantIndentationLines($harvester->tokens, $root);
     }
 
     private function collectKeyProperties(Harvester $harvester, KeyNode $keyNode): void
@@ -308,7 +291,7 @@ final class Parser
         $harvester->tokens->advance();
 
         $this->consumer->collectSpaceCommentEnds($harvester->tokens, $valueNode);
-        $this->collectInsignificantIndentationLines($harvester, $valueNode);
+        $this->lookAheadHelper->collectInsignificantIndentationLines($harvester->tokens, $valueNode);
     }
 
     /**
@@ -370,7 +353,7 @@ final class Parser
             ) {
                 break;
             }
-            $layoutBuffer[] = $this->createSimpleNode($layoutToken);
+            $layoutBuffer[] = $this->nodeFactory->createSimpleNode($layoutToken);
             $harvester->tokens->advance();
         }
 
@@ -393,7 +376,7 @@ final class Parser
             foreach ($layoutBuffer as $layoutNode) {
                 $multiline->addChild($layoutNode);
             }
-            $multiline->addChild($this->createScalarNode($scalarToken));
+            $multiline->addChild($this->nodeFactory->createScalarNode($scalarToken));
             $harvester->tokens->advance();
             $this->parserRegistry
                 ->getMultilinePlainScalarParser()
@@ -404,7 +387,7 @@ final class Parser
             foreach ($layoutBuffer as $layoutNode) {
                 $valueNode->addChild($layoutNode);
             }
-            $valueNode->addChild($this->createScalarNode($scalarToken));
+            $valueNode->addChild($this->nodeFactory->createScalarNode($scalarToken));
             $harvester->tokens->advance();
         }
     }
@@ -451,14 +434,14 @@ final class Parser
                 ->isMultilinePlainContinuationAhead($harvester->tokens, 1, $parentIndentLen)
         ) {
             $multiline = new MultilinePlainScalarNode();
-            $multiline->addChild($this->createScalarNode($scalarToken));
+            $multiline->addChild($this->nodeFactory->createScalarNode($scalarToken));
             $harvester->tokens->advance();
             $this->parserRegistry
                 ->getMultilinePlainScalarParser()
                 ->appendMultilinePlainScalarContinuations($harvester->tokens, $multiline, $parentIndentLen);
             $valueNode->addChild($multiline);
         } else {
-            $valueNode->addChild($this->createScalarNode($scalarToken));
+            $valueNode->addChild($this->nodeFactory->createScalarNode($scalarToken));
             $harvester->tokens->advance();
         }
     }
@@ -477,7 +460,7 @@ final class Parser
             throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('SEQUENCE_ENTRY expected, but %s given', $token?->type->value ?? '_nothing_'), $harvester->tokens));
         }
 
-        $target->addChild($this->createSimpleNode($token));
+        $target->addChild($this->nodeFactory->createSimpleNode($token));
         $harvester->tokens->advance();
         $consumed = \strlen($token->text);
 
@@ -499,7 +482,7 @@ final class Parser
         return new FlowHost(
             fn (Harvester $h, Node $root) => $this->consumer->collectSpaceAndComments($h->tokens, $root),
             fn (Harvester $h, Node $root) => $this->consumer->collectSpaceCommentEnds($h->tokens, $root),
-            fn (Token $t): Node => $this->createSimpleNode($t),
+            fn (Token $t): Node => $this->nodeFactory->createSimpleNode($t),
             fn (Harvester $h): KeyNode => $this->getKeyNode($h),
             fn (Harvester $h): bool => $this->isFlowMultilinePlainKeyStart($h),
             fn (Harvester $h): bool => $this->isScalarFollowedByValueIndicator($h, true),
@@ -511,16 +494,6 @@ final class Parser
             },
             fn (Harvester $h, KeyValueCoupleNode $couple): bool => $this->tryConsumeFlowMappingValueIndicator($h, $couple),
         );
-    }
-
-    private function createScalarNode(Token $token): ScalarNode
-    {
-        return $this->nodeFactory->createScalarNode($token);
-    }
-
-    private function createSimpleNode(Token $token): Node
-    {
-        return $this->nodeFactory->createSimpleNode($token);
     }
 
     private function getKeyNode(Harvester $harvester, ?int $entryIndentLen = null): KeyNode
@@ -551,7 +524,7 @@ final class Parser
             && null !== $entryIndentLen
             && TokenType::NEWLINE === $token->type
         ) {
-            $head = $this->peekFirstSignificantBlockHead($harvester);
+            $head = $this->lookAheadHelper->peekFirstSignificantBlockHead($harvester->tokens, 1);
             if (null === $head) {
                 return $keyNode;
             }
@@ -579,7 +552,7 @@ final class Parser
             if ($significantToken->type->isScalar()) {
                 // TODO: refactor confusing place
                 //       1) consider continuing of consuming (consume value outside of the method)
-                if ($this->isImplicitYamlKeyOnContinuationLine($harvester, $scalarPeekOffset)) {
+                if ($this->multilineContinuationHelper->isImplicitYamlKeyOnContinuationLine($harvester->tokens, $scalarPeekOffset)) {
                     $keyNode->setName($this->parseBlockMappingValue($harvester, $entryIndentLen));
                 } else {
                     $this->parserRegistry->getBlockScalarParser()->consumeExplicitKeyMultilinePlainScalar($harvester->tokens, $keyNode, $entryIndentLen);
@@ -808,17 +781,6 @@ final class Parser
     }
 
     /**
-     * True when the token at peek offset $scalarPeekOffset is a scalar and the same
-     * logical line contains ':' as implicit YAML key (nested block mapping entry).
-     *
-     * @see Parser::parseValue() Plain scalar continuation guard (~1633–1639)
-     */
-    private function isImplicitYamlKeyOnContinuationLine(Harvester $harvester, int $scalarPeekOffset): bool
-    {
-        return $this->multilineContinuationHelper->isImplicitYamlKeyOnContinuationLine($harvester->tokens, $scalarPeekOffset);
-    }
-
-    /**
      * YAML 1.2.2 §6.4 / §6.6: detects a line that is either entirely empty
      * (l-empty) or contains only a comment (l-comment), possibly with
      * leading whitespace. Such a line's leading INDENTATION token is part
@@ -854,7 +816,8 @@ final class Parser
         ], true)) {
             $scalarLineOffset = TokenType::INDENTATION === $harvester->tokens->current()?->type ? 1 : 0;
 
-            return $this->isImplicitYamlKeyOnContinuationLine($harvester, $scalarLineOffset);
+            return $this->multilineContinuationHelper
+                ->isImplicitYamlKeyOnContinuationLine($harvester->tokens, $scalarLineOffset);
         }
 
         return $this->isNodePropertyToken($token)
@@ -1127,13 +1090,13 @@ final class Parser
         $previousCoupleIndentLen = null;
 
         while (!$harvester->tokens->isEnd()) {
-            $head = $this->peekFirstSignificantBlockHead($harvester, 0);
+            $head = $this->lookAheadHelper->peekFirstSignificantBlockHead($harvester->tokens, 0);
             if (null === $head || $head[0] <= $parentIndentLen) {
                 break;
             }
 
             $this->consumer->collectSpaceCommentEnds($harvester->tokens, $blockMapping);
-            $this->collectInsignificantIndentationLines($harvester, $blockMapping);
+            $this->lookAheadHelper->collectInsignificantIndentationLines($harvester->tokens, $blockMapping);
 
             $token = $harvester->tokens->current();
             if (null === $token) {
@@ -1150,8 +1113,8 @@ final class Parser
             }
 
             if ($indentLen > 0) {
-                $this->registerIndentStepIfNeeded($harvester, $indentLen);
-                $this->assertIndentLenIsValid($harvester, $indentLen);
+                $this->indentationHelper->registerIndentStepIfNeeded($harvester->state, $harvester->tokens, $indentLen);
+                $this->indentationHelper->assertIndentLenIsValid($harvester->state, $harvester->tokens, $indentLen);
             }
 
             if ($indentLen <= $parentIndentLen) {
@@ -1195,13 +1158,13 @@ final class Parser
         $baseIndentLen = null;
 
         while (!$harvester->tokens->isEnd()) {
-            $head = $this->peekFirstSignificantBlockHead($harvester, 0);
+            $head = $this->lookAheadHelper->peekFirstSignificantBlockHead($harvester->tokens, 0);
             if (null === $head || $head[0] <= $parentIndentLen) {
                 break;
             }
 
             $this->consumer->collectSpaceCommentEnds($harvester->tokens, $blockSequence);
-            $this->collectInsignificantIndentationLines($harvester, $blockSequence);
+            $this->lookAheadHelper->collectInsignificantIndentationLines($harvester->tokens, $blockSequence);
 
             $token = $harvester->tokens->current();
             if (null === $token) {
@@ -1218,8 +1181,8 @@ final class Parser
             }
 
             if ($indentLen > 0) {
-                $this->registerIndentStepIfNeeded($harvester, $indentLen);
-                $this->assertIndentLenIsValid($harvester, $indentLen);
+                $this->indentationHelper->registerIndentStepIfNeeded($harvester->state, $harvester->tokens, $indentLen);
+                $this->indentationHelper->assertIndentLenIsValid($harvester->state, $harvester->tokens, $indentLen);
             }
 
             if ($indentLen <= $parentIndentLen) {
@@ -1273,13 +1236,13 @@ final class Parser
         $this->parseKeyValueCoupleAtCurrentPosition($harvester, $blockMapping, $indentLen);
 
         while (!$harvester->tokens->isEnd()) {
-            $head = $this->peekFirstSignificantBlockHead($harvester, 0);
+            $head = $this->lookAheadHelper->peekFirstSignificantBlockHead($harvester->tokens, 0);
             if (null === $head || $head[0] !== $indentLen) {
                 break;
             }
 
             $this->consumer->collectSpaceCommentEnds($harvester->tokens, $blockMapping);
-            $this->collectInsignificantIndentationLines($harvester, $blockMapping);
+            $this->lookAheadHelper->collectInsignificantIndentationLines($harvester->tokens, $blockMapping);
 
             $token = $harvester->tokens->current();
             if (null === $token || TokenType::INDENTATION !== $token->type) {
@@ -1319,13 +1282,13 @@ final class Parser
         $firstEntry->addChild($this->parseSequenceEntryValue($harvester, $indentLen, $firstCompactIndent));
 
         while (!$harvester->tokens->isEnd()) {
-            $head = $this->peekFirstSignificantBlockHead($harvester, 0);
+            $head = $this->lookAheadHelper->peekFirstSignificantBlockHead($harvester->tokens, 0);
             if (null === $head || $head[0] !== $indentLen) {
                 break;
             }
 
             $this->consumer->collectSpaceCommentEnds($harvester->tokens, $blockSequence);
-            $this->collectInsignificantIndentationLines($harvester, $blockSequence);
+            $this->lookAheadHelper->collectInsignificantIndentationLines($harvester->tokens, $blockSequence);
 
             $token = $harvester->tokens->current();
             if (null === $token || TokenType::INDENTATION !== $token->type) {
@@ -1543,7 +1506,7 @@ final class Parser
         // first significant content. Otherwise, a comment-only line indented
         // deeper than the key (e.g. "first:\n    # comment") is mistaken for
         // the value's content and triggers "Empty block mapping value".
-        $head = $this->peekFirstSignificantBlockHead($harvester);
+        $head = $this->lookAheadHelper->peekFirstSignificantBlockHead($harvester->tokens, 1);
         if (null === $head) {
             return;
         }
@@ -1586,7 +1549,7 @@ final class Parser
                 $separatorContainer->addChild(new NewLineNode($token));
                 $harvester->tokens->advance();
                 $this->consumer->collectSpaceCommentEnds($harvester->tokens, $separatorContainer);
-                $this->collectInsignificantIndentationLines($harvester, $separatorContainer);
+                $this->lookAheadHelper->collectInsignificantIndentationLines($harvester->tokens, $separatorContainer);
 
                 $indentationToken = $harvester->tokens->current();
                 if (null === $indentationToken || TokenType::INDENTATION !== $indentationToken->type) {
@@ -1657,7 +1620,8 @@ final class Parser
                     TokenType::SINGLE_QUOTED_SCALAR,
                     TokenType::PLAIN_SCALAR,
                 ], true)
-                && !$this->isImplicitYamlKeyOnContinuationLine($harvester, $afterIndentOffset)
+                && !$this->multilineContinuationHelper
+                    ->isImplicitYamlKeyOnContinuationLine($harvester->tokens, $afterIndentOffset)
             ) {
                 $this->consumeIndentedBlockScalarValue($harvester, $valueNode, $parentIndentLen);
 
@@ -1730,7 +1694,7 @@ final class Parser
         }
 
         if (null !== $afterKey && TokenType::NEWLINE === $afterKey->type) {
-            $head = $this->peekFirstSignificantBlockHead($harvester);
+            $head = $this->lookAheadHelper->peekFirstSignificantBlockHead($harvester->tokens, 1);
             if (null !== $head) {
                 [$headIndentLen, $significantToken] = $head;
                 if (TokenType::VALUE_INDICATOR === $significantToken->type && $headIndentLen === $entryIndentLen) {
@@ -1774,7 +1738,7 @@ final class Parser
         if (TokenType::MERGE_INDICATOR !== $token?->type) {
             throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('There is no expected MERGE_INDICATOR token, but %s given', $token?->type->value ?? '_nothing_'), $harvester->tokens));
         }
-        $mergeInstruction->addChild($this->createSimpleNode($token));
+        $mergeInstruction->addChild($this->nodeFactory->createSimpleNode($token));
         $harvester->tokens->advance();
 
         $this->consumer->collectTypes($harvester->tokens, [TokenType::VALUE_INDICATOR, TokenType::WHITESPACE], $mergeInstruction);
@@ -1879,7 +1843,7 @@ final class Parser
             }
 
             if (TokenType::WHITESPACE === $token->type) {
-                $tagDirectiveNode->addChild($this->createSimpleNode($token));
+                $tagDirectiveNode->addChild($this->nodeFactory->createSimpleNode($token));
                 $harvester->tokens->advance();
                 continue;
             }
@@ -2007,7 +1971,7 @@ final class Parser
                 throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Scalar expected, but %s given', $token?->type->value ?? '_nothing_'), $token));
             }
 
-            $valueNode->addChild($this->createScalarNode($token));
+            $valueNode->addChild($this->nodeFactory->createScalarNode($token));
             $harvester->tokens->advance();
 
             // YAML 1.2.2 §8.1.1.2 / rule [166]-[168] l-chomped-empty(n,t):
@@ -2061,7 +2025,7 @@ final class Parser
                     ->isMultilinePlainContinuationAhead($harvester->tokens, 1, $parentIndentLen)
             ) {
                 $multiline = new MultilinePlainScalarNode();
-                $multiline->addChild($this->createScalarNode($token));
+                $multiline->addChild($this->nodeFactory->createScalarNode($token));
                 $harvester->tokens->advance();
                 $multilinePlainScalarParser->appendMultilinePlainScalarContinuations($harvester->tokens, $multiline, $parentIndentLen);
                 $valueNode->addChild($multiline);
@@ -2069,7 +2033,7 @@ final class Parser
                 TokenType::PLAIN_SCALAR === $token->type
                 && self::FLOW_COLLECTION_VALUE_PARENT_INDENT === $parentIndentLen
             ) {
-                $head = $this->createScalarNode($token);
+                $head = $this->nodeFactory->createScalarNode($token);
                 $harvester->tokens->advance();
                 $multiline = new MultilinePlainScalarNode();
                 $multiline->addChild($head);
@@ -2120,13 +2084,13 @@ final class Parser
             }
 
             if (\in_array($token->type, [TokenType::WHITESPACE, TokenType::VALUE_INDICATOR], true)) {
-                $yamlDirectiveNode->addChild($this->createSimpleNode($token));
+                $yamlDirectiveNode->addChild($this->nodeFactory->createSimpleNode($token));
                 $harvester->tokens->advance();
                 continue;
             }
 
             if (TokenType::DIRECTIVE_YAML_VERSION === $token->type) {
-                $yamlDirectiveNode->addChild($this->createSimpleNode($token));
+                $yamlDirectiveNode->addChild($this->nodeFactory->createSimpleNode($token));
                 $harvester->tokens->advance();
 
                 $this->consumer->collectSpaceAndComments($harvester->tokens, $yamlDirectiveNode);
@@ -2142,43 +2106,6 @@ final class Parser
         }
     }
 
-    /**
-     * Look-ahead from the current token (expected NEWLINE) through any number
-     * of l-empty / l-comment lines (per YAML 1.2.2 §6.6) to find the first
-     * line that carries significant content. Used by parseIndentedBlockValue
-     * to decide whether the value of a `key:` is empty or holds a nested
-     * block / column-0 collection — without prematurely consuming any tokens.
-     *
-     * A line is considered insignificant when it consists exclusively of
-     * WHITESPACE / COMMENT tokens (optionally prefixed by an INDENTATION
-     * token) and is terminated by NEWLINE or end-of-stream. Both indented
-     * comment lines (`    # ...`) and column-0 comment lines (`# ...`) are
-     * skipped, since the lexer omits the leading INDENTATION token only
-     * for the latter.
-     *
-     * @param int $offset TokenStreamProxy peek offset of the first token to consider:
-     *                    0 - when layout from the current position must be included in the scan;
-     *                    1 - when the current token is already known, e.g. NEWLINE after ':';
-     *
-     * @return array{int, Token, int}|null Tuple of [indentLen, significantToken, offset] pointing
-     *                                     at the first significant line:
-     *                                     - indentLen is the byte-length of that line's
-     *                                     leading INDENTATION token (0 for column-0 lines);
-     *                                     - significantToken is the first non-WHITESPACE/COMMENT
-     *                                     token of that line.
-     *                                     - offset is the TokenStreamProxy peek offset of significantToken.
-     *                                     Returns null if the stream ends with only insignificant lines.
-     */
-    private function peekFirstSignificantBlockHead(Harvester $harvester, int $offset = 1): ?array
-    {
-        return $this->lookAheadHelper->peekFirstSignificantBlockHead($harvester->tokens, $offset);
-    }
-
-    private function registerIndentStepIfNeeded(Harvester $harvester, int $indentLen): void
-    {
-        $this->indentationHelper->registerIndentStepIfNeeded($harvester->state, $harvester->tokens, $indentLen);
-    }
-
     private function runFlowMappingDriver(Harvester $harvester): FlowMappingNode
     {
         $flowMappingNode = new FlowMappingNode();
@@ -2187,7 +2114,7 @@ final class Parser
             throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('There is no expected FLOW_MAPPING_START token, but %s given', $token?->type->value ?? '_nothing_'), $harvester->tokens));
         }
 
-        $flowMappingNode->addChild($this->createSimpleNode($token));
+        $flowMappingNode->addChild($this->nodeFactory->createSimpleNode($token));
         $harvester->tokens->advance();
 
         /** @var FlowMappingNode $result */
@@ -2210,7 +2137,7 @@ final class Parser
             throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('There is no expected FLOW_SEQUENCE_START token, but %s given', $token?->type->value ?? '_nothing_'), $harvester->tokens));
         }
 
-        $flowSequenceNode->addChild($this->createSimpleNode($token));
+        $flowSequenceNode->addChild($this->nodeFactory->createSimpleNode($token));
         $harvester->tokens->advance();
 
         /** @var FlowSequenceNode $result */

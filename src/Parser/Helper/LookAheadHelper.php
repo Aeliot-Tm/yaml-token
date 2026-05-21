@@ -18,6 +18,7 @@ use Aeliot\YamlToken\Node\IndentationNode;
 use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Parser\Consumer;
 use Aeliot\YamlToken\Parser\Dto\TokenStreamProxy;
+use Aeliot\YamlToken\Token\Token;
 
 final readonly class LookAheadHelper
 {
@@ -26,6 +27,12 @@ final readonly class LookAheadHelper
     ) {
     }
 
+    /**
+     * Consume one or more consecutive l-empty / l-comment lines whose
+     * leading INDENTATION must not contribute to the surrounding block's
+     * s-indent(n). Tokens are still attached to $root verbatim so the
+     * emitter can reproduce the original text.
+     */
     public function collectInsignificantIndentationLines(TokenStreamProxy $tokens, Node $root): void
     {
         while ($this->isInsignificantIndentationLine($tokens)) {
@@ -54,9 +61,33 @@ final readonly class LookAheadHelper
     }
 
     /**
-     * @return array{int, \Aeliot\YamlToken\Token\Token, int}|null
+     * Look-ahead from the current token (expected NEWLINE) through any number
+     * of l-empty / l-comment lines (per YAML 1.2.2 §6.6) to find the first
+     * line that carries significant content. Used by parseIndentedBlockValue
+     * to decide whether the value of a `key:` is empty or holds a nested
+     * block / column-0 collection — without prematurely consuming any tokens.
+     *
+     * A line is considered insignificant when it consists exclusively of
+     * WHITESPACE / COMMENT tokens (optionally prefixed by an INDENTATION
+     * token) and is terminated by NEWLINE or end-of-stream. Both indented
+     * comment lines (`    # ...`) and column-0 comment lines (`# ...`) are
+     * skipped, since the lexer omits the leading INDENTATION token only
+     * for the latter.
+     *
+     * @param int $offset TokenStreamProxy peek offset of the first token to consider:
+     *                    0 - when layout from the current position must be included in the scan;
+     *                    1 - when the current token is already known, e.g. NEWLINE after ':';
+     *
+     * @return array{int, Token, int}|null Tuple of [indentLen, significantToken, offset] pointing
+     *                                     at the first significant line:
+     *                                     - indentLen is the byte-length of that line's
+     *                                     leading INDENTATION token (0 for column-0 lines);
+     *                                     - significantToken is the first non-WHITESPACE/COMMENT
+     *                                     token of that line.
+     *                                     - offset is the TokenStreamProxy peek offset of significantToken.
+     *                                     Returns null if the stream ends with only insignificant lines.
      */
-    public function peekFirstSignificantBlockHead(TokenStreamProxy $tokens, int $offset = 1): ?array
+    public function peekFirstSignificantBlockHead(TokenStreamProxy $tokens, int $offset): ?array
     {
         while (true) {
             $token = $tokens->peek($offset);
