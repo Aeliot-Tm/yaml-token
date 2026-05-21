@@ -65,6 +65,7 @@ use Aeliot\YamlToken\Parser\Exception\UnexpectedEndException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Flow\FlowHost;
+use Aeliot\YamlToken\Parser\Helper\AnchorPostProcessor;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
 use Aeliot\YamlToken\Parser\Helper\IndentationHelper;
 use Aeliot\YamlToken\Parser\Helper\LookAheadHelper;
@@ -88,6 +89,8 @@ final class Parser
      */
     private const FLOW_COLLECTION_VALUE_PARENT_INDENT = -2;
 
+    private AnchorPostProcessor $anchorPostProcessor;
+
     private Consumer $consumer;
 
     private ErrorHelper $errorHelper;
@@ -102,6 +105,7 @@ final class Parser
 
     public function __construct()
     {
+        $this->anchorPostProcessor = new AnchorPostProcessor();
         $this->errorHelper = new ErrorHelper();
         $this->indentationHelper = new IndentationHelper($this->errorHelper);
         $this->multilineContinuationHelper = new MultilineContinuationHelper();
@@ -341,31 +345,6 @@ final class Parser
         }
 
         return $head;
-    }
-
-    /**
-     * Recursively collects {@see AnchorNode}s declared anywhere inside the key
-     * subtree of a {@see KeyValueCoupleNode}, stopping at nested {@see KeyValueCoupleNode}
-     * frames so anchors inside an inner couple keep their inner-couple declaration
-     * (per YAML 1.2.2 §6.9.2 anchor scoping: every anchor declares the immediately
-     * enclosing node, but the parser tracks the surrounding couple for round-trip).
-     *
-     * @param list<AnchorNode> $anchors
-     */
-    private function collecAnchorsRecursive(Node $node, array &$anchors): void
-    {
-        if ($node instanceof AnchorNode) {
-            $anchors[] = $node;
-
-            return;
-        }
-
-        foreach ($node->getChildren() as $child) {
-            if ($child instanceof KeyValueCoupleNode) {
-                continue;
-            }
-            $this->collecAnchorsRecursive($child, $anchors);
-        }
     }
 
     /**
@@ -862,7 +841,7 @@ final class Parser
             fn (Harvester $h): FlowMappingNode => $this->runFlowMappingDriver($h),
             fn (Harvester $h): MergeInstructionNode => $this->parseMergeInstructionAtCurrentPosition($h),
             function (Harvester $h, KeyValueCoupleNode $couple): void {
-                $this->postProcessKeyValueCouple($h, $couple);
+                $this->anchorPostProcessor->postProcessKeyValueCouple($h->anchorsRegistry, $couple);
             },
             fn (Harvester $h, KeyValueCoupleNode $couple): bool => $this->tryConsumeFlowMappingValueIndicator($h, $couple),
         );
@@ -2143,7 +2122,7 @@ final class Parser
 
         $this->consumer->collectTypes($harvester->tokens, [TokenType::VALUE_INDICATOR, TokenType::WHITESPACE], $keyValueCouple);
         $keyValueCouple->addChild($this->parseValue($harvester, $indentLen));
-        $this->postProcessKeyValueCouple($harvester, $keyValueCouple);
+        $this->anchorPostProcessor->postProcessKeyValueCouple($harvester->anchorsRegistry, $keyValueCouple);
     }
 
     private function parseMergeInstructionAtCurrentPosition(Harvester $harvester): MergeInstructionNode
@@ -2556,20 +2535,6 @@ final class Parser
     private function peekFirstSignificantBlockHead(Harvester $harvester, int $offset = 1): ?array
     {
         return $this->lookAheadHelper->peekFirstSignificantBlockHead($harvester->tokens, $offset);
-    }
-
-    private function postProcessKeyValueCouple(Harvester $harvester, KeyValueCoupleNode $couple): void
-    {
-        $anchors = [];
-        $this->collecAnchorsRecursive($couple->getKey(), $anchors);
-        if (null !== ($valueAnchor = $couple->getValue()?->getAnchor())) {
-            $anchors[] = $valueAnchor;
-        }
-
-        foreach ($anchors as $anchor) {
-            $anchor->setDeclarationCouple($couple);
-            $harvester->anchorsRegistry->anchors[$anchor->getName()] = $anchor;
-        }
     }
 
     private function registerIndentStepIfNeeded(Harvester $harvester, int $indentLen): void
