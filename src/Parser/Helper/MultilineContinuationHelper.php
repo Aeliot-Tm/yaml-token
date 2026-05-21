@@ -82,6 +82,12 @@ final readonly class MultilineContinuationHelper
         return TokenType::VALUE_INDICATOR !== $tokens->peek($keyProbe)?->type;
     }
 
+    /**
+     * Whether at least one multiline plain-scalar continuation line follows the current PLAIN_SCALAR
+     * (peek-only; does not consume tokens).
+     *
+     * @see MultilinePlainScalarParser::appendMultilinePlainScalarContinuations()
+     */
     public function isMultilinePlainContinuationAhead(TokenStreamProxy $tokens, int $peekOffset, int $parentIndentLen): bool
     {
         $offset = $peekOffset;

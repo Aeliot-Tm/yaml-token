@@ -22,6 +22,7 @@ use Aeliot\YamlToken\Parser\Helper\MultilineContinuationHelper;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
 use Aeliot\YamlToken\Parser\ParserRegistry;
 use Aeliot\YamlToken\Parser\SubParser\Scalar\BlockScalarParser;
+use Aeliot\YamlToken\Parser\SubParser\Scalar\MultilinePlainScalarParser;
 use Aeliot\YamlToken\Parser\SubParser\Scalar\SimpleScalarParser;
 
 final class ParserAssembler
@@ -40,6 +41,11 @@ final class ParserAssembler
     public function createBlockScalarParser(ParserRegistry $registry): BlockScalarParser
     {
         return new BlockScalarParser($this->consumer, $this->errorHelper, $this->nodeFactory);
+    }
+
+    public function createMultilinePlainScalarParser(ParserRegistry $registry): MultilinePlainScalarParser
+    {
+        return new MultilinePlainScalarParser($this->errorHelper, $this->multilineContinuationHelper, $this->nodeFactory, $registry);
     }
 
     public function createSimpleScalarParser(ParserRegistry $registry): SimpleScalarParser

@@ -17,11 +17,13 @@ use Aeliot\YamlToken\Parser\Assembler\ParserAssembler;
 use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
 use Aeliot\YamlToken\Parser\Enum\StructureType;
 use Aeliot\YamlToken\Parser\SubParser\Scalar\BlockScalarParser;
+use Aeliot\YamlToken\Parser\SubParser\Scalar\MultilinePlainScalarParser;
 use Aeliot\YamlToken\Parser\SubParser\Scalar\SimpleScalarParser;
 
 final class ParserRegistry
 {
     private ?BlockScalarParser $blockScalarParser = null;
+    private ?MultilinePlainScalarParser $multilinePlainScalarParser = null;
     private ?SimpleScalarParser $simpleScalarParser = null;
 
     public function __construct(
@@ -32,6 +34,11 @@ final class ParserRegistry
     public function getBlockScalarParser(): BlockScalarParser
     {
         return $this->blockScalarParser ??= $this->assembler->createBlockScalarParser($this);
+    }
+
+    public function getMultilinePlainScalarParser(): MultilinePlainScalarParser
+    {
+        return $this->multilinePlainScalarParser ??= $this->assembler->createMultilinePlainScalarParser($this);
     }
 
     public function getByType(StructureType $type): SubParserInterface
