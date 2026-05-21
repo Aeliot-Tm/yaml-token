@@ -22,6 +22,8 @@ use Aeliot\YamlToken\Parser\Helper\MultilineContinuationHelper;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
 use Aeliot\YamlToken\Parser\ParserRegistry;
 use Aeliot\YamlToken\Parser\SubParser\Block\KeyParser;
+use Aeliot\YamlToken\Parser\SubParser\Block\KeyValueCoupleParser;
+use Aeliot\YamlToken\Parser\SubParser\Block\SequenceEntryParser;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowEntryParser;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowMappingPairParser;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowMappingParser;
@@ -62,6 +64,39 @@ final class ParserAssembler
             $parseBlockSequenceValue,
             $parseCompactBlockSequence,
             $registry,
+        );
+    }
+
+    public function createKeyValueCoupleParser(
+        ParserRegistry $registry,
+        \Closure $parseValue,
+    ): KeyValueCoupleParser {
+        return new KeyValueCoupleParser(
+            $this->anchorPostProcessor,
+            $this->consumer,
+            $this->errorHelper,
+            $this->lookAheadHelper,
+            $parseValue,
+            $registry,
+        );
+    }
+
+    public function createSequenceEntryParser(
+        ParserRegistry $registry,
+        \Closure $isFlowCollectionFollowedByBlockValueIndicatorOnSameLine,
+        \Closure $isScalarFollowedByValueIndicator,
+        \Closure $parseCompactBlockMapping,
+        \Closure $parseCompactBlockSequence,
+        \Closure $parseValue,
+    ): SequenceEntryParser {
+        return new SequenceEntryParser(
+            $this->errorHelper,
+            $isFlowCollectionFollowedByBlockValueIndicatorOnSameLine,
+            $isScalarFollowedByValueIndicator,
+            $this->nodeFactory,
+            $parseCompactBlockMapping,
+            $parseCompactBlockSequence,
+            $parseValue,
         );
     }
 

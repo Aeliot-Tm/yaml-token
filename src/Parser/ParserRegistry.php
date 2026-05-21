@@ -17,6 +17,8 @@ use Aeliot\YamlToken\Parser\Assembler\ParserAssembler;
 use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
 use Aeliot\YamlToken\Parser\Enum\StructureType;
 use Aeliot\YamlToken\Parser\SubParser\Block\KeyParser;
+use Aeliot\YamlToken\Parser\SubParser\Block\KeyValueCoupleParser;
+use Aeliot\YamlToken\Parser\SubParser\Block\SequenceEntryParser;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowEntryParser;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowMappingPairParser;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowMappingParser;
@@ -29,14 +31,20 @@ final class ParserRegistry
 {
     private ?BlockScalarParser $blockScalarParser = null;
     private ?FlowEntryParser $flowEntryParser = null;
-    private ?KeyParser $keyParser = null;
-    private ?\Closure $parseBlockMappingValue = null;
-    private ?\Closure $parseBlockSequenceValue = null;
-    private ?\Closure $parseCompactBlockSequence = null;
     private ?FlowMappingPairParser $flowMappingPairParser = null;
     private ?FlowMappingParser $flowMappingParser = null;
     private ?FlowSequenceParser $flowSequenceParser = null;
+    private ?\Closure $isFlowCollectionFollowedByBlockValueIndicatorOnSameLine = null;
+    private ?\Closure $isScalarFollowedByValueIndicator = null;
+    private ?KeyParser $keyParser = null;
+    private ?KeyValueCoupleParser $keyValueCoupleParser = null;
     private ?MultilinePlainScalarParser $multilinePlainScalarParser = null;
+    private ?\Closure $parseBlockMappingValue = null;
+    private ?\Closure $parseBlockSequenceValue = null;
+    private ?\Closure $parseCompactBlockMapping = null;
+    private ?\Closure $parseCompactBlockSequence = null;
+    private ?\Closure $parseValue = null;
+    private ?SequenceEntryParser $sequenceEntryParser = null;
     private ?SimpleScalarParser $simpleScalarParser = null;
 
     public function __construct(
@@ -89,9 +97,29 @@ final class ParserRegistry
         );
     }
 
+    public function getKeyValueCoupleParser(): KeyValueCoupleParser
+    {
+        return $this->keyValueCoupleParser ??= $this->assembler->createKeyValueCoupleParser(
+            $this,
+            $this->parseValue ?? throw new \LogicException('Block parser bridge not set'),
+        );
+    }
+
     public function getMultilinePlainScalarParser(): MultilinePlainScalarParser
     {
         return $this->multilinePlainScalarParser ??= $this->assembler->createMultilinePlainScalarParser($this);
+    }
+
+    public function getSequenceEntryParser(): SequenceEntryParser
+    {
+        return $this->sequenceEntryParser ??= $this->assembler->createSequenceEntryParser(
+            $this,
+            $this->isFlowCollectionFollowedByBlockValueIndicatorOnSameLine ?? throw new \LogicException('Block parser bridge not set'),
+            $this->isScalarFollowedByValueIndicator ?? throw new \LogicException('Block parser bridge not set'),
+            $this->parseCompactBlockMapping ?? throw new \LogicException('Block parser bridge not set'),
+            $this->parseCompactBlockSequence ?? throw new \LogicException('Block parser bridge not set'),
+            $this->parseValue ?? throw new \LogicException('Block parser bridge not set'),
+        );
     }
 
     public function getSimpleScalarParser(): SimpleScalarParser
@@ -100,12 +128,20 @@ final class ParserRegistry
     }
 
     public function setBlockParserBridge(
+        \Closure $isFlowCollectionFollowedByBlockValueIndicatorOnSameLine,
+        \Closure $isScalarFollowedByValueIndicator,
         \Closure $parseBlockMappingValue,
         \Closure $parseBlockSequenceValue,
+        \Closure $parseCompactBlockMapping,
         \Closure $parseCompactBlockSequence,
+        \Closure $parseValue,
     ): void {
+        $this->isFlowCollectionFollowedByBlockValueIndicatorOnSameLine = $isFlowCollectionFollowedByBlockValueIndicatorOnSameLine;
+        $this->isScalarFollowedByValueIndicator = $isScalarFollowedByValueIndicator;
         $this->parseBlockMappingValue = $parseBlockMappingValue;
         $this->parseBlockSequenceValue = $parseBlockSequenceValue;
+        $this->parseCompactBlockMapping = $parseCompactBlockMapping;
         $this->parseCompactBlockSequence = $parseCompactBlockSequence;
+        $this->parseValue = $parseValue;
     }
 }

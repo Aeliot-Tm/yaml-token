@@ -30,7 +30,6 @@ use Aeliot\YamlToken\Node\DocumentStartNode;
 use Aeliot\YamlToken\Node\FlowSequenceNode;
 use Aeliot\YamlToken\Node\IndentationNode;
 use Aeliot\YamlToken\Node\KeyNode;
-use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\MergeInstructionNode;
 use Aeliot\YamlToken\Node\MultilinePlainScalarNode;
 use Aeliot\YamlToken\Node\NewLineNode;
@@ -56,7 +55,6 @@ use Aeliot\YamlToken\Parser\Exception\UnexpectedEndException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Flow\FlowHost;
-use Aeliot\YamlToken\Parser\Helper\AnchorPostProcessor;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
 use Aeliot\YamlToken\Parser\Helper\IndentationHelper;
 use Aeliot\YamlToken\Parser\Helper\LookAheadHelper;
@@ -81,7 +79,6 @@ final class Parser
     private const FLOW_COLLECTION_VALUE_PARENT_INDENT = -2;
 
     public function __construct(
-        private AnchorPostProcessor $anchorPostProcessor,
         private Consumer $consumer,
         private ErrorHelper $errorHelper,
         private IndentationHelper $indentationHelper,
@@ -91,9 +88,13 @@ final class Parser
         private ParserRegistry $parserRegistry,
     ) {
         $this->parserRegistry->setBlockParserBridge(
+            fn (Harvester $h, int $offset): bool => $this->isFlowCollectionFollowedByBlockValueIndicatorOnSameLine($h, $offset),
+            fn (Harvester $h, bool $allowFlowSeparation = false): bool => $this->isScalarFollowedByValueIndicator($h, $allowFlowSeparation),
             fn (Harvester $h, int $indent): BlockMappingNode => $this->parseBlockMappingValue($h, $indent),
             fn (Harvester $h, int $indent): BlockSequenceNode => $this->parseBlockSequenceValue($h, $indent),
+            fn (Harvester $h, int $indent): BlockMappingNode => $this->parseCompactBlockMapping($h, $indent),
             fn (Harvester $h, int $indent): BlockSequenceNode => $this->parseCompactBlockSequence($h, $indent),
+            fn (Harvester $h, int $parentIndentLen): ValueNode => $this->parseValue($h, $parentIndentLen),
         );
     }
 
@@ -389,37 +390,6 @@ final class Parser
             $valueNode->addChild($this->nodeFactory->createScalarNode($scalarToken));
             $harvester->tokens->advance();
         }
-    }
-
-    /**
-     * Consumes one SEQUENCE_ENTRY token followed by any number of
-     * directly adjacent WHITESPACE tokens. Returns the total length
-     * in characters (always >= 1). Per YAML 1.2.2 §8.2.1 this
-     * combined length is considered part of the indentation of the
-     * nested (compact) block collection.
-     */
-    private function consumeSequenceEntryIndicatorAndSpaces(Harvester $harvester, Node $target): int
-    {
-        $token = $harvester->tokens->current();
-        if (TokenType::SEQUENCE_ENTRY !== $token?->type) {
-            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('SEQUENCE_ENTRY expected, but %s given', $token?->type->value ?? '_nothing_'), $harvester->tokens));
-        }
-
-        $target->addChild($this->nodeFactory->createSimpleNode($token));
-        $harvester->tokens->advance();
-        $consumed = \strlen($token->text);
-
-        while (true) {
-            $next = $harvester->tokens->current();
-            if (TokenType::WHITESPACE !== $next?->type) {
-                break;
-            }
-            $target->addChild(new WhitespaceNode($next));
-            $consumed += \strlen($next->text);
-            $harvester->tokens->advance();
-        }
-
-        return $consumed;
     }
 
     private function createFlowHost(): FlowHost
@@ -928,7 +898,9 @@ final class Parser
                 $blockMapping->addChild($this->parseMergeInstructionAtCurrentPosition($harvester));
                 continue;
             }
-            $this->parseKeyValueCoupleAtCurrentPosition($harvester, $blockMapping, $indentLen);
+            $this->parserRegistry
+                ->getKeyValueCoupleParser()
+                ->parseKeyValueCoupleAtCurrentPosition($harvester, $blockMapping, $indentLen);
         }
 
         if (null === $baseIndentLen) {
@@ -996,8 +968,15 @@ final class Parser
                 $harvester->tokens->advance();
             }
 
-            $compactIndent = $indentLen + $this->consumeSequenceEntryIndicatorAndSpaces($harvester, $sequenceEntry);
-            $sequenceEntry->addChild($this->parseSequenceEntryValue($harvester, $indentLen, $compactIndent));
+            $compactIndent = $indentLen + $this->parserRegistry
+                    ->getSequenceEntryParser()
+                    ->consumeSequenceEntryIndicatorAndSpaces($harvester, $sequenceEntry);
+
+            $sequenceEntry->addChild(
+                $this->parserRegistry
+                    ->getSequenceEntryParser()
+                    ->parseSequenceEntryValue($harvester, $indentLen, $compactIndent),
+            );
         }
 
         if (null === $baseIndentLen) {
@@ -1020,7 +999,9 @@ final class Parser
     {
         $blockMapping = new BlockMappingNode();
 
-        $this->parseKeyValueCoupleAtCurrentPosition($harvester, $blockMapping, $indentLen);
+        $this->parserRegistry
+            ->getKeyValueCoupleParser()
+            ->parseKeyValueCoupleAtCurrentPosition($harvester, $blockMapping, $indentLen);
 
         while (!$harvester->tokens->isEnd()) {
             $head = $this->lookAheadHelper->peekFirstSignificantBlockHead($harvester->tokens, 0);
@@ -1042,7 +1023,9 @@ final class Parser
                 break;
             }
 
-            $this->parseKeyValueCoupleAtCurrentPosition($harvester, $blockMapping, $indentLen);
+            $this->parserRegistry
+                ->getKeyValueCoupleParser()
+                ->parseKeyValueCoupleAtCurrentPosition($harvester, $blockMapping, $indentLen);
         }
 
         return $blockMapping;
@@ -1065,8 +1048,15 @@ final class Parser
 
         $firstEntry = new BlockSequenceEntryNode();
         $blockSequence->addChild($firstEntry);
-        $firstCompactIndent = $indentLen + $this->consumeSequenceEntryIndicatorAndSpaces($harvester, $firstEntry);
-        $firstEntry->addChild($this->parseSequenceEntryValue($harvester, $indentLen, $firstCompactIndent));
+        $firstCompactIndent = $indentLen + $this->parserRegistry
+                ->getSequenceEntryParser()
+                ->consumeSequenceEntryIndicatorAndSpaces($harvester, $firstEntry);
+
+        $firstEntry->addChild(
+            $this->parserRegistry
+                ->getSequenceEntryParser()
+                ->parseSequenceEntryValue($harvester, $indentLen, $firstCompactIndent),
+        );
 
         while (!$harvester->tokens->isEnd()) {
             $head = $this->lookAheadHelper->peekFirstSignificantBlockHead($harvester->tokens, 0);
@@ -1093,8 +1083,15 @@ final class Parser
             $sequenceEntry->addChild(new IndentationNode($token));
             $harvester->tokens->advance();
 
-            $compactIndent = $indentLen + $this->consumeSequenceEntryIndicatorAndSpaces($harvester, $sequenceEntry);
-            $sequenceEntry->addChild($this->parseSequenceEntryValue($harvester, $indentLen, $compactIndent));
+            $compactIndent = $indentLen + $this->parserRegistry
+                    ->getSequenceEntryParser()
+                    ->consumeSequenceEntryIndicatorAndSpaces($harvester, $sequenceEntry);
+
+            $sequenceEntry->addChild(
+                $this->parserRegistry
+                    ->getSequenceEntryParser()
+                    ->parseSequenceEntryValue($harvester, $indentLen, $compactIndent),
+            );
         }
 
         return $blockSequence;
@@ -1213,8 +1210,15 @@ final class Parser
                     $harvester->tokens->advance();
                 }
 
-                $compactIndent = $leadingIndent + $this->consumeSequenceEntryIndicatorAndSpaces($harvester, $sequenceEntry);
-                $sequenceEntry->addChild($this->parseSequenceEntryValue($harvester, $leadingIndent, $compactIndent));
+                $compactIndent = $leadingIndent + $this->parserRegistry
+                        ->getSequenceEntryParser()
+                        ->consumeSequenceEntryIndicatorAndSpaces($harvester, $sequenceEntry);
+
+                $sequenceEntry->addChild(
+                    $this->parserRegistry
+                        ->getSequenceEntryParser()
+                        ->parseSequenceEntryValue($harvester, $leadingIndent, $compactIndent),
+                );
                 continue;
             }
 
@@ -1224,7 +1228,9 @@ final class Parser
                     $indentLen = \strlen($token->text);
                 }
 
-                $this->parseKeyValueCoupleAtCurrentPosition($harvester, $document, $indentLen);
+                $this->parserRegistry
+                    ->getKeyValueCoupleParser()
+                    ->parseKeyValueCoupleAtCurrentPosition($harvester, $document, $indentLen);
                 continue;
             }
 
@@ -1441,76 +1447,6 @@ final class Parser
         }
     }
 
-    private function parseKeyValueCoupleAtCurrentPosition(Harvester $harvester, Node $root, int $indentLen): void
-    {
-        $token = $harvester->tokens->current();
-        if (null === $token) {
-            throw new UnexpectedEndException($this->appendTokenLocation('Unexpected end of stream while parsing key/value couple', $harvester->tokens));
-        }
-
-        $keyValueCouple = new KeyValueCoupleNode();
-        $root->addChild($keyValueCouple);
-
-        $entryIndentLen = 0;
-        if (TokenType::INDENTATION === $token->type) {
-            $entryIndentLen = \strlen($token->text);
-            $keyValueCouple->setIndentation(new IndentationNode($token));
-            $harvester->tokens->advance();
-        }
-
-        $keyValueCouple->addChild($this->parserRegistry->getKeyParser()->getKeyNode($harvester, $entryIndentLen));
-
-        // YAML 1.2.2 explicit block mapping entry may put ':' on the next line:
-        //   ? key
-        //   : value
-        // When that happens, treat the NEWLINE and any empty/comment lines as part
-        // of this couple so the upcoming VALUE_INDICATOR is consumed here.
-        $afterKey = $harvester->tokens->current();
-        if (
-            null !== $afterKey
-            && null !== $keyValueCouple->getKey()->getExplicitKeyIndicatorNode()
-        ) {
-            $this->consumer->collectTypes($harvester->tokens, [TokenType::WHITESPACE], $keyValueCouple);
-            $afterKey = $harvester->tokens->current();
-
-            if (null === $afterKey || TokenType::NEWLINE !== $afterKey->type) {
-                // Compact in-line explicit entry ("? key : value") or other forms
-                // are handled by the regular VALUE_INDICATOR consumption below.
-                $afterKey = null;
-            }
-        }
-
-        if (null !== $afterKey && TokenType::NEWLINE === $afterKey->type) {
-            $head = $this->lookAheadHelper->peekFirstSignificantBlockHead($harvester->tokens, 1);
-            if (null !== $head) {
-                [$headIndentLen, $significantToken] = $head;
-                if (TokenType::VALUE_INDICATOR === $significantToken->type && $headIndentLen === $entryIndentLen) {
-                    $this->consumer->collectTypes($harvester->tokens, [
-                        TokenType::COMMENT,
-                        TokenType::INDENTATION,
-                        TokenType::NEWLINE,
-                        TokenType::WHITESPACE,
-                    ], $keyValueCouple);
-                }
-            }
-        }
-
-        $afterKey = $harvester->tokens->current();
-        if (
-            null !== $afterKey
-            && null !== $keyValueCouple->getKey()->getExplicitKeyIndicatorNode()
-            && TokenType::INDENTATION === $afterKey->type
-            && \strlen($afterKey->text) === $entryIndentLen
-            && TokenType::VALUE_INDICATOR === $harvester->tokens->peek(1)?->type
-        ) {
-            $this->consumer->collectTypes($harvester->tokens, [TokenType::INDENTATION], $keyValueCouple);
-        }
-
-        $this->consumer->collectTypes($harvester->tokens, [TokenType::VALUE_INDICATOR, TokenType::WHITESPACE], $keyValueCouple);
-        $keyValueCouple->addChild($this->parseValue($harvester, $indentLen));
-        $this->anchorPostProcessor->postProcessKeyValueCouple($harvester->anchorsRegistry, $keyValueCouple);
-    }
-
     private function parseMergeInstructionAtCurrentPosition(Harvester $harvester): MergeInstructionNode
     {
         $mergeInstruction = new MergeInstructionNode();
@@ -1539,76 +1475,6 @@ final class Parser
         }
 
         return $mergeInstruction;
-    }
-
-    /**
-     * YAML 1.2.2 §8.2.1 rule [185] s-l+block-indented(n,c): decides between
-     *  - a compact in-line block mapping (rule [195] ns-l-compact-mapping),
-     *    when the entry content starts with an implicit YAML key;
-     *  - a compact in-line block sequence (rule [186] ns-l-compact-sequence),
-     *    when the entry content starts with another '-' on the same line
-     *    (Example 8.15);
-     *  - a generic block / flow / scalar node (delegated to {@see parseValue()}).
-     *
-     * $compactIndent is the column of the entry's first content character,
-     * i.e. (indent of '-') + length('-') + length of WHITESPACE tokens
-     * that follow '-'. Per §8.2.1 this length defines the indentation
-     * of the nested compact collection.
-     */
-    private function parseSequenceEntryValue(Harvester $harvester, int $parentIndentLen, int $compactIndent): ValueNode
-    {
-        $token = $harvester->tokens->current();
-        $nodePropertiesFollowedByValueIndicator = false;
-        if (null !== $token && $this->isNodePropertyToken($token)) {
-            $offset = 0;
-            while (true) {
-                $peeked = $harvester->tokens->peek($offset);
-                if (null === $peeked || TokenType::NEWLINE === $peeked->type) {
-                    break;
-                }
-                if (TokenType::VALUE_INDICATOR === $peeked->type) {
-                    $nodePropertiesFollowedByValueIndicator = true;
-                    break;
-                }
-                if ($this->isNodePropertyToken($peeked) || TokenType::WHITESPACE === $peeked->type) {
-                    ++$offset;
-                    continue;
-                }
-                break;
-            }
-        }
-
-        if (
-            $this->isScalarFollowedByValueIndicator($harvester)
-            || TokenType::EXPLICIT_KEY_INDICATOR === $token?->type
-            || TokenType::VALUE_INDICATOR === $token?->type
-            || $nodePropertiesFollowedByValueIndicator
-        ) {
-            $valueNode = new ValueNode();
-            $valueNode->addChild($this->parseCompactBlockMapping($harvester, $compactIndent));
-
-            return $valueNode;
-        }
-
-        if (TokenType::SEQUENCE_ENTRY === $harvester->tokens->current()?->type) {
-            $valueNode = new ValueNode();
-            $valueNode->addChild($this->parseCompactBlockSequence($harvester, $compactIndent));
-
-            return $valueNode;
-        }
-
-        $flowOpen = $harvester->tokens->current();
-        if (
-            \in_array($flowOpen?->type, [TokenType::FLOW_SEQUENCE_START, TokenType::FLOW_MAPPING_START], true)
-            && $this->isFlowCollectionFollowedByBlockValueIndicatorOnSameLine($harvester, 0)
-        ) {
-            $valueNode = new ValueNode();
-            $valueNode->addChild($this->parseCompactBlockMapping($harvester, $compactIndent));
-
-            return $valueNode;
-        }
-
-        return $this->parseValue($harvester, $parentIndentLen);
     }
 
     private function parseTagDirective(Harvester $harvester): TagDirectiveNode
