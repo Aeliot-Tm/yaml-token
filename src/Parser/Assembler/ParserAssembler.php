@@ -21,6 +21,10 @@ use Aeliot\YamlToken\Parser\Helper\LookAheadHelper;
 use Aeliot\YamlToken\Parser\Helper\MultilineContinuationHelper;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
 use Aeliot\YamlToken\Parser\ParserRegistry;
+use Aeliot\YamlToken\Parser\SubParser\Flow\FlowEntryParser;
+use Aeliot\YamlToken\Parser\SubParser\Flow\FlowMappingPairParser;
+use Aeliot\YamlToken\Parser\SubParser\Flow\FlowMappingParser;
+use Aeliot\YamlToken\Parser\SubParser\Flow\FlowSequenceParser;
 use Aeliot\YamlToken\Parser\SubParser\Scalar\BlockScalarParser;
 use Aeliot\YamlToken\Parser\SubParser\Scalar\MultilinePlainScalarParser;
 use Aeliot\YamlToken\Parser\SubParser\Scalar\SimpleScalarParser;
@@ -41,6 +45,26 @@ final class ParserAssembler
     public function createBlockScalarParser(ParserRegistry $registry): BlockScalarParser
     {
         return new BlockScalarParser($this->consumer, $this->errorHelper, $this->nodeFactory);
+    }
+
+    public function createFlowEntryParser(ParserRegistry $registry): FlowEntryParser
+    {
+        return new FlowEntryParser($this->anchorPostProcessor, $registry);
+    }
+
+    public function createFlowMappingPairParser(): FlowMappingPairParser
+    {
+        return new FlowMappingPairParser($this->anchorPostProcessor, $this->consumer);
+    }
+
+    public function createFlowMappingParser(ParserRegistry $registry): FlowMappingParser
+    {
+        return new FlowMappingParser($this->consumer, $this->errorHelper, $this->nodeFactory, $registry);
+    }
+
+    public function createFlowSequenceParser(ParserRegistry $registry): FlowSequenceParser
+    {
+        return new FlowSequenceParser($this->consumer, $this->errorHelper, $this->nodeFactory, $registry);
     }
 
     public function createMultilinePlainScalarParser(ParserRegistry $registry): MultilinePlainScalarParser

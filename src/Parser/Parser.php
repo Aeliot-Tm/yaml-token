@@ -49,10 +49,6 @@ use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 use Aeliot\YamlToken\Node\YamlDirectiveIndicatorNode;
 use Aeliot\YamlToken\Node\YamlDirectiveNode;
-use Aeliot\YamlToken\Parser\Builder\FlowMappingBuilder;
-use Aeliot\YamlToken\Parser\Builder\FlowSequenceBuilder;
-use Aeliot\YamlToken\Parser\Driver\Driver;
-use Aeliot\YamlToken\Parser\Driver\Frame;
 use Aeliot\YamlToken\Parser\Dto\AnchorsRegistry;
 use Aeliot\YamlToken\Parser\Dto\Harvester;
 use Aeliot\YamlToken\Parser\Dto\ParseState;
@@ -487,7 +483,7 @@ final class Parser
             fn (Harvester $h): bool => $this->isFlowMultilinePlainKeyStart($h),
             fn (Harvester $h): bool => $this->isScalarFollowedByValueIndicator($h, true),
             fn (Harvester $h): ValueNode => $this->parseFlowContextValue($h),
-            fn (Harvester $h): FlowMappingNode => $this->runFlowMappingDriver($h),
+            fn (Harvester $h): FlowMappingNode => $this->parserRegistry->getFlowMappingParser()->parse($h),
             fn (Harvester $h): MergeInstructionNode => $this->parseMergeInstructionAtCurrentPosition($h),
             function (Harvester $h, KeyValueCoupleNode $couple): void {
                 $this->anchorPostProcessor->postProcessKeyValueCouple($h->anchorsRegistry, $couple);
@@ -584,13 +580,13 @@ final class Parser
         }
 
         if (TokenType::FLOW_MAPPING_START === $token->type) {
-            $keyNode->setName($this->runFlowMappingDriver($harvester));
+            $keyNode->setName($this->parserRegistry->getFlowMappingParser()->parse($harvester));
 
             return $keyNode;
         }
 
         if (TokenType::FLOW_SEQUENCE_START === $token->type) {
-            $keyNode->setName($this->runFlowSequenceDriver($harvester));
+            $keyNode->setName($this->parserRegistry->getFlowSequenceParser()->parse($harvester));
 
             return $keyNode;
         }
@@ -1462,7 +1458,7 @@ final class Parser
                     $harvester->tokens->advance();
                 }
 
-                $document->addChild($this->runFlowMappingDriver($harvester));
+                $document->addChild($this->parserRegistry->getFlowMappingParser()->parse($harvester));
                 continue;
             }
 
@@ -1472,7 +1468,7 @@ final class Parser
                     $harvester->tokens->advance();
                 }
 
-                $document->addChild($this->runFlowSequenceDriver($harvester));
+                $document->addChild($this->parserRegistry->getFlowSequenceParser()->parse($harvester));
                 continue;
             }
 
@@ -1598,8 +1594,8 @@ final class Parser
 
                 $valueNode->addChild(
                     TokenType::FLOW_SEQUENCE_START === $afterIndent->type
-                        ? $this->runFlowSequenceDriver($harvester)
-                        : $this->runFlowMappingDriver($harvester),
+                        ? $this->parserRegistry->getFlowSequenceParser()->parse($harvester)
+                        : $this->parserRegistry->getFlowMappingParser()->parse($harvester),
                 );
 
                 return;
@@ -2058,9 +2054,9 @@ final class Parser
         } elseif (TokenType::SEQUENCE_ENTRY === $token->type) {
             $valueNode->addChild($this->parseCompactBlockSequence($harvester, $token->column - 1));
         } elseif (TokenType::FLOW_SEQUENCE_START === $token->type) {
-            $valueNode->addChild($this->runFlowSequenceDriver($harvester));
+            $valueNode->addChild($this->parserRegistry->getFlowSequenceParser()->parse($harvester));
         } elseif (TokenType::FLOW_MAPPING_START === $token->type) {
-            $valueNode->addChild($this->runFlowMappingDriver($harvester));
+            $valueNode->addChild($this->parserRegistry->getFlowMappingParser()->parse($harvester));
         } else {
             throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Unexpected type while parsing of value: %s', $token->type->value), $token));
         }
@@ -2104,52 +2100,6 @@ final class Parser
 
             throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Unexpected token in YAML directive: %s', $token->type->value), $token));
         }
-    }
-
-    private function runFlowMappingDriver(Harvester $harvester): FlowMappingNode
-    {
-        $flowMappingNode = new FlowMappingNode();
-        $token = $harvester->tokens->current();
-        if (TokenType::FLOW_MAPPING_START !== $token?->type) {
-            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('There is no expected FLOW_MAPPING_START token, but %s given', $token?->type->value ?? '_nothing_'), $harvester->tokens));
-        }
-
-        $flowMappingNode->addChild($this->nodeFactory->createSimpleNode($token));
-        $harvester->tokens->advance();
-
-        /** @var FlowMappingNode $result */
-        $result = (new Driver())->run(
-            $harvester,
-            new Frame(
-                new FlowMappingBuilder($harvester->flowHost),
-                $flowMappingNode,
-            ),
-        );
-
-        return $result;
-    }
-
-    private function runFlowSequenceDriver(Harvester $harvester): FlowSequenceNode
-    {
-        $flowSequenceNode = new FlowSequenceNode();
-        $token = $harvester->tokens->current();
-        if (TokenType::FLOW_SEQUENCE_START !== $token?->type) {
-            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('There is no expected FLOW_SEQUENCE_START token, but %s given', $token?->type->value ?? '_nothing_'), $harvester->tokens));
-        }
-
-        $flowSequenceNode->addChild($this->nodeFactory->createSimpleNode($token));
-        $harvester->tokens->advance();
-
-        /** @var FlowSequenceNode $result */
-        $result = (new Driver())->run(
-            $harvester,
-            new Frame(
-                new FlowSequenceBuilder($harvester->flowHost),
-                $flowSequenceNode,
-            ),
-        );
-
-        return $result;
     }
 
     /**
