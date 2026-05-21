@@ -23,6 +23,7 @@ use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Parser\Exception\IndentationInvalidException;
 use Aeliot\YamlToken\Parser\Parser;
+use Aeliot\YamlToken\Parser\ParserBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
@@ -39,7 +40,7 @@ final class NestedBlockMappingTest extends TestCase
 {
     public function testParsesNestedBlockMappingFourLevels(): void
     {
-        $stream = (new Parser())->parse(<<<'YAML'
+        $stream = (new ParserBuilder())->createParser()->parse(<<<'YAML'
 levelA:
   levelB:
     levelC:
@@ -72,7 +73,7 @@ YAML);
 
     public function testParsesNestedBlockMappingTwoLevels(): void
     {
-        $stream = (new Parser())->parse(<<<'YAML'
+        $stream = (new ParserBuilder())->createParser()->parse(<<<'YAML'
 levelA:
   levelB:
     propA: valueA
@@ -105,7 +106,7 @@ YAML);
 
     public function testParsesNestedBlockMappingWhenParentValueHasInlineComment(): void
     {
-        $stream = (new Parser())->parse(<<<'YAML'
+        $stream = (new ParserBuilder())->createParser()->parse(<<<'YAML'
 levelA:
   levelB: # just a comment
     propA: valueA
@@ -133,7 +134,7 @@ YAML);
 
     public function testParsesNestedBlockMappingWithSiblingNodesAtDifferentLevels(): void
     {
-        $stream = (new Parser())->parse(<<<'YAML'
+        $stream = (new ParserBuilder())->createParser()->parse(<<<'YAML'
 levelA:
   levelB:
     levelC:
@@ -176,7 +177,7 @@ YAML);
         $this->expectException(IndentationInvalidException::class);
         $this->expectExceptionMessageMatches('/Unexpected indentation/i');
 
-        (new Parser())->parse(<<<'YAML'
+        (new ParserBuilder())->createParser()->parse(<<<'YAML'
 levelA:
   levelB:
    propA: valueA
@@ -189,7 +190,7 @@ YAML);
         $this->expectException(IndentationInvalidException::class);
         $this->expectExceptionMessageMatches('/Unexpected indentation/i');
 
-        (new Parser())->parse(<<<'YAML'
+        (new ParserBuilder())->createParser()->parse(<<<'YAML'
 levelA:
   levelB: valueB
     levelC: valueC

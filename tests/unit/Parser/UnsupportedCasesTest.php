@@ -15,6 +15,7 @@ namespace Aeliot\YamlToken\Test\Unit\Parser;
 
 use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
 use Aeliot\YamlToken\Parser\Parser;
+use Aeliot\YamlToken\Parser\ParserBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -26,7 +27,7 @@ final class UnsupportedCasesTest extends TestCase
         $this->expectException(UnexpectedStateException::class);
         $this->expectExceptionMessage('Merge value must be an alias or a flow sequence of aliases');
 
-        (new Parser())->parse(<<<'YAML'
+        (new ParserBuilder())->createParser()->parse(<<<'YAML'
 a:
   <<: not-an-alias
 YAML);

@@ -17,6 +17,7 @@ use Aeliot\YamlToken\Emitter\YamlEmitter;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Parser\Parser;
+use Aeliot\YamlToken\Parser\ParserBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -85,7 +86,7 @@ final class YamlEmitterTest extends TestCase
     public function testEmitsOriginalYaml(string $fixture): void
     {
         $yaml = file_get_contents($fixture);
-        $stream = (new Parser())->parse($yaml);
+        $stream = (new ParserBuilder())->createParser()->parse($yaml);
         self::assertSame($yaml, (new YamlEmitter())->emit($stream));
     }
 }

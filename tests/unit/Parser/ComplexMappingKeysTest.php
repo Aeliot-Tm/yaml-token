@@ -22,6 +22,7 @@ use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\PlainScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Parser\Parser;
+use Aeliot\YamlToken\Parser\ParserBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
@@ -33,7 +34,7 @@ final class ComplexMappingKeysTest extends TestCase
     public function testParsesBlockMappingAsExplicitKeyOnNextLine(): void
     {
         $source = "? \n  a: b\n: c\n";
-        $stream = (new Parser())->parse($source);
+        $stream = (new ParserBuilder())->createParser()->parse($source);
         self::assertSame($source, (new YamlEmitter())->emit($stream));
 
         $couple = $this->getOnlyDocumentCouple($stream);
@@ -45,7 +46,7 @@ final class ComplexMappingKeysTest extends TestCase
     public function testParsesExplicitKeyWithIndentedPlainScalarNotAsNestedBlockMapping(): void
     {
         $source = "?\n  true\n: null\n";
-        $stream = (new Parser())->parse($source);
+        $stream = (new ParserBuilder())->createParser()->parse($source);
         self::assertSame($source, (new YamlEmitter())->emit($stream));
 
         $couple = $this->getOnlyDocumentCouple($stream);
@@ -66,7 +67,7 @@ final class ComplexMappingKeysTest extends TestCase
     public function testParsesBlockSequenceAsExplicitKeyOnNextLine(): void
     {
         $source = "? \n  - a\n  - b\n: c\n";
-        $stream = (new Parser())->parse($source);
+        $stream = (new ParserBuilder())->createParser()->parse($source);
         self::assertSame($source, (new YamlEmitter())->emit($stream));
 
         $couple = $this->getOnlyDocumentCouple($stream);
@@ -76,7 +77,7 @@ final class ComplexMappingKeysTest extends TestCase
     public function testParsesFlowSequenceKeyInFlowMapping(): void
     {
         $source = "root: { &a [a, &b b]: *b, *a : [c, *b, d]}\n";
-        $stream = (new Parser())->parse($source);
+        $stream = (new ParserBuilder())->createParser()->parse($source);
         self::assertSame($source, (new YamlEmitter())->emit($stream));
 
         $rootCouple = $this->getOnlyDocumentCouple($stream);

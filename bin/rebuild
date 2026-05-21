@@ -13,7 +13,7 @@ declare(strict_types=1);
  */
 
 use Aeliot\YamlToken\Emitter\YamlEmitter;
-use Aeliot\YamlToken\Parser\Parser;
+use Aeliot\YamlToken\Parser\ParserBuilder;
 
 require_once (static function (): string {
     if (Phar::running()) {
@@ -179,7 +179,7 @@ function getPaths(string $extList): array
     return array_values(array_unique($paths));
 }
 
-$parser = new Parser();
+$parser = (new ParserBuilder())->createParser();
 $emitter = new YamlEmitter();
 
 $options = getOptions();

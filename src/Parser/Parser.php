@@ -89,29 +89,15 @@ final class Parser
      */
     private const FLOW_COLLECTION_VALUE_PARENT_INDENT = -2;
 
-    private AnchorPostProcessor $anchorPostProcessor;
-
-    private Consumer $consumer;
-
-    private ErrorHelper $errorHelper;
-
-    private IndentationHelper $indentationHelper;
-
-    private LookAheadHelper $lookAheadHelper;
-
-    private MultilineContinuationHelper $multilineContinuationHelper;
-
-    private NodeFactory $nodeFactory;
-
-    public function __construct()
-    {
-        $this->anchorPostProcessor = new AnchorPostProcessor();
-        $this->errorHelper = new ErrorHelper();
-        $this->indentationHelper = new IndentationHelper($this->errorHelper);
-        $this->multilineContinuationHelper = new MultilineContinuationHelper();
-        $this->nodeFactory = new NodeFactory();
-        $this->consumer = new Consumer($this->nodeFactory);
-        $this->lookAheadHelper = new LookAheadHelper($this->consumer);
+    public function __construct(
+        private AnchorPostProcessor $anchorPostProcessor,
+        private Consumer $consumer,
+        private ErrorHelper $errorHelper,
+        private IndentationHelper $indentationHelper,
+        private LookAheadHelper $lookAheadHelper,
+        private MultilineContinuationHelper $multilineContinuationHelper,
+        private NodeFactory $nodeFactory,
+    ) {
     }
 
     public function parse(string $input): StreamNode

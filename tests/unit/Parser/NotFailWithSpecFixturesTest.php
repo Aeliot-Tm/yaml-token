@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Aeliot\YamlToken\Test\Unit\Parser;
 
 use Aeliot\YamlToken\Parser\Parser;
+use Aeliot\YamlToken\Parser\ParserBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -73,6 +74,6 @@ final class NotFailWithSpecFixturesTest extends TestCase
     #[DataProvider('getDataForTestParsesSpecFixtures')]
     public function testParsesSpecFixtures(string $fixture): void
     {
-        self::assertNotEmpty((new Parser())->parse(file_get_contents($fixture))->getChildren());
+        self::assertNotEmpty((new ParserBuilder())->createParser()->parse(file_get_contents($fixture))->getChildren());
     }
 }

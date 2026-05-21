@@ -25,6 +25,7 @@ use Aeliot\YamlToken\Node\TagNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
 use Aeliot\YamlToken\Parser\Parser;
+use Aeliot\YamlToken\Parser\ParserBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
@@ -41,7 +42,7 @@ final class ValueTagPropertyTest extends TestCase
 {
     public function testBindsNonSpecificTagToMappingValue(): void
     {
-        $couple = $this->getOnlyCouple((new Parser())->parse(<<<'YAML'
+        $couple = $this->getOnlyCouple((new ParserBuilder())->createParser()->parse(<<<'YAML'
 key: ! value
 YAML));
 
@@ -54,7 +55,7 @@ YAML));
 
     public function testBindsPrimaryTagToMappingValue(): void
     {
-        $couple = $this->getOnlyCouple((new Parser())->parse(<<<'YAML'
+        $couple = $this->getOnlyCouple((new ParserBuilder())->createParser()->parse(<<<'YAML'
 key: !local value
 YAML));
 
@@ -68,7 +69,7 @@ YAML));
 
     public function testBindsSecondaryTagToMappingValue(): void
     {
-        $couple = $this->getOnlyCouple((new Parser())->parse(<<<'YAML'
+        $couple = $this->getOnlyCouple((new ParserBuilder())->createParser()->parse(<<<'YAML'
 key: !!str value
 YAML));
 
@@ -86,7 +87,7 @@ YAML));
 
     public function testBindsTagOnOwnLineToIndentedBlockMappingValue(): void
     {
-        $stream = (new Parser())->parse(<<<'YAML'
+        $stream = (new ParserBuilder())->createParser()->parse(<<<'YAML'
 root:
   tagged:
     !localTag
@@ -103,7 +104,7 @@ YAML);
 
     public function testBindsVerbatimTagToMappingValue(): void
     {
-        $couple = $this->getOnlyCouple((new Parser())->parse(<<<'YAML'
+        $couple = $this->getOnlyCouple((new ParserBuilder())->createParser()->parse(<<<'YAML'
 key: !<tag:yaml.org,2002:str> value
 YAML));
 
@@ -120,7 +121,7 @@ YAML));
         $this->expectException(UnexpectedStateException::class);
         $this->expectExceptionMessageMatches('/^Only one tag is supported per value node/');
 
-        (new Parser())->parse(<<<'YAML'
+        (new ParserBuilder())->createParser()->parse(<<<'YAML'
 key: !!str !local value
 YAML);
     }

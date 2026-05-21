@@ -24,6 +24,7 @@ use Aeliot\YamlToken\Node\YamlDirectiveVersionNode;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedEndException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Parser;
+use Aeliot\YamlToken\Parser\ParserBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -55,7 +56,7 @@ final class YamlDirectiveTest extends TestCase
 
     public function testParsesMultipleYamlDirectivesWithTrailingComment(): void
     {
-        $stream = (new Parser())->parse(<<<'YAML'
+        $stream = (new ParserBuilder())->createParser()->parse(<<<'YAML'
 %YAML 1.2 # ok
 %YAML 1.2
 YAML);
@@ -75,7 +76,7 @@ YAML);
         $yaml = file_get_contents(__DIR__.'/../../fixture/spec_extra/1.0/directive_4.3.2.yaml');
         self::assertNotFalse($yaml);
 
-        $stream = (new Parser())->parse($yaml);
+        $stream = (new ParserBuilder())->createParser()->parse($yaml);
         $documents = $this->getDocumentNodes($stream);
         self::assertNotEmpty($documents);
 
@@ -98,7 +99,7 @@ YAML);
         $yaml = file_get_contents(__DIR__.'/../../fixture/spec/1.2.2/directive_6.8.yaml');
         self::assertNotFalse($yaml);
 
-        $stream = (new Parser())->parse($yaml);
+        $stream = (new ParserBuilder())->createParser()->parse($yaml);
         $documents = $this->getDocumentNodes($stream);
         self::assertGreaterThanOrEqual(2, \count($documents));
 
@@ -140,7 +141,7 @@ YAML);
         $this->expectException(UnexpectedEndException::class);
         $this->expectExceptionMessageMatches('/^Unexpected end of token stream: YAML directive version is required/');
 
-        (new Parser())->parse($yaml);
+        (new ParserBuilder())->createParser()->parse($yaml);
     }
 
     #[DataProvider('getDataForTestWhenNoVersion')]
@@ -149,7 +150,7 @@ YAML);
         $this->expectException(UnexpectedTokenException::class);
         $this->expectExceptionMessageMatches('/^Expected YAML directive version before newline or comment/');
 
-        (new Parser())->parse($yaml);
+        (new ParserBuilder())->createParser()->parse($yaml);
     }
 
     /**

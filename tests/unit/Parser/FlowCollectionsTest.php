@@ -28,6 +28,7 @@ use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 use Aeliot\YamlToken\Parser\Parser;
+use Aeliot\YamlToken\Parser\ParserBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
@@ -54,7 +55,7 @@ final class FlowCollectionsTest extends TestCase
         $raw = str_replace(["\r\n", "\r"], "\n", (string) file_get_contents($path));
 
         $source = 'k: '.rtrim($raw);
-        $stream = (new Parser())->parse($source);
+        $stream = (new ParserBuilder())->createParser()->parse($source);
         self::assertSame($source, (new YamlEmitter())->emit($stream));
 
         $couple = $this->getOnlyCouple($stream);
@@ -88,7 +89,7 @@ final class FlowCollectionsTest extends TestCase
 
     public function testParsesFlowMappingAsValue(): void
     {
-        $stream = (new Parser())->parse(<<<'YAML'
+        $stream = (new ParserBuilder())->createParser()->parse(<<<'YAML'
 key: {a: 1, b: 2}
 YAML);
 
@@ -119,7 +120,7 @@ YAML);
     {
         $path = __DIR__.'/../../fixture/spec/1.2.2/flow-mapping-trailing-comma_7.4.2.yaml';
         $raw = str_replace(["\r\n", "\r"], "\n", (string) file_get_contents($path));
-        $stream = (new Parser())->parse('k: '.rtrim($raw));
+        $stream = (new ParserBuilder())->createParser()->parse('k: '.rtrim($raw));
 
         $couple = $this->getOnlyCouple($stream);
         $value = $couple->getValue();
@@ -145,7 +146,7 @@ YAML);
 
     public function testParsesFlowSequenceAsValue(): void
     {
-        $stream = (new Parser())->parse(<<<'YAML'
+        $stream = (new ParserBuilder())->createParser()->parse(<<<'YAML'
 key: [one, two]
 YAML);
 
@@ -175,7 +176,7 @@ YAML);
         $source = <<<'YAML'
 - [ YAML : separate ]
 YAML;
-        $stream = (new Parser())->parse($source);
+        $stream = (new ParserBuilder())->createParser()->parse($source);
         self::assertSame($source, (new YamlEmitter())->emit($stream));
 
         $flowSequence = $this->getOnlyTopLevelFlowSequence($stream);
@@ -196,7 +197,7 @@ YAML;
         $source = <<<'YAML'
 [three ,four]
 YAML;
-        $stream = (new Parser())->parse($source);
+        $stream = (new ParserBuilder())->createParser()->parse($source);
         self::assertSame($source, (new YamlEmitter())->emit($stream));
 
         $flowSequence = $this->getOnlyTopLevelFlowSequence($stream);
@@ -220,7 +221,7 @@ YAML;
     {
         $path = __DIR__.'/../../fixture/spec/1.2.2/flow-sequence-trailing-comma_7.4.1.yaml';
         $raw = str_replace(["\r\n", "\r"], "\n", (string) file_get_contents($path));
-        $stream = (new Parser())->parse('k: '.rtrim($raw));
+        $stream = (new ParserBuilder())->createParser()->parse('k: '.rtrim($raw));
 
         $couple = $this->getOnlyCouple($stream);
         $value = $couple->getValue();

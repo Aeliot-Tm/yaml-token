@@ -16,6 +16,7 @@ namespace Aeliot\YamlToken\Test\Unit\Parser;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Parser;
+use Aeliot\YamlToken\Parser\ParserBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -27,7 +28,7 @@ final class AdditionalNegativeCasesTest extends TestCase
         $this->expectException(UnexpectedTokenException::class);
         $this->expectExceptionMessageMatches('/^There is no expected FLOW_MAPPING_END token/');
 
-        (new Parser())->parse(<<<'YAML'
+        (new ParserBuilder())->createParser()->parse(<<<'YAML'
 key: {a: 1
 YAML);
     }
@@ -37,7 +38,7 @@ YAML);
         $this->expectException(UnexpectedTokenException::class);
         $this->expectExceptionMessageMatches('/^There is no expected FLOW_SEQUENCE_END token/');
 
-        (new Parser())->parse(<<<'YAML'
+        (new ParserBuilder())->createParser()->parse(<<<'YAML'
 key: [a, b
 YAML);
     }
@@ -47,7 +48,7 @@ YAML);
         $this->expectException(UnexpectedStateException::class);
         $this->expectExceptionMessage('Each merge sequence entry must contain exactly one alias but 0 given: ');
 
-        (new Parser())->parse(<<<'YAML'
+        (new ParserBuilder())->createParser()->parse(<<<'YAML'
 a: &A {k: v}
 b:
   <<: [*A, foo]
@@ -59,7 +60,7 @@ YAML);
         $this->expectException(UnexpectedStateException::class);
         $this->expectExceptionMessage('Each merge sequence entry must contain exactly one alias');
 
-        (new Parser())->parse(<<<'YAML'
+        (new ParserBuilder())->createParser()->parse(<<<'YAML'
 a:
   <<: [foo]
 YAML);
@@ -70,7 +71,7 @@ YAML);
         $this->expectException(UnexpectedTokenException::class);
         $this->expectExceptionMessageMatches('/^Sequence entry expected while parsing block sequence value/');
 
-        (new Parser())->parse(<<<'YAML'
+        (new ParserBuilder())->createParser()->parse(<<<'YAML'
 a:
   - one
   two: three

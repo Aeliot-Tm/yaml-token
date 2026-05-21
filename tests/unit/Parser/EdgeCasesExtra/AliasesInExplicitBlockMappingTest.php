@@ -21,6 +21,7 @@ use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\PlainScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Parser\Parser;
+use Aeliot\YamlToken\Parser\ParserBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
@@ -40,7 +41,7 @@ final class AliasesInExplicitBlockMappingTest extends TestCase
         $input = (string) file_get_contents(__DIR__.'/../../../fixture/go_yaml_extra/aliases-in-explicit-block-mapping/in.yaml');
         self::assertNotSame('', $input);
 
-        $stream = (new Parser())->parse($input);
+        $stream = (new ParserBuilder())->createParser()->parse($input);
         $document = $this->getOnlyDocument($stream);
         $couples = $this->getCouples($document);
 

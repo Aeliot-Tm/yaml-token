@@ -23,6 +23,7 @@ use Aeliot\YamlToken\Node\PlainScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Parser\Parser;
+use Aeliot\YamlToken\Parser\ParserBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -32,7 +33,7 @@ final class IndentLessSequenceWithScalarTest extends TestCase
     public function testParsesIndentlessSequenceAsMappingValue(): void
     {
         $yaml = (string) file_get_contents(__DIR__.'/../../fixture/invalid/indent_less_sequence_with_scalar.yaml');
-        $stream = (new Parser())->parse($yaml);
+        $stream = (new ParserBuilder())->createParser()->parse($yaml);
 
         $document = $this->getOnlyDocument($stream);
         $rootCouples = $this->getKeyValueCouples($document);

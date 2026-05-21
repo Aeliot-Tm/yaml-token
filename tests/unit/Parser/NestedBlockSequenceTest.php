@@ -25,6 +25,7 @@ use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Parser\Exception\IndentationInvalidException;
 use Aeliot\YamlToken\Parser\Parser;
+use Aeliot\YamlToken\Parser\ParserBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
@@ -43,7 +44,7 @@ final class NestedBlockSequenceTest extends TestCase
 {
     public function testParsesSimpleNestedBlockSequenceUnderKey(): void
     {
-        $stream = (new Parser())->parse(<<<'YAML'
+        $stream = (new ParserBuilder())->createParser()->parse(<<<'YAML'
 levelA:
   levelB:
     - valueA
@@ -87,7 +88,7 @@ YAML);
         $this->expectException(IndentationInvalidException::class);
         $this->expectExceptionMessageMatches('/Unexpected indentation/i');
 
-        (new Parser())->parse(<<<'YAML'
+        (new ParserBuilder())->createParser()->parse(<<<'YAML'
 levelA:
   levelB:
     - valueA
@@ -100,7 +101,7 @@ YAML);
         $this->expectException(IndentationInvalidException::class);
         $this->expectExceptionMessageMatches('/Unexpected indentation/i');
 
-        (new Parser())->parse(<<<'YAML'
+        (new ParserBuilder())->createParser()->parse(<<<'YAML'
 levelA:
   levelB:
       - valueA

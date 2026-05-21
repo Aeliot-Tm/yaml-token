@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Aeliot\YamlToken\Test\Unit\Parser;
 
 use Aeliot\YamlToken\Parser\Parser;
+use Aeliot\YamlToken\Parser\ParserBuilder;
 use Aeliot\YamlToken\TestHelper\FixtureFinder;
 use Aeliot\YamlToken\TestHelper\NodeTreeRepresenter;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -72,7 +73,7 @@ final class FixtureParserMappingTest extends TestCase
         /** @var array<string, mixed> $expected */
         $expected = require $expectationPath;
 
-        $stream = (new Parser())->parse(str_replace(["\r\n", "\r"], "\n", $raw));
+        $stream = (new ParserBuilder())->createParser()->parse(str_replace(["\r\n", "\r"], "\n", $raw));
         self::assertSame($expected, (new NodeTreeRepresenter())->build($stream));
     }
 }

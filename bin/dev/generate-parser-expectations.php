@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 require_once __DIR__.'/../../vendor/autoload.php';
 
-use Aeliot\YamlToken\Parser\Parser;
+use Aeliot\YamlToken\Parser\ParserBuilder;
 use Aeliot\YamlToken\TestHelper\ExpectationGeneratorCliArgs;
 use Aeliot\YamlToken\TestHelper\FixtureFinder;
 use Aeliot\YamlToken\TestHelper\NodeTreeRepresenter;
@@ -42,7 +42,7 @@ $finder = new FixtureFinder(
 );
 
 $args = new ExpectationGeneratorCliArgs($argv, $fixtureBase);
-$parser = new Parser();
+$parser = (new ParserBuilder())->createParser();
 $exporter = new ParserExpectationExporter();
 $nodeTreeRepresenter = new NodeTreeRepresenter();
 $skipped = 0;

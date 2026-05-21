@@ -22,6 +22,7 @@ use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Parser\Exception\AnchorUndefinedException;
 use Aeliot\YamlToken\Parser\Parser;
+use Aeliot\YamlToken\Parser\ParserBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
@@ -38,7 +39,7 @@ final class AliasValueTest extends TestCase
 {
     public function testResolvesAliasValueToAnchorDeclaration(): void
     {
-        $stream = (new Parser())->parse(<<<'YAML'
+        $stream = (new ParserBuilder())->createParser()->parse(<<<'YAML'
 a: &A valueA
 b: *A
 YAML);
@@ -73,7 +74,7 @@ YAML);
         $this->expectException(AnchorUndefinedException::class);
         $this->expectExceptionMessageMatches('/Undefined alias/i');
 
-        (new Parser())->parse(<<<'YAML'
+        (new ParserBuilder())->createParser()->parse(<<<'YAML'
 key: *missing
 YAML);
     }

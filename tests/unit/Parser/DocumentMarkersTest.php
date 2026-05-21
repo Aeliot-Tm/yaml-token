@@ -19,6 +19,7 @@ use Aeliot\YamlToken\Node\DocumentEndNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Parser\Parser;
+use Aeliot\YamlToken\Parser\ParserBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
@@ -33,7 +34,7 @@ final class DocumentMarkersTest extends TestCase
 {
     public function testParsesByteOrderMarkAsStreamChild(): void
     {
-        $stream = (new Parser())->parse("\xEF\xBB\xBFkey: value\n");
+        $stream = (new ParserBuilder())->createParser()->parse("\xEF\xBB\xBFkey: value\n");
 
         $children = $stream->getChildren();
         self::assertNotEmpty($children);
@@ -46,7 +47,7 @@ final class DocumentMarkersTest extends TestCase
         $yaml = file_get_contents(__DIR__.'/../../fixture/spec/1.2.2/document-end_9.1.yaml');
         self::assertNotFalse($yaml);
 
-        $stream = (new Parser())->parse($yaml);
+        $stream = (new ParserBuilder())->createParser()->parse($yaml);
 
         /** @var DocumentNode[] $documents */
         $documents = array_values(array_filter(

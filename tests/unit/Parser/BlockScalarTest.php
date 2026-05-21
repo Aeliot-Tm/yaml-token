@@ -21,6 +21,7 @@ use Aeliot\YamlToken\Node\LiteralBlockScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Parser\Parser;
+use Aeliot\YamlToken\Parser\ParserBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -61,7 +62,7 @@ final class BlockScalarTest extends TestCase
         $yaml = file_get_contents($fixture);
         self::assertNotFalse($yaml);
 
-        $stream = (new Parser())->parse($yaml);
+        $stream = (new ParserBuilder())->createParser()->parse($yaml);
         $couple = $this->getOnlyCouple($stream);
 
         $value = $couple->getValue();

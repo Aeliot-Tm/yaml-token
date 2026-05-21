@@ -22,6 +22,7 @@ use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Parser\Parser;
+use Aeliot\YamlToken\Parser\ParserBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
@@ -38,7 +39,7 @@ final class AnchorInsideComplexKeyTest extends TestCase
 {
     public function testAnchorInsideExplicitBlockKeyTreesToOuterCouple(): void
     {
-        $stream = (new Parser())->parse(<<<'YAML'
+        $stream = (new ParserBuilder())->createParser()->parse(<<<'YAML'
 ? [ &a foo, bar ]
 : value
 YAML);
@@ -53,7 +54,7 @@ YAML);
 
     public function testAnchorInsideFlowSequenceKeyTreesToOuterCouple(): void
     {
-        $stream = (new Parser())->parse(<<<'YAML'
+        $stream = (new ParserBuilder())->createParser()->parse(<<<'YAML'
 [ &a foo, bar ]: value
 YAML);
 

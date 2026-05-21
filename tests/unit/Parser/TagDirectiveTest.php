@@ -18,6 +18,7 @@ use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\TagDirectiveIndicatorNode;
 use Aeliot\YamlToken\Node\TagDirectiveNode;
 use Aeliot\YamlToken\Parser\Parser;
+use Aeliot\YamlToken\Parser\ParserBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -55,7 +56,7 @@ final class TagDirectiveTest extends TestCase
         $yaml = file_get_contents($fixture);
         self::assertNotFalse($yaml);
 
-        $stream = (new Parser())->parse($yaml);
+        $stream = (new ParserBuilder())->createParser()->parse($yaml);
         $documents = $this->getDocumentNodes($stream);
         self::assertNotEmpty($documents);
 

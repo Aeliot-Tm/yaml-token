@@ -26,6 +26,7 @@ use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Parser\Exception\AnchorUndefinedException;
 use Aeliot\YamlToken\Parser\Parser;
+use Aeliot\YamlToken\Parser\ParserBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
@@ -45,7 +46,7 @@ final class MergeInstructionTest extends TestCase
 {
     public function testParsesMergeInstructionAsMappingChildNotCouple(): void
     {
-        $stream = (new Parser())->parse(<<<'YAML'
+        $stream = (new ParserBuilder())->createParser()->parse(<<<'YAML'
 a: &a_alias
   a1: valueA1
 b:
@@ -85,7 +86,7 @@ YAML);
         $this->expectException(AnchorUndefinedException::class);
         $this->expectExceptionMessageMatches('/Undefined alias/i');
 
-        (new Parser())->parse(<<<'YAML'
+        (new ParserBuilder())->createParser()->parse(<<<'YAML'
 b:
   <<: *missing
   c: valueC
@@ -94,7 +95,7 @@ YAML);
 
     public function testUsesMostRecentAnchorDeclarationWhenOverridden(): void
     {
-        $stream = (new Parser())->parse(<<<'YAML'
+        $stream = (new ParserBuilder())->createParser()->parse(<<<'YAML'
 a: &A {k: v1}
 a2: &A {k: v2}
 b:
