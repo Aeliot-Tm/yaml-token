@@ -25,6 +25,7 @@ use Aeliot\YamlToken\Parser\SubParser\Block\KeyParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\KeyValueCoupleParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\SequenceEntryParser;
 use Aeliot\YamlToken\Parser\SubParser\DirectiveParser;
+use Aeliot\YamlToken\Parser\SubParser\DocumentParser;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowEntryParser;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowMappingPairParser;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowMappingParser;
@@ -34,6 +35,7 @@ use Aeliot\YamlToken\Parser\SubParser\NodePropertiesParser;
 use Aeliot\YamlToken\Parser\SubParser\Scalar\BlockScalarParser;
 use Aeliot\YamlToken\Parser\SubParser\Scalar\MultilinePlainScalarParser;
 use Aeliot\YamlToken\Parser\SubParser\Scalar\SimpleScalarParser;
+use Aeliot\YamlToken\Parser\SubParser\StreamParser;
 use Aeliot\YamlToken\Parser\SubParser\ValueParser;
 
 final class ParserRegistry
@@ -45,16 +47,22 @@ final class ParserRegistry
     private ?CompactBlockMappingParser $compactBlockMappingParser = null;
     private ?CompactBlockSequenceParser $compactBlockSequenceParser = null;
     private ?DirectiveParser $directiveParser = null;
+    private ?DocumentParser $documentParser = null;
     private ?FlowEntryParser $flowEntryParser = null;
     private ?FlowMappingPairParser $flowMappingPairParser = null;
     private ?FlowMappingParser $flowMappingParser = null;
     private ?FlowSequenceParser $flowSequenceParser = null;
     private ?IndentedBlockValueParser $indentedBlockValueParser = null;
+    private ?\Closure $isBlockScalarStartAtDocumentRoot = null;
     private ?\Closure $isFlowCollectionFollowedByBlockValueIndicatorOnSameLine = null;
+    private ?\Closure $isFlowMappingStart = null;
+    private ?\Closure $isFlowSequenceStart = null;
     private ?\Closure $isKeyValueCoupleStart = null;
     private ?\Closure $isKeyValueCoupleStartAllowingNodeProperties = null;
     private ?\Closure $isNodePropertiesFollowedByImplicitKeyFromOffset = null;
+    private ?\Closure $isNodePropertyAtDocumentRoot = null;
     private ?\Closure $isScalarFollowedByValueIndicator = null;
+    private ?\Closure $isSequenceStart = null;
     private ?KeyParser $keyParser = null;
     private ?KeyValueCoupleParser $keyValueCoupleParser = null;
     private ?MergeInstructionParser $mergeInstructionParser = null;
@@ -68,6 +76,7 @@ final class ParserRegistry
     private ?\Closure $parseValue = null;
     private ?SequenceEntryParser $sequenceEntryParser = null;
     private ?SimpleScalarParser $simpleScalarParser = null;
+    private ?StreamParser $streamParser = null;
     private ?ValueParser $valueParser = null;
 
     public function __construct(
@@ -111,6 +120,19 @@ final class ParserRegistry
     public function getDirectiveParser(): DirectiveParser
     {
         return $this->directiveParser ??= $this->assembler->createDirectiveParser();
+    }
+
+    public function getDocumentParser(): DocumentParser
+    {
+        return $this->documentParser ??= $this->assembler->createDocumentParser(
+            $this,
+            $this->isBlockScalarStartAtDocumentRoot ?? throw new \LogicException('Document parser bridge not set'),
+            $this->isFlowMappingStart ?? throw new \LogicException('Document parser bridge not set'),
+            $this->isFlowSequenceStart ?? throw new \LogicException('Document parser bridge not set'),
+            $this->isKeyValueCoupleStart ?? throw new \LogicException('Document parser bridge not set'),
+            $this->isNodePropertyAtDocumentRoot ?? throw new \LogicException('Document parser bridge not set'),
+            $this->isSequenceStart ?? throw new \LogicException('Document parser bridge not set'),
+        );
     }
 
     public function getByType(StructureType $type): SubParserInterface
@@ -204,6 +226,11 @@ final class ParserRegistry
         return $this->simpleScalarParser ??= $this->assembler->createSimpleScalarParser($this);
     }
 
+    public function getStreamParser(): StreamParser
+    {
+        return $this->streamParser ??= $this->assembler->createStreamParser($this);
+    }
+
     public function getValueParser(): ValueParser
     {
         return $this->valueParser ??= $this->assembler->createValueParser($this);
@@ -235,5 +262,21 @@ final class ParserRegistry
         $this->parseCompactBlockSequence = $parseCompactBlockSequence;
         $this->parseMergeInstructionAtCurrentPosition = $parseMergeInstructionAtCurrentPosition;
         $this->parseValue = $parseValue;
+    }
+
+    public function setDocumentParserBridge(
+        \Closure $isBlockScalarStartAtDocumentRoot,
+        \Closure $isFlowMappingStart,
+        \Closure $isFlowSequenceStart,
+        \Closure $isKeyValueCoupleStart,
+        \Closure $isNodePropertyAtDocumentRoot,
+        \Closure $isSequenceStart,
+    ): void {
+        $this->isBlockScalarStartAtDocumentRoot = $isBlockScalarStartAtDocumentRoot;
+        $this->isFlowMappingStart = $isFlowMappingStart;
+        $this->isFlowSequenceStart = $isFlowSequenceStart;
+        $this->isKeyValueCoupleStart = $isKeyValueCoupleStart;
+        $this->isNodePropertyAtDocumentRoot = $isNodePropertyAtDocumentRoot;
+        $this->isSequenceStart = $isSequenceStart;
     }
 }

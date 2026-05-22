@@ -30,6 +30,7 @@ use Aeliot\YamlToken\Parser\SubParser\Block\KeyParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\KeyValueCoupleParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\SequenceEntryParser;
 use Aeliot\YamlToken\Parser\SubParser\DirectiveParser;
+use Aeliot\YamlToken\Parser\SubParser\DocumentParser;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowEntryParser;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowMappingPairParser;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowMappingParser;
@@ -39,6 +40,7 @@ use Aeliot\YamlToken\Parser\SubParser\NodePropertiesParser;
 use Aeliot\YamlToken\Parser\SubParser\Scalar\BlockScalarParser;
 use Aeliot\YamlToken\Parser\SubParser\Scalar\MultilinePlainScalarParser;
 use Aeliot\YamlToken\Parser\SubParser\Scalar\SimpleScalarParser;
+use Aeliot\YamlToken\Parser\SubParser\StreamParser;
 use Aeliot\YamlToken\Parser\SubParser\ValueParser;
 
 final class ParserAssembler
@@ -112,6 +114,27 @@ final class ParserAssembler
     public function createDirectiveParser(): DirectiveParser
     {
         return new DirectiveParser($this->consumer, $this->errorHelper, $this->nodeFactory);
+    }
+
+    public function createDocumentParser(
+        ParserRegistry $registry,
+        \Closure $isBlockScalarStartAtDocumentRoot,
+        \Closure $isFlowMappingStart,
+        \Closure $isFlowSequenceStart,
+        \Closure $isKeyValueCoupleStart,
+        \Closure $isNodePropertyAtDocumentRoot,
+        \Closure $isSequenceStart,
+    ): DocumentParser {
+        return new DocumentParser(
+            $this->errorHelper,
+            $isBlockScalarStartAtDocumentRoot,
+            $isFlowMappingStart,
+            $isFlowSequenceStart,
+            $isKeyValueCoupleStart,
+            $isNodePropertyAtDocumentRoot,
+            $isSequenceStart,
+            $registry,
+        );
     }
 
     public function createFlowEntryParser(ParserRegistry $registry): FlowEntryParser
@@ -219,6 +242,11 @@ final class ParserAssembler
     public function createSimpleScalarParser(ParserRegistry $registry): SimpleScalarParser
     {
         return new SimpleScalarParser($this->nodeFactory);
+    }
+
+    public function createStreamParser(ParserRegistry $registry): StreamParser
+    {
+        return new StreamParser($registry);
     }
 
     public function createValueParser(ParserRegistry $registry): ValueParser
