@@ -44,6 +44,7 @@ use Aeliot\YamlToken\Parser\Flow\FlowHost;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
 use Aeliot\YamlToken\Parser\Helper\MultilineContinuationHelper;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
+use Aeliot\YamlToken\Parser\SubParser\Block\IndentedBlockValueParser;
 use Aeliot\YamlToken\Token\Token;
 use Aeliot\YamlToken\Token\TokenStream;
 
@@ -58,7 +59,7 @@ final class Parser
     /**
      * Sentinel for {@see parseValue()} when the value is parsed inside a flow collection or merge RHS.
      * Flow lines use {@see TokenType::WHITESPACE} (not {@see TokenType::INDENTATION}) before the node,
-     * so a newline-prefixed value must not use block-oriented {@see parseIndentedBlockValue()} with indent 0.
+     * so a newline-prefixed value must not use block-oriented {@see IndentedBlockValueParser::parseIndentedBlockValue()} with indent 0.
      */
     private const FLOW_COLLECTION_VALUE_PARENT_INDENT = -2;
 
@@ -157,7 +158,7 @@ final class Parser
             fn (Harvester $h): KeyNode => $this->parserRegistry->getKeyParser()->getKeyNode($h),
             fn (Harvester $h): bool => $this->isFlowMultilinePlainKeyStart($h),
             fn (Harvester $h): bool => $this->isScalarFollowedByValueIndicator($h, true),
-            fn (Harvester $h): ValueNode => $this->parseFlowContextValue($h),
+            fn (Harvester $h): ValueNode => $this->parseValue($h, self::FLOW_COLLECTION_VALUE_PARENT_INDENT),
             fn (Harvester $h): MergeInstructionNode => $this->parserRegistry
                 ->getMergeInstructionParser()
                 ->parseMergeInstructionAtCurrentPosition($h),
@@ -757,16 +758,6 @@ final class Parser
         }
     }
 
-    private function parseFlowContextValue(Harvester $harvester): ValueNode
-    {
-        return $this->parseValue($harvester, self::FLOW_COLLECTION_VALUE_PARENT_INDENT);
-    }
-
-    private function parseIndentedBlockValue(Harvester $harvester, ValueNode $valueNode, int $parentIndentLen): void
-    {
-        $this->parserRegistry->getIndentedBlockValueParser()->parseIndentedBlockValue($harvester, $valueNode, $parentIndentLen);
-    }
-
     /**
      * @param int $parentIndentLen Key-line indent length (spaces),
      *                             {@see self::BARE_DOCUMENT_BLOCK_PARENT_INDENT} at bare document root (YAML 1.2.2 rule [211]),
@@ -909,7 +900,7 @@ final class Parser
 
                 return;
             }
-            $this->parseIndentedBlockValue($harvester, $valueNode, $parentIndentLen);
+            $this->parserRegistry->getIndentedBlockValueParser()->parseIndentedBlockValue($harvester, $valueNode, $parentIndentLen);
         } elseif ($token->type->isScalar()) {
             if (
                 TokenType::PLAIN_SCALAR === $token->type
