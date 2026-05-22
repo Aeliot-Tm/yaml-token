@@ -29,7 +29,10 @@ final class ParserBuilder
         $parserRegistry = new ParserRegistry($assembler);
 
         return new Parser(
-            $assembler->getMultilineContinuationHelper(),
+            $assembler->getBlockStructureIdentifier(),
+            $assembler->getFlowStructureIdentifier(),
+            $assembler->getKeyIdentifier(),
+            $assembler->getNodePropertyIdentifier(),
             $parserRegistry,
         );
     }

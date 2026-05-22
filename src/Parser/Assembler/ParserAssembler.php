@@ -16,6 +16,10 @@ namespace Aeliot\YamlToken\Parser\Assembler;
 use Aeliot\YamlToken\Parser\Consumer;
 use Aeliot\YamlToken\Parser\Helper\AnchorPostProcessor;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
+use Aeliot\YamlToken\Parser\Helper\Identifier\BlockStructureIdentifier;
+use Aeliot\YamlToken\Parser\Helper\Identifier\FlowStructureIdentifier;
+use Aeliot\YamlToken\Parser\Helper\Identifier\KeyIdentifier;
+use Aeliot\YamlToken\Parser\Helper\Identifier\NodePropertyIdentifier;
 use Aeliot\YamlToken\Parser\Helper\IndentationHelper;
 use Aeliot\YamlToken\Parser\Helper\LookAheadHelper;
 use Aeliot\YamlToken\Parser\Helper\MultilineContinuationHelper;
@@ -45,6 +49,11 @@ use Aeliot\YamlToken\Parser\SubParser\ValueParser;
 
 final class ParserAssembler
 {
+    private ?BlockStructureIdentifier $blockStructureIdentifier = null;
+    private ?FlowStructureIdentifier $flowStructureIdentifier = null;
+    private ?KeyIdentifier $keyIdentifier = null;
+    private ?NodePropertyIdentifier $nodePropertyIdentifier = null;
+
     public function __construct(
         private AnchorPostProcessor $anchorPostProcessor,
         private Consumer $consumer,
@@ -259,6 +268,15 @@ final class ParserAssembler
         return $this->anchorPostProcessor;
     }
 
+    public function getBlockStructureIdentifier(): BlockStructureIdentifier
+    {
+        return $this->blockStructureIdentifier ??= new BlockStructureIdentifier(
+            $this->getFlowStructureIdentifier(),
+            $this->multilineContinuationHelper,
+            $this->getNodePropertyIdentifier(),
+        );
+    }
+
     public function getConsumer(): Consumer
     {
         return $this->consumer;
@@ -269,9 +287,19 @@ final class ParserAssembler
         return $this->errorHelper;
     }
 
+    public function getFlowStructureIdentifier(): FlowStructureIdentifier
+    {
+        return $this->flowStructureIdentifier ??= new FlowStructureIdentifier();
+    }
+
     public function getIndentationHelper(): IndentationHelper
     {
         return $this->indentationHelper;
+    }
+
+    public function getKeyIdentifier(): KeyIdentifier
+    {
+        return $this->keyIdentifier ??= new KeyIdentifier();
     }
 
     public function getLookAheadHelper(): LookAheadHelper
@@ -287,5 +315,12 @@ final class ParserAssembler
     public function getNodeFactory(): NodeFactory
     {
         return $this->nodeFactory;
+    }
+
+    public function getNodePropertyIdentifier(): NodePropertyIdentifier
+    {
+        return $this->nodePropertyIdentifier ??= new NodePropertyIdentifier(
+            $this->getFlowStructureIdentifier(),
+        );
     }
 }
