@@ -251,7 +251,8 @@ What gets removed by the end:
 - This is the central dispatcher: identifies the next construct type, delegates
   to the appropriate sub-parser via `ParserRegistry::getByType()`.
 - Uses context stack from `ParseContext` instead of sentinel constants
-  (`BARE_DOCUMENT_BLOCK_PARENT_INDENT`, `FLOW_COLLECTION_VALUE_PARENT_INDENT`).
+  (`\Aeliot\YamlToken\Parser\Enum\EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT`,
+  `\Aeliot\YamlToken\Parser\Enum\EspecialIndent::FLOW_COLLECTION_VALUE_PARENT`).
 - Register and wire.
 
 ### Commit 21 — DocumentParser + StreamParser
@@ -302,8 +303,9 @@ What gets removed by the end:
 - Remove all remaining private methods from `Parser.php`.
 - Remove `Harvester` creation and property — `ParseContext` is the sole
   runtime state.
-- Remove sentinel constants (`BARE_DOCUMENT_BLOCK_PARENT_INDENT`,
-  `FLOW_COLLECTION_VALUE_PARENT_INDENT`).
+- Remove sentinel constants 
+  (`\Aeliot\YamlToken\Parser\Enum\EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT`,
+  `\Aeliot\YamlToken\Parser\Enum\EspecialIndent::FLOW_COLLECTION_VALUE_PARENT`).
 - Final `Parser.php` shape:
 
 ```php

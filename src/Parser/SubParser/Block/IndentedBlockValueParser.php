@@ -21,6 +21,7 @@ use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Parser\Consumer;
 use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
 use Aeliot\YamlToken\Parser\Dto\Harvester;
+use Aeliot\YamlToken\Parser\Enum\EspecialIndent;
 use Aeliot\YamlToken\Parser\Exception\IndentationInvalidException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
@@ -32,8 +33,6 @@ use Aeliot\YamlToken\Token\Token;
 
 final readonly class IndentedBlockValueParser implements SubParserInterface
 {
-    private const BARE_DOCUMENT_BLOCK_PARENT_INDENT = -1;
-
     /**
      * @param \Closure(Harvester, ValueNode): void $collectValueProperties
      * @param \Closure(Harvester, int): bool $isNodePropertiesFollowedByImplicitKeyFromOffset
@@ -159,10 +158,14 @@ final readonly class IndentedBlockValueParser implements SubParserInterface
             return;
         }
 
-        if (self::BARE_DOCUMENT_BLOCK_PARENT_INDENT === $parentIndentLen) {
+        if (EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value === $parentIndentLen) {
             if (TokenType::SEQUENCE_ENTRY === $afterIndent->type) {
                 $this->consumeBlockValueOpeningLayout($harvester, $valueNode);
-                $valueNode->addChild($this->registry->getBlockSequenceParser()->parseBlockSequenceValue($harvester, self::BARE_DOCUMENT_BLOCK_PARENT_INDENT));
+                $valueNode->addChild(
+                    $this->registry
+                        ->getBlockSequenceParser()
+                        ->parseBlockSequenceValue($harvester, EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value),
+                );
 
                 return;
             }
@@ -172,7 +175,11 @@ final readonly class IndentedBlockValueParser implements SubParserInterface
                 || $afterIndent->type->isScalar()
             ) {
                 $this->consumeBlockValueOpeningLayout($harvester, $valueNode);
-                $valueNode->addChild($this->registry->getBlockMappingParser()->parseBlockMappingValue($harvester, self::BARE_DOCUMENT_BLOCK_PARENT_INDENT));
+                $valueNode->addChild(
+                    $this->registry
+                        ->getBlockMappingParser()
+                        ->parseBlockMappingValue($harvester, EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value),
+                );
             }
         }
     }

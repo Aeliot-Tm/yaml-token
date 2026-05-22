@@ -19,13 +19,13 @@ use Aeliot\YamlToken\Node\MergeInstructionNode;
 use Aeliot\YamlToken\Parser\Consumer;
 use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
 use Aeliot\YamlToken\Parser\Dto\Harvester;
+use Aeliot\YamlToken\Parser\Enum\EspecialIndent;
 use Aeliot\YamlToken\Parser\Exception\IndentationInvalidException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
 use Aeliot\YamlToken\Parser\Helper\IndentationHelper;
 use Aeliot\YamlToken\Parser\Helper\LookAheadHelper;
-use Aeliot\YamlToken\Parser\Helper\MultilineContinuationHelper;
 use Aeliot\YamlToken\Parser\ParserRegistry;
 
 final readonly class BlockMappingParser implements SubParserInterface
@@ -70,7 +70,7 @@ final readonly class BlockMappingParser implements SubParserInterface
 
             if (TokenType::INDENTATION === $token->type) {
                 $indentLen = \strlen($token->text);
-            } elseif (MultilineContinuationHelper::BARE_DOCUMENT_BLOCK_PARENT_INDENT === $parentIndentLen && ($this->isKeyValueCoupleStart)($harvester)) {
+            } elseif (EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value === $parentIndentLen && ($this->isKeyValueCoupleStart)($harvester)) {
                 $indentLen = 0;
             } else {
                 break;

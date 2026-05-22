@@ -178,7 +178,7 @@ All extend `SyntaxNode` (constructor: `Token`; no extra methods unless noted).
     token and the next `PLAIN_SCALAR`; the parser consumes those tokens as part of the same scalar
     line so block collections do not treat the line as a new entry.
     At bare document root (no enclosing block indent; `Parser` passes
-    `BARE_DOCUMENT_BLOCK_PARENT_INDENT` as the parent length),
+    `\Aeliot\YamlToken\Parser\Enum\EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT` as the parent length),
     a continuation may begin with a scalar at column one with no leading `INDENTATION` on that line;
     the same helper accepts it when the line is not an implicit YAML key (`:` on that line).
     Horizontal `WHITESPACE` that ends a physical line immediately before `NEWLINE` (for example trailing
@@ -233,13 +233,15 @@ All extend `SyntaxNode` (constructor: `Token`; no extra methods unless noted).
   - Flow mapping / sequence: `{...}` / `[...]`.
   - Inside flow collections, a mapping value may start after a line break; the lexer then uses
     `WHITESPACE` (not `INDENTATION`) before the node. Those values are parsed via `parseValue()`
-    with sentinel `FLOW_COLLECTION_VALUE_PARENT_INDENT` so newline-prefixed content is not mistaken
-    for block `parseIndentedBlockValue()` at indent `0` (which would not consume the value and could
-    split one `KeyValueCoupleNode` into two).
+    with sentinel `\Aeliot\YamlToken\Parser\Enum\EspecialIndent::FLOW_COLLECTION_VALUE_PARENT`
+    so newline-prefixed content is not mistaken for block `parseIndentedBlockValue()` at indent `0`
+    (which would not consume the value and could split one `KeyValueCoupleNode` into two).
   - In flow context, separation spaces and comments after a value (before `,`, `]`, or `}`) are
     children of the enclosing `FlowSequenceNode` or `FlowMappingNode`, not of the `ValueNode` that
     carries the scalar or nested flow node. Spaces after `:` in a flow pair stay on `KeyValueCoupleNode`
     (see Example 7.19).
 - Bare document content that is only a scalar (no mapping key) is parsed as a top-level `ValueNode`
   when the first token is a scalar and it is not an implicit key line.
-- The bare-document block context follows YAML 1.2.2 rule [211]. The parser passes a sentinel `BARE_DOCUMENT_BLOCK_PARENT_INDENT` (-1) into `parseValue()` so the same `$lineIndent <= $parentIndent` checks work at column 0; it is not a physical space count.
+- The bare-document block context follows YAML 1.2.2 rule [211]. The parser passes a sentinel
+  `\Aeliot\YamlToken\Parser\Enum\EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT` (-1) into `parseValue()`
+  so the same `$lineIndent <= $parentIndent` checks work at column 0; it is not a physical space count.

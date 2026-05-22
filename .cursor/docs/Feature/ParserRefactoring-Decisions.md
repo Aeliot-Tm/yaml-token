@@ -97,8 +97,8 @@ unrelated meanings in one parameter:
 
 1. The actual parent indent level (≥ 0).
 2. The parsing context type, encoded as sentinel constants:
-   `BARE_DOCUMENT_BLOCK_PARENT_INDENT = -1`,
-   `FLOW_COLLECTION_VALUE_PARENT_INDENT = -2`.
+   `\Aeliot\YamlToken\Parser\Enum\EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT = -1`,
+   `\Aeliot\YamlToken\Parser\Enum\EspecialIndent::FLOW_COLLECTION_VALUE_PARENT = -2`.
 
 This conflation makes the API confusing and forces every intermediate caller
 to forward magic integers.

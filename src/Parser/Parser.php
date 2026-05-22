@@ -38,31 +38,18 @@ use Aeliot\YamlToken\Parser\Dto\AnchorsRegistry;
 use Aeliot\YamlToken\Parser\Dto\Harvester;
 use Aeliot\YamlToken\Parser\Dto\ParseState;
 use Aeliot\YamlToken\Parser\Dto\TokenStreamProxy;
+use Aeliot\YamlToken\Parser\Enum\EspecialIndent;
 use Aeliot\YamlToken\Parser\Exception\AnchorUndefinedException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Flow\FlowHost;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
 use Aeliot\YamlToken\Parser\Helper\MultilineContinuationHelper;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
-use Aeliot\YamlToken\Parser\SubParser\Block\IndentedBlockValueParser;
 use Aeliot\YamlToken\Token\Token;
 use Aeliot\YamlToken\Token\TokenStream;
 
 final class Parser
 {
-    /**
-     * Bare-document block parent indent (YAML 1.2.2 rule [211], grammar uses n = -1). Not a column count;
-     * keeps “$lineIndent <= $parentIndent” checks uniform: no non-negative indent is <= this value.
-     */
-    private const BARE_DOCUMENT_BLOCK_PARENT_INDENT = MultilineContinuationHelper::BARE_DOCUMENT_BLOCK_PARENT_INDENT;
-
-    /**
-     * Sentinel for {@see parseValue()} when the value is parsed inside a flow collection or merge RHS.
-     * Flow lines use {@see TokenType::WHITESPACE} (not {@see TokenType::INDENTATION}) before the node,
-     * so a newline-prefixed value must not use block-oriented {@see IndentedBlockValueParser::parseIndentedBlockValue()} with indent 0.
-     */
-    private const FLOW_COLLECTION_VALUE_PARENT_INDENT = -2;
-
     public function __construct(
         private Consumer $consumer,
         private ErrorHelper $errorHelper,
@@ -158,7 +145,7 @@ final class Parser
             fn (Harvester $h): KeyNode => $this->parserRegistry->getKeyParser()->getKeyNode($h),
             fn (Harvester $h): bool => $this->isFlowMultilinePlainKeyStart($h),
             fn (Harvester $h): bool => $this->isScalarFollowedByValueIndicator($h, true),
-            fn (Harvester $h): ValueNode => $this->parseValue($h, self::FLOW_COLLECTION_VALUE_PARENT_INDENT),
+            fn (Harvester $h): ValueNode => $this->parseValue($h, EspecialIndent::FLOW_COLLECTION_VALUE_PARENT->value),
             fn (Harvester $h): MergeInstructionNode => $this->parserRegistry
                 ->getMergeInstructionParser()
                 ->parseMergeInstructionAtCurrentPosition($h),
@@ -665,12 +652,12 @@ final class Parser
                     break;
                 }
 
-                $document->addChild($this->parseValue($harvester, self::BARE_DOCUMENT_BLOCK_PARENT_INDENT));
+                $document->addChild($this->parseValue($harvester, EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value));
                 continue;
             }
 
             if (TokenType::ALIAS === $token->type) {
-                $document->addChild($this->parseValue($harvester, self::BARE_DOCUMENT_BLOCK_PARENT_INDENT));
+                $document->addChild($this->parseValue($harvester, EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value));
                 continue;
             }
 
@@ -710,7 +697,7 @@ final class Parser
             }
 
             if ($token->type->isScalar()) {
-                $document->addChild($this->parseValue($harvester, self::BARE_DOCUMENT_BLOCK_PARENT_INDENT));
+                $document->addChild($this->parseValue($harvester, EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value));
                 continue;
             }
 
@@ -720,7 +707,7 @@ final class Parser
                     $harvester->tokens->advance();
                 }
 
-                $document->addChild($this->parseValue($harvester, self::BARE_DOCUMENT_BLOCK_PARENT_INDENT));
+                $document->addChild($this->parseValue($harvester, EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value));
                 continue;
             }
 
@@ -760,8 +747,8 @@ final class Parser
 
     /**
      * @param int $parentIndentLen Key-line indent length (spaces),
-     *                             {@see self::BARE_DOCUMENT_BLOCK_PARENT_INDENT} at bare document root (YAML 1.2.2 rule [211]),
-     *                             or {@see self::FLOW_COLLECTION_VALUE_PARENT_INDENT} for flow / merge RHS values.
+     *                             {@see EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value} at bare document root (YAML 1.2.2 rule [211]),
+     *                             or {@see EspecialIndent::FLOW_COLLECTION_VALUE_PARENT->value} for flow / merge RHS values.
      */
     private function parseValue(Harvester $harvester, int $parentIndentLen): ValueNode
     {
@@ -779,7 +766,7 @@ final class Parser
         if (
             null !== $token
             && TokenType::NEWLINE === $token->type
-            && self::FLOW_COLLECTION_VALUE_PARENT_INDENT === $parentIndentLen
+            && EspecialIndent::FLOW_COLLECTION_VALUE_PARENT->value === $parentIndentLen
         ) {
             $this->consumer->collectSpaceCommentEnds($harvester->tokens, $valueNode);
         }
@@ -788,7 +775,7 @@ final class Parser
 
         // Trailing s-separate / s-l-comments before ',', ']', or '}' belong to the enclosing
         // FlowSequenceBuilder / FlowMappingBuilder (YAML 1.2.2 §6.3, §7.1), not this ValueNode.
-        if (self::FLOW_COLLECTION_VALUE_PARENT_INDENT !== $parentIndentLen) {
+        if (EspecialIndent::FLOW_COLLECTION_VALUE_PARENT->value !== $parentIndentLen) {
             $this->consumer->collectSpaceAndComments($harvester->tokens, $valueNode);
         }
 
@@ -807,7 +794,7 @@ final class Parser
         // YAML 1.2.2 §7.2 e-node / §7.4: in flow contexts, scalar content may be empty right
         // after c-ns-properties (tag/anchor) — the next ',' / '}' / ']' terminates the entry.
         if (
-            self::FLOW_COLLECTION_VALUE_PARENT_INDENT === $parentIndentLen
+            EspecialIndent::FLOW_COLLECTION_VALUE_PARENT->value === $parentIndentLen
             && \in_array($token->type, [
                 TokenType::FLOW_ENTRY,
                 TokenType::FLOW_MAPPING_END,
@@ -894,7 +881,7 @@ final class Parser
             // structure as multiline plain scalars (YAML 1.2.2 §8.1.1).
             $multilinePlainScalarParser->appendMultilinePlainScalarContinuations($harvester->tokens, $valueNode, $parentIndentLen);
         } elseif (TokenType::NEWLINE === $token->type) {
-            if (self::FLOW_COLLECTION_VALUE_PARENT_INDENT === $parentIndentLen) {
+            if (EspecialIndent::FLOW_COLLECTION_VALUE_PARENT->value === $parentIndentLen) {
                 $this->consumer->collectSpaceCommentEnds($harvester->tokens, $valueNode);
                 $this->parseValuePrimaryPayload($harvester, $valueNode, $parentIndentLen);
 
@@ -914,7 +901,7 @@ final class Parser
                 $valueNode->addChild($multiline);
             } elseif (
                 TokenType::PLAIN_SCALAR === $token->type
-                && self::FLOW_COLLECTION_VALUE_PARENT_INDENT === $parentIndentLen
+                && EspecialIndent::FLOW_COLLECTION_VALUE_PARENT->value === $parentIndentLen
             ) {
                 $head = $this->nodeFactory->createScalarNode($token);
                 $harvester->tokens->advance();

@@ -23,6 +23,7 @@ use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Parser\Consumer;
 use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
 use Aeliot\YamlToken\Parser\Dto\Harvester;
+use Aeliot\YamlToken\Parser\Enum\EspecialIndent;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
@@ -30,8 +31,6 @@ use Aeliot\YamlToken\Parser\Helper\NodeFactory;
 
 final readonly class MergeInstructionParser implements SubParserInterface
 {
-    private const FLOW_COLLECTION_VALUE_PARENT_INDENT = -2;
-
     /**
      * @param \Closure(Harvester, int): ValueNode $parseValue
      */
@@ -62,7 +61,7 @@ final readonly class MergeInstructionParser implements SubParserInterface
 
         $this->consumer->collectTypes($harvester->tokens, [TokenType::VALUE_INDICATOR, TokenType::WHITESPACE], $mergeInstruction);
 
-        $value = ($this->parseValue)($harvester, self::FLOW_COLLECTION_VALUE_PARENT_INDENT);
+        $value = ($this->parseValue)($harvester, EspecialIndent::FLOW_COLLECTION_VALUE_PARENT->value);
         $mergeInstruction->addChild($value);
 
         $aliases = $this->collectMergeAliases($value);

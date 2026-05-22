@@ -22,6 +22,7 @@ use Aeliot\YamlToken\Node\PlainScalarNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
 use Aeliot\YamlToken\Parser\Dto\TokenStreamProxy;
+use Aeliot\YamlToken\Parser\Enum\EspecialIndent;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
 use Aeliot\YamlToken\Parser\Helper\MultilineContinuationHelper;
@@ -65,7 +66,7 @@ final readonly class MultilinePlainScalarParser implements SubParserInterface
                 $continuesAfterBlankLine =
                     $this->multilineContinuationHelper->isIndentedMultilinePlainContinuationAt($tokens, 2, $parentIndentLen)
                     || (
-                        MultilineContinuationHelper::BARE_DOCUMENT_BLOCK_PARENT_INDENT === $parentIndentLen
+                        EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value === $parentIndentLen
                         && $this->multilineContinuationHelper->isBareDocumentFlushMultilinePlainContinuationAt($tokens, 2)
                     );
                 if (!$continuesAfterBlankLine) {
@@ -88,7 +89,7 @@ final readonly class MultilinePlainScalarParser implements SubParserInterface
                     && (
                         $this->multilineContinuationHelper->isIndentedMultilinePlainContinuationAt($tokens, $afterIndentOffset + 1, $parentIndentLen)
                         || (
-                            MultilineContinuationHelper::BARE_DOCUMENT_BLOCK_PARENT_INDENT === $parentIndentLen
+                            EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value === $parentIndentLen
                             && $this->multilineContinuationHelper->isBareDocumentFlushMultilinePlainContinuationAt($tokens, $afterIndentOffset + 1)
                         )
                     )
@@ -139,7 +140,7 @@ final readonly class MultilinePlainScalarParser implements SubParserInterface
             }
 
             if (
-                MultilineContinuationHelper::BARE_DOCUMENT_BLOCK_PARENT_INDENT === $parentIndentLen
+                EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value === $parentIndentLen
                 && $this->multilineContinuationHelper->isBareDocumentFlushMultilinePlainContinuationAt($tokens, 1)
             ) {
                 $targetNode->addChild(new NewLineNode($newLine));
