@@ -29,10 +29,8 @@ final class ParserBuilder
         $parserRegistry = new ParserRegistry($assembler);
 
         return new Parser(
-            $assembler->getConsumer(),
             $assembler->getErrorHelper(),
             $assembler->getMultilineContinuationHelper(),
-            $assembler->getNodeFactory(),
             $parserRegistry,
         );
     }

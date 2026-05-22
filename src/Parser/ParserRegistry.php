@@ -34,6 +34,7 @@ use Aeliot\YamlToken\Parser\SubParser\NodePropertiesParser;
 use Aeliot\YamlToken\Parser\SubParser\Scalar\BlockScalarParser;
 use Aeliot\YamlToken\Parser\SubParser\Scalar\MultilinePlainScalarParser;
 use Aeliot\YamlToken\Parser\SubParser\Scalar\SimpleScalarParser;
+use Aeliot\YamlToken\Parser\SubParser\ValueParser;
 
 final class ParserRegistry
 {
@@ -67,6 +68,7 @@ final class ParserRegistry
     private ?\Closure $parseValue = null;
     private ?SequenceEntryParser $sequenceEntryParser = null;
     private ?SimpleScalarParser $simpleScalarParser = null;
+    private ?ValueParser $valueParser = null;
 
     public function __construct(
         private readonly ParserAssembler $assembler,
@@ -200,6 +202,11 @@ final class ParserRegistry
     public function getSimpleScalarParser(): SimpleScalarParser
     {
         return $this->simpleScalarParser ??= $this->assembler->createSimpleScalarParser($this);
+    }
+
+    public function getValueParser(): ValueParser
+    {
+        return $this->valueParser ??= $this->assembler->createValueParser($this);
     }
 
     public function setBlockParserBridge(

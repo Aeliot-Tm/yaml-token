@@ -39,6 +39,7 @@ use Aeliot\YamlToken\Parser\SubParser\NodePropertiesParser;
 use Aeliot\YamlToken\Parser\SubParser\Scalar\BlockScalarParser;
 use Aeliot\YamlToken\Parser\SubParser\Scalar\MultilinePlainScalarParser;
 use Aeliot\YamlToken\Parser\SubParser\Scalar\SimpleScalarParser;
+use Aeliot\YamlToken\Parser\SubParser\ValueParser;
 
 final class ParserAssembler
 {
@@ -218,6 +219,11 @@ final class ParserAssembler
     public function createSimpleScalarParser(ParserRegistry $registry): SimpleScalarParser
     {
         return new SimpleScalarParser($this->nodeFactory);
+    }
+
+    public function createValueParser(ParserRegistry $registry): ValueParser
+    {
+        return new ValueParser($this->consumer, $this->errorHelper, $this->multilineContinuationHelper, $this->nodeFactory, $registry);
     }
 
     public function getAnchorPostProcessor(): AnchorPostProcessor
