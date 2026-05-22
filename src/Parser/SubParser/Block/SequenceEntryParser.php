@@ -53,25 +53,25 @@ final readonly class SequenceEntryParser implements SubParserInterface
      * combined length is considered part of the indentation of the
      * nested (compact) block collection.
      */
-    public function consumeSequenceEntryIndicatorAndSpaces(ParseContext $harvester, Node $target): int
+    public function consumeSequenceEntryIndicatorAndSpaces(ParseContext $parseContext, Node $target): int
     {
-        $token = $harvester->tokens->current();
+        $token = $parseContext->tokens->current();
         if (TokenType::SEQUENCE_ENTRY !== $token?->type) {
-            throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('SEQUENCE_ENTRY expected, but %s given', $token?->type->value ?? '_nothing_'), $harvester->tokens));
+            throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('SEQUENCE_ENTRY expected, but %s given', $token?->type->value ?? '_nothing_'), $parseContext->tokens));
         }
 
         $target->addChild($this->nodeFactory->createSimpleNode($token));
-        $harvester->tokens->advance();
+        $parseContext->tokens->advance();
         $consumed = \strlen($token->text);
 
         while (true) {
-            $next = $harvester->tokens->current();
+            $next = $parseContext->tokens->current();
             if (TokenType::WHITESPACE !== $next?->type) {
                 break;
             }
             $target->addChild(new WhitespaceNode($next));
             $consumed += \strlen($next->text);
-            $harvester->tokens->advance();
+            $parseContext->tokens->advance();
         }
 
         return $consumed;
@@ -91,14 +91,14 @@ final readonly class SequenceEntryParser implements SubParserInterface
      * that follow '-'. Per §8.2.1 this length defines the indentation
      * of the nested compact collection.
      */
-    public function parseSequenceEntryValue(ParseContext $harvester, int $parentIndentLen, int $compactIndent): ValueNode
+    public function parseSequenceEntryValue(ParseContext $parseContext, int $parentIndentLen, int $compactIndent): ValueNode
     {
-        $token = $harvester->tokens->current();
+        $token = $parseContext->tokens->current();
         $nodePropertiesFollowedByValueIndicator = false;
         if (null !== $token && $this->isNodePropertyToken($token)) {
             $offset = 0;
             while (true) {
-                $peeked = $harvester->tokens->peek($offset);
+                $peeked = $parseContext->tokens->peek($offset);
                 if (null === $peeked || TokenType::NEWLINE === $peeked->type) {
                     break;
                 }
@@ -118,36 +118,36 @@ final readonly class SequenceEntryParser implements SubParserInterface
         }
 
         if (
-            ($this->isScalarFollowedByValueIndicator)($harvester)
+            ($this->isScalarFollowedByValueIndicator)($parseContext)
             || TokenType::EXPLICIT_KEY_INDICATOR === $token?->type
             || TokenType::VALUE_INDICATOR === $token?->type
             || $nodePropertiesFollowedByValueIndicator
         ) {
             $valueNode = new ValueNode();
-            $valueNode->addChild(($this->parseCompactBlockMapping)($harvester, $compactIndent));
+            $valueNode->addChild(($this->parseCompactBlockMapping)($parseContext, $compactIndent));
 
             return $valueNode;
         }
 
-        if (TokenType::SEQUENCE_ENTRY === $harvester->tokens->current()?->type) {
+        if (TokenType::SEQUENCE_ENTRY === $parseContext->tokens->current()?->type) {
             $valueNode = new ValueNode();
-            $valueNode->addChild(($this->parseCompactBlockSequence)($harvester, $compactIndent));
+            $valueNode->addChild(($this->parseCompactBlockSequence)($parseContext, $compactIndent));
 
             return $valueNode;
         }
 
-        $flowOpen = $harvester->tokens->current();
+        $flowOpen = $parseContext->tokens->current();
         if (
             \in_array($flowOpen?->type, [TokenType::FLOW_SEQUENCE_START, TokenType::FLOW_MAPPING_START], true)
-            && ($this->isFlowCollectionFollowedByBlockValueIndicatorOnSameLine)($harvester, 0)
+            && ($this->isFlowCollectionFollowedByBlockValueIndicatorOnSameLine)($parseContext, 0)
         ) {
             $valueNode = new ValueNode();
-            $valueNode->addChild(($this->parseCompactBlockMapping)($harvester, $compactIndent));
+            $valueNode->addChild(($this->parseCompactBlockMapping)($parseContext, $compactIndent));
 
             return $valueNode;
         }
 
-        return ($this->parseValue)($harvester, $parentIndentLen);
+        return ($this->parseValue)($parseContext, $parentIndentLen);
     }
 
     private function isNodePropertyToken(?Token $token): bool

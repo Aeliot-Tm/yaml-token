@@ -34,14 +34,14 @@ final readonly class NodePropertyIdentifier
      * Detects such a node-property prefix at the document root by peeking past
      * a possible leading INDENTATION token.
      */
-    public function isNodePropertyAtDocumentRoot(ParseContext $harvester): bool
+    public function isNodePropertyAtDocumentRoot(ParseContext $parseContext): bool
     {
-        $token = $harvester->tokens->current();
+        $token = $parseContext->tokens->current();
         if (null === $token) {
             return false;
         }
         if (TokenType::INDENTATION === $token->type) {
-            $token = $harvester->tokens->peek(1);
+            $token = $parseContext->tokens->peek(1);
         }
 
         return null !== $token && \in_array($token->type, [
@@ -68,20 +68,20 @@ final readonly class NodePropertyIdentifier
      * same line by {@code VALUE_INDICATOR} (block implicit key whose key is a tagged or
      * anchored flow collection, e.g. {@code &k [a]: b}).
      */
-    public function isNodePropertiesFollowedByFlowCollectionImplicitBlockKeyOnSameLine(ParseContext $harvester): bool
+    public function isNodePropertiesFollowedByFlowCollectionImplicitBlockKeyOnSameLine(ParseContext $parseContext): bool
     {
         $offset = 0;
-        if (TokenType::INDENTATION === $harvester->tokens->current()?->type) {
+        if (TokenType::INDENTATION === $parseContext->tokens->current()?->type) {
             $offset = 1;
         }
 
-        if (!$this->isNodePropertyToken($harvester->tokens->peek($offset))) {
+        if (!$this->isNodePropertyToken($parseContext->tokens->peek($offset))) {
             return false;
         }
 
         $sawProperty = false;
         while (true) {
-            $peeked = $harvester->tokens->peek($offset);
+            $peeked = $parseContext->tokens->peek($offset);
             if (null === $peeked) {
                 return false;
             }
@@ -109,7 +109,7 @@ final readonly class NodePropertyIdentifier
             return false;
         }
 
-        return $this->flowStructureIdentifier->isFlowCollectionFollowedByBlockValueIndicatorOnSameLine($harvester, $offset);
+        return $this->flowStructureIdentifier->isFlowCollectionFollowedByBlockValueIndicatorOnSameLine($parseContext, $offset);
     }
 
     /**
@@ -118,10 +118,10 @@ final readonly class NodePropertyIdentifier
      *
      * @param int $offset Peek offset to the first TAG or ANCHOR on the line
      */
-    public function isNodePropertiesFollowedByImplicitKeyFromOffset(ParseContext $harvester, int $offset): bool
+    public function isNodePropertiesFollowedByImplicitKeyFromOffset(ParseContext $parseContext, int $offset): bool
     {
         while (true) {
-            $token = $harvester->tokens->peek($offset);
+            $token = $parseContext->tokens->peek($offset);
             if (null === $token) {
                 return false;
             }
@@ -147,7 +147,7 @@ final readonly class NodePropertyIdentifier
 
             $peekOffset = $offset + 1;
             while (true) {
-                $peeked = $harvester->tokens->peek($peekOffset);
+                $peeked = $parseContext->tokens->peek($peekOffset);
                 if (null === $peeked) {
                     return false;
                 }
@@ -167,17 +167,17 @@ final readonly class NodePropertyIdentifier
      * NEWLINE — an implicit YAML key (scalar followed by VALUE_INDICATOR). Distinguishes
      * "&a: key: value" from a properties-only prefix line whose value continues below.
      */
-    public function isNodePropertiesFollowedByImplicitYamlKeyOnSameLine(ParseContext $harvester): bool
+    public function isNodePropertiesFollowedByImplicitYamlKeyOnSameLine(ParseContext $parseContext): bool
     {
         $offset = 0;
-        if (TokenType::INDENTATION === $harvester->tokens->current()?->type) {
+        if (TokenType::INDENTATION === $parseContext->tokens->current()?->type) {
             $offset = 1;
         }
 
-        if (!$this->isNodePropertyToken($harvester->tokens->peek($offset))) {
+        if (!$this->isNodePropertyToken($parseContext->tokens->peek($offset))) {
             return false;
         }
 
-        return $this->isNodePropertiesFollowedByImplicitKeyFromOffset($harvester, $offset);
+        return $this->isNodePropertiesFollowedByImplicitKeyFromOffset($parseContext, $offset);
     }
 }

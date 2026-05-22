@@ -33,47 +33,47 @@ final readonly class FlowMappingParser implements SubParserInterface
     ) {
     }
 
-    public function parse(ParseContext $harvester): FlowMappingNode
+    public function parse(ParseContext $parseContext): FlowMappingNode
     {
         $node = new FlowMappingNode();
-        $token = $harvester->tokens->current();
+        $token = $parseContext->tokens->current();
         if (TokenType::FLOW_MAPPING_START !== $token?->type) {
-            throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('There is no expected FLOW_MAPPING_START token, but %s given', $token?->type->value ?? '_nothing_'), $harvester->tokens));
+            throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('There is no expected FLOW_MAPPING_START token, but %s given', $token?->type->value ?? '_nothing_'), $parseContext->tokens));
         }
 
         $node->addChild($this->nodeFactory->createSimpleNode($token));
-        $harvester->tokens->advance();
+        $parseContext->tokens->advance();
 
         while (true) {
-            $this->consumer->collectSpaceCommentEnds($harvester->tokens, $node);
+            $this->consumer->collectSpaceCommentEnds($parseContext->tokens, $node);
 
-            $token = $harvester->tokens->current();
+            $token = $parseContext->tokens->current();
             if (null === $token || TokenType::FLOW_MAPPING_END === $token->type) {
                 if (TokenType::FLOW_MAPPING_END !== $token?->type) {
                     throw new UnexpectedTokenException(\sprintf('There is no expected FLOW_MAPPING_END token, but %s given', $token?->type->value ?? '_nothing_'));
                 }
 
                 $node->addChild($this->nodeFactory->createSimpleNode($token));
-                $harvester->tokens->advance();
-                $this->consumer->collectSpaceAndComments($harvester->tokens, $node);
+                $parseContext->tokens->advance();
+                $this->consumer->collectSpaceAndComments($parseContext->tokens, $node);
 
                 return $node;
             }
 
             if (TokenType::FLOW_ENTRY === $token->type) {
                 $node->addChild($this->nodeFactory->createSimpleNode($token));
-                $harvester->tokens->advance();
+                $parseContext->tokens->advance();
 
                 continue;
             }
 
             if (TokenType::MERGE_INDICATOR === $token->type) {
-                $node->addChild($this->registry->getFlowHost()->parseMergeInstructionAtCurrentPosition($harvester));
+                $node->addChild($this->registry->getFlowHost()->parseMergeInstructionAtCurrentPosition($parseContext));
 
                 continue;
             }
 
-            $node->addChild($this->registry->getFlowMappingPairParser()->parse($harvester));
+            $node->addChild($this->registry->getFlowMappingPairParser()->parse($parseContext));
         }
     }
 }

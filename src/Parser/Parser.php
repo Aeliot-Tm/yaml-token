@@ -34,12 +34,12 @@ final class Parser
 
     public function parseStream(TokenStream $tokens): StreamNode
     {
-        $ctx = new ParseContext(
+        $parseContext = new ParseContext(
             new TokenStreamProxy($tokens),
             new AnchorsRegistry(),
             new ParseState(),
         );
 
-        return $this->parserRegistry->getStreamParser()->parseStream($ctx);
+        return $this->parserRegistry->getStreamParser()->parseStream($parseContext);
     }
 }

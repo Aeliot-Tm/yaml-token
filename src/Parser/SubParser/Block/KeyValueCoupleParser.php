@@ -42,11 +42,11 @@ final readonly class KeyValueCoupleParser implements SubParserInterface
     ) {
     }
 
-    public function parseKeyValueCoupleAtCurrentPosition(ParseContext $harvester, Node $root, int $indentLen): void
+    public function parseKeyValueCoupleAtCurrentPosition(ParseContext $parseContext, Node $root, int $indentLen): void
     {
-        $token = $harvester->tokens->current();
+        $token = $parseContext->tokens->current();
         if (null === $token) {
-            throw new UnexpectedEndException($this->errorHelper->appendTokenLocation('Unexpected end of stream while parsing key/value couple', $harvester->tokens));
+            throw new UnexpectedEndException($this->errorHelper->appendTokenLocation('Unexpected end of stream while parsing key/value couple', $parseContext->tokens));
         }
 
         $keyValueCouple = new KeyValueCoupleNode();
@@ -56,18 +56,18 @@ final readonly class KeyValueCoupleParser implements SubParserInterface
         if (TokenType::INDENTATION === $token->type) {
             $entryIndentLen = \strlen($token->text);
             $keyValueCouple->setIndentation(new IndentationNode($token));
-            $harvester->tokens->advance();
+            $parseContext->tokens->advance();
         }
 
-        $keyValueCouple->addChild($this->registry->getKeyParser()->getKeyNode($harvester, $entryIndentLen));
+        $keyValueCouple->addChild($this->registry->getKeyParser()->getKeyNode($parseContext, $entryIndentLen));
 
-        $afterKey = $harvester->tokens->current();
+        $afterKey = $parseContext->tokens->current();
         if (
             null !== $afterKey
             && null !== $keyValueCouple->getKey()->getExplicitKeyIndicatorNode()
         ) {
-            $this->consumer->collectTypes($harvester->tokens, [TokenType::WHITESPACE], $keyValueCouple);
-            $afterKey = $harvester->tokens->current();
+            $this->consumer->collectTypes($parseContext->tokens, [TokenType::WHITESPACE], $keyValueCouple);
+            $afterKey = $parseContext->tokens->current();
 
             if (null === $afterKey || TokenType::NEWLINE !== $afterKey->type) {
                 $afterKey = null;
@@ -75,11 +75,11 @@ final readonly class KeyValueCoupleParser implements SubParserInterface
         }
 
         if (null !== $afterKey && TokenType::NEWLINE === $afterKey->type) {
-            $head = $this->lookAheadHelper->peekFirstSignificantBlockHead($harvester->tokens, 1);
+            $head = $this->lookAheadHelper->peekFirstSignificantBlockHead($parseContext->tokens, 1);
             if (null !== $head) {
                 [$headIndentLen, $significantToken] = $head;
                 if (TokenType::VALUE_INDICATOR === $significantToken->type && $headIndentLen === $entryIndentLen) {
-                    $this->consumer->collectTypes($harvester->tokens, [
+                    $this->consumer->collectTypes($parseContext->tokens, [
                         TokenType::COMMENT,
                         TokenType::INDENTATION,
                         TokenType::NEWLINE,
@@ -89,19 +89,19 @@ final readonly class KeyValueCoupleParser implements SubParserInterface
             }
         }
 
-        $afterKey = $harvester->tokens->current();
+        $afterKey = $parseContext->tokens->current();
         if (
             null !== $afterKey
             && null !== $keyValueCouple->getKey()->getExplicitKeyIndicatorNode()
             && TokenType::INDENTATION === $afterKey->type
             && \strlen($afterKey->text) === $entryIndentLen
-            && TokenType::VALUE_INDICATOR === $harvester->tokens->peek(1)?->type
+            && TokenType::VALUE_INDICATOR === $parseContext->tokens->peek(1)?->type
         ) {
-            $this->consumer->collectTypes($harvester->tokens, [TokenType::INDENTATION], $keyValueCouple);
+            $this->consumer->collectTypes($parseContext->tokens, [TokenType::INDENTATION], $keyValueCouple);
         }
 
-        $this->consumer->collectTypes($harvester->tokens, [TokenType::VALUE_INDICATOR, TokenType::WHITESPACE], $keyValueCouple);
-        $keyValueCouple->addChild(($this->parseValue)($harvester, $indentLen));
-        $this->anchorPostProcessor->postProcessKeyValueCouple($harvester->anchorsRegistry, $keyValueCouple);
+        $this->consumer->collectTypes($parseContext->tokens, [TokenType::VALUE_INDICATOR, TokenType::WHITESPACE], $keyValueCouple);
+        $keyValueCouple->addChild(($this->parseValue)($parseContext, $indentLen));
+        $this->anchorPostProcessor->postProcessKeyValueCouple($parseContext->anchorsRegistry, $keyValueCouple);
     }
 }

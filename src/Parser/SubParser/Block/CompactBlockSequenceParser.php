@@ -43,7 +43,7 @@ final readonly class CompactBlockSequenceParser implements SubParserInterface
      * an INDENTATION token whose length equals $indentLen — the column
      * (0-based) of the first '-', i.e. the value of n in rule [186].
      */
-    public function parseCompactBlockSequence(ParseContext $harvester, int $indentLen): BlockSequenceNode
+    public function parseCompactBlockSequence(ParseContext $parseContext, int $indentLen): BlockSequenceNode
     {
         $blockSequence = new BlockSequenceNode();
 
@@ -51,58 +51,58 @@ final readonly class CompactBlockSequenceParser implements SubParserInterface
         $blockSequence->addChild($firstEntry);
         $firstCompactIndent = $indentLen + $this->registry
                 ->getSequenceEntryParser()
-                ->consumeSequenceEntryIndicatorAndSpaces($harvester, $firstEntry);
+                ->consumeSequenceEntryIndicatorAndSpaces($parseContext, $firstEntry);
 
         $firstEntry->addChild(
             $this->registry
                 ->getSequenceEntryParser()
-                ->parseSequenceEntryValue($harvester, $indentLen, $firstCompactIndent),
+                ->parseSequenceEntryValue($parseContext, $indentLen, $firstCompactIndent),
         );
 
-        while (!$harvester->tokens->isEnd()) {
-            $head = $this->lookAheadHelper->peekFirstSignificantBlockHead($harvester->tokens, 0);
+        while (!$parseContext->tokens->isEnd()) {
+            $head = $this->lookAheadHelper->peekFirstSignificantBlockHead($parseContext->tokens, 0);
             if (null === $head || $head[0] !== $indentLen) {
                 break;
             }
 
-            $this->consumer->collectSpaceCommentEnds($harvester->tokens, $blockSequence);
-            $this->lookAheadHelper->collectInsignificantIndentationLines($harvester->tokens, $blockSequence);
+            $this->consumer->collectSpaceCommentEnds($parseContext->tokens, $blockSequence);
+            $this->lookAheadHelper->collectInsignificantIndentationLines($parseContext->tokens, $blockSequence);
 
-            $token = $harvester->tokens->current();
+            $token = $parseContext->tokens->current();
             if (null === $token || TokenType::INDENTATION !== $token->type) {
                 break;
             }
             if (\strlen($token->text) !== $indentLen) {
                 break;
             }
-            if (!$this->isSequenceStart($harvester)) {
+            if (!$this->isSequenceStart($parseContext)) {
                 break;
             }
 
             $sequenceEntry = new BlockSequenceEntryNode();
             $blockSequence->addChild($sequenceEntry);
             $sequenceEntry->addChild(new IndentationNode($token));
-            $harvester->tokens->advance();
+            $parseContext->tokens->advance();
 
             $compactIndent = $indentLen + $this->registry
                     ->getSequenceEntryParser()
-                    ->consumeSequenceEntryIndicatorAndSpaces($harvester, $sequenceEntry);
+                    ->consumeSequenceEntryIndicatorAndSpaces($parseContext, $sequenceEntry);
 
             $sequenceEntry->addChild(
                 $this->registry
                     ->getSequenceEntryParser()
-                    ->parseSequenceEntryValue($harvester, $indentLen, $compactIndent),
+                    ->parseSequenceEntryValue($parseContext, $indentLen, $compactIndent),
             );
         }
 
         return $blockSequence;
     }
 
-    private function isSequenceStart(ParseContext $harvester): bool
+    private function isSequenceStart(ParseContext $parseContext): bool
     {
-        $token = $harvester->tokens->current();
+        $token = $parseContext->tokens->current();
         if (TokenType::INDENTATION === $token->type) {
-            $token = $harvester->tokens->peek(1);
+            $token = $parseContext->tokens->peek(1);
         }
 
         return TokenType::SEQUENCE_ENTRY === $token?->type;

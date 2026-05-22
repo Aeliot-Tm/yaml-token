@@ -42,26 +42,26 @@ final readonly class MergeInstructionParser implements SubParserInterface
     ) {
     }
 
-    public function parseMergeInstructionAtCurrentPosition(ParseContext $harvester): MergeInstructionNode
+    public function parseMergeInstructionAtCurrentPosition(ParseContext $parseContext): MergeInstructionNode
     {
         $mergeInstruction = new MergeInstructionNode();
 
-        $token = $harvester->tokens->current();
+        $token = $parseContext->tokens->current();
         if (TokenType::INDENTATION === $token?->type) {
             $mergeInstruction->addChild(new IndentationNode($token));
-            $harvester->tokens->advance();
-            $token = $harvester->tokens->current();
+            $parseContext->tokens->advance();
+            $token = $parseContext->tokens->current();
         }
 
         if (TokenType::MERGE_INDICATOR !== $token?->type) {
-            throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('There is no expected MERGE_INDICATOR token, but %s given', $token?->type->value ?? '_nothing_'), $harvester->tokens));
+            throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('There is no expected MERGE_INDICATOR token, but %s given', $token?->type->value ?? '_nothing_'), $parseContext->tokens));
         }
         $mergeInstruction->addChild($this->nodeFactory->createSimpleNode($token));
-        $harvester->tokens->advance();
+        $parseContext->tokens->advance();
 
-        $this->consumer->collectTypes($harvester->tokens, [TokenType::VALUE_INDICATOR, TokenType::WHITESPACE], $mergeInstruction);
+        $this->consumer->collectTypes($parseContext->tokens, [TokenType::VALUE_INDICATOR, TokenType::WHITESPACE], $mergeInstruction);
 
-        $value = ($this->parseValue)($harvester, EspecialIndent::FLOW_COLLECTION_VALUE_PARENT->value);
+        $value = ($this->parseValue)($parseContext, EspecialIndent::FLOW_COLLECTION_VALUE_PARENT->value);
         $mergeInstruction->addChild($value);
 
         $aliases = $this->collectMergeAliases($value);

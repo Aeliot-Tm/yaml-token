@@ -26,11 +26,11 @@ final readonly class BlockStructureIdentifier
     ) {
     }
 
-    public function isBlockScalarStartAtDocumentRoot(ParseContext $harvester): bool
+    public function isBlockScalarStartAtDocumentRoot(ParseContext $parseContext): bool
     {
         $offset = 0;
         while (true) {
-            $token = $harvester->tokens->peek($offset);
+            $token = $parseContext->tokens->peek($offset);
             if (null === $token) {
                 return false;
             }
@@ -50,13 +50,13 @@ final readonly class BlockStructureIdentifier
      * of s-separate-in-line, not of block s-indent(n), and must not be
      * registered as the document's indent step nor validated against it.
      */
-    public function isKeyValueCoupleStart(ParseContext $harvester): bool
+    public function isKeyValueCoupleStart(ParseContext $parseContext): bool
     {
         $contentPeekOffset = 0;
-        $token = $harvester->tokens->current();
+        $token = $parseContext->tokens->current();
         if (TokenType::INDENTATION === $token->type) {
             $contentPeekOffset = 1;
-            $token = $harvester->tokens->peek(1);
+            $token = $parseContext->tokens->peek(1);
         }
 
         if (
@@ -69,7 +69,7 @@ final readonly class BlockStructureIdentifier
         }
 
         if (\in_array($token?->type, [TokenType::FLOW_SEQUENCE_START, TokenType::FLOW_MAPPING_START], true)) {
-            return $this->flowStructureIdentifier->isFlowCollectionFollowedByBlockValueIndicatorOnSameLine($harvester, $contentPeekOffset);
+            return $this->flowStructureIdentifier->isFlowCollectionFollowedByBlockValueIndicatorOnSameLine($parseContext, $contentPeekOffset);
         }
 
         if (\in_array($token->type, [
@@ -77,38 +77,38 @@ final readonly class BlockStructureIdentifier
             TokenType::SINGLE_QUOTED_SCALAR,
             TokenType::PLAIN_SCALAR,
         ], true)) {
-            $scalarLineOffset = TokenType::INDENTATION === $harvester->tokens->current()?->type ? 1 : 0;
+            $scalarLineOffset = TokenType::INDENTATION === $parseContext->tokens->current()?->type ? 1 : 0;
 
             return $this->multilineContinuationHelper
-                ->isImplicitYamlKeyOnContinuationLine($harvester->tokens, $scalarLineOffset);
+                ->isImplicitYamlKeyOnContinuationLine($parseContext->tokens, $scalarLineOffset);
         }
 
         return $this->nodePropertyIdentifier->isNodePropertyToken($token)
             && (
-                $this->nodePropertyIdentifier->isNodePropertiesFollowedByImplicitYamlKeyOnSameLine($harvester)
-                || $this->nodePropertyIdentifier->isNodePropertiesFollowedByFlowCollectionImplicitBlockKeyOnSameLine($harvester)
+                $this->nodePropertyIdentifier->isNodePropertiesFollowedByImplicitYamlKeyOnSameLine($parseContext)
+                || $this->nodePropertyIdentifier->isNodePropertiesFollowedByFlowCollectionImplicitBlockKeyOnSameLine($parseContext)
             );
     }
 
-    public function isKeyValueCoupleStartAllowingNodeProperties(ParseContext $harvester): bool
+    public function isKeyValueCoupleStartAllowingNodeProperties(ParseContext $parseContext): bool
     {
-        $token = $harvester->tokens->current();
+        $token = $parseContext->tokens->current();
         if (TokenType::INDENTATION === $token->type) {
-            $token = $harvester->tokens->peek(1);
+            $token = $parseContext->tokens->peek(1);
         }
 
         if ($this->nodePropertyIdentifier->isNodePropertyToken($token)) {
             return true;
         }
 
-        return $this->isKeyValueCoupleStart($harvester);
+        return $this->isKeyValueCoupleStart($parseContext);
     }
 
-    public function isSequenceStart(ParseContext $harvester): bool
+    public function isSequenceStart(ParseContext $parseContext): bool
     {
-        $token = $harvester->tokens->current();
+        $token = $parseContext->tokens->current();
         if (TokenType::INDENTATION === $token->type) {
-            $token = $harvester->tokens->peek(1);
+            $token = $parseContext->tokens->peek(1);
         }
 
         return TokenType::SEQUENCE_ENTRY === $token?->type;

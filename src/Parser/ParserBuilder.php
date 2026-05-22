@@ -66,43 +66,43 @@ final class ParserBuilder
     private function populateBlockParserBridge(ParserRegistry $registry, ParserAssembler $assembler): void
     {
         $registry->setBlockParserBridge(
-            function (ParseContext $h, ValueNode $v) use ($registry): void {
-                $registry->getNodePropertiesParser()->collectValueProperties($h, $v);
+            function (ParseContext $parseContext, ValueNode $v) use ($registry): void {
+                $registry->getNodePropertiesParser()->collectValueProperties($parseContext, $v);
             },
-            fn (ParseContext $h, int $offset): bool => $assembler->getFlowStructureIdentifier()->isFlowCollectionFollowedByBlockValueIndicatorOnSameLine($h, $offset),
-            fn (ParseContext $h): bool => $assembler->getBlockStructureIdentifier()->isKeyValueCoupleStart($h),
-            fn (ParseContext $h): bool => $assembler->getBlockStructureIdentifier()->isKeyValueCoupleStartAllowingNodeProperties($h),
-            fn (ParseContext $h, int $offset): bool => $assembler->getNodePropertyIdentifier()->isNodePropertiesFollowedByImplicitKeyFromOffset($h, $offset),
-            fn (ParseContext $h, bool $allowFlowSeparation = false): bool => $assembler->getKeyIdentifier()->isScalarFollowedByValueIndicator($h, $allowFlowSeparation),
-            fn (ParseContext $h, int $indent): BlockMappingNode => $registry->getBlockMappingParser()->parseBlockMappingValue($h, $indent),
-            fn (ParseContext $h, int $indent): BlockSequenceNode => $registry->getBlockSequenceParser()->parseBlockSequenceValue($h, $indent),
-            fn (ParseContext $h, int $indent): BlockMappingNode => $registry->getCompactBlockMappingParser()->parseCompactBlockMapping($h, $indent),
-            fn (ParseContext $h, int $indent): BlockSequenceNode => $registry->getCompactBlockSequenceParser()->parseCompactBlockSequence($h, $indent),
-            fn (ParseContext $h): MergeInstructionNode => $registry->getMergeInstructionParser()->parseMergeInstructionAtCurrentPosition($h),
-            fn (ParseContext $h, int $parentIndentLen): ValueNode => $registry->getValueParser()->parseValue($h, $parentIndentLen),
+            fn (ParseContext $parseContext, int $offset): bool => $assembler->getFlowStructureIdentifier()->isFlowCollectionFollowedByBlockValueIndicatorOnSameLine($parseContext, $offset),
+            fn (ParseContext $parseContext): bool => $assembler->getBlockStructureIdentifier()->isKeyValueCoupleStart($parseContext),
+            fn (ParseContext $parseContext): bool => $assembler->getBlockStructureIdentifier()->isKeyValueCoupleStartAllowingNodeProperties($parseContext),
+            fn (ParseContext $parseContext, int $offset): bool => $assembler->getNodePropertyIdentifier()->isNodePropertiesFollowedByImplicitKeyFromOffset($parseContext, $offset),
+            fn (ParseContext $parseContext, bool $allowFlowSeparation = false): bool => $assembler->getKeyIdentifier()->isScalarFollowedByValueIndicator($parseContext, $allowFlowSeparation),
+            fn (ParseContext $parseContext, int $indent): BlockMappingNode => $registry->getBlockMappingParser()->parseBlockMappingValue($parseContext, $indent),
+            fn (ParseContext $parseContext, int $indent): BlockSequenceNode => $registry->getBlockSequenceParser()->parseBlockSequenceValue($parseContext, $indent),
+            fn (ParseContext $parseContext, int $indent): BlockMappingNode => $registry->getCompactBlockMappingParser()->parseCompactBlockMapping($parseContext, $indent),
+            fn (ParseContext $parseContext, int $indent): BlockSequenceNode => $registry->getCompactBlockSequenceParser()->parseCompactBlockSequence($parseContext, $indent),
+            fn (ParseContext $parseContext): MergeInstructionNode => $registry->getMergeInstructionParser()->parseMergeInstructionAtCurrentPosition($parseContext),
+            fn (ParseContext $parseContext, int $parentIndentLen): ValueNode => $registry->getValueParser()->parseValue($parseContext, $parentIndentLen),
         );
     }
 
     private function populateDocumentParserBridge(ParserRegistry $registry, ParserAssembler $assembler): void
     {
         $registry->setDocumentParserBridge(
-            fn (ParseContext $h): bool => $assembler->getBlockStructureIdentifier()->isBlockScalarStartAtDocumentRoot($h),
-            fn (ParseContext $h): bool => $assembler->getFlowStructureIdentifier()->isFlowMappingStart($h),
-            fn (ParseContext $h): bool => $assembler->getFlowStructureIdentifier()->isFlowSequenceStart($h),
-            fn (ParseContext $h): bool => $assembler->getBlockStructureIdentifier()->isKeyValueCoupleStart($h),
-            fn (ParseContext $h): bool => $assembler->getNodePropertyIdentifier()->isNodePropertyAtDocumentRoot($h),
-            fn (ParseContext $h): bool => $assembler->getBlockStructureIdentifier()->isSequenceStart($h),
+            fn (ParseContext $parseContext): bool => $assembler->getBlockStructureIdentifier()->isBlockScalarStartAtDocumentRoot($parseContext),
+            fn (ParseContext $parseContext): bool => $assembler->getFlowStructureIdentifier()->isFlowMappingStart($parseContext),
+            fn (ParseContext $parseContext): bool => $assembler->getFlowStructureIdentifier()->isFlowSequenceStart($parseContext),
+            fn (ParseContext $parseContext): bool => $assembler->getBlockStructureIdentifier()->isKeyValueCoupleStart($parseContext),
+            fn (ParseContext $parseContext): bool => $assembler->getNodePropertyIdentifier()->isNodePropertyAtDocumentRoot($parseContext),
+            fn (ParseContext $parseContext): bool => $assembler->getBlockStructureIdentifier()->isSequenceStart($parseContext),
         );
     }
 
     private function populateFlowHost(ParserRegistry $registry, ParserAssembler $assembler): void
     {
         $registry->setFlowHost(new FlowHost(
-            fn (ParseContext $h): KeyNode => $registry->getKeyParser()->getKeyNode($h),
-            fn (ParseContext $h): bool => $assembler->getFlowStructureIdentifier()->isFlowMultilinePlainKeyStart($h),
-            fn (ParseContext $h): bool => $assembler->getKeyIdentifier()->isScalarFollowedByValueIndicator($h, true),
-            fn (ParseContext $h): ValueNode => $registry->getValueParser()->parseValue($h, EspecialIndent::FLOW_COLLECTION_VALUE_PARENT->value),
-            fn (ParseContext $h): MergeInstructionNode => $registry->getMergeInstructionParser()->parseMergeInstructionAtCurrentPosition($h),
+            fn (ParseContext $parseContext): KeyNode => $registry->getKeyParser()->getKeyNode($parseContext),
+            fn (ParseContext $parseContext): bool => $assembler->getFlowStructureIdentifier()->isFlowMultilinePlainKeyStart($parseContext),
+            fn (ParseContext $parseContext): bool => $assembler->getKeyIdentifier()->isScalarFollowedByValueIndicator($parseContext, true),
+            fn (ParseContext $parseContext): ValueNode => $registry->getValueParser()->parseValue($parseContext, EspecialIndent::FLOW_COLLECTION_VALUE_PARENT->value),
+            fn (ParseContext $parseContext): MergeInstructionNode => $registry->getMergeInstructionParser()->parseMergeInstructionAtCurrentPosition($parseContext),
         ));
     }
 }

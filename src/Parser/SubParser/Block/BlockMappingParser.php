@@ -47,38 +47,38 @@ final readonly class BlockMappingParser implements SubParserInterface
     ) {
     }
 
-    public function parseBlockMappingValue(ParseContext $harvester, int $parentIndentLen): BlockMappingNode
+    public function parseBlockMappingValue(ParseContext $parseContext, int $parentIndentLen): BlockMappingNode
     {
         $blockMapping = new BlockMappingNode();
 
         $baseIndentLen = null;
         $previousCoupleIndentLen = null;
 
-        while (!$harvester->tokens->isEnd()) {
-            $head = $this->lookAheadHelper->peekFirstSignificantBlockHead($harvester->tokens, 0);
+        while (!$parseContext->tokens->isEnd()) {
+            $head = $this->lookAheadHelper->peekFirstSignificantBlockHead($parseContext->tokens, 0);
             if (null === $head || $head[0] <= $parentIndentLen) {
                 break;
             }
 
-            $this->consumer->collectSpaceCommentEnds($harvester->tokens, $blockMapping);
-            $this->lookAheadHelper->collectInsignificantIndentationLines($harvester->tokens, $blockMapping);
+            $this->consumer->collectSpaceCommentEnds($parseContext->tokens, $blockMapping);
+            $this->lookAheadHelper->collectInsignificantIndentationLines($parseContext->tokens, $blockMapping);
 
-            $token = $harvester->tokens->current();
+            $token = $parseContext->tokens->current();
             if (null === $token) {
                 break;
             }
 
             if (TokenType::INDENTATION === $token->type) {
                 $indentLen = \strlen($token->text);
-            } elseif (EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value === $parentIndentLen && ($this->isKeyValueCoupleStart)($harvester)) {
+            } elseif (EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value === $parentIndentLen && ($this->isKeyValueCoupleStart)($parseContext)) {
                 $indentLen = 0;
             } else {
                 break;
             }
 
             if ($indentLen > 0) {
-                $this->indentationHelper->registerIndentStepIfNeeded($harvester->state, $harvester->tokens, $indentLen);
-                $this->indentationHelper->assertIndentLenIsValid($harvester->state, $harvester->tokens, $indentLen);
+                $this->indentationHelper->registerIndentStepIfNeeded($parseContext->state, $parseContext->tokens, $indentLen);
+                $this->indentationHelper->assertIndentLenIsValid($parseContext->state, $parseContext->tokens, $indentLen);
             }
 
             if ($indentLen <= $parentIndentLen) {
@@ -93,22 +93,22 @@ final readonly class BlockMappingParser implements SubParserInterface
                 throw new IndentationInvalidException($this->errorHelper->appendTokenLocation(\sprintf('Unexpected indentation %d for next key/value couple; expected %d', $indentLen, $baseIndentLen), $token));
             }
 
-            if (false === ($this->isKeyValueCoupleStartAllowingNodeProperties)($harvester)) {
-                throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Key/value couple expected while parsing block mapping value, but %s given', $harvester->tokens->current()?->type->value ?? '_nothing_'), $token));
+            if (false === ($this->isKeyValueCoupleStartAllowingNodeProperties)($parseContext)) {
+                throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Key/value couple expected while parsing block mapping value, but %s given', $parseContext->tokens->current()?->type->value ?? '_nothing_'), $token));
             }
 
             $previousCoupleIndentLen = $indentLen;
             $mergeCandidate = TokenType::INDENTATION === $token->type
-                ? $harvester->tokens->peek(1)
+                ? $parseContext->tokens->peek(1)
                 : $token;
             if (TokenType::MERGE_INDICATOR === $mergeCandidate?->type) {
-                $blockMapping->addChild(($this->parseMergeInstructionAtCurrentPosition)($harvester));
+                $blockMapping->addChild(($this->parseMergeInstructionAtCurrentPosition)($parseContext));
 
                 continue;
             }
             $this->registry
                 ->getKeyValueCoupleParser()
-                ->parseKeyValueCoupleAtCurrentPosition($harvester, $blockMapping, $indentLen);
+                ->parseKeyValueCoupleAtCurrentPosition($parseContext, $blockMapping, $indentLen);
         }
 
         if (null === $baseIndentLen) {

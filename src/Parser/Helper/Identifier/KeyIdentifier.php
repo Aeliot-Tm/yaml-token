@@ -26,16 +26,16 @@ final readonly class KeyIdentifier
      * When {@code $allowFlowSeparation} is true (flow collections only), COMMENT and NEWLINE tokens may
      * appear between the scalar and ':' (YAML test suite K3WX / flow line breaks).
      */
-    public function isScalarFollowedByValueIndicator(ParseContext $harvester, bool $allowFlowSeparation = false): bool
+    public function isScalarFollowedByValueIndicator(ParseContext $parseContext, bool $allowFlowSeparation = false): bool
     {
-        $token = $harvester->tokens->current();
+        $token = $parseContext->tokens->current();
         if (null === $token || !$token->type->isScalar()) {
             return false;
         }
 
         $offset = 1;
         while (true) {
-            $peeked = $harvester->tokens->peek($offset);
+            $peeked = $parseContext->tokens->peek($offset);
             if (null === $peeked) {
                 return false;
             }

@@ -27,17 +27,17 @@ final readonly class StreamParser implements SubParserInterface
     ) {
     }
 
-    public function parseStream(ParseContext $harvester): StreamNode
+    public function parseStream(ParseContext $parseContext): StreamNode
     {
         $stream = new StreamNode();
 
-        $token = $harvester->tokens->current();
+        $token = $parseContext->tokens->current();
         if (null !== $token && TokenType::BYTE_ORDER_MARK === $token->type) {
             $stream->addChild(new ByteOrderNode($token));
-            $harvester->tokens->advance();
+            $parseContext->tokens->advance();
         }
 
-        $this->registry->getDocumentParser()->parseDocuments($harvester, $stream);
+        $this->registry->getDocumentParser()->parseDocuments($parseContext, $stream);
 
         return $stream;
     }

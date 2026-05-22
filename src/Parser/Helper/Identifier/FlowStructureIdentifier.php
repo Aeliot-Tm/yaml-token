@@ -23,9 +23,9 @@ final readonly class FlowStructureIdentifier
      * the next non-layout token on the same line is {@code VALUE_INDICATOR} (block implicit key
      * whose key is a flow collection, e.g. {@code [flow]: block}).
      */
-    public function isFlowCollectionFollowedByBlockValueIndicatorOnSameLine(ParseContext $harvester, int $collectionStartPeekOffset): bool
+    public function isFlowCollectionFollowedByBlockValueIndicatorOnSameLine(ParseContext $parseContext, int $collectionStartPeekOffset): bool
     {
-        $open = $harvester->tokens->peek($collectionStartPeekOffset);
+        $open = $parseContext->tokens->peek($collectionStartPeekOffset);
         if (!\in_array($open?->type, [TokenType::FLOW_SEQUENCE_START, TokenType::FLOW_MAPPING_START], true)) {
             return false;
         }
@@ -33,7 +33,7 @@ final readonly class FlowStructureIdentifier
         $depth = 0;
         $i = $collectionStartPeekOffset;
         while (true) {
-            $tok = $harvester->tokens->peek($i);
+            $tok = $parseContext->tokens->peek($i);
             if (null === $tok) {
                 return false;
             }
@@ -55,7 +55,7 @@ final readonly class FlowStructureIdentifier
 
         ++$i;
         while (true) {
-            $tok = $harvester->tokens->peek($i);
+            $tok = $parseContext->tokens->peek($i);
             if (null === $tok) {
                 return false;
             }
@@ -71,11 +71,11 @@ final readonly class FlowStructureIdentifier
         }
     }
 
-    public function isFlowMappingStart(ParseContext $harvester): bool
+    public function isFlowMappingStart(ParseContext $parseContext): bool
     {
-        $token = $harvester->tokens->current();
+        $token = $parseContext->tokens->current();
         if (TokenType::INDENTATION === $token->type) {
-            $token = $harvester->tokens->peek(1);
+            $token = $parseContext->tokens->peek(1);
         }
 
         return TokenType::FLOW_MAPPING_START === $token?->type;
@@ -85,9 +85,9 @@ final readonly class FlowStructureIdentifier
      * In flow context, checks if the current PLAIN_SCALAR is the start of a multiline
      * implicit key: PLAIN_SCALAR (NEWLINE WS* PLAIN_SCALAR)+ WS* VALUE_INDICATOR.
      */
-    public function isFlowMultilinePlainKeyStart(ParseContext $harvester): bool
+    public function isFlowMultilinePlainKeyStart(ParseContext $parseContext): bool
     {
-        if (TokenType::PLAIN_SCALAR !== $harvester->tokens->current()?->type) {
+        if (TokenType::PLAIN_SCALAR !== $parseContext->tokens->current()?->type) {
             return false;
         }
 
@@ -95,11 +95,11 @@ final readonly class FlowStructureIdentifier
         $hasContinuation = false;
 
         while (true) {
-            while (TokenType::WHITESPACE === $harvester->tokens->peek($offset)?->type) {
+            while (TokenType::WHITESPACE === $parseContext->tokens->peek($offset)?->type) {
                 ++$offset;
             }
 
-            $peeked = $harvester->tokens->peek($offset);
+            $peeked = $parseContext->tokens->peek($offset);
             if (null === $peeked) {
                 return false;
             }
@@ -113,11 +113,11 @@ final readonly class FlowStructureIdentifier
             }
             ++$offset;
 
-            while (TokenType::WHITESPACE === $harvester->tokens->peek($offset)?->type) {
+            while (TokenType::WHITESPACE === $parseContext->tokens->peek($offset)?->type) {
                 ++$offset;
             }
 
-            if (TokenType::PLAIN_SCALAR !== $harvester->tokens->peek($offset)?->type) {
+            if (TokenType::PLAIN_SCALAR !== $parseContext->tokens->peek($offset)?->type) {
                 return false;
             }
             ++$offset;
@@ -125,11 +125,11 @@ final readonly class FlowStructureIdentifier
         }
     }
 
-    public function isFlowSequenceStart(ParseContext $harvester): bool
+    public function isFlowSequenceStart(ParseContext $parseContext): bool
     {
-        $token = $harvester->tokens->current();
+        $token = $parseContext->tokens->current();
         if (TokenType::INDENTATION === $token->type) {
-            $token = $harvester->tokens->peek(1);
+            $token = $parseContext->tokens->peek(1);
         }
 
         return TokenType::FLOW_SEQUENCE_START === $token?->type;

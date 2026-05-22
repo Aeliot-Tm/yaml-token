@@ -52,24 +52,24 @@ final readonly class KeyParser implements SubParserInterface
     ) {
     }
 
-    public function getKeyNode(ParseContext $harvester, ?int $entryIndentLen = null): KeyNode
+    public function getKeyNode(ParseContext $parseContext, ?int $entryIndentLen = null): KeyNode
     {
         $keyNode = new KeyNode();
-        $this->collectKeyProperties($harvester, $keyNode);
-        $token = $harvester->tokens->current();
+        $this->collectKeyProperties($parseContext, $keyNode);
+        $token = $parseContext->tokens->current();
 
         if (TokenType::EXPLICIT_KEY_INDICATOR === $token->type) {
             $keyNode->addChild(new ExplicitKeyIndicatorNode($token));
-            $harvester->tokens->advance();
-            $token = $harvester->tokens->current();
+            $parseContext->tokens->advance();
+            $token = $parseContext->tokens->current();
 
             if (TokenType::WHITESPACE === $token->type) {
                 $keyNode->addChild(new WhitespaceNode($token));
-                $harvester->tokens->advance();
+                $parseContext->tokens->advance();
             }
 
-            $this->collectKeyProperties($harvester, $keyNode);
-            $token = $harvester->tokens->current();
+            $this->collectKeyProperties($parseContext, $keyNode);
+            $token = $parseContext->tokens->current();
         }
 
         if (
@@ -77,7 +77,7 @@ final readonly class KeyParser implements SubParserInterface
             && null !== $entryIndentLen
             && TokenType::NEWLINE === $token->type
         ) {
-            $head = $this->lookAheadHelper->peekFirstSignificantBlockHead($harvester->tokens, 1);
+            $head = $this->lookAheadHelper->peekFirstSignificantBlockHead($parseContext->tokens, 1);
             if (null === $head) {
                 return $keyNode;
             }
@@ -88,7 +88,7 @@ final readonly class KeyParser implements SubParserInterface
             }
 
             if (TokenType::SEQUENCE_ENTRY === $significantToken->type) {
-                $keyNode->setName(($this->parseBlockSequenceValue)($harvester, $entryIndentLen));
+                $keyNode->setName(($this->parseBlockSequenceValue)($parseContext, $entryIndentLen));
 
                 return $keyNode;
             }
@@ -97,16 +97,16 @@ final readonly class KeyParser implements SubParserInterface
                 TokenType::EXPLICIT_KEY_INDICATOR === $significantToken->type
                 || TokenType::MERGE_INDICATOR === $significantToken->type
             ) {
-                $keyNode->setName(($this->parseBlockMappingValue)($harvester, $entryIndentLen));
+                $keyNode->setName(($this->parseBlockMappingValue)($parseContext, $entryIndentLen));
 
                 return $keyNode;
             }
 
             if ($significantToken->type->isScalar()) {
-                if ($this->multilineContinuationHelper->isImplicitYamlKeyOnContinuationLine($harvester->tokens, $scalarPeekOffset)) {
-                    $keyNode->setName(($this->parseBlockMappingValue)($harvester, $entryIndentLen));
+                if ($this->multilineContinuationHelper->isImplicitYamlKeyOnContinuationLine($parseContext->tokens, $scalarPeekOffset)) {
+                    $keyNode->setName(($this->parseBlockMappingValue)($parseContext, $entryIndentLen));
                 } else {
-                    $this->registry->getBlockScalarParser()->consumeExplicitKeyMultilinePlainScalar($harvester->tokens, $keyNode, $entryIndentLen);
+                    $this->registry->getBlockScalarParser()->consumeExplicitKeyMultilinePlainScalar($parseContext->tokens, $keyNode, $entryIndentLen);
                 }
 
                 return $keyNode;
@@ -123,19 +123,19 @@ final readonly class KeyParser implements SubParserInterface
             null !== $keyNode->getExplicitKeyIndicatorNode()
             && TokenType::SEQUENCE_ENTRY === $token->type
         ) {
-            $keyNode->setName(($this->parseCompactBlockSequence)($harvester, $token->column - 1));
+            $keyNode->setName(($this->parseCompactBlockSequence)($parseContext, $token->column - 1));
 
             return $keyNode;
         }
 
         if (TokenType::FLOW_MAPPING_START === $token->type) {
-            $keyNode->setName($this->registry->getFlowMappingParser()->parse($harvester));
+            $keyNode->setName($this->registry->getFlowMappingParser()->parse($parseContext));
 
             return $keyNode;
         }
 
         if (TokenType::FLOW_SEQUENCE_START === $token->type) {
-            $keyNode->setName($this->registry->getFlowSequenceParser()->parse($harvester));
+            $keyNode->setName($this->registry->getFlowSequenceParser()->parse($parseContext));
 
             return $keyNode;
         }
@@ -143,13 +143,13 @@ final readonly class KeyParser implements SubParserInterface
         if (TokenType::ALIAS === $token->type) {
             $aliasNode = new AliasNode($token);
             $aliasName = $aliasNode->getName();
-            $anchor = $harvester->anchorsRegistry->anchors[$aliasName] ?? null;
+            $anchor = $parseContext->anchorsRegistry->anchors[$aliasName] ?? null;
             if (null === $anchor) {
                 throw new AnchorUndefinedException($this->errorHelper->appendTokenLocation(\sprintf('Undefined alias "%s"', $aliasName), $token));
             }
             $aliasNode->setAnchor($anchor);
             $keyNode->setName($aliasNode);
-            $harvester->tokens->advance();
+            $parseContext->tokens->advance();
 
             return $keyNode;
         }
@@ -162,7 +162,7 @@ final readonly class KeyParser implements SubParserInterface
             null !== $keyNode->getExplicitKeyIndicatorNode()
             && \in_array($token->type, TokenType::BLOCK_SCALAR_INDICATORS, true)
         ) {
-            $this->registry->getBlockScalarParser()->consumeBlockScalarKeyName($harvester->tokens, $keyNode);
+            $this->registry->getBlockScalarParser()->consumeBlockScalarKeyName($parseContext->tokens, $keyNode);
 
             return $keyNode;
         }
@@ -179,7 +179,7 @@ final readonly class KeyParser implements SubParserInterface
             $this->registry
                 ->getMultilinePlainScalarParser()
                 ->buildScalarKeyName(
-                    $harvester->tokens,
+                    $parseContext->tokens,
                     $token,
                     $entryIndentLen,
                     null !== $keyNode->getExplicitKeyIndicatorNode(),
@@ -189,20 +189,20 @@ final readonly class KeyParser implements SubParserInterface
         return $keyNode;
     }
 
-    private function collectKeyProperties(ParseContext $harvester, KeyNode $keyNode): void
+    private function collectKeyProperties(ParseContext $parseContext, KeyNode $keyNode): void
     {
         $properties = null;
         $whitespaceBuffer = [];
 
-        while (!$harvester->tokens->isEnd()) {
-            $token = $harvester->tokens->current();
+        while (!$parseContext->tokens->isEnd()) {
+            $token = $parseContext->tokens->current();
             if (TokenType::WHITESPACE === $token->type) {
                 if (null === $properties) {
                     $keyNode->addChild(new WhitespaceNode($token));
                 } else {
                     $whitespaceBuffer[] = new WhitespaceNode($token);
                 }
-                $harvester->tokens->advance();
+                $parseContext->tokens->advance();
 
                 continue;
             }
@@ -214,7 +214,7 @@ final readonly class KeyParser implements SubParserInterface
                 }
                 $whitespaceBuffer = [];
                 $properties->addChild(new AnchorNode($token));
-                $harvester->tokens->advance();
+                $parseContext->tokens->advance();
 
                 continue;
             }
@@ -229,7 +229,7 @@ final readonly class KeyParser implements SubParserInterface
                 }
                 $whitespaceBuffer = [];
                 $properties->addChild(new TagNode($token));
-                $harvester->tokens->advance();
+                $parseContext->tokens->advance();
 
                 continue;
             }

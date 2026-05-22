@@ -53,12 +53,12 @@ final readonly class DocumentParser implements SubParserInterface
     ) {
     }
 
-    public function parseDocuments(ParseContext $harvester, StreamNode $stream): void
+    public function parseDocuments(ParseContext $parseContext, StreamNode $stream): void
     {
         $addedDocs = [];
         $document = new DocumentNode();
-        while (!$harvester->tokens->isEnd()) {
-            $token = $harvester->tokens->current();
+        while (!$parseContext->tokens->isEnd()) {
+            $token = $parseContext->tokens->current();
 
             if (TokenType::DOCUMENT_START === $token->type) {
                 if ($document->getChildren()) {
@@ -68,94 +68,94 @@ final readonly class DocumentParser implements SubParserInterface
 
                 $document->addChild(new DocumentStartNode($token));
                 $this->tryAddDocumentToStream($stream, $document, $addedDocs);
-                $harvester->tokens->advance();
+                $parseContext->tokens->advance();
                 continue;
             }
 
             if (TokenType::DOCUMENT_END === $token->type) {
                 $document->addChild(new DocumentEndNode($token));
                 $this->tryAddDocumentToStream($stream, $document, $addedDocs);
-                $harvester->tokens->advance();
-                $this->consumeDocumentEndLineSuffix($harvester, $document);
+                $parseContext->tokens->advance();
+                $this->consumeDocumentEndLineSuffix($parseContext, $document);
                 $document = new DocumentNode();
                 continue;
             }
 
             if (TokenType::DIRECTIVE === $token->type) {
                 $document->addChild(new DirectiveNode($token));
-                $harvester->tokens->advance();
+                $parseContext->tokens->advance();
                 continue;
             }
 
             if (TokenType::DIRECTIVE_YAML_INDICATOR === $token->type) {
-                $document->addChild($this->registry->getDirectiveParser()->parseYamlDirective($harvester));
+                $document->addChild($this->registry->getDirectiveParser()->parseYamlDirective($parseContext));
                 continue;
             }
 
             if (TokenType::DIRECTIVE_TAG_INDICATOR === $token->type) {
-                $document->addChild($this->registry->getDirectiveParser()->parseTagDirective($harvester));
+                $document->addChild($this->registry->getDirectiveParser()->parseTagDirective($parseContext));
                 continue;
             }
 
             if (TokenType::COMMENT === $token->type) {
                 $document->addChild(new CommentNode($token));
-                $harvester->tokens->advance();
+                $parseContext->tokens->advance();
                 continue;
             }
 
             if (TokenType::NEWLINE === $token->type) {
                 $document->addChild(new NewLineNode($token));
-                $harvester->tokens->advance();
+                $parseContext->tokens->advance();
                 continue;
             }
 
             // Preserve trailing spaces on otherwise blank lines: whitespace before NEWLINE is not structural.
-            if (TokenType::WHITESPACE === $token->type && TokenType::NEWLINE === $harvester->tokens->peek(1)?->type) {
+            if (TokenType::WHITESPACE === $token->type && TokenType::NEWLINE === $parseContext->tokens->peek(1)?->type) {
                 $document->addChild(new WhitespaceNode($token));
-                $harvester->tokens->advance();
+                $parseContext->tokens->advance();
                 continue;
             }
 
-            if (TokenType::INDENTATION === $token->type && TokenType::COMMENT === $harvester->tokens->peek(1)?->type) {
+            if (TokenType::INDENTATION === $token->type && TokenType::COMMENT === $parseContext->tokens->peek(1)?->type) {
                 $document->addChild(new IndentationNode($token));
-                $harvester->tokens->advance();
+                $parseContext->tokens->advance();
                 continue;
             }
 
             // YAML 1.2.2 §6.6 Comments: "Comments must be separated from other tokens by white space characters."
             // Handles `s-separate-in-line` between a preceding token on the same line (e.g. DOCUMENT_START/END) and a trailing comment.
-            if (TokenType::WHITESPACE === $token->type && TokenType::COMMENT === $harvester->tokens->peek(1)?->type) {
+            if (TokenType::WHITESPACE === $token->type && TokenType::COMMENT === $parseContext->tokens->peek(1)?->type) {
                 $document->addChild(new WhitespaceNode($token));
-                $harvester->tokens->advance();
+                $parseContext->tokens->advance();
                 continue;
             }
 
-            if (($this->isBlockScalarStartAtDocumentRoot)($harvester)) {
+            if (($this->isBlockScalarStartAtDocumentRoot)($parseContext)) {
                 while (true) {
-                    $separation = $harvester->tokens->current();
+                    $separation = $parseContext->tokens->current();
                     if (TokenType::INDENTATION === $separation?->type) {
                         $document->addChild(new IndentationNode($separation));
-                        $harvester->tokens->advance();
+                        $parseContext->tokens->advance();
                         continue;
                     }
                     if (TokenType::WHITESPACE === $separation?->type) {
                         $document->addChild(new WhitespaceNode($separation));
-                        $harvester->tokens->advance();
+                        $parseContext->tokens->advance();
                         continue;
                     }
                     break;
                 }
 
-                $document->addChild($this->registry->getValueParser()->parseValue($harvester, EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value));
+                $document->addChild($this->registry->getValueParser()->parseValue($parseContext, EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value));
                 continue;
             }
 
             if (TokenType::ALIAS === $token->type) {
-                $document->addChild($this->registry->getValueParser()->parseValue($harvester, EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value));
+                $document->addChild($this->registry->getValueParser()->parseValue($parseContext, EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value));
                 continue;
             }
 
-            if (($this->isSequenceStart)($harvester)) {
+            if (($this->isSequenceStart)($parseContext)) {
                 $sequenceEntry = new BlockSequenceEntryNode();
                 $document->addChild($sequenceEntry);
 
@@ -163,22 +163,22 @@ final readonly class DocumentParser implements SubParserInterface
                 if (TokenType::INDENTATION === $token->type) {
                     $sequenceEntry->addChild(new IndentationNode($token));
                     $leadingIndent = \strlen($token->text);
-                    $harvester->tokens->advance();
+                    $parseContext->tokens->advance();
                 }
 
                 $compactIndent = $leadingIndent + $this->registry
                         ->getSequenceEntryParser()
-                        ->consumeSequenceEntryIndicatorAndSpaces($harvester, $sequenceEntry);
+                        ->consumeSequenceEntryIndicatorAndSpaces($parseContext, $sequenceEntry);
 
                 $sequenceEntry->addChild(
                     $this->registry
                         ->getSequenceEntryParser()
-                        ->parseSequenceEntryValue($harvester, $leadingIndent, $compactIndent),
+                        ->parseSequenceEntryValue($parseContext, $leadingIndent, $compactIndent),
                 );
                 continue;
             }
 
-            if (($this->isKeyValueCoupleStart)($harvester)) {
+            if (($this->isKeyValueCoupleStart)($parseContext)) {
                 $indentLen = 0;
                 if (TokenType::INDENTATION === $token->type) {
                     $indentLen = \strlen($token->text);
@@ -186,48 +186,48 @@ final readonly class DocumentParser implements SubParserInterface
 
                 $this->registry
                     ->getKeyValueCoupleParser()
-                    ->parseKeyValueCoupleAtCurrentPosition($harvester, $document, $indentLen);
+                    ->parseKeyValueCoupleAtCurrentPosition($parseContext, $document, $indentLen);
                 continue;
             }
 
             if ($token->type->isScalar()) {
-                $document->addChild($this->registry->getValueParser()->parseValue($harvester, EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value));
+                $document->addChild($this->registry->getValueParser()->parseValue($parseContext, EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value));
                 continue;
             }
 
-            if (($this->isNodePropertyAtDocumentRoot)($harvester)) {
+            if (($this->isNodePropertyAtDocumentRoot)($parseContext)) {
                 if (TokenType::INDENTATION === $token->type) {
                     $document->addChild(new IndentationNode($token));
-                    $harvester->tokens->advance();
+                    $parseContext->tokens->advance();
                 }
 
-                $document->addChild($this->registry->getValueParser()->parseValue($harvester, EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value));
+                $document->addChild($this->registry->getValueParser()->parseValue($parseContext, EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value));
                 continue;
             }
 
-            if (($this->isFlowMappingStart)($harvester)) {
+            if (($this->isFlowMappingStart)($parseContext)) {
                 if (TokenType::INDENTATION === $token->type) {
                     $document->addChild(new IndentationNode($token));
-                    $harvester->tokens->advance();
+                    $parseContext->tokens->advance();
                 }
 
-                $document->addChild($this->registry->getFlowMappingParser()->parse($harvester));
+                $document->addChild($this->registry->getFlowMappingParser()->parse($parseContext));
                 continue;
             }
 
-            if (($this->isFlowSequenceStart)($harvester)) {
+            if (($this->isFlowSequenceStart)($parseContext)) {
                 if (TokenType::INDENTATION === $token->type) {
                     $document->addChild(new IndentationNode($token));
-                    $harvester->tokens->advance();
+                    $parseContext->tokens->advance();
                 }
 
-                $document->addChild($this->registry->getFlowSequenceParser()->parse($harvester));
+                $document->addChild($this->registry->getFlowSequenceParser()->parse($parseContext));
                 continue;
             }
 
             if (TokenType::WHITESPACE === $token->type) {
                 $document->addChild(new WhitespaceNode($token));
-                $harvester->tokens->advance();
+                $parseContext->tokens->advance();
                 continue;
             }
 
@@ -242,29 +242,29 @@ final readonly class DocumentParser implements SubParserInterface
     /**
      * Consumes the line suffix after a document end marker (YAML 1.2.2 rule [209] c-document-end).
      */
-    private function consumeDocumentEndLineSuffix(ParseContext $harvester, DocumentNode $document): void
+    private function consumeDocumentEndLineSuffix(ParseContext $parseContext, DocumentNode $document): void
     {
         while (true) {
-            $token = $harvester->tokens->current();
+            $token = $parseContext->tokens->current();
             if (null === $token) {
                 break;
             }
 
             if (TokenType::WHITESPACE === $token->type) {
                 $document->addChild(new WhitespaceNode($token));
-                $harvester->tokens->advance();
+                $parseContext->tokens->advance();
                 continue;
             }
 
             if (TokenType::COMMENT === $token->type) {
                 $document->addChild(new CommentNode($token));
-                $harvester->tokens->advance();
+                $parseContext->tokens->advance();
                 continue;
             }
 
             if (TokenType::NEWLINE === $token->type) {
                 $document->addChild(new NewLineNode($token));
-                $harvester->tokens->advance();
+                $parseContext->tokens->advance();
             }
 
             break;

@@ -36,28 +36,28 @@ final class FlowHost
     ) {
     }
 
-    public function getFlowEntryKeyNode(ParseContext $harvester): KeyNode
+    public function getFlowEntryKeyNode(ParseContext $parseContext): KeyNode
     {
-        return ($this->getFlowEntryKeyNode)($harvester);
+        return ($this->getFlowEntryKeyNode)($parseContext);
     }
 
-    public function isFlowMultilinePlainKeyStart(ParseContext $harvester): bool
+    public function isFlowMultilinePlainKeyStart(ParseContext $parseContext): bool
     {
-        return ($this->isFlowMultilinePlainKeyStart)($harvester);
+        return ($this->isFlowMultilinePlainKeyStart)($parseContext);
     }
 
-    public function isScalarFollowedByValueIndicatorInFlow(ParseContext $harvester): bool
+    public function isScalarFollowedByValueIndicatorInFlow(ParseContext $parseContext): bool
     {
-        return ($this->isScalarFollowedByValueIndicatorInFlow)($harvester);
+        return ($this->isScalarFollowedByValueIndicatorInFlow)($parseContext);
     }
 
-    public function parseFlowContextValue(ParseContext $harvester): ValueNode
+    public function parseFlowContextValue(ParseContext $parseContext): ValueNode
     {
-        return ($this->parseFlowContextValue)($harvester);
+        return ($this->parseFlowContextValue)($parseContext);
     }
 
-    public function parseMergeInstructionAtCurrentPosition(ParseContext $harvester): MergeInstructionNode
+    public function parseMergeInstructionAtCurrentPosition(ParseContext $parseContext): MergeInstructionNode
     {
-        return ($this->parseMergeInstructionAtCurrentPosition)($harvester);
+        return ($this->parseMergeInstructionAtCurrentPosition)($parseContext);
     }
 }

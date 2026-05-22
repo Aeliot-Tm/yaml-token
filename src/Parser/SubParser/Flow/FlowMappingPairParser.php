@@ -32,46 +32,46 @@ final readonly class FlowMappingPairParser implements SubParserInterface
     ) {
     }
 
-    public function parse(ParseContext $harvester): KeyValueCoupleNode
+    public function parse(ParseContext $parseContext): KeyValueCoupleNode
     {
         $couple = new KeyValueCoupleNode();
-        $couple->addChild($this->registry->getFlowHost()->getFlowEntryKeyNode($harvester));
+        $couple->addChild($this->registry->getFlowHost()->getFlowEntryKeyNode($parseContext));
 
-        if ($this->tryConsumeFlowMappingValueIndicator($harvester, $couple)) {
-            if ($this->isAtFlowMappingEntryBoundary($harvester)) {
+        if ($this->tryConsumeFlowMappingValueIndicator($parseContext, $couple)) {
+            if ($this->isAtFlowMappingEntryBoundary($parseContext)) {
                 $couple->addChild(new ValueNode());
             } else {
-                $couple->addChild($this->registry->getFlowHost()->parseFlowContextValue($harvester));
+                $couple->addChild($this->registry->getFlowHost()->parseFlowContextValue($parseContext));
             }
         }
 
-        $this->anchorPostProcessor->postProcessKeyValueCouple($harvester->anchorsRegistry, $couple);
+        $this->anchorPostProcessor->postProcessKeyValueCouple($parseContext->anchorsRegistry, $couple);
 
         return $couple;
     }
 
-    public function tryConsumeFlowMappingValueIndicator(ParseContext $harvester, KeyValueCoupleNode $couple): bool
+    public function tryConsumeFlowMappingValueIndicator(ParseContext $parseContext, KeyValueCoupleNode $couple): bool
     {
-        $this->consumer->collectSpaceCommentEnds($harvester->tokens, $couple);
+        $this->consumer->collectSpaceCommentEnds($parseContext->tokens, $couple);
 
-        $token = $harvester->tokens->current();
+        $token = $parseContext->tokens->current();
         if (TokenType::VALUE_INDICATOR !== $token?->type) {
             return false;
         }
 
         $couple->addChild(new ValueIndicatorNode($token));
-        $harvester->tokens->advance();
+        $parseContext->tokens->advance();
 
-        $this->consumer->collectTypes($harvester->tokens, [TokenType::WHITESPACE], $couple);
+        $this->consumer->collectTypes($parseContext->tokens, [TokenType::WHITESPACE], $couple);
 
         return true;
     }
 
-    private function isAtFlowMappingEntryBoundary(ParseContext $harvester): bool
+    private function isAtFlowMappingEntryBoundary(ParseContext $parseContext): bool
     {
         $offset = 0;
         while (true) {
-            $peeked = $harvester->tokens->peek($offset);
+            $peeked = $parseContext->tokens->peek($offset);
             if (null === $peeked) {
                 return true;
             }

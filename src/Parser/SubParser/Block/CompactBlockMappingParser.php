@@ -43,37 +43,37 @@ final readonly class CompactBlockMappingParser implements SubParserInterface
      * trailing spaces so we sit directly on the key). Subsequent entries
      * require an INDENTATION token whose length equals $indentLen.
      */
-    public function parseCompactBlockMapping(ParseContext $harvester, int $indentLen): BlockMappingNode
+    public function parseCompactBlockMapping(ParseContext $parseContext, int $indentLen): BlockMappingNode
     {
         $blockMapping = new BlockMappingNode();
 
         $this->registry
             ->getKeyValueCoupleParser()
-            ->parseKeyValueCoupleAtCurrentPosition($harvester, $blockMapping, $indentLen);
+            ->parseKeyValueCoupleAtCurrentPosition($parseContext, $blockMapping, $indentLen);
 
-        while (!$harvester->tokens->isEnd()) {
-            $head = $this->lookAheadHelper->peekFirstSignificantBlockHead($harvester->tokens, 0);
+        while (!$parseContext->tokens->isEnd()) {
+            $head = $this->lookAheadHelper->peekFirstSignificantBlockHead($parseContext->tokens, 0);
             if (null === $head || $head[0] !== $indentLen) {
                 break;
             }
 
-            $this->consumer->collectSpaceCommentEnds($harvester->tokens, $blockMapping);
-            $this->lookAheadHelper->collectInsignificantIndentationLines($harvester->tokens, $blockMapping);
+            $this->consumer->collectSpaceCommentEnds($parseContext->tokens, $blockMapping);
+            $this->lookAheadHelper->collectInsignificantIndentationLines($parseContext->tokens, $blockMapping);
 
-            $token = $harvester->tokens->current();
+            $token = $parseContext->tokens->current();
             if (null === $token || TokenType::INDENTATION !== $token->type) {
                 break;
             }
             if (\strlen($token->text) !== $indentLen) {
                 break;
             }
-            if (!($this->isKeyValueCoupleStartAllowingNodeProperties)($harvester)) {
+            if (!($this->isKeyValueCoupleStartAllowingNodeProperties)($parseContext)) {
                 break;
             }
 
             $this->registry
                 ->getKeyValueCoupleParser()
-                ->parseKeyValueCoupleAtCurrentPosition($harvester, $blockMapping, $indentLen);
+                ->parseKeyValueCoupleAtCurrentPosition($parseContext, $blockMapping, $indentLen);
         }
 
         return $blockMapping;

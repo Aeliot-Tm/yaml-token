@@ -40,22 +40,22 @@ final readonly class BlockSequenceParser implements SubParserInterface
     ) {
     }
 
-    public function parseBlockSequenceValue(ParseContext $harvester, int $parentIndentLen, bool $allowNonSequenceAtBaseIndentAsTerminator = false): BlockSequenceNode
+    public function parseBlockSequenceValue(ParseContext $parseContext, int $parentIndentLen, bool $allowNonSequenceAtBaseIndentAsTerminator = false): BlockSequenceNode
     {
         $blockSequence = new BlockSequenceNode();
 
         $baseIndentLen = null;
 
-        while (!$harvester->tokens->isEnd()) {
-            $head = $this->lookAheadHelper->peekFirstSignificantBlockHead($harvester->tokens, 0);
+        while (!$parseContext->tokens->isEnd()) {
+            $head = $this->lookAheadHelper->peekFirstSignificantBlockHead($parseContext->tokens, 0);
             if (null === $head || $head[0] <= $parentIndentLen) {
                 break;
             }
 
-            $this->consumer->collectSpaceCommentEnds($harvester->tokens, $blockSequence);
-            $this->lookAheadHelper->collectInsignificantIndentationLines($harvester->tokens, $blockSequence);
+            $this->consumer->collectSpaceCommentEnds($parseContext->tokens, $blockSequence);
+            $this->lookAheadHelper->collectInsignificantIndentationLines($parseContext->tokens, $blockSequence);
 
-            $token = $harvester->tokens->current();
+            $token = $parseContext->tokens->current();
             if (null === $token) {
                 break;
             }
@@ -69,8 +69,8 @@ final readonly class BlockSequenceParser implements SubParserInterface
             }
 
             if ($indentLen > 0) {
-                $this->indentationHelper->registerIndentStepIfNeeded($harvester->state, $harvester->tokens, $indentLen);
-                $this->indentationHelper->assertIndentLenIsValid($harvester->state, $harvester->tokens, $indentLen);
+                $this->indentationHelper->registerIndentStepIfNeeded($parseContext->state, $parseContext->tokens, $indentLen);
+                $this->indentationHelper->assertIndentLenIsValid($parseContext->state, $parseContext->tokens, $indentLen);
             }
 
             if ($indentLen <= $parentIndentLen) {
@@ -83,28 +83,28 @@ final readonly class BlockSequenceParser implements SubParserInterface
                 throw new IndentationInvalidException($this->errorHelper->appendTokenLocation(\sprintf('Unexpected indentation %d while base indentation is %d', $indentLen, $baseIndentLen), $token));
             }
 
-            if (!$this->isSequenceStart($harvester)) {
+            if (!$this->isSequenceStart($parseContext)) {
                 if ($allowNonSequenceAtBaseIndentAsTerminator && $indentLen === $baseIndentLen) {
                     break;
                 }
-                throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Sequence entry expected while parsing block sequence value, but %s given', $harvester->tokens->current()?->type->value ?? '_nothing_'), $token));
+                throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Sequence entry expected while parsing block sequence value, but %s given', $parseContext->tokens->current()?->type->value ?? '_nothing_'), $token));
             }
 
             $sequenceEntry = new BlockSequenceEntryNode();
             $blockSequence->addChild($sequenceEntry);
             if (TokenType::INDENTATION === $token->type) {
                 $sequenceEntry->addChild(new IndentationNode($token));
-                $harvester->tokens->advance();
+                $parseContext->tokens->advance();
             }
 
             $compactIndent = $indentLen + $this->registry
                     ->getSequenceEntryParser()
-                    ->consumeSequenceEntryIndicatorAndSpaces($harvester, $sequenceEntry);
+                    ->consumeSequenceEntryIndicatorAndSpaces($parseContext, $sequenceEntry);
 
             $sequenceEntry->addChild(
                 $this->registry
                     ->getSequenceEntryParser()
-                    ->parseSequenceEntryValue($harvester, $indentLen, $compactIndent),
+                    ->parseSequenceEntryValue($parseContext, $indentLen, $compactIndent),
             );
         }
 
@@ -115,11 +115,11 @@ final readonly class BlockSequenceParser implements SubParserInterface
         return $blockSequence;
     }
 
-    private function isSequenceStart(ParseContext $harvester): bool
+    private function isSequenceStart(ParseContext $parseContext): bool
     {
-        $token = $harvester->tokens->current();
+        $token = $parseContext->tokens->current();
         if (TokenType::INDENTATION === $token->type) {
-            $token = $harvester->tokens->peek(1);
+            $token = $parseContext->tokens->peek(1);
         }
 
         return TokenType::SEQUENCE_ENTRY === $token?->type;

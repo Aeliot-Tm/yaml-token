@@ -25,11 +25,11 @@ final readonly class SimpleScalarParser implements SubParserInterface
     ) {
     }
 
-    public function parse(ParseContext $ctx): ScalarNode
+    public function parse(ParseContext $parseContext): ScalarNode
     {
-        $token = $ctx->tokens->current();
+        $token = $parseContext->tokens->current();
         $node = $this->nodeFactory->createScalarNode($token);
-        $ctx->tokens->advance();
+        $parseContext->tokens->advance();
 
         return $node;
     }

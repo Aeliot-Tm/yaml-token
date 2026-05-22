@@ -33,41 +33,41 @@ final readonly class FlowSequenceParser implements SubParserInterface
     ) {
     }
 
-    public function parse(ParseContext $harvester): FlowSequenceNode
+    public function parse(ParseContext $parseContext): FlowSequenceNode
     {
         $node = new FlowSequenceNode();
-        $token = $harvester->tokens->current();
+        $token = $parseContext->tokens->current();
         if (TokenType::FLOW_SEQUENCE_START !== $token?->type) {
-            throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('There is no expected FLOW_SEQUENCE_START token, but %s given', $token?->type->value ?? '_nothing_'), $harvester->tokens));
+            throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('There is no expected FLOW_SEQUENCE_START token, but %s given', $token?->type->value ?? '_nothing_'), $parseContext->tokens));
         }
 
         $node->addChild($this->nodeFactory->createSimpleNode($token));
-        $harvester->tokens->advance();
+        $parseContext->tokens->advance();
 
         while (true) {
-            $this->consumer->collectSpaceCommentEnds($harvester->tokens, $node);
+            $this->consumer->collectSpaceCommentEnds($parseContext->tokens, $node);
 
-            $token = $harvester->tokens->current();
+            $token = $parseContext->tokens->current();
             if (null === $token || TokenType::FLOW_SEQUENCE_END === $token->type) {
                 if (TokenType::FLOW_SEQUENCE_END !== $token?->type) {
                     throw new UnexpectedTokenException(\sprintf('There is no expected FLOW_SEQUENCE_END token, but %s given', $token?->type->value ?? '_nothing_'));
                 }
 
                 $node->addChild($this->nodeFactory->createSimpleNode($token));
-                $harvester->tokens->advance();
-                $this->consumer->collectSpaceAndComments($harvester->tokens, $node);
+                $parseContext->tokens->advance();
+                $this->consumer->collectSpaceAndComments($parseContext->tokens, $node);
 
                 return $node;
             }
 
             if (TokenType::FLOW_ENTRY === $token->type) {
                 $node->addChild($this->nodeFactory->createSimpleNode($token));
-                $harvester->tokens->advance();
+                $parseContext->tokens->advance();
 
                 continue;
             }
 
-            $node->addChild($this->registry->getFlowEntryParser()->parse($harvester));
+            $node->addChild($this->registry->getFlowEntryParser()->parse($parseContext));
         }
     }
 }

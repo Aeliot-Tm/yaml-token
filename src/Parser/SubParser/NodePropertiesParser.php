@@ -31,7 +31,7 @@ final readonly class NodePropertiesParser implements SubParserInterface
     ) {
     }
 
-    public function collectValueProperties(ParseContext $harvester, ValueNode $valueNode): void
+    public function collectValueProperties(ParseContext $parseContext, ValueNode $valueNode): void
     {
         // Per YAML 1.2.2 rule [96] c-ns-properties(n,c), a node has at most one anchor and one tag.
         // The properties may appear inline or be split across separate lines (see [200]
@@ -42,15 +42,15 @@ final readonly class NodePropertiesParser implements SubParserInterface
         $hadProperties = null !== $properties;
         $whitespaceBuffer = [];
 
-        while (!$harvester->tokens->isEnd()) {
-            $token = $harvester->tokens->current();
+        while (!$parseContext->tokens->isEnd()) {
+            $token = $parseContext->tokens->current();
             if (TokenType::WHITESPACE === $token->type) {
                 if (null === $properties) {
                     $valueNode->addChild(new WhitespaceNode($token));
                 } else {
                     $whitespaceBuffer[] = new WhitespaceNode($token);
                 }
-                $harvester->tokens->advance();
+                $parseContext->tokens->advance();
                 continue;
             }
 
@@ -64,7 +64,7 @@ final readonly class NodePropertiesParser implements SubParserInterface
                 }
                 $whitespaceBuffer = [];
                 $properties->addChild(new AnchorNode($token));
-                $harvester->tokens->advance();
+                $parseContext->tokens->advance();
                 continue;
             }
 
@@ -78,7 +78,7 @@ final readonly class NodePropertiesParser implements SubParserInterface
                 }
                 $whitespaceBuffer = [];
                 $properties->addChild(new TagNode($token));
-                $harvester->tokens->advance();
+                $parseContext->tokens->advance();
                 continue;
             }
 

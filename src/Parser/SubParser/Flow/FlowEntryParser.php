@@ -37,31 +37,31 @@ final readonly class FlowEntryParser implements SubParserInterface
     ) {
     }
 
-    public function parse(ParseContext $harvester): Node
+    public function parse(ParseContext $parseContext): Node
     {
-        if ($this->isLegacyFlowPairEntryStart($harvester)) {
-            return $this->parseLegacyFlowPair($harvester);
+        if ($this->isLegacyFlowPairEntryStart($parseContext)) {
+            return $this->parseLegacyFlowPair($parseContext);
         }
 
-        $token = $harvester->tokens->current();
+        $token = $parseContext->tokens->current();
 
         if (TokenType::FLOW_SEQUENCE_START === $token?->type) {
             return $this->finishPostOperand(
-                $harvester,
-                $this->registry->getFlowSequenceParser()->parse($harvester),
+                $parseContext,
+                $this->registry->getFlowSequenceParser()->parse($parseContext),
             );
         }
 
         if (TokenType::FLOW_MAPPING_START === $token?->type) {
             return $this->finishPostOperand(
-                $harvester,
-                $this->registry->getFlowMappingParser()->parse($harvester),
+                $parseContext,
+                $this->registry->getFlowMappingParser()->parse($parseContext),
             );
         }
 
         return $this->finishPostOperand(
-            $harvester,
-            $this->registry->getFlowHost()->parseFlowContextValue($harvester),
+            $parseContext,
+            $this->registry->getFlowHost()->parseFlowContextValue($parseContext),
         );
     }
 
@@ -77,9 +77,9 @@ final readonly class FlowEntryParser implements SubParserInterface
         return $valueNode;
     }
 
-    private function finishPostOperand(ParseContext $harvester, Node $operand): ValueNode
+    private function finishPostOperand(ParseContext $parseContext, Node $operand): ValueNode
     {
-        if (!$this->peekFlowPairColon($harvester)) {
+        if (!$this->peekFlowPairColon($parseContext)) {
             return $this->completeOperandAsValue($operand);
         }
 
@@ -88,26 +88,26 @@ final readonly class FlowEntryParser implements SubParserInterface
         $this->promoteOperandToKey($operand, $keyNode);
         $couple->addChild($keyNode);
 
-        if (!$this->registry->getFlowMappingPairParser()->tryConsumeFlowMappingValueIndicator($harvester, $couple)) {
+        if (!$this->registry->getFlowMappingPairParser()->tryConsumeFlowMappingValueIndicator($parseContext, $couple)) {
             throw new UnexpectedStateException('Expected VALUE_INDICATOR after flow complex key');
         }
 
-        if ($this->isAtFlowSequenceEntryBoundary($harvester)) {
+        if ($this->isAtFlowSequenceEntryBoundary($parseContext)) {
             $couple->addChild(new ValueNode());
         } else {
-            $couple->addChild($this->registry->getFlowHost()->parseFlowContextValue($harvester));
+            $couple->addChild($this->registry->getFlowHost()->parseFlowContextValue($parseContext));
         }
 
-        $this->anchorPostProcessor->postProcessKeyValueCouple($harvester->anchorsRegistry, $couple);
+        $this->anchorPostProcessor->postProcessKeyValueCouple($parseContext->anchorsRegistry, $couple);
 
         return $this->completeOperandAsValue($couple);
     }
 
-    private function isAtFlowSequenceEntryBoundary(ParseContext $harvester): bool
+    private function isAtFlowSequenceEntryBoundary(ParseContext $parseContext): bool
     {
         $offset = 0;
         while (true) {
-            $peeked = $harvester->tokens->peek($offset);
+            $peeked = $parseContext->tokens->peek($offset);
             if (null === $peeked) {
                 return true;
             }
@@ -125,9 +125,9 @@ final readonly class FlowEntryParser implements SubParserInterface
         }
     }
 
-    private function isLegacyFlowPairEntryStart(ParseContext $harvester): bool
+    private function isLegacyFlowPairEntryStart(ParseContext $parseContext): bool
     {
-        $token = $harvester->tokens->current();
+        $token = $parseContext->tokens->current();
         if (TokenType::EXPLICIT_KEY_INDICATOR === $token?->type) {
             return true;
         }
@@ -135,33 +135,33 @@ final readonly class FlowEntryParser implements SubParserInterface
             return true;
         }
 
-        return $this->registry->getFlowHost()->isScalarFollowedByValueIndicatorInFlow($harvester)
-            || $this->registry->getFlowHost()->isFlowMultilinePlainKeyStart($harvester);
+        return $this->registry->getFlowHost()->isScalarFollowedByValueIndicatorInFlow($parseContext)
+            || $this->registry->getFlowHost()->isFlowMultilinePlainKeyStart($parseContext);
     }
 
-    private function parseLegacyFlowPair(ParseContext $harvester): ValueNode
+    private function parseLegacyFlowPair(ParseContext $parseContext): ValueNode
     {
         $couple = new KeyValueCoupleNode();
-        $couple->addChild($this->registry->getFlowHost()->getFlowEntryKeyNode($harvester));
+        $couple->addChild($this->registry->getFlowHost()->getFlowEntryKeyNode($parseContext));
 
-        $this->registry->getFlowMappingPairParser()->tryConsumeFlowMappingValueIndicator($harvester, $couple);
+        $this->registry->getFlowMappingPairParser()->tryConsumeFlowMappingValueIndicator($parseContext, $couple);
 
-        if ($this->isAtFlowSequenceEntryBoundary($harvester)) {
+        if ($this->isAtFlowSequenceEntryBoundary($parseContext)) {
             $couple->addChild(new ValueNode());
         } else {
-            $couple->addChild($this->registry->getFlowHost()->parseFlowContextValue($harvester));
+            $couple->addChild($this->registry->getFlowHost()->parseFlowContextValue($parseContext));
         }
 
-        $this->anchorPostProcessor->postProcessKeyValueCouple($harvester->anchorsRegistry, $couple);
+        $this->anchorPostProcessor->postProcessKeyValueCouple($parseContext->anchorsRegistry, $couple);
 
         return $this->completeOperandAsValue($couple);
     }
 
-    private function peekFlowPairColon(ParseContext $harvester): bool
+    private function peekFlowPairColon(ParseContext $parseContext): bool
     {
         $offset = 0;
         while (true) {
-            $peeked = $harvester->tokens->peek($offset);
+            $peeked = $parseContext->tokens->peek($offset);
             if (null === $peeked) {
                 return false;
             }

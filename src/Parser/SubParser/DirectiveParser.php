@@ -38,27 +38,27 @@ final readonly class DirectiveParser implements SubParserInterface
     ) {
     }
 
-    public function parseTagDirective(ParseContext $harvester): TagDirectiveNode
+    public function parseTagDirective(ParseContext $parseContext): TagDirectiveNode
     {
-        $token = $harvester->tokens->current();
+        $token = $parseContext->tokens->current();
         if (TokenType::DIRECTIVE_TAG_INDICATOR !== $token?->type) {
-            throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Expected DIRECTIVE_TAG_INDICATOR token, but %s given', $token?->type->value ?? '_nothing_'), $harvester->tokens));
+            throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Expected DIRECTIVE_TAG_INDICATOR token, but %s given', $token?->type->value ?? '_nothing_'), $parseContext->tokens));
         }
 
         $tagDirectiveNode = new TagDirectiveNode();
         $tagDirectiveNode->addChild(new TagDirectiveIndicatorNode($token));
-        $harvester->tokens->advance();
+        $parseContext->tokens->advance();
 
         $seenHandle = false;
         while (true) {
-            $token = $harvester->tokens->current();
+            $token = $parseContext->tokens->current();
             if (null === $token) {
-                throw new UnexpectedEndException($this->errorHelper->appendTokenLocation('Unexpected end of token stream: TAG directive handle and prefix are required', $harvester->tokens));
+                throw new UnexpectedEndException($this->errorHelper->appendTokenLocation('Unexpected end of token stream: TAG directive handle and prefix are required', $parseContext->tokens));
             }
 
             if (TokenType::WHITESPACE === $token->type) {
                 $tagDirectiveNode->addChild($this->nodeFactory->createSimpleNode($token));
-                $harvester->tokens->advance();
+                $parseContext->tokens->advance();
 
                 continue;
             }
@@ -66,7 +66,7 @@ final readonly class DirectiveParser implements SubParserInterface
             if (TokenType::DIRECTIVE_TAG_HANDLE === $token->type) {
                 $seenHandle = true;
                 $tagDirectiveNode->addChild(new TagDirectiveHandleNode($token));
-                $harvester->tokens->advance();
+                $parseContext->tokens->advance();
 
                 continue;
             }
@@ -76,9 +76,9 @@ final readonly class DirectiveParser implements SubParserInterface
                     throw new UnexpectedStateException('Expected TAG directive handle before prefix');
                 }
                 $tagDirectiveNode->addChild(new TagDirectivePrefixNode($token));
-                $harvester->tokens->advance();
+                $parseContext->tokens->advance();
 
-                $this->consumer->collectSpaceAndComments($harvester->tokens, $tagDirectiveNode);
+                $this->consumer->collectSpaceAndComments($parseContext->tokens, $tagDirectiveNode);
 
                 return $tagDirectiveNode;
             }
@@ -91,35 +91,35 @@ final readonly class DirectiveParser implements SubParserInterface
         }
     }
 
-    public function parseYamlDirective(ParseContext $harvester): YamlDirectiveNode
+    public function parseYamlDirective(ParseContext $parseContext): YamlDirectiveNode
     {
-        $token = $harvester->tokens->current();
+        $token = $parseContext->tokens->current();
         if (TokenType::DIRECTIVE_YAML_INDICATOR !== $token?->type) {
-            throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Expected DIRECTIVE_YAML_INDICATOR token, but %s given', $token?->type->value ?? '_nothing_'), $harvester->tokens));
+            throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Expected DIRECTIVE_YAML_INDICATOR token, but %s given', $token?->type->value ?? '_nothing_'), $parseContext->tokens));
         }
 
         $yamlDirectiveNode = new YamlDirectiveNode();
         $yamlDirectiveNode->addChild(new YamlDirectiveIndicatorNode($token));
-        $harvester->tokens->advance();
+        $parseContext->tokens->advance();
 
         while (true) {
-            $token = $harvester->tokens->current();
+            $token = $parseContext->tokens->current();
             if (null === $token) {
-                throw new UnexpectedEndException($this->errorHelper->appendTokenLocation('Unexpected end of token stream: YAML directive version is required', $harvester->tokens));
+                throw new UnexpectedEndException($this->errorHelper->appendTokenLocation('Unexpected end of token stream: YAML directive version is required', $parseContext->tokens));
             }
 
             if (\in_array($token->type, [TokenType::WHITESPACE, TokenType::VALUE_INDICATOR], true)) {
                 $yamlDirectiveNode->addChild($this->nodeFactory->createSimpleNode($token));
-                $harvester->tokens->advance();
+                $parseContext->tokens->advance();
 
                 continue;
             }
 
             if (TokenType::DIRECTIVE_YAML_VERSION === $token->type) {
                 $yamlDirectiveNode->addChild($this->nodeFactory->createSimpleNode($token));
-                $harvester->tokens->advance();
+                $parseContext->tokens->advance();
 
-                $this->consumer->collectSpaceAndComments($harvester->tokens, $yamlDirectiveNode);
+                $this->consumer->collectSpaceAndComments($parseContext->tokens, $yamlDirectiveNode);
 
                 return $yamlDirectiveNode;
             }
