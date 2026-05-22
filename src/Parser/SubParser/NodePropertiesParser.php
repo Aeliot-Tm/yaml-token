@@ -20,9 +20,9 @@ use Aeliot\YamlToken\Node\TagNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
-use Aeliot\YamlToken\Parser\Dto\Harvester;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
+use Aeliot\YamlToken\Parser\ParseContext;
 
 final readonly class NodePropertiesParser implements SubParserInterface
 {
@@ -31,7 +31,7 @@ final readonly class NodePropertiesParser implements SubParserInterface
     ) {
     }
 
-    public function collectValueProperties(Harvester $harvester, ValueNode $valueNode): void
+    public function collectValueProperties(ParseContext $harvester, ValueNode $valueNode): void
     {
         // Per YAML 1.2.2 rule [96] c-ns-properties(n,c), a node has at most one anchor and one tag.
         // The properties may appear inline or be split across separate lines (see [200]

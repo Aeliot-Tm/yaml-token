@@ -151,9 +151,9 @@ final class ParserAssembler
         return new FlowEntryParser($this->anchorPostProcessor, $registry);
     }
 
-    public function createFlowMappingPairParser(): FlowMappingPairParser
+    public function createFlowMappingPairParser(ParserRegistry $registry): FlowMappingPairParser
     {
-        return new FlowMappingPairParser($this->anchorPostProcessor, $this->consumer);
+        return new FlowMappingPairParser($this->anchorPostProcessor, $this->consumer, $registry);
     }
 
     public function createFlowMappingParser(ParserRegistry $registry): FlowMappingParser

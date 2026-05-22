@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace Aeliot\YamlToken\Parser\Helper\Identifier;
 
 use Aeliot\YamlToken\Enum\TokenType;
-use Aeliot\YamlToken\Parser\Dto\Harvester;
 use Aeliot\YamlToken\Parser\Helper\MultilineContinuationHelper;
+use Aeliot\YamlToken\Parser\ParseContext;
 
 final readonly class BlockStructureIdentifier
 {
@@ -26,7 +26,7 @@ final readonly class BlockStructureIdentifier
     ) {
     }
 
-    public function isBlockScalarStartAtDocumentRoot(Harvester $harvester): bool
+    public function isBlockScalarStartAtDocumentRoot(ParseContext $harvester): bool
     {
         $offset = 0;
         while (true) {
@@ -50,7 +50,7 @@ final readonly class BlockStructureIdentifier
      * of s-separate-in-line, not of block s-indent(n), and must not be
      * registered as the document's indent step nor validated against it.
      */
-    public function isKeyValueCoupleStart(Harvester $harvester): bool
+    public function isKeyValueCoupleStart(ParseContext $harvester): bool
     {
         $contentPeekOffset = 0;
         $token = $harvester->tokens->current();
@@ -90,7 +90,7 @@ final readonly class BlockStructureIdentifier
             );
     }
 
-    public function isKeyValueCoupleStartAllowingNodeProperties(Harvester $harvester): bool
+    public function isKeyValueCoupleStartAllowingNodeProperties(ParseContext $harvester): bool
     {
         $token = $harvester->tokens->current();
         if (TokenType::INDENTATION === $token->type) {
@@ -104,7 +104,7 @@ final readonly class BlockStructureIdentifier
         return $this->isKeyValueCoupleStart($harvester);
     }
 
-    public function isSequenceStart(Harvester $harvester): bool
+    public function isSequenceStart(ParseContext $harvester): bool
     {
         $token = $harvester->tokens->current();
         if (TokenType::INDENTATION === $token->type) {

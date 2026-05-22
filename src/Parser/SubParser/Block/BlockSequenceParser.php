@@ -19,7 +19,6 @@ use Aeliot\YamlToken\Node\BlockSequenceNode;
 use Aeliot\YamlToken\Node\IndentationNode;
 use Aeliot\YamlToken\Parser\Consumer;
 use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
-use Aeliot\YamlToken\Parser\Dto\Harvester;
 use Aeliot\YamlToken\Parser\Enum\EspecialIndent;
 use Aeliot\YamlToken\Parser\Exception\IndentationInvalidException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
@@ -27,6 +26,7 @@ use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
 use Aeliot\YamlToken\Parser\Helper\IndentationHelper;
 use Aeliot\YamlToken\Parser\Helper\LookAheadHelper;
+use Aeliot\YamlToken\Parser\ParseContext;
 use Aeliot\YamlToken\Parser\ParserRegistry;
 
 final readonly class BlockSequenceParser implements SubParserInterface
@@ -40,7 +40,7 @@ final readonly class BlockSequenceParser implements SubParserInterface
     ) {
     }
 
-    public function parseBlockSequenceValue(Harvester $harvester, int $parentIndentLen, bool $allowNonSequenceAtBaseIndentAsTerminator = false): BlockSequenceNode
+    public function parseBlockSequenceValue(ParseContext $harvester, int $parentIndentLen, bool $allowNonSequenceAtBaseIndentAsTerminator = false): BlockSequenceNode
     {
         $blockSequence = new BlockSequenceNode();
 
@@ -115,7 +115,7 @@ final readonly class BlockSequenceParser implements SubParserInterface
         return $blockSequence;
     }
 
-    private function isSequenceStart(Harvester $harvester): bool
+    private function isSequenceStart(ParseContext $harvester): bool
     {
         $token = $harvester->tokens->current();
         if (TokenType::INDENTATION === $token->type) {

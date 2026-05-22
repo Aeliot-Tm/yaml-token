@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Aeliot\YamlToken\Parser\Helper\Identifier;
 
 use Aeliot\YamlToken\Enum\TokenType;
-use Aeliot\YamlToken\Parser\Dto\Harvester;
+use Aeliot\YamlToken\Parser\ParseContext;
 
 final readonly class FlowStructureIdentifier
 {
@@ -23,7 +23,7 @@ final readonly class FlowStructureIdentifier
      * the next non-layout token on the same line is {@code VALUE_INDICATOR} (block implicit key
      * whose key is a flow collection, e.g. {@code [flow]: block}).
      */
-    public function isFlowCollectionFollowedByBlockValueIndicatorOnSameLine(Harvester $harvester, int $collectionStartPeekOffset): bool
+    public function isFlowCollectionFollowedByBlockValueIndicatorOnSameLine(ParseContext $harvester, int $collectionStartPeekOffset): bool
     {
         $open = $harvester->tokens->peek($collectionStartPeekOffset);
         if (!\in_array($open?->type, [TokenType::FLOW_SEQUENCE_START, TokenType::FLOW_MAPPING_START], true)) {
@@ -71,7 +71,7 @@ final readonly class FlowStructureIdentifier
         }
     }
 
-    public function isFlowMappingStart(Harvester $harvester): bool
+    public function isFlowMappingStart(ParseContext $harvester): bool
     {
         $token = $harvester->tokens->current();
         if (TokenType::INDENTATION === $token->type) {
@@ -85,7 +85,7 @@ final readonly class FlowStructureIdentifier
      * In flow context, checks if the current PLAIN_SCALAR is the start of a multiline
      * implicit key: PLAIN_SCALAR (NEWLINE WS* PLAIN_SCALAR)+ WS* VALUE_INDICATOR.
      */
-    public function isFlowMultilinePlainKeyStart(Harvester $harvester): bool
+    public function isFlowMultilinePlainKeyStart(ParseContext $harvester): bool
     {
         if (TokenType::PLAIN_SCALAR !== $harvester->tokens->current()?->type) {
             return false;
@@ -125,7 +125,7 @@ final readonly class FlowStructureIdentifier
         }
     }
 
-    public function isFlowSequenceStart(Harvester $harvester): bool
+    public function isFlowSequenceStart(ParseContext $harvester): bool
     {
         $token = $harvester->tokens->current();
         if (TokenType::INDENTATION === $token->type) {

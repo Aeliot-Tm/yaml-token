@@ -17,14 +17,14 @@ use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\BlockMappingNode;
 use Aeliot\YamlToken\Parser\Consumer;
 use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
-use Aeliot\YamlToken\Parser\Dto\Harvester;
 use Aeliot\YamlToken\Parser\Helper\LookAheadHelper;
+use Aeliot\YamlToken\Parser\ParseContext;
 use Aeliot\YamlToken\Parser\ParserRegistry;
 
 final readonly class CompactBlockMappingParser implements SubParserInterface
 {
     /**
-     * @param \Closure(Harvester): bool $isKeyValueCoupleStartAllowingNodeProperties
+     * @param \Closure(ParseContext): bool $isKeyValueCoupleStartAllowingNodeProperties
      */
     public function __construct(
         private Consumer $consumer,
@@ -43,7 +43,7 @@ final readonly class CompactBlockMappingParser implements SubParserInterface
      * trailing spaces so we sit directly on the key). Subsequent entries
      * require an INDENTATION token whose length equals $indentLen.
      */
-    public function parseCompactBlockMapping(Harvester $harvester, int $indentLen): BlockMappingNode
+    public function parseCompactBlockMapping(ParseContext $harvester, int $indentLen): BlockMappingNode
     {
         $blockMapping = new BlockMappingNode();
 

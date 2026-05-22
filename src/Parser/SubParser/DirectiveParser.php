@@ -22,12 +22,12 @@ use Aeliot\YamlToken\Node\YamlDirectiveIndicatorNode;
 use Aeliot\YamlToken\Node\YamlDirectiveNode;
 use Aeliot\YamlToken\Parser\Consumer;
 use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
-use Aeliot\YamlToken\Parser\Dto\Harvester;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedEndException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
+use Aeliot\YamlToken\Parser\ParseContext;
 
 final readonly class DirectiveParser implements SubParserInterface
 {
@@ -38,7 +38,7 @@ final readonly class DirectiveParser implements SubParserInterface
     ) {
     }
 
-    public function parseTagDirective(Harvester $harvester): TagDirectiveNode
+    public function parseTagDirective(ParseContext $harvester): TagDirectiveNode
     {
         $token = $harvester->tokens->current();
         if (TokenType::DIRECTIVE_TAG_INDICATOR !== $token?->type) {
@@ -91,7 +91,7 @@ final readonly class DirectiveParser implements SubParserInterface
         }
     }
 
-    public function parseYamlDirective(Harvester $harvester): YamlDirectiveNode
+    public function parseYamlDirective(ParseContext $harvester): YamlDirectiveNode
     {
         $token = $harvester->tokens->current();
         if (TokenType::DIRECTIVE_YAML_INDICATOR !== $token?->type) {

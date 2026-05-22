@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Aeliot\YamlToken\Parser\Helper\Identifier;
 
 use Aeliot\YamlToken\Enum\TokenType;
-use Aeliot\YamlToken\Parser\Dto\Harvester;
+use Aeliot\YamlToken\Parser\ParseContext;
 use Aeliot\YamlToken\Token\Token;
 
 final readonly class NodePropertyIdentifier
@@ -34,7 +34,7 @@ final readonly class NodePropertyIdentifier
      * Detects such a node-property prefix at the document root by peeking past
      * a possible leading INDENTATION token.
      */
-    public function isNodePropertyAtDocumentRoot(Harvester $harvester): bool
+    public function isNodePropertyAtDocumentRoot(ParseContext $harvester): bool
     {
         $token = $harvester->tokens->current();
         if (null === $token) {
@@ -68,7 +68,7 @@ final readonly class NodePropertyIdentifier
      * same line by {@code VALUE_INDICATOR} (block implicit key whose key is a tagged or
      * anchored flow collection, e.g. {@code &k [a]: b}).
      */
-    public function isNodePropertiesFollowedByFlowCollectionImplicitBlockKeyOnSameLine(Harvester $harvester): bool
+    public function isNodePropertiesFollowedByFlowCollectionImplicitBlockKeyOnSameLine(ParseContext $harvester): bool
     {
         $offset = 0;
         if (TokenType::INDENTATION === $harvester->tokens->current()?->type) {
@@ -118,7 +118,7 @@ final readonly class NodePropertyIdentifier
      *
      * @param int $offset Peek offset to the first TAG or ANCHOR on the line
      */
-    public function isNodePropertiesFollowedByImplicitKeyFromOffset(Harvester $harvester, int $offset): bool
+    public function isNodePropertiesFollowedByImplicitKeyFromOffset(ParseContext $harvester, int $offset): bool
     {
         while (true) {
             $token = $harvester->tokens->peek($offset);
@@ -167,7 +167,7 @@ final readonly class NodePropertyIdentifier
      * NEWLINE — an implicit YAML key (scalar followed by VALUE_INDICATOR). Distinguishes
      * "&a: key: value" from a properties-only prefix line whose value continues below.
      */
-    public function isNodePropertiesFollowedByImplicitYamlKeyOnSameLine(Harvester $harvester): bool
+    public function isNodePropertiesFollowedByImplicitYamlKeyOnSameLine(ParseContext $harvester): bool
     {
         $offset = 0;
         if (TokenType::INDENTATION === $harvester->tokens->current()?->type) {

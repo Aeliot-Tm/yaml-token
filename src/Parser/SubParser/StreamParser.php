@@ -17,7 +17,7 @@ use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\ByteOrderNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
-use Aeliot\YamlToken\Parser\Dto\Harvester;
+use Aeliot\YamlToken\Parser\ParseContext;
 use Aeliot\YamlToken\Parser\ParserRegistry;
 
 final readonly class StreamParser implements SubParserInterface
@@ -27,9 +27,9 @@ final readonly class StreamParser implements SubParserInterface
     ) {
     }
 
-    public function parseStream(Harvester $harvester): StreamNode
+    public function parseStream(ParseContext $harvester): StreamNode
     {
-        $harvester->stream = $stream = new StreamNode();
+        $stream = new StreamNode();
 
         $token = $harvester->tokens->current();
         if (null !== $token && TokenType::BYTE_ORDER_MARK === $token->type) {

@@ -159,7 +159,7 @@ final class ParserRegistry
 
     public function getFlowMappingPairParser(): FlowMappingPairParser
     {
-        return $this->flowMappingPairParser ??= $this->assembler->createFlowMappingPairParser();
+        return $this->flowMappingPairParser ??= $this->assembler->createFlowMappingPairParser($this);
     }
 
     public function getFlowMappingParser(): FlowMappingParser

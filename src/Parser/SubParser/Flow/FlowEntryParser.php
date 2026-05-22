@@ -24,9 +24,9 @@ use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
-use Aeliot\YamlToken\Parser\Dto\Harvester;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
 use Aeliot\YamlToken\Parser\Helper\AnchorPostProcessor;
+use Aeliot\YamlToken\Parser\ParseContext;
 use Aeliot\YamlToken\Parser\ParserRegistry;
 
 final readonly class FlowEntryParser implements SubParserInterface
@@ -37,7 +37,7 @@ final readonly class FlowEntryParser implements SubParserInterface
     ) {
     }
 
-    public function parse(Harvester $harvester): Node
+    public function parse(ParseContext $harvester): Node
     {
         if ($this->isLegacyFlowPairEntryStart($harvester)) {
             return $this->parseLegacyFlowPair($harvester);
@@ -61,7 +61,7 @@ final readonly class FlowEntryParser implements SubParserInterface
 
         return $this->finishPostOperand(
             $harvester,
-            $harvester->flowHost->parseFlowContextValue($harvester),
+            $this->registry->getFlowHost()->parseFlowContextValue($harvester),
         );
     }
 
@@ -77,7 +77,7 @@ final readonly class FlowEntryParser implements SubParserInterface
         return $valueNode;
     }
 
-    private function finishPostOperand(Harvester $harvester, Node $operand): ValueNode
+    private function finishPostOperand(ParseContext $harvester, Node $operand): ValueNode
     {
         if (!$this->peekFlowPairColon($harvester)) {
             return $this->completeOperandAsValue($operand);
@@ -95,7 +95,7 @@ final readonly class FlowEntryParser implements SubParserInterface
         if ($this->isAtFlowSequenceEntryBoundary($harvester)) {
             $couple->addChild(new ValueNode());
         } else {
-            $couple->addChild($harvester->flowHost->parseFlowContextValue($harvester));
+            $couple->addChild($this->registry->getFlowHost()->parseFlowContextValue($harvester));
         }
 
         $this->anchorPostProcessor->postProcessKeyValueCouple($harvester->anchorsRegistry, $couple);
@@ -103,7 +103,7 @@ final readonly class FlowEntryParser implements SubParserInterface
         return $this->completeOperandAsValue($couple);
     }
 
-    private function isAtFlowSequenceEntryBoundary(Harvester $harvester): bool
+    private function isAtFlowSequenceEntryBoundary(ParseContext $harvester): bool
     {
         $offset = 0;
         while (true) {
@@ -125,7 +125,7 @@ final readonly class FlowEntryParser implements SubParserInterface
         }
     }
 
-    private function isLegacyFlowPairEntryStart(Harvester $harvester): bool
+    private function isLegacyFlowPairEntryStart(ParseContext $harvester): bool
     {
         $token = $harvester->tokens->current();
         if (TokenType::EXPLICIT_KEY_INDICATOR === $token?->type) {
@@ -135,21 +135,21 @@ final readonly class FlowEntryParser implements SubParserInterface
             return true;
         }
 
-        return $harvester->flowHost->isScalarFollowedByValueIndicatorInFlow($harvester)
-            || $harvester->flowHost->isFlowMultilinePlainKeyStart($harvester);
+        return $this->registry->getFlowHost()->isScalarFollowedByValueIndicatorInFlow($harvester)
+            || $this->registry->getFlowHost()->isFlowMultilinePlainKeyStart($harvester);
     }
 
-    private function parseLegacyFlowPair(Harvester $harvester): ValueNode
+    private function parseLegacyFlowPair(ParseContext $harvester): ValueNode
     {
         $couple = new KeyValueCoupleNode();
-        $couple->addChild($harvester->flowHost->getFlowEntryKeyNode($harvester));
+        $couple->addChild($this->registry->getFlowHost()->getFlowEntryKeyNode($harvester));
 
         $this->registry->getFlowMappingPairParser()->tryConsumeFlowMappingValueIndicator($harvester, $couple);
 
         if ($this->isAtFlowSequenceEntryBoundary($harvester)) {
             $couple->addChild(new ValueNode());
         } else {
-            $couple->addChild($harvester->flowHost->parseFlowContextValue($harvester));
+            $couple->addChild($this->registry->getFlowHost()->parseFlowContextValue($harvester));
         }
 
         $this->anchorPostProcessor->postProcessKeyValueCouple($harvester->anchorsRegistry, $couple);
@@ -157,7 +157,7 @@ final readonly class FlowEntryParser implements SubParserInterface
         return $this->completeOperandAsValue($couple);
     }
 
-    private function peekFlowPairColon(Harvester $harvester): bool
+    private function peekFlowPairColon(ParseContext $harvester): bool
     {
         $offset = 0;
         while (true) {

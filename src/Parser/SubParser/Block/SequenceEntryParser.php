@@ -20,20 +20,20 @@ use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
-use Aeliot\YamlToken\Parser\Dto\Harvester;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
+use Aeliot\YamlToken\Parser\ParseContext;
 use Aeliot\YamlToken\Token\Token;
 
 final readonly class SequenceEntryParser implements SubParserInterface
 {
     /**
-     * @param \Closure(Harvester, int): bool $isFlowCollectionFollowedByBlockValueIndicatorOnSameLine
-     * @param \Closure(Harvester, bool=): bool $isScalarFollowedByValueIndicator
-     * @param \Closure(Harvester, int): BlockMappingNode $parseCompactBlockMapping
-     * @param \Closure(Harvester, int): BlockSequenceNode $parseCompactBlockSequence
-     * @param \Closure(Harvester, int): ValueNode $parseValue
+     * @param \Closure(ParseContext, int): bool $isFlowCollectionFollowedByBlockValueIndicatorOnSameLine
+     * @param \Closure(ParseContext, bool=): bool $isScalarFollowedByValueIndicator
+     * @param \Closure(ParseContext, int): BlockMappingNode $parseCompactBlockMapping
+     * @param \Closure(ParseContext, int): BlockSequenceNode $parseCompactBlockSequence
+     * @param \Closure(ParseContext, int): ValueNode $parseValue
      */
     public function __construct(
         private ErrorHelper $errorHelper,
@@ -53,7 +53,7 @@ final readonly class SequenceEntryParser implements SubParserInterface
      * combined length is considered part of the indentation of the
      * nested (compact) block collection.
      */
-    public function consumeSequenceEntryIndicatorAndSpaces(Harvester $harvester, Node $target): int
+    public function consumeSequenceEntryIndicatorAndSpaces(ParseContext $harvester, Node $target): int
     {
         $token = $harvester->tokens->current();
         if (TokenType::SEQUENCE_ENTRY !== $token?->type) {
@@ -91,7 +91,7 @@ final readonly class SequenceEntryParser implements SubParserInterface
      * that follow '-'. Per §8.2.1 this length defines the indentation
      * of the nested compact collection.
      */
-    public function parseSequenceEntryValue(Harvester $harvester, int $parentIndentLen, int $compactIndent): ValueNode
+    public function parseSequenceEntryValue(ParseContext $harvester, int $parentIndentLen, int $compactIndent): ValueNode
     {
         $token = $harvester->tokens->current();
         $nodePropertiesFollowedByValueIndicator = false;

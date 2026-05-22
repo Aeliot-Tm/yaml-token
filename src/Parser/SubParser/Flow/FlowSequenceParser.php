@@ -17,10 +17,10 @@ use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\FlowSequenceNode;
 use Aeliot\YamlToken\Parser\Consumer;
 use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
-use Aeliot\YamlToken\Parser\Dto\Harvester;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
+use Aeliot\YamlToken\Parser\ParseContext;
 use Aeliot\YamlToken\Parser\ParserRegistry;
 
 final readonly class FlowSequenceParser implements SubParserInterface
@@ -33,7 +33,7 @@ final readonly class FlowSequenceParser implements SubParserInterface
     ) {
     }
 
-    public function parse(Harvester $harvester): FlowSequenceNode
+    public function parse(ParseContext $harvester): FlowSequenceNode
     {
         $node = new FlowSequenceNode();
         $token = $harvester->tokens->current();

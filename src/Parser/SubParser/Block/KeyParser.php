@@ -24,22 +24,22 @@ use Aeliot\YamlToken\Node\NodePropertiesNode;
 use Aeliot\YamlToken\Node\TagNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
-use Aeliot\YamlToken\Parser\Dto\Harvester;
 use Aeliot\YamlToken\Parser\Exception\AnchorUndefinedException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
 use Aeliot\YamlToken\Parser\Helper\LookAheadHelper;
 use Aeliot\YamlToken\Parser\Helper\MultilineContinuationHelper;
+use Aeliot\YamlToken\Parser\ParseContext;
 use Aeliot\YamlToken\Parser\ParserRegistry;
 use Aeliot\YamlToken\Token\Token;
 
 final readonly class KeyParser implements SubParserInterface
 {
     /**
-     * @param \Closure(Harvester, int): BlockMappingNode $parseBlockMappingValue
-     * @param \Closure(Harvester, int): BlockSequenceNode $parseBlockSequenceValue
-     * @param \Closure(Harvester, int): BlockSequenceNode $parseCompactBlockSequence
+     * @param \Closure(ParseContext, int): BlockMappingNode $parseBlockMappingValue
+     * @param \Closure(ParseContext, int): BlockSequenceNode $parseBlockSequenceValue
+     * @param \Closure(ParseContext, int): BlockSequenceNode $parseCompactBlockSequence
      */
     public function __construct(
         private ErrorHelper $errorHelper,
@@ -52,7 +52,7 @@ final readonly class KeyParser implements SubParserInterface
     ) {
     }
 
-    public function getKeyNode(Harvester $harvester, ?int $entryIndentLen = null): KeyNode
+    public function getKeyNode(ParseContext $harvester, ?int $entryIndentLen = null): KeyNode
     {
         $keyNode = new KeyNode();
         $this->collectKeyProperties($harvester, $keyNode);
@@ -189,7 +189,7 @@ final readonly class KeyParser implements SubParserInterface
         return $keyNode;
     }
 
-    private function collectKeyProperties(Harvester $harvester, KeyNode $keyNode): void
+    private function collectKeyProperties(ParseContext $harvester, KeyNode $keyNode): void
     {
         $properties = null;
         $whitespaceBuffer = [];

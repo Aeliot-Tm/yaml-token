@@ -16,7 +16,6 @@ namespace Aeliot\YamlToken\Parser;
 use Aeliot\YamlToken\Lexer\Lexer;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Parser\Dto\AnchorsRegistry;
-use Aeliot\YamlToken\Parser\Dto\Harvester;
 use Aeliot\YamlToken\Parser\Dto\ParseState;
 use Aeliot\YamlToken\Parser\Dto\TokenStreamProxy;
 use Aeliot\YamlToken\Token\TokenStream;
@@ -35,12 +34,12 @@ final class Parser
 
     public function parseStream(TokenStream $tokens): StreamNode
     {
-        $harvester = new Harvester(new TokenStreamProxy($tokens));
-        $harvester->flowHost = $this->parserRegistry->getFlowHost();
-        $harvester->anchorsRegistry = new AnchorsRegistry();
-        $harvester->state = new ParseState();
-        $harvester->parseContext = new ParseContext($harvester->tokens, $harvester->anchorsRegistry, $harvester->state);
+        $ctx = new ParseContext(
+            new TokenStreamProxy($tokens),
+            new AnchorsRegistry(),
+            new ParseState(),
+        );
 
-        return $this->parserRegistry->getStreamParser()->parseStream($harvester);
+        return $this->parserRegistry->getStreamParser()->parseStream($ctx);
     }
 }

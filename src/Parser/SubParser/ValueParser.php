@@ -23,13 +23,13 @@ use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 use Aeliot\YamlToken\Parser\Consumer;
 use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
-use Aeliot\YamlToken\Parser\Dto\Harvester;
 use Aeliot\YamlToken\Parser\Enum\EspecialIndent;
 use Aeliot\YamlToken\Parser\Exception\AnchorUndefinedException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
 use Aeliot\YamlToken\Parser\Helper\MultilineContinuationHelper;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
+use Aeliot\YamlToken\Parser\ParseContext;
 use Aeliot\YamlToken\Parser\ParserRegistry;
 
 final readonly class ValueParser implements SubParserInterface
@@ -48,7 +48,7 @@ final readonly class ValueParser implements SubParserInterface
      *                             {@see EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value} at bare document root (YAML 1.2.2 rule [211]),
      *                             or {@see EspecialIndent::FLOW_COLLECTION_VALUE_PARENT->value} for flow / merge RHS values.
      */
-    public function parseValue(Harvester $harvester, int $parentIndentLen): ValueNode
+    public function parseValue(ParseContext $harvester, int $parentIndentLen): ValueNode
     {
         $valueNode = new ValueNode();
 
@@ -83,7 +83,7 @@ final readonly class ValueParser implements SubParserInterface
     /**
      * Parses the main value payload (block scalar, block-after-newline, scalars, aliases, compact collections, flow nodes).
      */
-    private function parseValuePrimaryPayload(Harvester $harvester, ValueNode $valueNode, int $parentIndentLen): void
+    private function parseValuePrimaryPayload(ParseContext $harvester, ValueNode $valueNode, int $parentIndentLen): void
     {
         $token = $harvester->tokens->current();
         if (null === $token) {
@@ -211,7 +211,7 @@ final readonly class ValueParser implements SubParserInterface
                 }
                 $valueNode->addChild($consumedAny ? $multiline : $head);
             } else {
-                $valueNode->addChild($this->registry->getSimpleScalarParser()->parse($harvester->parseContext));
+                $valueNode->addChild($this->registry->getSimpleScalarParser()->parse($harvester));
             }
         } elseif (TokenType::ALIAS === $token->type) {
             $aliasNode = new AliasNode($token);

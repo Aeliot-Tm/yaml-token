@@ -19,8 +19,8 @@ use Aeliot\YamlToken\Node\BlockSequenceNode;
 use Aeliot\YamlToken\Node\IndentationNode;
 use Aeliot\YamlToken\Parser\Consumer;
 use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
-use Aeliot\YamlToken\Parser\Dto\Harvester;
 use Aeliot\YamlToken\Parser\Helper\LookAheadHelper;
+use Aeliot\YamlToken\Parser\ParseContext;
 use Aeliot\YamlToken\Parser\ParserRegistry;
 
 final readonly class CompactBlockSequenceParser implements SubParserInterface
@@ -43,7 +43,7 @@ final readonly class CompactBlockSequenceParser implements SubParserInterface
      * an INDENTATION token whose length equals $indentLen — the column
      * (0-based) of the first '-', i.e. the value of n in rule [186].
      */
-    public function parseCompactBlockSequence(Harvester $harvester, int $indentLen): BlockSequenceNode
+    public function parseCompactBlockSequence(ParseContext $harvester, int $indentLen): BlockSequenceNode
     {
         $blockSequence = new BlockSequenceNode();
 
@@ -98,7 +98,7 @@ final readonly class CompactBlockSequenceParser implements SubParserInterface
         return $blockSequence;
     }
 
-    private function isSequenceStart(Harvester $harvester): bool
+    private function isSequenceStart(ParseContext $harvester): bool
     {
         $token = $harvester->tokens->current();
         if (TokenType::INDENTATION === $token->type) {

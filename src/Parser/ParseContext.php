@@ -27,7 +27,7 @@ final class ParseContext
 
     public function __construct(
         public readonly TokenStreamProxy $tokens,
-        public readonly AnchorsRegistry $anchors,
+        public readonly AnchorsRegistry $anchorsRegistry,
         public readonly ParseState $state,
     ) {
     }

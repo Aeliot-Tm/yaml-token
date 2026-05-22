@@ -17,10 +17,10 @@ use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\FlowMappingNode;
 use Aeliot\YamlToken\Parser\Consumer;
 use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
-use Aeliot\YamlToken\Parser\Dto\Harvester;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
+use Aeliot\YamlToken\Parser\ParseContext;
 use Aeliot\YamlToken\Parser\ParserRegistry;
 
 final readonly class FlowMappingParser implements SubParserInterface
@@ -33,7 +33,7 @@ final readonly class FlowMappingParser implements SubParserInterface
     ) {
     }
 
-    public function parse(Harvester $harvester): FlowMappingNode
+    public function parse(ParseContext $harvester): FlowMappingNode
     {
         $node = new FlowMappingNode();
         $token = $harvester->tokens->current();
@@ -68,7 +68,7 @@ final readonly class FlowMappingParser implements SubParserInterface
             }
 
             if (TokenType::MERGE_INDICATOR === $token->type) {
-                $node->addChild($harvester->flowHost->parseMergeInstructionAtCurrentPosition($harvester));
+                $node->addChild($this->registry->getFlowHost()->parseMergeInstructionAtCurrentPosition($harvester));
 
                 continue;
             }

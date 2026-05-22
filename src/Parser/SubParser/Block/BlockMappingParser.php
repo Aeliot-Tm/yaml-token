@@ -18,7 +18,6 @@ use Aeliot\YamlToken\Node\BlockMappingNode;
 use Aeliot\YamlToken\Node\MergeInstructionNode;
 use Aeliot\YamlToken\Parser\Consumer;
 use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
-use Aeliot\YamlToken\Parser\Dto\Harvester;
 use Aeliot\YamlToken\Parser\Enum\EspecialIndent;
 use Aeliot\YamlToken\Parser\Exception\IndentationInvalidException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
@@ -26,14 +25,15 @@ use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
 use Aeliot\YamlToken\Parser\Helper\IndentationHelper;
 use Aeliot\YamlToken\Parser\Helper\LookAheadHelper;
+use Aeliot\YamlToken\Parser\ParseContext;
 use Aeliot\YamlToken\Parser\ParserRegistry;
 
 final readonly class BlockMappingParser implements SubParserInterface
 {
     /**
-     * @param \Closure(Harvester): bool $isKeyValueCoupleStart
-     * @param \Closure(Harvester): bool $isKeyValueCoupleStartAllowingNodeProperties
-     * @param \Closure(Harvester): MergeInstructionNode $parseMergeInstructionAtCurrentPosition
+     * @param \Closure(ParseContext): bool $isKeyValueCoupleStart
+     * @param \Closure(ParseContext): bool $isKeyValueCoupleStartAllowingNodeProperties
+     * @param \Closure(ParseContext): MergeInstructionNode $parseMergeInstructionAtCurrentPosition
      */
     public function __construct(
         private Consumer $consumer,
@@ -47,7 +47,7 @@ final readonly class BlockMappingParser implements SubParserInterface
     ) {
     }
 
-    public function parseBlockMappingValue(Harvester $harvester, int $parentIndentLen): BlockMappingNode
+    public function parseBlockMappingValue(ParseContext $harvester, int $parentIndentLen): BlockMappingNode
     {
         $blockMapping = new BlockMappingNode();
 

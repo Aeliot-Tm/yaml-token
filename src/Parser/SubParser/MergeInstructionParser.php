@@ -22,17 +22,17 @@ use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Parser\Consumer;
 use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
-use Aeliot\YamlToken\Parser\Dto\Harvester;
 use Aeliot\YamlToken\Parser\Enum\EspecialIndent;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
+use Aeliot\YamlToken\Parser\ParseContext;
 
 final readonly class MergeInstructionParser implements SubParserInterface
 {
     /**
-     * @param \Closure(Harvester, int): ValueNode $parseValue
+     * @param \Closure(ParseContext, int): ValueNode $parseValue
      */
     public function __construct(
         private Consumer $consumer,
@@ -42,7 +42,7 @@ final readonly class MergeInstructionParser implements SubParserInterface
     ) {
     }
 
-    public function parseMergeInstructionAtCurrentPosition(Harvester $harvester): MergeInstructionNode
+    public function parseMergeInstructionAtCurrentPosition(ParseContext $harvester): MergeInstructionNode
     {
         $mergeInstruction = new MergeInstructionNode();
 

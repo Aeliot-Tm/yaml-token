@@ -20,7 +20,6 @@ use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Parser\Consumer;
 use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
-use Aeliot\YamlToken\Parser\Dto\Harvester;
 use Aeliot\YamlToken\Parser\Enum\EspecialIndent;
 use Aeliot\YamlToken\Parser\Exception\IndentationInvalidException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
@@ -28,14 +27,15 @@ use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
 use Aeliot\YamlToken\Parser\Helper\LookAheadHelper;
 use Aeliot\YamlToken\Parser\Helper\MultilineContinuationHelper;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
+use Aeliot\YamlToken\Parser\ParseContext;
 use Aeliot\YamlToken\Parser\ParserRegistry;
 use Aeliot\YamlToken\Token\Token;
 
 final readonly class IndentedBlockValueParser implements SubParserInterface
 {
     /**
-     * @param \Closure(Harvester, ValueNode): void $collectValueProperties
-     * @param \Closure(Harvester, int): bool $isNodePropertiesFollowedByImplicitKeyFromOffset
+     * @param \Closure(ParseContext, ValueNode): void $collectValueProperties
+     * @param \Closure(ParseContext, int): bool $isNodePropertiesFollowedByImplicitKeyFromOffset
      */
     public function __construct(
         private \Closure $collectValueProperties,
@@ -49,7 +49,7 @@ final readonly class IndentedBlockValueParser implements SubParserInterface
     ) {
     }
 
-    public function parseIndentedBlockValue(Harvester $harvester, ValueNode $valueNode, int $parentIndentLen): void
+    public function parseIndentedBlockValue(ParseContext $harvester, ValueNode $valueNode, int $parentIndentLen): void
     {
         $token = $harvester->tokens->current();
         if (TokenType::NEWLINE !== $token?->type) {
@@ -184,7 +184,7 @@ final readonly class IndentedBlockValueParser implements SubParserInterface
         }
     }
 
-    private function consumeBlockValueOpeningLayout(Harvester $harvester, ValueNode $valueNode): void
+    private function consumeBlockValueOpeningLayout(ParseContext $harvester, ValueNode $valueNode): void
     {
         $valueNode->addChild(new NewLineNode($harvester->tokens->current()));
         $harvester->tokens->advance();
@@ -193,7 +193,7 @@ final readonly class IndentedBlockValueParser implements SubParserInterface
         $this->lookAheadHelper->collectInsignificantIndentationLines($harvester->tokens, $valueNode);
     }
 
-    private function consumeIndentedBlockScalarValue(Harvester $harvester, ValueNode $valueNode, int $parentIndentLen): void
+    private function consumeIndentedBlockScalarValue(ParseContext $harvester, ValueNode $valueNode, int $parentIndentLen): void
     {
         $this->consumeBlockValueOpeningLayout($harvester, $valueNode);
 
@@ -256,7 +256,7 @@ final readonly class IndentedBlockValueParser implements SubParserInterface
         }
     }
 
-    private function consumeIndentedBlockTaggedScalarValue(Harvester $harvester, ValueNode $valueNode, int $parentIndentLen): void
+    private function consumeIndentedBlockTaggedScalarValue(ParseContext $harvester, ValueNode $valueNode, int $parentIndentLen): void
     {
         $this->consumeBlockValueOpeningLayout($harvester, $valueNode);
 
@@ -306,7 +306,7 @@ final readonly class IndentedBlockValueParser implements SubParserInterface
         }
     }
 
-    private function isNodePropertiesOnlyLine(Harvester $harvester, int $offset): bool
+    private function isNodePropertiesOnlyLine(ParseContext $harvester, int $offset): bool
     {
         $i = $offset;
         $seenTag = false;

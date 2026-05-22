@@ -19,27 +19,29 @@ use Aeliot\YamlToken\Node\ValueIndicatorNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Parser\Consumer;
 use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
-use Aeliot\YamlToken\Parser\Dto\Harvester;
 use Aeliot\YamlToken\Parser\Helper\AnchorPostProcessor;
+use Aeliot\YamlToken\Parser\ParseContext;
+use Aeliot\YamlToken\Parser\ParserRegistry;
 
 final readonly class FlowMappingPairParser implements SubParserInterface
 {
     public function __construct(
         private AnchorPostProcessor $anchorPostProcessor,
         private Consumer $consumer,
+        private ParserRegistry $registry,
     ) {
     }
 
-    public function parse(Harvester $harvester): KeyValueCoupleNode
+    public function parse(ParseContext $harvester): KeyValueCoupleNode
     {
         $couple = new KeyValueCoupleNode();
-        $couple->addChild($harvester->flowHost->getFlowEntryKeyNode($harvester));
+        $couple->addChild($this->registry->getFlowHost()->getFlowEntryKeyNode($harvester));
 
         if ($this->tryConsumeFlowMappingValueIndicator($harvester, $couple)) {
             if ($this->isAtFlowMappingEntryBoundary($harvester)) {
                 $couple->addChild(new ValueNode());
             } else {
-                $couple->addChild($harvester->flowHost->parseFlowContextValue($harvester));
+                $couple->addChild($this->registry->getFlowHost()->parseFlowContextValue($harvester));
             }
         }
 
@@ -48,7 +50,7 @@ final readonly class FlowMappingPairParser implements SubParserInterface
         return $couple;
     }
 
-    public function tryConsumeFlowMappingValueIndicator(Harvester $harvester, KeyValueCoupleNode $couple): bool
+    public function tryConsumeFlowMappingValueIndicator(ParseContext $harvester, KeyValueCoupleNode $couple): bool
     {
         $this->consumer->collectSpaceCommentEnds($harvester->tokens, $couple);
 
@@ -65,7 +67,7 @@ final readonly class FlowMappingPairParser implements SubParserInterface
         return true;
     }
 
-    private function isAtFlowMappingEntryBoundary(Harvester $harvester): bool
+    private function isAtFlowMappingEntryBoundary(ParseContext $harvester): bool
     {
         $offset = 0;
         while (true) {

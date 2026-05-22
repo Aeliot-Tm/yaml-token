@@ -20,17 +20,17 @@ use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Parser\Consumer;
 use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
-use Aeliot\YamlToken\Parser\Dto\Harvester;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedEndException;
 use Aeliot\YamlToken\Parser\Helper\AnchorPostProcessor;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
 use Aeliot\YamlToken\Parser\Helper\LookAheadHelper;
+use Aeliot\YamlToken\Parser\ParseContext;
 use Aeliot\YamlToken\Parser\ParserRegistry;
 
 final readonly class KeyValueCoupleParser implements SubParserInterface
 {
     /**
-     * @param \Closure(Harvester, int): ValueNode $parseValue
+     * @param \Closure(ParseContext, int): ValueNode $parseValue
      */
     public function __construct(
         private AnchorPostProcessor $anchorPostProcessor,
@@ -42,7 +42,7 @@ final readonly class KeyValueCoupleParser implements SubParserInterface
     ) {
     }
 
-    public function parseKeyValueCoupleAtCurrentPosition(Harvester $harvester, Node $root, int $indentLen): void
+    public function parseKeyValueCoupleAtCurrentPosition(ParseContext $harvester, Node $root, int $indentLen): void
     {
         $token = $harvester->tokens->current();
         if (null === $token) {

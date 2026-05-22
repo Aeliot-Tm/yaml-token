@@ -25,21 +25,21 @@ use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
-use Aeliot\YamlToken\Parser\Dto\Harvester;
 use Aeliot\YamlToken\Parser\Enum\EspecialIndent;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
+use Aeliot\YamlToken\Parser\ParseContext;
 use Aeliot\YamlToken\Parser\ParserRegistry;
 
 final readonly class DocumentParser implements SubParserInterface
 {
     /**
-     * @param \Closure(Harvester): bool $isBlockScalarStartAtDocumentRoot
-     * @param \Closure(Harvester): bool $isFlowMappingStart
-     * @param \Closure(Harvester): bool $isFlowSequenceStart
-     * @param \Closure(Harvester): bool $isKeyValueCoupleStart
-     * @param \Closure(Harvester): bool $isNodePropertyAtDocumentRoot
-     * @param \Closure(Harvester): bool $isSequenceStart
+     * @param \Closure(ParseContext): bool $isBlockScalarStartAtDocumentRoot
+     * @param \Closure(ParseContext): bool $isFlowMappingStart
+     * @param \Closure(ParseContext): bool $isFlowSequenceStart
+     * @param \Closure(ParseContext): bool $isKeyValueCoupleStart
+     * @param \Closure(ParseContext): bool $isNodePropertyAtDocumentRoot
+     * @param \Closure(ParseContext): bool $isSequenceStart
      */
     public function __construct(
         private ErrorHelper $errorHelper,
@@ -53,7 +53,7 @@ final readonly class DocumentParser implements SubParserInterface
     ) {
     }
 
-    public function parseDocuments(Harvester $harvester, StreamNode $stream): void
+    public function parseDocuments(ParseContext $harvester, StreamNode $stream): void
     {
         $addedDocs = [];
         $document = new DocumentNode();
@@ -242,7 +242,7 @@ final readonly class DocumentParser implements SubParserInterface
     /**
      * Consumes the line suffix after a document end marker (YAML 1.2.2 rule [209] c-document-end).
      */
-    private function consumeDocumentEndLineSuffix(Harvester $harvester, DocumentNode $document): void
+    private function consumeDocumentEndLineSuffix(ParseContext $harvester, DocumentNode $document): void
     {
         while (true) {
             $token = $harvester->tokens->current();

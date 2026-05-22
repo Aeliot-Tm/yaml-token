@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Aeliot\YamlToken\Parser\Helper\Identifier;
 
 use Aeliot\YamlToken\Enum\TokenType;
-use Aeliot\YamlToken\Parser\Dto\Harvester;
+use Aeliot\YamlToken\Parser\ParseContext;
 
 final readonly class KeyIdentifier
 {
@@ -26,7 +26,7 @@ final readonly class KeyIdentifier
      * When {@code $allowFlowSeparation} is true (flow collections only), COMMENT and NEWLINE tokens may
      * appear between the scalar and ':' (YAML test suite K3WX / flow line breaks).
      */
-    public function isScalarFollowedByValueIndicator(Harvester $harvester, bool $allowFlowSeparation = false): bool
+    public function isScalarFollowedByValueIndicator(ParseContext $harvester, bool $allowFlowSeparation = false): bool
     {
         $token = $harvester->tokens->current();
         if (null === $token || !$token->type->isScalar()) {
