@@ -29,10 +29,13 @@ use Aeliot\YamlToken\Parser\SubParser\Block\IndentedBlockValueParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\KeyParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\KeyValueCoupleParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\SequenceEntryParser;
+use Aeliot\YamlToken\Parser\SubParser\DirectiveParser;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowEntryParser;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowMappingPairParser;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowMappingParser;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowSequenceParser;
+use Aeliot\YamlToken\Parser\SubParser\MergeInstructionParser;
+use Aeliot\YamlToken\Parser\SubParser\NodePropertiesParser;
 use Aeliot\YamlToken\Parser\SubParser\Scalar\BlockScalarParser;
 use Aeliot\YamlToken\Parser\SubParser\Scalar\MultilinePlainScalarParser;
 use Aeliot\YamlToken\Parser\SubParser\Scalar\SimpleScalarParser;
@@ -105,6 +108,11 @@ final class ParserAssembler
         );
     }
 
+    public function createDirectiveParser(): DirectiveParser
+    {
+        return new DirectiveParser($this->consumer, $this->errorHelper, $this->nodeFactory);
+    }
+
     public function createFlowEntryParser(ParserRegistry $registry): FlowEntryParser
     {
         return new FlowEntryParser($this->anchorPostProcessor, $registry);
@@ -171,6 +179,16 @@ final class ParserAssembler
             $parseValue,
             $registry,
         );
+    }
+
+    public function createMergeInstructionParser(\Closure $parseValue): MergeInstructionParser
+    {
+        return new MergeInstructionParser($this->consumer, $this->errorHelper, $this->nodeFactory, $parseValue);
+    }
+
+    public function createNodePropertiesParser(): NodePropertiesParser
+    {
+        return new NodePropertiesParser($this->errorHelper);
     }
 
     public function createSequenceEntryParser(

@@ -16,7 +16,6 @@ namespace Aeliot\YamlToken\Parser;
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Lexer\Lexer;
 use Aeliot\YamlToken\Node\AliasNode;
-use Aeliot\YamlToken\Node\AnchorNode;
 use Aeliot\YamlToken\Node\BlockMappingNode;
 use Aeliot\YamlToken\Node\BlockScalarIndicatorNode;
 use Aeliot\YamlToken\Node\BlockSequenceEntryNode;
@@ -27,31 +26,20 @@ use Aeliot\YamlToken\Node\DirectiveNode;
 use Aeliot\YamlToken\Node\DocumentEndNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\DocumentStartNode;
-use Aeliot\YamlToken\Node\FlowSequenceNode;
 use Aeliot\YamlToken\Node\IndentationNode;
 use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\MergeInstructionNode;
 use Aeliot\YamlToken\Node\MultilinePlainScalarNode;
 use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\Node;
-use Aeliot\YamlToken\Node\NodePropertiesNode;
 use Aeliot\YamlToken\Node\StreamNode;
-use Aeliot\YamlToken\Node\TagDirectiveHandleNode;
-use Aeliot\YamlToken\Node\TagDirectiveIndicatorNode;
-use Aeliot\YamlToken\Node\TagDirectiveNode;
-use Aeliot\YamlToken\Node\TagDirectivePrefixNode;
-use Aeliot\YamlToken\Node\TagNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
-use Aeliot\YamlToken\Node\YamlDirectiveIndicatorNode;
-use Aeliot\YamlToken\Node\YamlDirectiveNode;
 use Aeliot\YamlToken\Parser\Dto\AnchorsRegistry;
 use Aeliot\YamlToken\Parser\Dto\Harvester;
 use Aeliot\YamlToken\Parser\Dto\ParseState;
 use Aeliot\YamlToken\Parser\Dto\TokenStreamProxy;
 use Aeliot\YamlToken\Parser\Exception\AnchorUndefinedException;
-use Aeliot\YamlToken\Parser\Exception\UnexpectedEndException;
-use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Flow\FlowHost;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
@@ -83,7 +71,9 @@ final class Parser
         private ParserRegistry $parserRegistry,
     ) {
         $this->parserRegistry->setBlockParserBridge(
-            function (Harvester $h, ValueNode $v): void { $this->collectValueProperties($h, $v); },
+            function (Harvester $h, ValueNode $v): void {
+                $this->parserRegistry->getNodePropertiesParser()->collectValueProperties($h, $v);
+            },
             fn (Harvester $h, int $offset): bool => $this->isFlowCollectionFollowedByBlockValueIndicatorOnSameLine($h, $offset),
             fn (Harvester $h): bool => $this->isKeyValueCoupleStart($h),
             fn (Harvester $h): bool => $this->isKeyValueCoupleStartAllowingNodeProperties($h),
@@ -93,7 +83,9 @@ final class Parser
             fn (Harvester $h, int $indent): BlockSequenceNode => $this->parserRegistry->getBlockSequenceParser()->parseBlockSequenceValue($h, $indent),
             fn (Harvester $h, int $indent): BlockMappingNode => $this->parseCompactBlockMapping($h, $indent),
             fn (Harvester $h, int $indent): BlockSequenceNode => $this->parseCompactBlockSequence($h, $indent),
-            fn (Harvester $h): MergeInstructionNode => $this->parseMergeInstructionAtCurrentPosition($h),
+            fn (Harvester $h): MergeInstructionNode => $this->parserRegistry
+                ->getMergeInstructionParser()
+                ->parseMergeInstructionAtCurrentPosition($h),
             fn (Harvester $h, int $parentIndentLen): ValueNode => $this->parseValue($h, $parentIndentLen),
         );
     }
@@ -126,109 +118,6 @@ final class Parser
     private function appendTokenLocation(string $message, Token|TokenStreamProxy $tokens): string
     {
         return $this->errorHelper->appendTokenLocation($message, $tokens);
-    }
-
-    /**
-     * @return list<AliasNode>
-     */
-    private function collectMergeAliases(ValueNode $value): array
-    {
-        $directAliases = array_values(array_filter(
-            $value->getChildren(),
-            static fn (Node $n): bool => $n instanceof AliasNode,
-        ));
-        if ($directAliases) {
-            /* @var list<AliasNode> $directAliases */
-            return $directAliases;
-        }
-
-        $flowSequence = null;
-        foreach ($value->getChildren() as $child) {
-            if ($child instanceof FlowSequenceNode) {
-                $flowSequence = $child;
-                break;
-            }
-        }
-        if (null === $flowSequence) {
-            throw new UnexpectedStateException('Merge value must be an alias or a flow sequence of aliases');
-        }
-
-        $aliases = [];
-        foreach ($flowSequence->getEntries() as $entry) {
-            $entryAliases = array_values(array_filter(
-                $entry->getChildren(),
-                static fn (Node $n): bool => $n instanceof AliasNode,
-            ));
-            if (1 !== \count($entryAliases)) {
-                $references = array_map(static fn (AliasNode $a): string => $a->getToken()->text, $entryAliases);
-                throw new UnexpectedStateException(\sprintf('Each merge sequence entry must contain exactly one alias but %d given: %s', \count($references), implode(', ', $references)));
-            }
-            $aliases[] = $entryAliases[0];
-        }
-
-        return $aliases;
-    }
-
-    private function collectValueProperties(Harvester $harvester, ValueNode $valueNode): void
-    {
-        // Per YAML 1.2.2 rule [96] c-ns-properties(n,c), a node has at most one anchor and one tag.
-        // The properties may appear inline or be split across separate lines (see [200]
-        // s-l+block-collection). When the parser re-enters this routine after consuming the
-        // s-separate between the parts, an existing NodePropertiesNode on the value must be
-        // reused so the second property does not produce a duplicate properties node.
-        $properties = $valueNode->getProperties();
-        $hadProperties = null !== $properties;
-        $whitespaceBuffer = [];
-
-        while (!$harvester->tokens->isEnd()) {
-            $token = $harvester->tokens->current();
-            if (TokenType::WHITESPACE === $token->type) {
-                if (null === $properties) {
-                    $valueNode->addChild(new WhitespaceNode($token));
-                } else {
-                    $whitespaceBuffer[] = new WhitespaceNode($token);
-                }
-                $harvester->tokens->advance();
-                continue;
-            }
-
-            if (TokenType::ANCHOR === $token->type) {
-                if (null !== $properties?->getAnchor()) {
-                    throw new UnexpectedStateException($this->appendTokenLocation('Only one anchor is supported per value node', $token));
-                }
-                $properties ??= new NodePropertiesNode();
-                foreach ($whitespaceBuffer as $whitespace) {
-                    $properties->addChild($whitespace);
-                }
-                $whitespaceBuffer = [];
-                $properties->addChild(new AnchorNode($token));
-                $harvester->tokens->advance();
-                continue;
-            }
-
-            if (TokenType::TAG === $token->type) {
-                if (null !== $properties?->getTag()) {
-                    throw new UnexpectedStateException($this->appendTokenLocation('Only one tag is supported per value node', $token));
-                }
-                $properties ??= new NodePropertiesNode();
-                foreach ($whitespaceBuffer as $whitespace) {
-                    $properties->addChild($whitespace);
-                }
-                $whitespaceBuffer = [];
-                $properties->addChild(new TagNode($token));
-                $harvester->tokens->advance();
-                continue;
-            }
-
-            break;
-        }
-
-        if (null !== $properties && !$hadProperties) {
-            $valueNode->addChild($properties);
-        }
-        foreach ($whitespaceBuffer as $whitespace) {
-            $valueNode->addChild($whitespace);
-        }
     }
 
     /**
@@ -270,7 +159,9 @@ final class Parser
             fn (Harvester $h): bool => $this->isFlowMultilinePlainKeyStart($h),
             fn (Harvester $h): bool => $this->isScalarFollowedByValueIndicator($h, true),
             fn (Harvester $h): ValueNode => $this->parseFlowContextValue($h),
-            fn (Harvester $h): MergeInstructionNode => $this->parseMergeInstructionAtCurrentPosition($h),
+            fn (Harvester $h): MergeInstructionNode => $this->parserRegistry
+                ->getMergeInstructionParser()
+                ->parseMergeInstructionAtCurrentPosition($h),
         );
     }
 
@@ -716,12 +607,12 @@ final class Parser
             }
 
             if (TokenType::DIRECTIVE_YAML_INDICATOR === $token->type) {
-                $document->addChild($this->parseYamlDirective($harvester));
+                $document->addChild($this->parserRegistry->getDirectiveParser()->parseYamlDirective($harvester));
                 continue;
             }
 
             if (TokenType::DIRECTIVE_TAG_INDICATOR === $token->type) {
-                $document->addChild($this->parseTagDirective($harvester));
+                $document->addChild($this->parserRegistry->getDirectiveParser()->parseTagDirective($harvester));
                 continue;
             }
 
@@ -877,87 +768,6 @@ final class Parser
         $this->parserRegistry->getIndentedBlockValueParser()->parseIndentedBlockValue($harvester, $valueNode, $parentIndentLen);
     }
 
-    private function parseMergeInstructionAtCurrentPosition(Harvester $harvester): MergeInstructionNode
-    {
-        $mergeInstruction = new MergeInstructionNode();
-
-        $token = $harvester->tokens->current();
-        if (TokenType::INDENTATION === $token?->type) {
-            $mergeInstruction->addChild(new IndentationNode($token));
-            $harvester->tokens->advance();
-            $token = $harvester->tokens->current();
-        }
-
-        if (TokenType::MERGE_INDICATOR !== $token?->type) {
-            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('There is no expected MERGE_INDICATOR token, but %s given', $token?->type->value ?? '_nothing_'), $harvester->tokens));
-        }
-        $mergeInstruction->addChild($this->nodeFactory->createSimpleNode($token));
-        $harvester->tokens->advance();
-
-        $this->consumer->collectTypes($harvester->tokens, [TokenType::VALUE_INDICATOR, TokenType::WHITESPACE], $mergeInstruction);
-
-        $value = $this->parseValue($harvester, self::FLOW_COLLECTION_VALUE_PARENT_INDENT);
-        $mergeInstruction->addChild($value);
-
-        $aliases = $this->collectMergeAliases($value);
-        foreach ($aliases as $alias) {
-            $mergeInstruction->addAlias($alias);
-        }
-
-        return $mergeInstruction;
-    }
-
-    private function parseTagDirective(Harvester $harvester): TagDirectiveNode
-    {
-        $token = $harvester->tokens->current();
-        if (TokenType::DIRECTIVE_TAG_INDICATOR !== $token?->type) {
-            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Expected DIRECTIVE_TAG_INDICATOR token, but %s given', $token?->type->value ?? '_nothing_'), $harvester->tokens));
-        }
-
-        $tagDirectiveNode = new TagDirectiveNode();
-        $tagDirectiveNode->addChild(new TagDirectiveIndicatorNode($token));
-        $harvester->tokens->advance();
-
-        $seenHandle = false;
-        while (true) {
-            $token = $harvester->tokens->current();
-            if (null === $token) {
-                throw new UnexpectedEndException($this->appendTokenLocation('Unexpected end of token stream: TAG directive handle and prefix are required', $harvester->tokens));
-            }
-
-            if (TokenType::WHITESPACE === $token->type) {
-                $tagDirectiveNode->addChild($this->nodeFactory->createSimpleNode($token));
-                $harvester->tokens->advance();
-                continue;
-            }
-
-            if (TokenType::DIRECTIVE_TAG_HANDLE === $token->type) {
-                $seenHandle = true;
-                $tagDirectiveNode->addChild(new TagDirectiveHandleNode($token));
-                $harvester->tokens->advance();
-                continue;
-            }
-
-            if (TokenType::DIRECTIVE_TAG_PREFIX === $token->type) {
-                if (!$seenHandle) {
-                    throw new UnexpectedStateException('Expected TAG directive handle before prefix');
-                }
-                $tagDirectiveNode->addChild(new TagDirectivePrefixNode($token));
-                $harvester->tokens->advance();
-
-                $this->consumer->collectSpaceAndComments($harvester->tokens, $tagDirectiveNode);
-
-                return $tagDirectiveNode;
-            }
-
-            if (\in_array($token->type, [TokenType::COMMENT, TokenType::NEWLINE], true)) {
-                throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Expected TAG directive handle and prefix before newline or comment, but %s given', $token->type->value), $token));
-            }
-
-            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Unexpected token in TAG directive: %s', $token->type->value), $token));
-        }
-    }
-
     /**
      * @param int $parentIndentLen Key-line indent length (spaces),
      *                             {@see self::BARE_DOCUMENT_BLOCK_PARENT_INDENT} at bare document root (YAML 1.2.2 rule [211]),
@@ -967,7 +777,7 @@ final class Parser
     {
         $valueNode = new ValueNode();
 
-        $this->collectValueProperties($harvester, $valueNode);
+        $this->parserRegistry->getNodePropertiesParser()->collectValueProperties($harvester, $valueNode);
 
         if ($anchor = $valueNode->getAnchor()) {
             $harvester->anchorsRegistry->anchors[$anchor->getName()] = $anchor;
@@ -1146,46 +956,6 @@ final class Parser
             $valueNode->addChild($this->parserRegistry->getFlowMappingParser()->parse($harvester));
         } else {
             throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Unexpected type while parsing of value: %s', $token->type->value), $token));
-        }
-    }
-
-    private function parseYamlDirective(Harvester $harvester): YamlDirectiveNode
-    {
-        $token = $harvester->tokens->current();
-        if (TokenType::DIRECTIVE_YAML_INDICATOR !== $token?->type) {
-            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Expected DIRECTIVE_YAML_INDICATOR token, but %s given', $token?->type->value ?? '_nothing_'), $harvester->tokens));
-        }
-
-        $yamlDirectiveNode = new YamlDirectiveNode();
-        $yamlDirectiveNode->addChild(new YamlDirectiveIndicatorNode($token));
-        $harvester->tokens->advance();
-
-        while (true) {
-            $token = $harvester->tokens->current();
-            if (null === $token) {
-                throw new UnexpectedEndException($this->appendTokenLocation('Unexpected end of token stream: YAML directive version is required', $harvester->tokens));
-            }
-
-            if (\in_array($token->type, [TokenType::WHITESPACE, TokenType::VALUE_INDICATOR], true)) {
-                $yamlDirectiveNode->addChild($this->nodeFactory->createSimpleNode($token));
-                $harvester->tokens->advance();
-                continue;
-            }
-
-            if (TokenType::DIRECTIVE_YAML_VERSION === $token->type) {
-                $yamlDirectiveNode->addChild($this->nodeFactory->createSimpleNode($token));
-                $harvester->tokens->advance();
-
-                $this->consumer->collectSpaceAndComments($harvester->tokens, $yamlDirectiveNode);
-
-                return $yamlDirectiveNode;
-            }
-
-            if (\in_array($token->type, [TokenType::COMMENT, TokenType::NEWLINE], true)) {
-                throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Expected YAML directive version before newline or comment, but %s given', $token->type->value), $token));
-            }
-
-            throw new UnexpectedTokenException($this->appendTokenLocation(\sprintf('Unexpected token in YAML directive: %s', $token->type->value), $token));
         }
     }
 

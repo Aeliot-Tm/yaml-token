@@ -1,0 +1,116 @@
+<?php
+
+declare(strict_types=1);
+
+/*
+ * This file is part of the YAML Token project.
+ *
+ * (c) Anatoliy Melnikov <5785276@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
+namespace Aeliot\YamlToken\Parser\SubParser;
+
+use Aeliot\YamlToken\Enum\TokenType;
+use Aeliot\YamlToken\Node\AliasNode;
+use Aeliot\YamlToken\Node\FlowSequenceNode;
+use Aeliot\YamlToken\Node\IndentationNode;
+use Aeliot\YamlToken\Node\MergeInstructionNode;
+use Aeliot\YamlToken\Node\Node;
+use Aeliot\YamlToken\Node\ValueNode;
+use Aeliot\YamlToken\Parser\Consumer;
+use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
+use Aeliot\YamlToken\Parser\Dto\Harvester;
+use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
+use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
+use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
+use Aeliot\YamlToken\Parser\Helper\NodeFactory;
+
+final readonly class MergeInstructionParser implements SubParserInterface
+{
+    private const FLOW_COLLECTION_VALUE_PARENT_INDENT = -2;
+
+    /**
+     * @param \Closure(Harvester, int): ValueNode $parseValue
+     */
+    public function __construct(
+        private Consumer $consumer,
+        private ErrorHelper $errorHelper,
+        private NodeFactory $nodeFactory,
+        private \Closure $parseValue,
+    ) {
+    }
+
+    public function parseMergeInstructionAtCurrentPosition(Harvester $harvester): MergeInstructionNode
+    {
+        $mergeInstruction = new MergeInstructionNode();
+
+        $token = $harvester->tokens->current();
+        if (TokenType::INDENTATION === $token?->type) {
+            $mergeInstruction->addChild(new IndentationNode($token));
+            $harvester->tokens->advance();
+            $token = $harvester->tokens->current();
+        }
+
+        if (TokenType::MERGE_INDICATOR !== $token?->type) {
+            throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('There is no expected MERGE_INDICATOR token, but %s given', $token?->type->value ?? '_nothing_'), $harvester->tokens));
+        }
+        $mergeInstruction->addChild($this->nodeFactory->createSimpleNode($token));
+        $harvester->tokens->advance();
+
+        $this->consumer->collectTypes($harvester->tokens, [TokenType::VALUE_INDICATOR, TokenType::WHITESPACE], $mergeInstruction);
+
+        $value = ($this->parseValue)($harvester, self::FLOW_COLLECTION_VALUE_PARENT_INDENT);
+        $mergeInstruction->addChild($value);
+
+        $aliases = $this->collectMergeAliases($value);
+        foreach ($aliases as $alias) {
+            $mergeInstruction->addAlias($alias);
+        }
+
+        return $mergeInstruction;
+    }
+
+    /**
+     * @return list<AliasNode>
+     */
+    private function collectMergeAliases(ValueNode $value): array
+    {
+        $directAliases = array_values(array_filter(
+            $value->getChildren(),
+            static fn (Node $n): bool => $n instanceof AliasNode,
+        ));
+        if ($directAliases) {
+            /* @var list<AliasNode> $directAliases */
+            return $directAliases;
+        }
+
+        $flowSequence = null;
+        foreach ($value->getChildren() as $child) {
+            if ($child instanceof FlowSequenceNode) {
+                $flowSequence = $child;
+                break;
+            }
+        }
+        if (null === $flowSequence) {
+            throw new UnexpectedStateException('Merge value must be an alias or a flow sequence of aliases');
+        }
+
+        $aliases = [];
+        foreach ($flowSequence->getEntries() as $entry) {
+            $entryAliases = array_values(array_filter(
+                $entry->getChildren(),
+                static fn (Node $n): bool => $n instanceof AliasNode,
+            ));
+            if (1 !== \count($entryAliases)) {
+                $references = array_map(static fn (AliasNode $a): string => $a->getToken()->text, $entryAliases);
+                throw new UnexpectedStateException(\sprintf('Each merge sequence entry must contain exactly one alias but %d given: %s', \count($references), implode(', ', $references)));
+            }
+            $aliases[] = $entryAliases[0];
+        }
+
+        return $aliases;
+    }
+}

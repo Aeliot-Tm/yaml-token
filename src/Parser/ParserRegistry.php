@@ -24,10 +24,13 @@ use Aeliot\YamlToken\Parser\SubParser\Block\IndentedBlockValueParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\KeyParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\KeyValueCoupleParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\SequenceEntryParser;
+use Aeliot\YamlToken\Parser\SubParser\DirectiveParser;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowEntryParser;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowMappingPairParser;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowMappingParser;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowSequenceParser;
+use Aeliot\YamlToken\Parser\SubParser\MergeInstructionParser;
+use Aeliot\YamlToken\Parser\SubParser\NodePropertiesParser;
 use Aeliot\YamlToken\Parser\SubParser\Scalar\BlockScalarParser;
 use Aeliot\YamlToken\Parser\SubParser\Scalar\MultilinePlainScalarParser;
 use Aeliot\YamlToken\Parser\SubParser\Scalar\SimpleScalarParser;
@@ -40,6 +43,7 @@ final class ParserRegistry
     private ?\Closure $collectValueProperties = null;
     private ?CompactBlockMappingParser $compactBlockMappingParser = null;
     private ?CompactBlockSequenceParser $compactBlockSequenceParser = null;
+    private ?DirectiveParser $directiveParser = null;
     private ?FlowEntryParser $flowEntryParser = null;
     private ?FlowMappingPairParser $flowMappingPairParser = null;
     private ?FlowMappingParser $flowMappingParser = null;
@@ -52,7 +56,9 @@ final class ParserRegistry
     private ?\Closure $isScalarFollowedByValueIndicator = null;
     private ?KeyParser $keyParser = null;
     private ?KeyValueCoupleParser $keyValueCoupleParser = null;
+    private ?MergeInstructionParser $mergeInstructionParser = null;
     private ?MultilinePlainScalarParser $multilinePlainScalarParser = null;
+    private ?NodePropertiesParser $nodePropertiesParser = null;
     private ?\Closure $parseBlockMappingValue = null;
     private ?\Closure $parseBlockSequenceValue = null;
     private ?\Closure $parseCompactBlockMapping = null;
@@ -98,6 +104,11 @@ final class ParserRegistry
     public function getCompactBlockSequenceParser(): CompactBlockSequenceParser
     {
         return $this->compactBlockSequenceParser ??= $this->assembler->createCompactBlockSequenceParser($this);
+    }
+
+    public function getDirectiveParser(): DirectiveParser
+    {
+        return $this->directiveParser ??= $this->assembler->createDirectiveParser();
     }
 
     public function getByType(StructureType $type): SubParserInterface
@@ -157,9 +168,21 @@ final class ParserRegistry
         );
     }
 
+    public function getMergeInstructionParser(): MergeInstructionParser
+    {
+        return $this->mergeInstructionParser ??= $this->assembler->createMergeInstructionParser(
+            $this->parseValue ?? throw new \LogicException('Block parser bridge not set'),
+        );
+    }
+
     public function getMultilinePlainScalarParser(): MultilinePlainScalarParser
     {
         return $this->multilinePlainScalarParser ??= $this->assembler->createMultilinePlainScalarParser($this);
+    }
+
+    public function getNodePropertiesParser(): NodePropertiesParser
+    {
+        return $this->nodePropertiesParser ??= $this->assembler->createNodePropertiesParser();
     }
 
     public function getSequenceEntryParser(): SequenceEntryParser
