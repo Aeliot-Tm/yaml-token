@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Aeliot\YamlToken\Parser\Assembler;
 
 use Aeliot\YamlToken\Parser\Consumer;
+use Aeliot\YamlToken\Parser\Helper\AliasResolver;
 use Aeliot\YamlToken\Parser\Helper\AnchorPostProcessor;
 use Aeliot\YamlToken\Parser\Helper\BlockCollectionLoopHelper;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
@@ -52,6 +53,7 @@ use Aeliot\YamlToken\Parser\SubParser\ValueParser;
 
 final class ParserAssembler
 {
+    private ?AliasResolver $aliasResolver = null;
     private ?BlockCollectionLoopHelper $blockCollectionLoopHelper = null;
     private ?BlockStructureIdentifier $blockStructureIdentifier = null;
     private ?FlowCollectionHelper $flowCollectionHelper = null;
@@ -183,6 +185,7 @@ final class ParserAssembler
     public function createKeyParser(ParserRegistry $registry): KeyParser
     {
         return new KeyParser(
+            $this->getAliasResolver(),
             $this->errorHelper,
             $this->lookAheadHelper,
             $this->multilineContinuationHelper,
@@ -241,7 +244,12 @@ final class ParserAssembler
 
     public function createValueParser(ParserRegistry $registry): ValueParser
     {
-        return new ValueParser($this->consumer, $this->errorHelper, $this->multilineContinuationHelper, $this->nodeFactory, $registry);
+        return new ValueParser($this->getAliasResolver(), $this->consumer, $this->errorHelper, $this->multilineContinuationHelper, $this->nodeFactory, $registry);
+    }
+
+    public function getAliasResolver(): AliasResolver
+    {
+        return $this->aliasResolver ??= new AliasResolver($this->errorHelper);
     }
 
     public function getAnchorPostProcessor(): AnchorPostProcessor

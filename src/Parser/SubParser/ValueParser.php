@@ -14,14 +14,13 @@ declare(strict_types=1);
 namespace Aeliot\YamlToken\Parser\SubParser;
 
 use Aeliot\YamlToken\Enum\TokenType;
-use Aeliot\YamlToken\Node\AliasNode;
 use Aeliot\YamlToken\Node\MultilinePlainScalarNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Parser\Consumer;
 use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
 use Aeliot\YamlToken\Parser\Enum\EspecialIndent;
-use Aeliot\YamlToken\Parser\Exception\AnchorUndefinedException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
+use Aeliot\YamlToken\Parser\Helper\AliasResolver;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
 use Aeliot\YamlToken\Parser\Helper\MultilineContinuationHelper;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
@@ -32,6 +31,7 @@ use Aeliot\YamlToken\Token\Token;
 final readonly class ValueParser implements SubParserInterface
 {
     public function __construct(
+        private AliasResolver $aliasResolver,
         private Consumer $consumer,
         private ErrorHelper $errorHelper,
         private MultilineContinuationHelper $multilineContinuationHelper,
@@ -173,13 +173,7 @@ final readonly class ValueParser implements SubParserInterface
         } elseif ($token->type->isScalar()) {
             $this->parsePlainScalarPayload($parseContext, $valueNode, $parentIndentLen, $token);
         } elseif (TokenType::ALIAS === $token->type) {
-            $aliasNode = new AliasNode($token);
-            $aliasName = $aliasNode->getName();
-            $anchor = $parseContext->anchorsRegistry->anchors[$aliasName] ?? null;
-            if (null === $anchor) {
-                throw new AnchorUndefinedException($this->errorHelper->appendTokenLocation(\sprintf('Undefined alias "%s"', $aliasName), $token));
-            }
-            $aliasNode->setAnchor($anchor);
+            $aliasNode = $this->aliasResolver->resolveAlias($parseContext, $token);
             $valueNode->addChild($aliasNode);
             $parseContext->tokens->advance();
         } elseif (TokenType::SEQUENCE_ENTRY === $token->type) {

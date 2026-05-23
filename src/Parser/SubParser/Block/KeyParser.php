@@ -14,13 +14,12 @@ declare(strict_types=1);
 namespace Aeliot\YamlToken\Parser\SubParser\Block;
 
 use Aeliot\YamlToken\Enum\TokenType;
-use Aeliot\YamlToken\Node\AliasNode;
 use Aeliot\YamlToken\Node\ExplicitKeyIndicatorNode;
 use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
-use Aeliot\YamlToken\Parser\Exception\AnchorUndefinedException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
+use Aeliot\YamlToken\Parser\Helper\AliasResolver;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
 use Aeliot\YamlToken\Parser\Helper\LookAheadHelper;
 use Aeliot\YamlToken\Parser\Helper\MultilineContinuationHelper;
@@ -31,6 +30,7 @@ use Aeliot\YamlToken\Parser\SubParser\NodePropertiesParser;
 final readonly class KeyParser implements SubParserInterface
 {
     public function __construct(
+        private AliasResolver $aliasResolver,
         private ErrorHelper $errorHelper,
         private LookAheadHelper $lookAheadHelper,
         private MultilineContinuationHelper $multilineContinuationHelper,
@@ -128,13 +128,7 @@ final readonly class KeyParser implements SubParserInterface
         }
 
         if (TokenType::ALIAS === $token->type) {
-            $aliasNode = new AliasNode($token);
-            $aliasName = $aliasNode->getName();
-            $anchor = $parseContext->anchorsRegistry->anchors[$aliasName] ?? null;
-            if (null === $anchor) {
-                throw new AnchorUndefinedException($this->errorHelper->appendTokenLocation(\sprintf('Undefined alias "%s"', $aliasName), $token));
-            }
-            $aliasNode->setAnchor($anchor);
+            $aliasNode = $this->aliasResolver->resolveAlias($parseContext, $token);
             $keyNode->setName($aliasNode);
             $parseContext->tokens->advance();
 
@@ -184,13 +178,7 @@ final readonly class KeyParser implements SubParserInterface
         }
 
         if (TokenType::ALIAS === $token->type) {
-            $aliasNode = new AliasNode($token);
-            $aliasName = $aliasNode->getName();
-            $anchor = $parseContext->anchorsRegistry->anchors[$aliasName] ?? null;
-            if (null === $anchor) {
-                throw new AnchorUndefinedException($this->errorHelper->appendTokenLocation(\sprintf('Undefined alias "%s"', $aliasName), $token));
-            }
-            $aliasNode->setAnchor($anchor);
+            $aliasNode = $this->aliasResolver->resolveAlias($parseContext, $token);
             $keyNode->setName($aliasNode);
             $parseContext->tokens->advance();
 
