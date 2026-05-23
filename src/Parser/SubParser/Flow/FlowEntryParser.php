@@ -27,6 +27,7 @@ use Aeliot\YamlToken\Parser\Dto\IndentContext;
 use Aeliot\YamlToken\Parser\Dto\ParseContext;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
 use Aeliot\YamlToken\Parser\Helper\AnchorPostProcessor;
+use Aeliot\YamlToken\Parser\Helper\FlowValueIndicatorConsumer;
 use Aeliot\YamlToken\Parser\Helper\Identifier\FlowStructureIdentifier;
 use Aeliot\YamlToken\Parser\Helper\Identifier\KeyIdentifier;
 use Aeliot\YamlToken\Parser\ParserRegistry;
@@ -36,6 +37,7 @@ final readonly class FlowEntryParser
     public function __construct(
         private AnchorPostProcessor $anchorPostProcessor,
         private FlowStructureIdentifier $flowStructureIdentifier,
+        private FlowValueIndicatorConsumer $flowValueIndicatorConsumer,
         private KeyIdentifier $keyIdentifier,
         private ParserRegistry $registry,
     ) {
@@ -96,7 +98,7 @@ final readonly class FlowEntryParser
         $this->promoteOperandToKey($operand, $keyNode);
         $couple->addChild($keyNode);
 
-        if (!$this->registry->getFlowMappingPairParser()->tryConsumeFlowMappingValueIndicator($parseContext, $couple)) {
+        if (!$this->flowValueIndicatorConsumer->tryConsume($parseContext, $couple)) {
             throw new UnexpectedStateException('Expected VALUE_INDICATOR after flow complex key');
         }
 
@@ -135,7 +137,7 @@ final readonly class FlowEntryParser
         $couple = new KeyValueCoupleNode();
         $couple->addChild($this->registry->getKeyParser()->getKeyNode($parseContext));
 
-        $this->registry->getFlowMappingPairParser()->tryConsumeFlowMappingValueIndicator($parseContext, $couple);
+        $this->flowValueIndicatorConsumer->tryConsume($parseContext, $couple);
 
         if ($this->flowStructureIdentifier->isNextSignificantTokenOneOf(
             $parseContext,

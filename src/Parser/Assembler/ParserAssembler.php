@@ -20,6 +20,7 @@ use Aeliot\YamlToken\Parser\Helper\BlockCollectionLoopHelper;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
 use Aeliot\YamlToken\Parser\Helper\FlowCollectionHelper;
 use Aeliot\YamlToken\Parser\Helper\FlowMultilinePlainScalarHelper;
+use Aeliot\YamlToken\Parser\Helper\FlowValueIndicatorConsumer;
 use Aeliot\YamlToken\Parser\Helper\Identifier\BlockStructureIdentifier;
 use Aeliot\YamlToken\Parser\Helper\Identifier\FlowStructureIdentifier;
 use Aeliot\YamlToken\Parser\Helper\Identifier\KeyIdentifier;
@@ -60,6 +61,7 @@ final class ParserAssembler
     private ?BlockStructureIdentifier $blockStructureIdentifier = null;
     private ?FlowCollectionHelper $flowCollectionHelper = null;
     private ?FlowStructureIdentifier $flowStructureIdentifier = null;
+    private ?FlowValueIndicatorConsumer $flowValueIndicatorConsumer = null;
     private ?KeyIdentifier $keyIdentifier = null;
     private ?NodePropertyIdentifier $nodePropertyIdentifier = null;
     private ?SequenceIdentifier $sequenceIdentifier = null;
@@ -146,6 +148,7 @@ final class ParserAssembler
         return new FlowEntryParser(
             $this->anchorPostProcessor,
             $this->getFlowStructureIdentifier(),
+            $this->getFlowValueIndicatorConsumer(),
             $this->getKeyIdentifier(),
             $registry,
         );
@@ -155,8 +158,8 @@ final class ParserAssembler
     {
         return new FlowMappingPairParser(
             $this->anchorPostProcessor,
-            $this->consumer,
             $this->getFlowStructureIdentifier(),
+            $this->getFlowValueIndicatorConsumer(),
             $registry,
         );
     }
@@ -286,6 +289,11 @@ final class ParserAssembler
     public function getFlowStructureIdentifier(): FlowStructureIdentifier
     {
         return $this->flowStructureIdentifier ??= new FlowStructureIdentifier($this->peekOffsetHelper);
+    }
+
+    public function getFlowValueIndicatorConsumer(): FlowValueIndicatorConsumer
+    {
+        return $this->flowValueIndicatorConsumer ??= new FlowValueIndicatorConsumer($this->consumer);
     }
 
     public function getKeyIdentifier(): KeyIdentifier

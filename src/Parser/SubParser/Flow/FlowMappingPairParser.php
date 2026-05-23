@@ -15,12 +15,11 @@ namespace Aeliot\YamlToken\Parser\SubParser\Flow;
 
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
-use Aeliot\YamlToken\Node\ValueIndicatorNode;
 use Aeliot\YamlToken\Node\ValueNode;
-use Aeliot\YamlToken\Parser\Consumer;
 use Aeliot\YamlToken\Parser\Dto\IndentContext;
 use Aeliot\YamlToken\Parser\Dto\ParseContext;
 use Aeliot\YamlToken\Parser\Helper\AnchorPostProcessor;
+use Aeliot\YamlToken\Parser\Helper\FlowValueIndicatorConsumer;
 use Aeliot\YamlToken\Parser\Helper\Identifier\FlowStructureIdentifier;
 use Aeliot\YamlToken\Parser\ParserRegistry;
 
@@ -28,8 +27,8 @@ final readonly class FlowMappingPairParser
 {
     public function __construct(
         private AnchorPostProcessor $anchorPostProcessor,
-        private Consumer $consumer,
         private FlowStructureIdentifier $flowStructureIdentifier,
+        private FlowValueIndicatorConsumer $flowValueIndicatorConsumer,
         private ParserRegistry $registry,
     ) {
     }
@@ -39,7 +38,7 @@ final readonly class FlowMappingPairParser
         $couple = new KeyValueCoupleNode();
         $couple->addChild($this->registry->getKeyParser()->getKeyNode($parseContext));
 
-        if ($this->tryConsumeFlowMappingValueIndicator($parseContext, $couple)) {
+        if ($this->flowValueIndicatorConsumer->tryConsume($parseContext, $couple)) {
             if ($this->flowStructureIdentifier->isNextSignificantTokenOneOf(
                 $parseContext,
                 true,
@@ -55,22 +54,5 @@ final readonly class FlowMappingPairParser
         $this->anchorPostProcessor->postProcessKeyValueCouple($parseContext->anchorsRegistry, $couple);
 
         return $couple;
-    }
-
-    public function tryConsumeFlowMappingValueIndicator(ParseContext $parseContext, KeyValueCoupleNode $couple): bool
-    {
-        $this->consumer->collectSpaceCommentEnds($parseContext->tokens, $couple);
-
-        $token = $parseContext->tokens->current();
-        if (TokenType::VALUE_INDICATOR !== $token?->type) {
-            return false;
-        }
-
-        $couple->addChild(new ValueIndicatorNode($token));
-        $parseContext->tokens->advance();
-
-        $this->consumer->collectTypes($parseContext->tokens, [TokenType::WHITESPACE], $couple);
-
-        return true;
     }
 }
