@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Aeliot\YamlToken\Parser\Helper\Identifier;
 
 use Aeliot\YamlToken\Enum\TokenType;
-use Aeliot\YamlToken\Parser\ParseContext;
+use Aeliot\YamlToken\Parser\Dto\ParseContext;
 
 final readonly class SequenceIdentifier
 {

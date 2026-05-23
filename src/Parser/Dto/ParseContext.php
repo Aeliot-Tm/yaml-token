@@ -11,11 +11,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace Aeliot\YamlToken\Parser;
-
-use Aeliot\YamlToken\Parser\Dto\AnchorsRegistry;
-use Aeliot\YamlToken\Parser\Dto\ParseState;
-use Aeliot\YamlToken\Parser\Dto\TokenStreamProxy;
+namespace Aeliot\YamlToken\Parser\Dto;
 
 final class ParseContext
 {

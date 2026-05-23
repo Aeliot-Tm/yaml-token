@@ -17,8 +17,8 @@ use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\FlowNode;
 use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Parser\Consumer;
+use Aeliot\YamlToken\Parser\Dto\ParseContext;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
-use Aeliot\YamlToken\Parser\ParseContext;
 
 final readonly class FlowCollectionHelper
 {

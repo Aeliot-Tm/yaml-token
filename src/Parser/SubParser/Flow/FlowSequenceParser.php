@@ -15,8 +15,8 @@ namespace Aeliot\YamlToken\Parser\SubParser\Flow;
 
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\FlowSequenceNode;
+use Aeliot\YamlToken\Parser\Dto\ParseContext;
 use Aeliot\YamlToken\Parser\Helper\FlowCollectionHelper;
-use Aeliot\YamlToken\Parser\ParseContext;
 use Aeliot\YamlToken\Parser\ParserRegistry;
 
 final readonly class FlowSequenceParser

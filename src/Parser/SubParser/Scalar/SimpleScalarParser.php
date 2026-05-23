@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace Aeliot\YamlToken\Parser\SubParser\Scalar;
 
 use Aeliot\YamlToken\Node\ScalarNode;
+use Aeliot\YamlToken\Parser\Dto\ParseContext;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
-use Aeliot\YamlToken\Parser\ParseContext;
 
 final readonly class SimpleScalarParser
 {

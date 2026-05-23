@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace Aeliot\YamlToken\Parser\Helper;
 
 use Aeliot\YamlToken\Node\AliasNode;
+use Aeliot\YamlToken\Parser\Dto\ParseContext;
 use Aeliot\YamlToken\Parser\Exception\AnchorUndefinedException;
-use Aeliot\YamlToken\Parser\ParseContext;
 use Aeliot\YamlToken\Token\Token;
 
 final readonly class AliasResolver

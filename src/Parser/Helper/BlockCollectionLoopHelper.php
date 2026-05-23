@@ -16,8 +16,8 @@ namespace Aeliot\YamlToken\Parser\Helper;
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Parser\Consumer;
+use Aeliot\YamlToken\Parser\Dto\ParseContext;
 use Aeliot\YamlToken\Parser\Enum\EspecialIndent;
-use Aeliot\YamlToken\Parser\ParseContext;
 
 final readonly class BlockCollectionLoopHelper
 {
