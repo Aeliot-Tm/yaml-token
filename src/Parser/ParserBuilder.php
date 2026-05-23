@@ -65,9 +65,6 @@ final class ParserBuilder
     private function populateBlockParserBridge(ParserRegistry $registry): void
     {
         $registry->setBlockParserBridge(
-            function (ParseContext $parseContext, ValueNode $v) use ($registry): void {
-                $registry->getNodePropertiesParser()->collectValueProperties($parseContext, $v);
-            },
             fn (ParseContext $parseContext, int $indent): BlockMappingNode => $registry->getBlockMappingParser()->parseBlockMappingValue($parseContext, $indent),
             fn (ParseContext $parseContext, int $indent): BlockSequenceNode => $registry->getBlockSequenceParser()->parseBlockSequenceValue($parseContext, $indent),
             fn (ParseContext $parseContext, int $indent): BlockMappingNode => $registry->getCompactBlockMappingParser()->parseCompactBlockMapping($parseContext, $indent),

@@ -44,7 +44,6 @@ final class ParserRegistry
     private ?BlockMappingParser $blockMappingParser = null;
     private ?BlockScalarParser $blockScalarParser = null;
     private ?BlockSequenceParser $blockSequenceParser = null;
-    private ?\Closure $collectValueProperties = null;
     private ?CompactBlockMappingParser $compactBlockMappingParser = null;
     private ?CompactBlockSequenceParser $compactBlockSequenceParser = null;
     private ?DirectiveParser $directiveParser = null;
@@ -151,10 +150,7 @@ final class ParserRegistry
 
     public function getIndentedBlockValueParser(): IndentedBlockValueParser
     {
-        return $this->indentedBlockValueParser ??= $this->assembler->createIndentedBlockValueParser(
-            $this,
-            $this->collectValueProperties ?? throw new \LogicException('Block parser bridge not set'),
-        );
+        return $this->indentedBlockValueParser ??= $this->assembler->createIndentedBlockValueParser($this);
     }
 
     public function getKeyParser(): KeyParser
@@ -217,7 +213,6 @@ final class ParserRegistry
     }
 
     public function setBlockParserBridge(
-        \Closure $collectValueProperties,
         \Closure $parseBlockMappingValue,
         \Closure $parseBlockSequenceValue,
         \Closure $parseCompactBlockMapping,
@@ -225,7 +220,6 @@ final class ParserRegistry
         \Closure $parseMergeInstructionAtCurrentPosition,
         \Closure $parseValue,
     ): void {
-        $this->collectValueProperties = $collectValueProperties;
         $this->parseBlockMappingValue = $parseBlockMappingValue;
         $this->parseBlockSequenceValue = $parseBlockSequenceValue;
         $this->parseCompactBlockMapping = $parseCompactBlockMapping;

@@ -156,12 +156,9 @@ final class ParserAssembler
         return new FlowSequenceParser($this->consumer, $this->errorHelper, $this->nodeFactory, $registry);
     }
 
-    public function createIndentedBlockValueParser(
-        ParserRegistry $registry,
-        \Closure $collectValueProperties,
-    ): IndentedBlockValueParser {
+    public function createIndentedBlockValueParser(ParserRegistry $registry): IndentedBlockValueParser
+    {
         return new IndentedBlockValueParser(
-            $collectValueProperties,
             $this->consumer,
             $this->errorHelper,
             $this->lookAheadHelper,

@@ -34,11 +34,7 @@ use Aeliot\YamlToken\Token\Token;
 
 final readonly class IndentedBlockValueParser implements SubParserInterface
 {
-    /**
-     * @param \Closure(ParseContext, ValueNode): void $collectValueProperties
-     */
     public function __construct(
-        private \Closure $collectValueProperties,
         private Consumer $consumer,
         private ErrorHelper $errorHelper,
         private LookAheadHelper $lookAheadHelper,
@@ -88,7 +84,7 @@ final readonly class IndentedBlockValueParser implements SubParserInterface
                 $separatorContainer->addChild(new IndentationNode($indentationToken));
                 $parseContext->tokens->advance();
 
-                ($this->collectValueProperties)($parseContext, $valueNode);
+                $this->registry->getNodePropertiesParser()->collectValueProperties($parseContext, $valueNode);
 
                 $next = $parseContext->tokens->current();
                 if (null === $next || TokenType::NEWLINE !== $next->type) {
@@ -271,7 +267,7 @@ final readonly class IndentedBlockValueParser implements SubParserInterface
         $valueNode->addChild(new IndentationNode($indentationToken));
         $parseContext->tokens->advance();
 
-        ($this->collectValueProperties)($parseContext, $valueNode);
+        $this->registry->getNodePropertiesParser()->collectValueProperties($parseContext, $valueNode);
 
         if ($anchor = $valueNode->getAnchor()) {
             $parseContext->anchorsRegistry->anchors[$anchor->getName()] = $anchor;
