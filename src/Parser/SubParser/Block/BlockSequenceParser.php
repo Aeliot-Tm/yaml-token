@@ -76,15 +76,7 @@ final readonly class BlockSequenceParser
                 $parseContext->tokens->advance();
             }
 
-            $compactIndent = $indentLen + $this->registry
-                    ->getSequenceEntryParser()
-                    ->consumeSequenceEntryIndicatorAndSpaces($parseContext, $sequenceEntry);
-
-            $sequenceEntry->addChild(
-                $this->registry
-                    ->getSequenceEntryParser()
-                    ->parseSequenceEntryValue($parseContext, IndentContext::createForBlock($indentLen), $compactIndent),
-            );
+            $this->registry->getSequenceEntryParser()->parseSequenceEntry($parseContext, $sequenceEntry, $indentLen);
         }
 
         if (null === $baseIndentLen) {

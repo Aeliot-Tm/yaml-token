@@ -16,7 +16,6 @@ namespace Aeliot\YamlToken\Parser\SubParser\Block;
 use Aeliot\YamlToken\Node\BlockSequenceEntryNode;
 use Aeliot\YamlToken\Node\BlockSequenceNode;
 use Aeliot\YamlToken\Node\IndentationNode;
-use Aeliot\YamlToken\Parser\Dto\IndentContext;
 use Aeliot\YamlToken\Parser\Dto\ParseContext;
 use Aeliot\YamlToken\Parser\Helper\BlockCollectionLoopHelper;
 use Aeliot\YamlToken\Parser\Helper\Identifier\SequenceIdentifier;
@@ -48,15 +47,7 @@ final readonly class CompactBlockSequenceParser
 
         $firstEntry = new BlockSequenceEntryNode();
         $blockSequence->addChild($firstEntry);
-        $firstCompactIndent = $indentLen + $this->registry
-                ->getSequenceEntryParser()
-                ->consumeSequenceEntryIndicatorAndSpaces($parseContext, $firstEntry);
-
-        $firstEntry->addChild(
-            $this->registry
-                ->getSequenceEntryParser()
-                ->parseSequenceEntryValue($parseContext, IndentContext::createForBlock($indentLen), $firstCompactIndent),
-        );
+        $this->registry->getSequenceEntryParser()->parseSequenceEntry($parseContext, $firstEntry, $indentLen);
 
         while (!$parseContext->tokens->isEnd()) {
             if (!$this->blockCollectionLoopHelper->advanceToNextCompactBlockEntry($parseContext, $blockSequence, $indentLen)) {
@@ -73,15 +64,7 @@ final readonly class CompactBlockSequenceParser
             $sequenceEntry->addChild(new IndentationNode($token));
             $parseContext->tokens->advance();
 
-            $compactIndent = $indentLen + $this->registry
-                    ->getSequenceEntryParser()
-                    ->consumeSequenceEntryIndicatorAndSpaces($parseContext, $sequenceEntry);
-
-            $sequenceEntry->addChild(
-                $this->registry
-                    ->getSequenceEntryParser()
-                    ->parseSequenceEntryValue($parseContext, IndentContext::createForBlock($indentLen), $compactIndent),
-            );
+            $this->registry->getSequenceEntryParser()->parseSequenceEntry($parseContext, $sequenceEntry, $indentLen);
         }
 
         return $blockSequence;

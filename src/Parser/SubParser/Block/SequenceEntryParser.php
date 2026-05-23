@@ -26,7 +26,6 @@ use Aeliot\YamlToken\Parser\Helper\Identifier\KeyIdentifier;
 use Aeliot\YamlToken\Parser\Helper\Identifier\NodePropertyIdentifier;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
 use Aeliot\YamlToken\Parser\ParserRegistry;
-use Aeliot\YamlToken\Parser\SubParser\ValueParser;
 
 final readonly class SequenceEntryParser
 {
@@ -41,13 +40,27 @@ final readonly class SequenceEntryParser
     }
 
     /**
+     * Parses one block sequence entry: consumes the SEQUENCE_ENTRY indicator
+     * with any trailing whitespace, then parses the entry value, and appends
+     * all resulting nodes to $target.
+     *
+     * $indentLen is the column (0-based) of the '-' indicator, which defines
+     * the indentation context for the nested content per YAML 1.2.2 §8.2.1.
+     */
+    public function parseSequenceEntry(ParseContext $parseContext, Node $target, int $indentLen): void
+    {
+        $compactIndent = $indentLen + $this->consumeSequenceEntryIndicatorAndSpaces($parseContext, $target);
+        $target->addChild($this->parseSequenceEntryValue($parseContext, IndentContext::createForBlock($indentLen), $compactIndent));
+    }
+
+    /**
      * Consumes one SEQUENCE_ENTRY token followed by any number of
      * directly adjacent WHITESPACE tokens. Returns the total length
      * in characters (always >= 1). Per YAML 1.2.2 §8.2.1 this
      * combined length is considered part of the indentation of the
      * nested (compact) block collection.
      */
-    public function consumeSequenceEntryIndicatorAndSpaces(ParseContext $parseContext, Node $target): int
+    private function consumeSequenceEntryIndicatorAndSpaces(ParseContext $parseContext, Node $target): int
     {
         $token = $parseContext->tokens->current();
         if (TokenType::SEQUENCE_ENTRY !== $token?->type) {
@@ -78,14 +91,14 @@ final readonly class SequenceEntryParser
      *  - a compact in-line block sequence (rule [186] ns-l-compact-sequence),
      *    when the entry content starts with another '-' on the same line
      *    (Example 8.15);
-     *  - a generic block / flow / scalar node (delegated to {@see ValueParser::parseValue()}).
+     *  - a generic block / flow / scalar node (delegated to ValueParser::parseValue()).
      *
      * $compactIndent is the column of the entry's first content character,
      * i.e. (indent of '-') + length('-') + length of WHITESPACE tokens
      * that follow '-'. Per §8.2.1 this length defines the indentation
      * of the nested compact collection.
      */
-    public function parseSequenceEntryValue(ParseContext $parseContext, IndentContext $parentIndent, int $compactIndent): ValueNode
+    private function parseSequenceEntryValue(ParseContext $parseContext, IndentContext $parentIndent, int $compactIndent): ValueNode
     {
         $token = $parseContext->tokens->current();
         $nodePropertiesFollowedByValueIndicator = null !== $token

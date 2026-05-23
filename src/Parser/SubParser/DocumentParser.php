@@ -127,15 +127,9 @@ final readonly class DocumentParser
             $parseContext->tokens->advance();
         }
 
-        $compactIndent = $leadingIndent + $this->registry
+        $this->registry
                 ->getSequenceEntryParser()
-                ->consumeSequenceEntryIndicatorAndSpaces($parseContext, $sequenceEntry);
-
-        $sequenceEntry->addChild(
-            $this->registry
-                ->getSequenceEntryParser()
-                ->parseSequenceEntryValue($parseContext, IndentContext::createForBlock($leadingIndent), $compactIndent),
-        );
+                ->parseSequenceEntry($parseContext, $sequenceEntry, $leadingIndent);
     }
 
     /**
