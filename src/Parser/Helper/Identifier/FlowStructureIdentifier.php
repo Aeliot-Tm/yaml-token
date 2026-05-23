@@ -125,6 +125,31 @@ final readonly class FlowStructureIdentifier
         }
     }
 
+    public function isNextSignificantTokenOneOf(
+        ParseContext $parseContext,
+        bool $treatEndAsMatch,
+        TokenType ...$types,
+    ): bool {
+        $offset = 0;
+        while (true) {
+            $peeked = $parseContext->tokens->peek($offset);
+            if (null === $peeked) {
+                return $treatEndAsMatch;
+            }
+            if (
+                TokenType::WHITESPACE === $peeked->type
+                || TokenType::COMMENT === $peeked->type
+                || TokenType::NEWLINE === $peeked->type
+            ) {
+                ++$offset;
+
+                continue;
+            }
+
+            return \in_array($peeked->type, $types, true);
+        }
+    }
+
     public function isFlowSequenceStart(ParseContext $parseContext): bool
     {
         $token = $parseContext->tokens->current();

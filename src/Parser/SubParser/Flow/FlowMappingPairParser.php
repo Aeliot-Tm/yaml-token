@@ -21,6 +21,7 @@ use Aeliot\YamlToken\Parser\Consumer;
 use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
 use Aeliot\YamlToken\Parser\Enum\EspecialIndent;
 use Aeliot\YamlToken\Parser\Helper\AnchorPostProcessor;
+use Aeliot\YamlToken\Parser\Helper\Identifier\FlowStructureIdentifier;
 use Aeliot\YamlToken\Parser\ParseContext;
 use Aeliot\YamlToken\Parser\ParserRegistry;
 
@@ -29,6 +30,7 @@ final readonly class FlowMappingPairParser implements SubParserInterface
     public function __construct(
         private AnchorPostProcessor $anchorPostProcessor,
         private Consumer $consumer,
+        private FlowStructureIdentifier $flowStructureIdentifier,
         private ParserRegistry $registry,
     ) {
     }
@@ -39,7 +41,12 @@ final readonly class FlowMappingPairParser implements SubParserInterface
         $couple->addChild($this->registry->getKeyParser()->getKeyNode($parseContext));
 
         if ($this->tryConsumeFlowMappingValueIndicator($parseContext, $couple)) {
-            if ($this->isAtFlowMappingEntryBoundary($parseContext)) {
+            if ($this->flowStructureIdentifier->isNextSignificantTokenOneOf(
+                $parseContext,
+                true,
+                TokenType::FLOW_ENTRY,
+                TokenType::FLOW_MAPPING_END,
+            )) {
                 $couple->addChild(new ValueNode());
             } else {
                 $couple->addChild($this->registry->getValueParser()->parseValue($parseContext, EspecialIndent::FLOW_COLLECTION_VALUE_PARENT->value));
@@ -66,27 +73,5 @@ final readonly class FlowMappingPairParser implements SubParserInterface
         $this->consumer->collectTypes($parseContext->tokens, [TokenType::WHITESPACE], $couple);
 
         return true;
-    }
-
-    private function isAtFlowMappingEntryBoundary(ParseContext $parseContext): bool
-    {
-        $offset = 0;
-        while (true) {
-            $peeked = $parseContext->tokens->peek($offset);
-            if (null === $peeked) {
-                return true;
-            }
-            if (
-                TokenType::WHITESPACE === $peeked->type
-                || TokenType::COMMENT === $peeked->type
-                || TokenType::NEWLINE === $peeked->type
-            ) {
-                ++$offset;
-
-                continue;
-            }
-
-            return \in_array($peeked->type, [TokenType::FLOW_ENTRY, TokenType::FLOW_MAPPING_END], true);
-        }
     }
 }

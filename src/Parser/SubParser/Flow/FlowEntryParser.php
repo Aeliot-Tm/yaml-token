@@ -84,7 +84,11 @@ final readonly class FlowEntryParser implements SubParserInterface
 
     private function finishPostOperand(ParseContext $parseContext, Node $operand): ValueNode
     {
-        if (!$this->peekFlowPairColon($parseContext)) {
+        if (!$this->flowStructureIdentifier->isNextSignificantTokenOneOf(
+            $parseContext,
+            false,
+            TokenType::VALUE_INDICATOR,
+        )) {
             return $this->completeOperandAsValue($operand);
         }
 
@@ -97,7 +101,12 @@ final readonly class FlowEntryParser implements SubParserInterface
             throw new UnexpectedStateException('Expected VALUE_INDICATOR after flow complex key');
         }
 
-        if ($this->isAtFlowSequenceEntryBoundary($parseContext)) {
+        if ($this->flowStructureIdentifier->isNextSignificantTokenOneOf(
+            $parseContext,
+            true,
+            TokenType::FLOW_ENTRY,
+            TokenType::FLOW_SEQUENCE_END,
+        )) {
             $couple->addChild(new ValueNode());
         } else {
             $couple->addChild($this->registry->getValueParser()->parseValue($parseContext, EspecialIndent::FLOW_COLLECTION_VALUE_PARENT->value));
@@ -106,28 +115,6 @@ final readonly class FlowEntryParser implements SubParserInterface
         $this->anchorPostProcessor->postProcessKeyValueCouple($parseContext->anchorsRegistry, $couple);
 
         return $this->completeOperandAsValue($couple);
-    }
-
-    private function isAtFlowSequenceEntryBoundary(ParseContext $parseContext): bool
-    {
-        $offset = 0;
-        while (true) {
-            $peeked = $parseContext->tokens->peek($offset);
-            if (null === $peeked) {
-                return true;
-            }
-            if (
-                TokenType::WHITESPACE === $peeked->type
-                || TokenType::COMMENT === $peeked->type
-                || TokenType::NEWLINE === $peeked->type
-            ) {
-                ++$offset;
-
-                continue;
-            }
-
-            return \in_array($peeked->type, [TokenType::FLOW_ENTRY, TokenType::FLOW_SEQUENCE_END], true);
-        }
     }
 
     private function isLegacyFlowPairEntryStart(ParseContext $parseContext): bool
@@ -151,7 +138,12 @@ final readonly class FlowEntryParser implements SubParserInterface
 
         $this->registry->getFlowMappingPairParser()->tryConsumeFlowMappingValueIndicator($parseContext, $couple);
 
-        if ($this->isAtFlowSequenceEntryBoundary($parseContext)) {
+        if ($this->flowStructureIdentifier->isNextSignificantTokenOneOf(
+            $parseContext,
+            true,
+            TokenType::FLOW_ENTRY,
+            TokenType::FLOW_SEQUENCE_END,
+        )) {
             $couple->addChild(new ValueNode());
         } else {
             $couple->addChild($this->registry->getValueParser()->parseValue($parseContext, EspecialIndent::FLOW_COLLECTION_VALUE_PARENT->value));
@@ -160,28 +152,6 @@ final readonly class FlowEntryParser implements SubParserInterface
         $this->anchorPostProcessor->postProcessKeyValueCouple($parseContext->anchorsRegistry, $couple);
 
         return $this->completeOperandAsValue($couple);
-    }
-
-    private function peekFlowPairColon(ParseContext $parseContext): bool
-    {
-        $offset = 0;
-        while (true) {
-            $peeked = $parseContext->tokens->peek($offset);
-            if (null === $peeked) {
-                return false;
-            }
-            if (
-                TokenType::WHITESPACE === $peeked->type
-                || TokenType::COMMENT === $peeked->type
-                || TokenType::NEWLINE === $peeked->type
-            ) {
-                ++$offset;
-
-                continue;
-            }
-
-            return TokenType::VALUE_INDICATOR === $peeked->type;
-        }
     }
 
     private function promoteOperandToKey(Node $operand, KeyNode $keyNode): void
