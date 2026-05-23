@@ -60,122 +60,10 @@ final readonly class KeyParser implements SubParserInterface
             }
 
             $this->collectKeyProperties($parseContext, $keyNode);
-            $token = $parseContext->tokens->current();
+            $this->parseExplicitKeyContent($parseContext, $keyNode, $entryIndentLen);
+        } else {
+            $this->parseImplicitKeyContent($parseContext, $keyNode, $entryIndentLen);
         }
-
-        if (
-            null !== $keyNode->getExplicitKeyIndicatorNode()
-            && null !== $entryIndentLen
-            && TokenType::NEWLINE === $token->type
-        ) {
-            $head = $this->lookAheadHelper->peekFirstSignificantBlockHead($parseContext->tokens, 1);
-            if (null === $head) {
-                return $keyNode;
-            }
-
-            [$indentLen, $significantToken, $scalarPeekOffset] = $head;
-            if ($indentLen <= $entryIndentLen) {
-                return $keyNode;
-            }
-
-            if (TokenType::SEQUENCE_ENTRY === $significantToken->type) {
-                $keyNode->setName($this->registry->getBlockSequenceParser()->parseBlockSequenceValue($parseContext, $entryIndentLen));
-
-                return $keyNode;
-            }
-
-            if (
-                TokenType::EXPLICIT_KEY_INDICATOR === $significantToken->type
-                || TokenType::MERGE_INDICATOR === $significantToken->type
-            ) {
-                $keyNode->setName($this->registry->getBlockMappingParser()->parseBlockMappingValue($parseContext, $entryIndentLen));
-
-                return $keyNode;
-            }
-
-            if ($significantToken->type->isScalar()) {
-                if ($this->multilineContinuationHelper->isImplicitYamlKeyOnContinuationLine($parseContext->tokens, $scalarPeekOffset)) {
-                    $keyNode->setName($this->registry->getBlockMappingParser()->parseBlockMappingValue($parseContext, $entryIndentLen));
-                } else {
-                    $this->registry->getBlockScalarParser()->consumeExplicitKeyMultilinePlainScalar($parseContext->tokens, $keyNode, $entryIndentLen);
-                }
-
-                return $keyNode;
-            }
-
-            return $keyNode;
-        }
-
-        if (TokenType::VALUE_INDICATOR === $token->type) {
-            return $keyNode;
-        }
-
-        if (
-            null !== $keyNode->getExplicitKeyIndicatorNode()
-            && TokenType::SEQUENCE_ENTRY === $token->type
-        ) {
-            $keyNode->setName($this->registry->getCompactBlockSequenceParser()->parseCompactBlockSequence($parseContext, $token->column - 1));
-
-            return $keyNode;
-        }
-
-        if (TokenType::FLOW_MAPPING_START === $token->type) {
-            $keyNode->setName($this->registry->getFlowMappingParser()->parse($parseContext));
-
-            return $keyNode;
-        }
-
-        if (TokenType::FLOW_SEQUENCE_START === $token->type) {
-            $keyNode->setName($this->registry->getFlowSequenceParser()->parse($parseContext));
-
-            return $keyNode;
-        }
-
-        if (TokenType::ALIAS === $token->type) {
-            $aliasNode = new AliasNode($token);
-            $aliasName = $aliasNode->getName();
-            $anchor = $parseContext->anchorsRegistry->anchors[$aliasName] ?? null;
-            if (null === $anchor) {
-                throw new AnchorUndefinedException($this->errorHelper->appendTokenLocation(\sprintf('Undefined alias "%s"', $aliasName), $token));
-            }
-            $aliasNode->setAnchor($anchor);
-            $keyNode->setName($aliasNode);
-            $parseContext->tokens->advance();
-
-            return $keyNode;
-        }
-
-        if (TokenType::VALUE_INDICATOR === $token->type && null !== $keyNode->getProperties()) {
-            return $keyNode;
-        }
-
-        if (
-            null !== $keyNode->getExplicitKeyIndicatorNode()
-            && \in_array($token->type, TokenType::BLOCK_SCALAR_INDICATORS, true)
-        ) {
-            $this->registry->getBlockScalarParser()->consumeBlockScalarKeyName($parseContext->tokens, $keyNode);
-
-            return $keyNode;
-        }
-
-        if (!$token->type->isScalar() && !$token->type->isMergeIndicator()) {
-            if (null !== $keyNode->getExplicitKeyIndicatorNode()) {
-                return $keyNode;
-            }
-
-            throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Key scalar expected, but %s given', $token->type->value), $token));
-        }
-
-        $keyNode->setName(
-            $this->registry
-                ->getMultilinePlainScalarParser()
-                ->buildScalarKeyName(
-                    $parseContext->tokens,
-                    $token,
-                    $entryIndentLen,
-                    null !== $keyNode->getExplicitKeyIndicatorNode(),
-                ),
-        );
 
         return $keyNode;
     }
@@ -234,5 +122,154 @@ final readonly class KeyParser implements SubParserInterface
         foreach ($whitespaceBuffer as $whitespace) {
             $keyNode->addChild($whitespace);
         }
+    }
+
+    private function parseExplicitKeyContent(ParseContext $parseContext, KeyNode $keyNode, ?int $entryIndentLen): void
+    {
+        $token = $parseContext->tokens->current();
+
+        if (null !== $entryIndentLen && TokenType::NEWLINE === $token->type) {
+            $head = $this->lookAheadHelper->peekFirstSignificantBlockHead($parseContext->tokens, 1);
+            if (null === $head) {
+                return;
+            }
+
+            [$indentLen, $significantToken, $scalarPeekOffset] = $head;
+            if ($indentLen <= $entryIndentLen) {
+                return;
+            }
+
+            if (TokenType::SEQUENCE_ENTRY === $significantToken->type) {
+                $keyNode->setName($this->registry->getBlockSequenceParser()->parseBlockSequenceValue($parseContext, $entryIndentLen));
+
+                return;
+            }
+
+            if (
+                TokenType::EXPLICIT_KEY_INDICATOR === $significantToken->type
+                || TokenType::MERGE_INDICATOR === $significantToken->type
+            ) {
+                $keyNode->setName($this->registry->getBlockMappingParser()->parseBlockMappingValue($parseContext, $entryIndentLen));
+
+                return;
+            }
+
+            if ($significantToken->type->isScalar()) {
+                if ($this->multilineContinuationHelper->isImplicitYamlKeyOnContinuationLine($parseContext->tokens, $scalarPeekOffset)) {
+                    $keyNode->setName($this->registry->getBlockMappingParser()->parseBlockMappingValue($parseContext, $entryIndentLen));
+                } else {
+                    $this->registry->getBlockScalarParser()->consumeExplicitKeyMultilinePlainScalar($parseContext->tokens, $keyNode, $entryIndentLen);
+                }
+            }
+
+            return;
+        }
+
+        if (TokenType::VALUE_INDICATOR === $token->type) {
+            return;
+        }
+
+        if (TokenType::SEQUENCE_ENTRY === $token->type) {
+            $keyNode->setName($this->registry->getCompactBlockSequenceParser()->parseCompactBlockSequence($parseContext, $token->column - 1));
+
+            return;
+        }
+
+        if (TokenType::FLOW_MAPPING_START === $token->type) {
+            $keyNode->setName($this->registry->getFlowMappingParser()->parse($parseContext));
+
+            return;
+        }
+
+        if (TokenType::FLOW_SEQUENCE_START === $token->type) {
+            $keyNode->setName($this->registry->getFlowSequenceParser()->parse($parseContext));
+
+            return;
+        }
+
+        if (TokenType::ALIAS === $token->type) {
+            $aliasNode = new AliasNode($token);
+            $aliasName = $aliasNode->getName();
+            $anchor = $parseContext->anchorsRegistry->anchors[$aliasName] ?? null;
+            if (null === $anchor) {
+                throw new AnchorUndefinedException($this->errorHelper->appendTokenLocation(\sprintf('Undefined alias "%s"', $aliasName), $token));
+            }
+            $aliasNode->setAnchor($anchor);
+            $keyNode->setName($aliasNode);
+            $parseContext->tokens->advance();
+
+            return;
+        }
+
+        if (\in_array($token->type, TokenType::BLOCK_SCALAR_INDICATORS, true)) {
+            $this->registry->getBlockScalarParser()->consumeBlockScalarKeyName($parseContext->tokens, $keyNode);
+
+            return;
+        }
+
+        if (!$token->type->isScalar() && !$token->type->isMergeIndicator()) {
+            return;
+        }
+
+        $keyNode->setName(
+            $this->registry
+                ->getMultilinePlainScalarParser()
+                ->buildScalarKeyName(
+                    $parseContext->tokens,
+                    $token,
+                    $entryIndentLen,
+                    true,
+                ),
+        );
+    }
+
+    private function parseImplicitKeyContent(ParseContext $parseContext, KeyNode $keyNode, ?int $entryIndentLen): void
+    {
+        $token = $parseContext->tokens->current();
+
+        if (TokenType::VALUE_INDICATOR === $token->type) {
+            return;
+        }
+
+        if (TokenType::FLOW_MAPPING_START === $token->type) {
+            $keyNode->setName($this->registry->getFlowMappingParser()->parse($parseContext));
+
+            return;
+        }
+
+        if (TokenType::FLOW_SEQUENCE_START === $token->type) {
+            $keyNode->setName($this->registry->getFlowSequenceParser()->parse($parseContext));
+
+            return;
+        }
+
+        if (TokenType::ALIAS === $token->type) {
+            $aliasNode = new AliasNode($token);
+            $aliasName = $aliasNode->getName();
+            $anchor = $parseContext->anchorsRegistry->anchors[$aliasName] ?? null;
+            if (null === $anchor) {
+                throw new AnchorUndefinedException($this->errorHelper->appendTokenLocation(\sprintf('Undefined alias "%s"', $aliasName), $token));
+            }
+            $aliasNode->setAnchor($anchor);
+            $keyNode->setName($aliasNode);
+            $parseContext->tokens->advance();
+
+            return;
+        }
+
+        if (!$token->type->isScalar() && !$token->type->isMergeIndicator()) {
+            throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Key scalar expected, but %s given', $token->type->value), $token));
+        }
+
+        $keyNode->setName(
+            $this->registry
+                ->getMultilinePlainScalarParser()
+                ->buildScalarKeyName(
+                    $parseContext->tokens,
+                    $token,
+                    $entryIndentLen,
+                    false,
+                ),
+        );
     }
 }
