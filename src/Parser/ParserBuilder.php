@@ -36,7 +36,7 @@ final class ParserBuilder
         $parserRegistry = new ParserRegistry($assembler);
 
         $this->populateBlockParserBridge($parserRegistry);
-        $this->populateFlowHost($parserRegistry, $assembler);
+        $this->populateFlowHost($parserRegistry);
 
         return new Parser($parserRegistry);
     }
@@ -77,12 +77,10 @@ final class ParserBuilder
         );
     }
 
-    private function populateFlowHost(ParserRegistry $registry, ParserAssembler $assembler): void
+    private function populateFlowHost(ParserRegistry $registry): void
     {
         $registry->setFlowHost(new FlowHost(
             fn (ParseContext $parseContext): KeyNode => $registry->getKeyParser()->getKeyNode($parseContext),
-            fn (ParseContext $parseContext): bool => $assembler->getFlowStructureIdentifier()->isFlowMultilinePlainKeyStart($parseContext),
-            fn (ParseContext $parseContext): bool => $assembler->getKeyIdentifier()->isScalarFollowedByValueIndicator($parseContext, true),
             fn (ParseContext $parseContext): ValueNode => $registry->getValueParser()->parseValue($parseContext, EspecialIndent::FLOW_COLLECTION_VALUE_PARENT->value),
             fn (ParseContext $parseContext): MergeInstructionNode => $registry->getMergeInstructionParser()->parseMergeInstructionAtCurrentPosition($parseContext),
         ));

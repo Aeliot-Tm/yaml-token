@@ -26,6 +26,8 @@ use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
 use Aeliot\YamlToken\Parser\Helper\AnchorPostProcessor;
+use Aeliot\YamlToken\Parser\Helper\Identifier\FlowStructureIdentifier;
+use Aeliot\YamlToken\Parser\Helper\Identifier\KeyIdentifier;
 use Aeliot\YamlToken\Parser\ParseContext;
 use Aeliot\YamlToken\Parser\ParserRegistry;
 
@@ -33,6 +35,8 @@ final readonly class FlowEntryParser implements SubParserInterface
 {
     public function __construct(
         private AnchorPostProcessor $anchorPostProcessor,
+        private FlowStructureIdentifier $flowStructureIdentifier,
+        private KeyIdentifier $keyIdentifier,
         private ParserRegistry $registry,
     ) {
     }
@@ -135,8 +139,8 @@ final readonly class FlowEntryParser implements SubParserInterface
             return true;
         }
 
-        return $this->registry->getFlowHost()->isScalarFollowedByValueIndicatorInFlow($parseContext)
-            || $this->registry->getFlowHost()->isFlowMultilinePlainKeyStart($parseContext);
+        return $this->keyIdentifier->isScalarFollowedByValueIndicator($parseContext, true)
+            || $this->flowStructureIdentifier->isFlowMultilinePlainKeyStart($parseContext);
     }
 
     private function parseLegacyFlowPair(ParseContext $parseContext): ValueNode
