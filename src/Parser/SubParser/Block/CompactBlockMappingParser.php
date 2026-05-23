@@ -17,18 +17,16 @@ use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\BlockMappingNode;
 use Aeliot\YamlToken\Parser\Consumer;
 use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
+use Aeliot\YamlToken\Parser\Helper\Identifier\BlockStructureIdentifier;
 use Aeliot\YamlToken\Parser\Helper\LookAheadHelper;
 use Aeliot\YamlToken\Parser\ParseContext;
 use Aeliot\YamlToken\Parser\ParserRegistry;
 
 final readonly class CompactBlockMappingParser implements SubParserInterface
 {
-    /**
-     * @param \Closure(ParseContext): bool $isKeyValueCoupleStartAllowingNodeProperties
-     */
     public function __construct(
+        private BlockStructureIdentifier $blockStructureIdentifier,
         private Consumer $consumer,
-        private \Closure $isKeyValueCoupleStartAllowingNodeProperties,
         private LookAheadHelper $lookAheadHelper,
         private ParserRegistry $registry,
     ) {
@@ -67,7 +65,7 @@ final readonly class CompactBlockMappingParser implements SubParserInterface
             if (\strlen($token->text) !== $indentLen) {
                 break;
             }
-            if (!($this->isKeyValueCoupleStartAllowingNodeProperties)($parseContext)) {
+            if (!$this->blockStructureIdentifier->isKeyValueCoupleStartAllowingNodeProperties($parseContext)) {
                 break;
             }
 

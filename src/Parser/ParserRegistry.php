@@ -55,16 +55,6 @@ final class ParserRegistry
     private ?FlowHost $flowHost = null;
     private ?FlowSequenceParser $flowSequenceParser = null;
     private ?IndentedBlockValueParser $indentedBlockValueParser = null;
-    private ?\Closure $isBlockScalarStartAtDocumentRoot = null;
-    private ?\Closure $isFlowCollectionFollowedByBlockValueIndicatorOnSameLine = null;
-    private ?\Closure $isFlowMappingStart = null;
-    private ?\Closure $isFlowSequenceStart = null;
-    private ?\Closure $isKeyValueCoupleStart = null;
-    private ?\Closure $isKeyValueCoupleStartAllowingNodeProperties = null;
-    private ?\Closure $isNodePropertiesFollowedByImplicitKeyFromOffset = null;
-    private ?\Closure $isNodePropertyAtDocumentRoot = null;
-    private ?\Closure $isScalarFollowedByValueIndicator = null;
-    private ?\Closure $isSequenceStart = null;
     private ?KeyParser $keyParser = null;
     private ?KeyValueCoupleParser $keyValueCoupleParser = null;
     private ?MergeInstructionParser $mergeInstructionParser = null;
@@ -90,8 +80,6 @@ final class ParserRegistry
     {
         return $this->blockMappingParser ??= $this->assembler->createBlockMappingParser(
             $this,
-            $this->isKeyValueCoupleStart ?? throw new \LogicException('Block parser bridge not set'),
-            $this->isKeyValueCoupleStartAllowingNodeProperties ?? throw new \LogicException('Block parser bridge not set'),
             $this->parseMergeInstructionAtCurrentPosition ?? throw new \LogicException('Block parser bridge not set'),
         );
     }
@@ -108,10 +96,7 @@ final class ParserRegistry
 
     public function getCompactBlockMappingParser(): CompactBlockMappingParser
     {
-        return $this->compactBlockMappingParser ??= $this->assembler->createCompactBlockMappingParser(
-            $this,
-            $this->isKeyValueCoupleStartAllowingNodeProperties ?? throw new \LogicException('Block parser bridge not set'),
-        );
+        return $this->compactBlockMappingParser ??= $this->assembler->createCompactBlockMappingParser($this);
     }
 
     public function getCompactBlockSequenceParser(): CompactBlockSequenceParser
@@ -126,15 +111,7 @@ final class ParserRegistry
 
     public function getDocumentParser(): DocumentParser
     {
-        return $this->documentParser ??= $this->assembler->createDocumentParser(
-            $this,
-            $this->isBlockScalarStartAtDocumentRoot ?? throw new \LogicException('Document parser bridge not set'),
-            $this->isFlowMappingStart ?? throw new \LogicException('Document parser bridge not set'),
-            $this->isFlowSequenceStart ?? throw new \LogicException('Document parser bridge not set'),
-            $this->isKeyValueCoupleStart ?? throw new \LogicException('Document parser bridge not set'),
-            $this->isNodePropertyAtDocumentRoot ?? throw new \LogicException('Document parser bridge not set'),
-            $this->isSequenceStart ?? throw new \LogicException('Document parser bridge not set'),
-        );
+        return $this->documentParser ??= $this->assembler->createDocumentParser($this);
     }
 
     public function getByType(StructureType $type): SubParserInterface
@@ -177,7 +154,6 @@ final class ParserRegistry
         return $this->indentedBlockValueParser ??= $this->assembler->createIndentedBlockValueParser(
             $this,
             $this->collectValueProperties ?? throw new \LogicException('Block parser bridge not set'),
-            $this->isNodePropertiesFollowedByImplicitKeyFromOffset ?? throw new \LogicException('Block parser bridge not set'),
         );
     }
 
@@ -219,9 +195,6 @@ final class ParserRegistry
     public function getSequenceEntryParser(): SequenceEntryParser
     {
         return $this->sequenceEntryParser ??= $this->assembler->createSequenceEntryParser(
-            $this,
-            $this->isFlowCollectionFollowedByBlockValueIndicatorOnSameLine ?? throw new \LogicException('Block parser bridge not set'),
-            $this->isScalarFollowedByValueIndicator ?? throw new \LogicException('Block parser bridge not set'),
             $this->parseCompactBlockMapping ?? throw new \LogicException('Block parser bridge not set'),
             $this->parseCompactBlockSequence ?? throw new \LogicException('Block parser bridge not set'),
             $this->parseValue ?? throw new \LogicException('Block parser bridge not set'),
@@ -245,11 +218,6 @@ final class ParserRegistry
 
     public function setBlockParserBridge(
         \Closure $collectValueProperties,
-        \Closure $isFlowCollectionFollowedByBlockValueIndicatorOnSameLine,
-        \Closure $isKeyValueCoupleStart,
-        \Closure $isKeyValueCoupleStartAllowingNodeProperties,
-        \Closure $isNodePropertiesFollowedByImplicitKeyFromOffset,
-        \Closure $isScalarFollowedByValueIndicator,
         \Closure $parseBlockMappingValue,
         \Closure $parseBlockSequenceValue,
         \Closure $parseCompactBlockMapping,
@@ -258,33 +226,12 @@ final class ParserRegistry
         \Closure $parseValue,
     ): void {
         $this->collectValueProperties = $collectValueProperties;
-        $this->isFlowCollectionFollowedByBlockValueIndicatorOnSameLine = $isFlowCollectionFollowedByBlockValueIndicatorOnSameLine;
-        $this->isKeyValueCoupleStart = $isKeyValueCoupleStart;
-        $this->isKeyValueCoupleStartAllowingNodeProperties = $isKeyValueCoupleStartAllowingNodeProperties;
-        $this->isNodePropertiesFollowedByImplicitKeyFromOffset = $isNodePropertiesFollowedByImplicitKeyFromOffset;
-        $this->isScalarFollowedByValueIndicator = $isScalarFollowedByValueIndicator;
         $this->parseBlockMappingValue = $parseBlockMappingValue;
         $this->parseBlockSequenceValue = $parseBlockSequenceValue;
         $this->parseCompactBlockMapping = $parseCompactBlockMapping;
         $this->parseCompactBlockSequence = $parseCompactBlockSequence;
         $this->parseMergeInstructionAtCurrentPosition = $parseMergeInstructionAtCurrentPosition;
         $this->parseValue = $parseValue;
-    }
-
-    public function setDocumentParserBridge(
-        \Closure $isBlockScalarStartAtDocumentRoot,
-        \Closure $isFlowMappingStart,
-        \Closure $isFlowSequenceStart,
-        \Closure $isKeyValueCoupleStart,
-        \Closure $isNodePropertyAtDocumentRoot,
-        \Closure $isSequenceStart,
-    ): void {
-        $this->isBlockScalarStartAtDocumentRoot = $isBlockScalarStartAtDocumentRoot;
-        $this->isFlowMappingStart = $isFlowMappingStart;
-        $this->isFlowSequenceStart = $isFlowSequenceStart;
-        $this->isKeyValueCoupleStart = $isKeyValueCoupleStart;
-        $this->isNodePropertyAtDocumentRoot = $isNodePropertyAtDocumentRoot;
-        $this->isSequenceStart = $isSequenceStart;
     }
 
     public function setFlowHost(FlowHost $flowHost): void

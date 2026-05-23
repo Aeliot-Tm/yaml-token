@@ -24,6 +24,7 @@ use Aeliot\YamlToken\Parser\Enum\EspecialIndent;
 use Aeliot\YamlToken\Parser\Exception\IndentationInvalidException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
+use Aeliot\YamlToken\Parser\Helper\Identifier\NodePropertyIdentifier;
 use Aeliot\YamlToken\Parser\Helper\LookAheadHelper;
 use Aeliot\YamlToken\Parser\Helper\MultilineContinuationHelper;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
@@ -35,16 +36,15 @@ final readonly class IndentedBlockValueParser implements SubParserInterface
 {
     /**
      * @param \Closure(ParseContext, ValueNode): void $collectValueProperties
-     * @param \Closure(ParseContext, int): bool $isNodePropertiesFollowedByImplicitKeyFromOffset
      */
     public function __construct(
         private \Closure $collectValueProperties,
         private Consumer $consumer,
         private ErrorHelper $errorHelper,
-        private \Closure $isNodePropertiesFollowedByImplicitKeyFromOffset,
         private LookAheadHelper $lookAheadHelper,
         private MultilineContinuationHelper $multilineContinuationHelper,
         private NodeFactory $nodeFactory,
+        private NodePropertyIdentifier $nodePropertyIdentifier,
         private ParserRegistry $registry,
     ) {
     }
@@ -131,7 +131,7 @@ final readonly class IndentedBlockValueParser implements SubParserInterface
 
             if (
                 $this->isNodePropertyToken($afterIndent)
-                && !($this->isNodePropertiesFollowedByImplicitKeyFromOffset)($parseContext, $afterIndentOffset)
+                && !$this->nodePropertyIdentifier->isNodePropertiesFollowedByImplicitKeyFromOffset($parseContext, $afterIndentOffset)
             ) {
                 $this->consumeIndentedBlockTaggedScalarValue($parseContext, $valueNode, $parentIndentLen);
 

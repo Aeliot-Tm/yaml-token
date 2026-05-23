@@ -28,27 +28,19 @@ use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
 use Aeliot\YamlToken\Parser\Enum\EspecialIndent;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
+use Aeliot\YamlToken\Parser\Helper\Identifier\BlockStructureIdentifier;
+use Aeliot\YamlToken\Parser\Helper\Identifier\FlowStructureIdentifier;
+use Aeliot\YamlToken\Parser\Helper\Identifier\NodePropertyIdentifier;
 use Aeliot\YamlToken\Parser\ParseContext;
 use Aeliot\YamlToken\Parser\ParserRegistry;
 
 final readonly class DocumentParser implements SubParserInterface
 {
-    /**
-     * @param \Closure(ParseContext): bool $isBlockScalarStartAtDocumentRoot
-     * @param \Closure(ParseContext): bool $isFlowMappingStart
-     * @param \Closure(ParseContext): bool $isFlowSequenceStart
-     * @param \Closure(ParseContext): bool $isKeyValueCoupleStart
-     * @param \Closure(ParseContext): bool $isNodePropertyAtDocumentRoot
-     * @param \Closure(ParseContext): bool $isSequenceStart
-     */
     public function __construct(
+        private BlockStructureIdentifier $blockStructureIdentifier,
         private ErrorHelper $errorHelper,
-        private \Closure $isBlockScalarStartAtDocumentRoot,
-        private \Closure $isFlowMappingStart,
-        private \Closure $isFlowSequenceStart,
-        private \Closure $isKeyValueCoupleStart,
-        private \Closure $isNodePropertyAtDocumentRoot,
-        private \Closure $isSequenceStart,
+        private FlowStructureIdentifier $flowStructureIdentifier,
+        private NodePropertyIdentifier $nodePropertyIdentifier,
         private ParserRegistry $registry,
     ) {
     }
@@ -130,7 +122,7 @@ final readonly class DocumentParser implements SubParserInterface
                 continue;
             }
 
-            if (($this->isBlockScalarStartAtDocumentRoot)($parseContext)) {
+            if ($this->blockStructureIdentifier->isBlockScalarStartAtDocumentRoot($parseContext)) {
                 while (true) {
                     $separation = $parseContext->tokens->current();
                     if (TokenType::INDENTATION === $separation?->type) {
@@ -155,7 +147,7 @@ final readonly class DocumentParser implements SubParserInterface
                 continue;
             }
 
-            if (($this->isSequenceStart)($parseContext)) {
+            if ($this->blockStructureIdentifier->isSequenceStart($parseContext)) {
                 $sequenceEntry = new BlockSequenceEntryNode();
                 $document->addChild($sequenceEntry);
 
@@ -178,7 +170,7 @@ final readonly class DocumentParser implements SubParserInterface
                 continue;
             }
 
-            if (($this->isKeyValueCoupleStart)($parseContext)) {
+            if ($this->blockStructureIdentifier->isKeyValueCoupleStart($parseContext)) {
                 $indentLen = 0;
                 if (TokenType::INDENTATION === $token->type) {
                     $indentLen = \strlen($token->text);
@@ -195,7 +187,7 @@ final readonly class DocumentParser implements SubParserInterface
                 continue;
             }
 
-            if (($this->isNodePropertyAtDocumentRoot)($parseContext)) {
+            if ($this->nodePropertyIdentifier->isNodePropertyAtDocumentRoot($parseContext)) {
                 if (TokenType::INDENTATION === $token->type) {
                     $document->addChild(new IndentationNode($token));
                     $parseContext->tokens->advance();
@@ -205,7 +197,7 @@ final readonly class DocumentParser implements SubParserInterface
                 continue;
             }
 
-            if (($this->isFlowMappingStart)($parseContext)) {
+            if ($this->flowStructureIdentifier->isFlowMappingStart($parseContext)) {
                 if (TokenType::INDENTATION === $token->type) {
                     $document->addChild(new IndentationNode($token));
                     $parseContext->tokens->advance();
@@ -215,7 +207,7 @@ final readonly class DocumentParser implements SubParserInterface
                 continue;
             }
 
-            if (($this->isFlowSequenceStart)($parseContext)) {
+            if ($this->flowStructureIdentifier->isFlowSequenceStart($parseContext)) {
                 if (TokenType::INDENTATION === $token->type) {
                     $document->addChild(new IndentationNode($token));
                     $parseContext->tokens->advance();

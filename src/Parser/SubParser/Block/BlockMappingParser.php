@@ -23,6 +23,7 @@ use Aeliot\YamlToken\Parser\Exception\IndentationInvalidException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
+use Aeliot\YamlToken\Parser\Helper\Identifier\BlockStructureIdentifier;
 use Aeliot\YamlToken\Parser\Helper\IndentationHelper;
 use Aeliot\YamlToken\Parser\Helper\LookAheadHelper;
 use Aeliot\YamlToken\Parser\ParseContext;
@@ -31,16 +32,13 @@ use Aeliot\YamlToken\Parser\ParserRegistry;
 final readonly class BlockMappingParser implements SubParserInterface
 {
     /**
-     * @param \Closure(ParseContext): bool $isKeyValueCoupleStart
-     * @param \Closure(ParseContext): bool $isKeyValueCoupleStartAllowingNodeProperties
      * @param \Closure(ParseContext): MergeInstructionNode $parseMergeInstructionAtCurrentPosition
      */
     public function __construct(
+        private BlockStructureIdentifier $blockStructureIdentifier,
         private Consumer $consumer,
         private ErrorHelper $errorHelper,
         private IndentationHelper $indentationHelper,
-        private \Closure $isKeyValueCoupleStart,
-        private \Closure $isKeyValueCoupleStartAllowingNodeProperties,
         private LookAheadHelper $lookAheadHelper,
         private \Closure $parseMergeInstructionAtCurrentPosition,
         private ParserRegistry $registry,
@@ -70,7 +68,10 @@ final readonly class BlockMappingParser implements SubParserInterface
 
             if (TokenType::INDENTATION === $token->type) {
                 $indentLen = \strlen($token->text);
-            } elseif (EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value === $parentIndentLen && ($this->isKeyValueCoupleStart)($parseContext)) {
+            } elseif (
+                EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value === $parentIndentLen
+                && $this->blockStructureIdentifier->isKeyValueCoupleStart($parseContext)
+            ) {
                 $indentLen = 0;
             } else {
                 break;
@@ -93,7 +94,7 @@ final readonly class BlockMappingParser implements SubParserInterface
                 throw new IndentationInvalidException($this->errorHelper->appendTokenLocation(\sprintf('Unexpected indentation %d for next key/value couple; expected %d', $indentLen, $baseIndentLen), $token));
             }
 
-            if (false === ($this->isKeyValueCoupleStartAllowingNodeProperties)($parseContext)) {
+            if (false === $this->blockStructureIdentifier->isKeyValueCoupleStartAllowingNodeProperties($parseContext)) {
                 throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Key/value couple expected while parsing block mapping value, but %s given', $parseContext->tokens->current()?->type->value ?? '_nothing_'), $token));
             }
 

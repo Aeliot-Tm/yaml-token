@@ -67,16 +67,13 @@ final class ParserAssembler
 
     public function createBlockMappingParser(
         ParserRegistry $registry,
-        \Closure $isKeyValueCoupleStart,
-        \Closure $isKeyValueCoupleStartAllowingNodeProperties,
         \Closure $parseMergeInstructionAtCurrentPosition,
     ): BlockMappingParser {
         return new BlockMappingParser(
+            $this->getBlockStructureIdentifier(),
             $this->consumer,
             $this->errorHelper,
             $this->indentationHelper,
-            $isKeyValueCoupleStart,
-            $isKeyValueCoupleStartAllowingNodeProperties,
             $this->lookAheadHelper,
             $parseMergeInstructionAtCurrentPosition,
             $registry,
@@ -99,13 +96,11 @@ final class ParserAssembler
         );
     }
 
-    public function createCompactBlockMappingParser(
-        ParserRegistry $registry,
-        \Closure $isKeyValueCoupleStartAllowingNodeProperties,
-    ): CompactBlockMappingParser {
+    public function createCompactBlockMappingParser(ParserRegistry $registry): CompactBlockMappingParser
+    {
         return new CompactBlockMappingParser(
+            $this->getBlockStructureIdentifier(),
             $this->consumer,
-            $isKeyValueCoupleStartAllowingNodeProperties,
             $this->lookAheadHelper,
             $registry,
         );
@@ -125,23 +120,13 @@ final class ParserAssembler
         return new DirectiveParser($this->consumer, $this->errorHelper, $this->nodeFactory);
     }
 
-    public function createDocumentParser(
-        ParserRegistry $registry,
-        \Closure $isBlockScalarStartAtDocumentRoot,
-        \Closure $isFlowMappingStart,
-        \Closure $isFlowSequenceStart,
-        \Closure $isKeyValueCoupleStart,
-        \Closure $isNodePropertyAtDocumentRoot,
-        \Closure $isSequenceStart,
-    ): DocumentParser {
+    public function createDocumentParser(ParserRegistry $registry): DocumentParser
+    {
         return new DocumentParser(
+            $this->getBlockStructureIdentifier(),
             $this->errorHelper,
-            $isBlockScalarStartAtDocumentRoot,
-            $isFlowMappingStart,
-            $isFlowSequenceStart,
-            $isKeyValueCoupleStart,
-            $isNodePropertyAtDocumentRoot,
-            $isSequenceStart,
+            $this->getFlowStructureIdentifier(),
+            $this->getNodePropertyIdentifier(),
             $registry,
         );
     }
@@ -169,16 +154,15 @@ final class ParserAssembler
     public function createIndentedBlockValueParser(
         ParserRegistry $registry,
         \Closure $collectValueProperties,
-        \Closure $isNodePropertiesFollowedByImplicitKeyFromOffset,
     ): IndentedBlockValueParser {
         return new IndentedBlockValueParser(
             $collectValueProperties,
             $this->consumer,
             $this->errorHelper,
-            $isNodePropertiesFollowedByImplicitKeyFromOffset,
             $this->lookAheadHelper,
             $this->multilineContinuationHelper,
             $this->nodeFactory,
+            $this->getNodePropertyIdentifier(),
             $registry,
         );
     }
@@ -225,17 +209,14 @@ final class ParserAssembler
     }
 
     public function createSequenceEntryParser(
-        ParserRegistry $registry,
-        \Closure $isFlowCollectionFollowedByBlockValueIndicatorOnSameLine,
-        \Closure $isScalarFollowedByValueIndicator,
         \Closure $parseCompactBlockMapping,
         \Closure $parseCompactBlockSequence,
         \Closure $parseValue,
     ): SequenceEntryParser {
         return new SequenceEntryParser(
             $this->errorHelper,
-            $isFlowCollectionFollowedByBlockValueIndicatorOnSameLine,
-            $isScalarFollowedByValueIndicator,
+            $this->getFlowStructureIdentifier(),
+            $this->getKeyIdentifier(),
             $this->nodeFactory,
             $parseCompactBlockMapping,
             $parseCompactBlockSequence,

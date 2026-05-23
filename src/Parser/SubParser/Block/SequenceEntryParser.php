@@ -22,6 +22,8 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
+use Aeliot\YamlToken\Parser\Helper\Identifier\FlowStructureIdentifier;
+use Aeliot\YamlToken\Parser\Helper\Identifier\KeyIdentifier;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
 use Aeliot\YamlToken\Parser\ParseContext;
 use Aeliot\YamlToken\Token\Token;
@@ -29,16 +31,14 @@ use Aeliot\YamlToken\Token\Token;
 final readonly class SequenceEntryParser implements SubParserInterface
 {
     /**
-     * @param \Closure(ParseContext, int): bool $isFlowCollectionFollowedByBlockValueIndicatorOnSameLine
-     * @param \Closure(ParseContext, bool=): bool $isScalarFollowedByValueIndicator
      * @param \Closure(ParseContext, int): BlockMappingNode $parseCompactBlockMapping
      * @param \Closure(ParseContext, int): BlockSequenceNode $parseCompactBlockSequence
      * @param \Closure(ParseContext, int): ValueNode $parseValue
      */
     public function __construct(
         private ErrorHelper $errorHelper,
-        private \Closure $isFlowCollectionFollowedByBlockValueIndicatorOnSameLine,
-        private \Closure $isScalarFollowedByValueIndicator,
+        private FlowStructureIdentifier $flowStructureIdentifier,
+        private KeyIdentifier $keyIdentifier,
         private NodeFactory $nodeFactory,
         private \Closure $parseCompactBlockMapping,
         private \Closure $parseCompactBlockSequence,
@@ -118,7 +118,7 @@ final readonly class SequenceEntryParser implements SubParserInterface
         }
 
         if (
-            ($this->isScalarFollowedByValueIndicator)($parseContext)
+            $this->keyIdentifier->isScalarFollowedByValueIndicator($parseContext)
             || TokenType::EXPLICIT_KEY_INDICATOR === $token?->type
             || TokenType::VALUE_INDICATOR === $token?->type
             || $nodePropertiesFollowedByValueIndicator
@@ -139,7 +139,7 @@ final readonly class SequenceEntryParser implements SubParserInterface
         $flowOpen = $parseContext->tokens->current();
         if (
             \in_array($flowOpen?->type, [TokenType::FLOW_SEQUENCE_START, TokenType::FLOW_MAPPING_START], true)
-            && ($this->isFlowCollectionFollowedByBlockValueIndicatorOnSameLine)($parseContext, 0)
+            && $this->flowStructureIdentifier->isFlowCollectionFollowedByBlockValueIndicatorOnSameLine($parseContext, 0)
         ) {
             $valueNode = new ValueNode();
             $valueNode->addChild(($this->parseCompactBlockMapping)($parseContext, $compactIndent));
