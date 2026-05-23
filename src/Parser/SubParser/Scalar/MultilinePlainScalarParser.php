@@ -135,34 +135,7 @@ final readonly class MultilinePlainScalarParser implements SubParserInterface
 
     public function tryConsumeFlowKeyMultilinePlainScalarLine(TokenStreamProxy $tokens, MultilinePlainScalarNode $multiline): bool
     {
-        if (TokenType::NEWLINE !== $tokens->current()?->type) {
-            return false;
-        }
-
-        $newLine = $tokens->current();
-        $scalarOffset = 1;
-        while (TokenType::WHITESPACE === $tokens->peek($scalarOffset)?->type) {
-            ++$scalarOffset;
-        }
-        $scalarToken = $tokens->peek($scalarOffset);
-        if (TokenType::PLAIN_SCALAR !== $scalarToken?->type) {
-            return false;
-        }
-
-        $multiline->addChild(new NewLineNode($newLine));
-        $tokens->advance();
-
-        $contentHead = $tokens->current();
-        while (TokenType::WHITESPACE === $contentHead->type) {
-            $multiline->addChild(new WhitespaceNode($contentHead));
-            $tokens->advance();
-            $contentHead = $tokens->current();
-        }
-
-        $multiline->addChild($this->nodeFactory->createScalarNode($scalarToken));
-        $tokens->advance();
-
-        return true;
+        return $this->tryConsumeFlowMultilinePlainScalarLine($tokens, $multiline, false);
     }
 
     /**
@@ -172,6 +145,14 @@ final readonly class MultilinePlainScalarParser implements SubParserInterface
      */
     public function tryConsumeFlowValueMultilinePlainScalarLine(TokenStreamProxy $tokens, MultilinePlainScalarNode $multiline): bool
     {
+        return $this->tryConsumeFlowMultilinePlainScalarLine($tokens, $multiline, true);
+    }
+
+    private function tryConsumeFlowMultilinePlainScalarLine(
+        TokenStreamProxy $tokens,
+        MultilinePlainScalarNode $multiline,
+        bool $rejectValueIndicatorAfterScalar,
+    ): bool {
         if (TokenType::NEWLINE !== $tokens->current()?->type) {
             return false;
         }
@@ -185,12 +166,14 @@ final readonly class MultilinePlainScalarParser implements SubParserInterface
             return false;
         }
 
-        $afterScalar = $scalarOffset + 1;
-        while (TokenType::WHITESPACE === $tokens->peek($afterScalar)?->type) {
-            ++$afterScalar;
-        }
-        if (TokenType::VALUE_INDICATOR === $tokens->peek($afterScalar)?->type) {
-            return false;
+        if ($rejectValueIndicatorAfterScalar) {
+            $afterScalar = $scalarOffset + 1;
+            while (TokenType::WHITESPACE === $tokens->peek($afterScalar)?->type) {
+                ++$afterScalar;
+            }
+            if (TokenType::VALUE_INDICATOR === $tokens->peek($afterScalar)?->type) {
+                return false;
+            }
         }
 
         $newLine = $tokens->current();
