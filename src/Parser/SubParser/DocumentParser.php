@@ -158,13 +158,13 @@ final readonly class DocumentParser
         }
 
         if (TokenType::DIRECTIVE_YAML_INDICATOR === $token->type) {
-            $document->addChild($this->registry->getDirectiveParser()->parseYamlDirective($parseContext));
+            $document->addChild($this->registry->getYamlDirectiveParser()->parse($parseContext));
 
             return true;
         }
 
         if (TokenType::DIRECTIVE_TAG_INDICATOR === $token->type) {
-            $document->addChild($this->registry->getDirectiveParser()->parseTagDirective($parseContext));
+            $document->addChild($this->registry->getTagDirectiveParser()->parse($parseContext));
 
             return true;
         }

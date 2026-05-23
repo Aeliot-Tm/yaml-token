@@ -40,7 +40,6 @@ use Aeliot\YamlToken\Parser\SubParser\Block\IndentedBlockValueParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\KeyParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\KeyValueCoupleParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\SequenceEntryParser;
-use Aeliot\YamlToken\Parser\SubParser\DirectiveParser;
 use Aeliot\YamlToken\Parser\SubParser\DocumentParser;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowEntryParser;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowMappingPairParser;
@@ -52,7 +51,9 @@ use Aeliot\YamlToken\Parser\SubParser\Scalar\BlockScalarParser;
 use Aeliot\YamlToken\Parser\SubParser\Scalar\MultilinePlainScalarParser;
 use Aeliot\YamlToken\Parser\SubParser\Scalar\SimpleScalarParser;
 use Aeliot\YamlToken\Parser\SubParser\StreamParser;
+use Aeliot\YamlToken\Parser\SubParser\TagDirectiveParser;
 use Aeliot\YamlToken\Parser\SubParser\ValueParser;
+use Aeliot\YamlToken\Parser\SubParser\YamlDirectiveParser;
 
 final class ParserAssembler
 {
@@ -125,11 +126,6 @@ final class ParserAssembler
             $this->getSequenceIdentifier(),
             $registry,
         );
-    }
-
-    public function createDirectiveParser(): DirectiveParser
-    {
-        return new DirectiveParser($this->consumer, $this->errorHelper, $this->nodeFactory);
     }
 
     public function createDocumentParser(ParserRegistry $registry): DocumentParser
@@ -252,9 +248,19 @@ final class ParserAssembler
         return new StreamParser($registry);
     }
 
+    public function createTagDirectiveParser(): TagDirectiveParser
+    {
+        return new TagDirectiveParser($this->consumer, $this->errorHelper, $this->nodeFactory);
+    }
+
     public function createValueParser(ParserRegistry $registry): ValueParser
     {
         return new ValueParser($this->getAliasResolver(), $this->consumer, $this->errorHelper, $this->multilineContinuationHelper, $this->nodeFactory, $registry);
+    }
+
+    public function createYamlDirectiveParser(): YamlDirectiveParser
+    {
+        return new YamlDirectiveParser($this->consumer, $this->errorHelper, $this->nodeFactory);
     }
 
     public function getAliasResolver(): AliasResolver

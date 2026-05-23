@@ -23,7 +23,6 @@ use Aeliot\YamlToken\Parser\SubParser\Block\IndentedBlockValueParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\KeyParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\KeyValueCoupleParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\SequenceEntryParser;
-use Aeliot\YamlToken\Parser\SubParser\DirectiveParser;
 use Aeliot\YamlToken\Parser\SubParser\DocumentParser;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowEntryParser;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowMappingPairParser;
@@ -35,7 +34,9 @@ use Aeliot\YamlToken\Parser\SubParser\Scalar\BlockScalarParser;
 use Aeliot\YamlToken\Parser\SubParser\Scalar\MultilinePlainScalarParser;
 use Aeliot\YamlToken\Parser\SubParser\Scalar\SimpleScalarParser;
 use Aeliot\YamlToken\Parser\SubParser\StreamParser;
+use Aeliot\YamlToken\Parser\SubParser\TagDirectiveParser;
 use Aeliot\YamlToken\Parser\SubParser\ValueParser;
+use Aeliot\YamlToken\Parser\SubParser\YamlDirectiveParser;
 
 final class ParserRegistry
 {
@@ -44,7 +45,6 @@ final class ParserRegistry
     private ?BlockSequenceParser $blockSequenceParser = null;
     private ?CompactBlockMappingParser $compactBlockMappingParser = null;
     private ?CompactBlockSequenceParser $compactBlockSequenceParser = null;
-    private ?DirectiveParser $directiveParser = null;
     private ?DocumentParser $documentParser = null;
     private ?FlowEntryParser $flowEntryParser = null;
     private ?FlowMappingPairParser $flowMappingPairParser = null;
@@ -60,7 +60,9 @@ final class ParserRegistry
     private ?SequenceEntryParser $sequenceEntryParser = null;
     private ?SimpleScalarParser $simpleScalarParser = null;
     private ?StreamParser $streamParser = null;
+    private ?TagDirectiveParser $tagDirectiveParser = null;
     private ?ValueParser $valueParser = null;
+    private ?YamlDirectiveParser $yamlDirectiveParser = null;
 
     public function __construct(
         private readonly ParserAssembler $assembler,
@@ -90,11 +92,6 @@ final class ParserRegistry
     public function getCompactBlockSequenceParser(): CompactBlockSequenceParser
     {
         return $this->compactBlockSequenceParser ??= $this->assembler->createCompactBlockSequenceParser($this);
-    }
-
-    public function getDirectiveParser(): DirectiveParser
-    {
-        return $this->directiveParser ??= $this->assembler->createDirectiveParser();
     }
 
     public function getDocumentParser(): DocumentParser
@@ -172,8 +169,18 @@ final class ParserRegistry
         return $this->streamParser ??= $this->assembler->createStreamParser($this);
     }
 
+    public function getTagDirectiveParser(): TagDirectiveParser
+    {
+        return $this->tagDirectiveParser ??= $this->assembler->createTagDirectiveParser();
+    }
+
     public function getValueParser(): ValueParser
     {
         return $this->valueParser ??= $this->assembler->createValueParser($this);
+    }
+
+    public function getYamlDirectiveParser(): YamlDirectiveParser
+    {
+        return $this->yamlDirectiveParser ??= $this->assembler->createYamlDirectiveParser();
     }
 }
