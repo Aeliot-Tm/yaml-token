@@ -166,19 +166,12 @@ final class ParserAssembler
         );
     }
 
-    public function createKeyParser(
-        ParserRegistry $registry,
-        \Closure $parseBlockMappingValue,
-        \Closure $parseBlockSequenceValue,
-        \Closure $parseCompactBlockSequence,
-    ): KeyParser {
+    public function createKeyParser(ParserRegistry $registry): KeyParser
+    {
         return new KeyParser(
             $this->errorHelper,
             $this->lookAheadHelper,
             $this->multilineContinuationHelper,
-            $parseBlockMappingValue,
-            $parseBlockSequenceValue,
-            $parseCompactBlockSequence,
             $registry,
         );
     }

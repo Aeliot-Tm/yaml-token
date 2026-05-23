@@ -16,8 +16,6 @@ namespace Aeliot\YamlToken\Parser\SubParser\Block;
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\AliasNode;
 use Aeliot\YamlToken\Node\AnchorNode;
-use Aeliot\YamlToken\Node\BlockMappingNode;
-use Aeliot\YamlToken\Node\BlockSequenceNode;
 use Aeliot\YamlToken\Node\ExplicitKeyIndicatorNode;
 use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\NodePropertiesNode;
@@ -36,18 +34,10 @@ use Aeliot\YamlToken\Token\Token;
 
 final readonly class KeyParser implements SubParserInterface
 {
-    /**
-     * @param \Closure(ParseContext, int): BlockMappingNode $parseBlockMappingValue
-     * @param \Closure(ParseContext, int): BlockSequenceNode $parseBlockSequenceValue
-     * @param \Closure(ParseContext, int): BlockSequenceNode $parseCompactBlockSequence
-     */
     public function __construct(
         private ErrorHelper $errorHelper,
         private LookAheadHelper $lookAheadHelper,
         private MultilineContinuationHelper $multilineContinuationHelper,
-        private \Closure $parseBlockMappingValue,
-        private \Closure $parseBlockSequenceValue,
-        private \Closure $parseCompactBlockSequence,
         private ParserRegistry $registry,
     ) {
     }
@@ -88,7 +78,7 @@ final readonly class KeyParser implements SubParserInterface
             }
 
             if (TokenType::SEQUENCE_ENTRY === $significantToken->type) {
-                $keyNode->setName(($this->parseBlockSequenceValue)($parseContext, $entryIndentLen));
+                $keyNode->setName($this->registry->getBlockSequenceParser()->parseBlockSequenceValue($parseContext, $entryIndentLen));
 
                 return $keyNode;
             }
@@ -97,14 +87,14 @@ final readonly class KeyParser implements SubParserInterface
                 TokenType::EXPLICIT_KEY_INDICATOR === $significantToken->type
                 || TokenType::MERGE_INDICATOR === $significantToken->type
             ) {
-                $keyNode->setName(($this->parseBlockMappingValue)($parseContext, $entryIndentLen));
+                $keyNode->setName($this->registry->getBlockMappingParser()->parseBlockMappingValue($parseContext, $entryIndentLen));
 
                 return $keyNode;
             }
 
             if ($significantToken->type->isScalar()) {
                 if ($this->multilineContinuationHelper->isImplicitYamlKeyOnContinuationLine($parseContext->tokens, $scalarPeekOffset)) {
-                    $keyNode->setName(($this->parseBlockMappingValue)($parseContext, $entryIndentLen));
+                    $keyNode->setName($this->registry->getBlockMappingParser()->parseBlockMappingValue($parseContext, $entryIndentLen));
                 } else {
                     $this->registry->getBlockScalarParser()->consumeExplicitKeyMultilinePlainScalar($parseContext->tokens, $keyNode, $entryIndentLen);
                 }
@@ -123,7 +113,7 @@ final readonly class KeyParser implements SubParserInterface
             null !== $keyNode->getExplicitKeyIndicatorNode()
             && TokenType::SEQUENCE_ENTRY === $token->type
         ) {
-            $keyNode->setName(($this->parseCompactBlockSequence)($parseContext, $token->column - 1));
+            $keyNode->setName($this->registry->getCompactBlockSequenceParser()->parseCompactBlockSequence($parseContext, $token->column - 1));
 
             return $keyNode;
         }

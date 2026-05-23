@@ -59,8 +59,6 @@ final class ParserRegistry
     private ?MergeInstructionParser $mergeInstructionParser = null;
     private ?MultilinePlainScalarParser $multilinePlainScalarParser = null;
     private ?NodePropertiesParser $nodePropertiesParser = null;
-    private ?\Closure $parseBlockMappingValue = null;
-    private ?\Closure $parseBlockSequenceValue = null;
     private ?\Closure $parseCompactBlockMapping = null;
     private ?\Closure $parseCompactBlockSequence = null;
     private ?\Closure $parseValue = null;
@@ -151,12 +149,7 @@ final class ParserRegistry
 
     public function getKeyParser(): KeyParser
     {
-        return $this->keyParser ??= $this->assembler->createKeyParser(
-            $this,
-            $this->parseBlockMappingValue ?? throw new \LogicException('Block mapping parser bridge not set'),
-            $this->parseBlockSequenceValue ?? throw new \LogicException('Block sequence parser bridge not set'),
-            $this->parseCompactBlockSequence ?? throw new \LogicException('Block compact parser bridge not set'),
-        );
+        return $this->keyParser ??= $this->assembler->createKeyParser($this);
     }
 
     public function getKeyValueCoupleParser(): KeyValueCoupleParser
@@ -206,14 +199,10 @@ final class ParserRegistry
     }
 
     public function setBlockParserBridge(
-        \Closure $parseBlockMappingValue,
-        \Closure $parseBlockSequenceValue,
         \Closure $parseCompactBlockMapping,
         \Closure $parseCompactBlockSequence,
         \Closure $parseValue,
     ): void {
-        $this->parseBlockMappingValue = $parseBlockMappingValue;
-        $this->parseBlockSequenceValue = $parseBlockSequenceValue;
         $this->parseCompactBlockMapping = $parseCompactBlockMapping;
         $this->parseCompactBlockSequence = $parseCompactBlockSequence;
         $this->parseValue = $parseValue;
