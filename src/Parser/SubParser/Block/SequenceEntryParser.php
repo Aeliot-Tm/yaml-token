@@ -27,7 +27,6 @@ use Aeliot\YamlToken\Parser\Helper\NodeFactory;
 use Aeliot\YamlToken\Parser\ParseContext;
 use Aeliot\YamlToken\Parser\ParserRegistry;
 use Aeliot\YamlToken\Parser\SubParser\ValueParser;
-use Aeliot\YamlToken\Token\Token;
 
 final readonly class SequenceEntryParser implements SubParserInterface
 {
@@ -89,28 +88,9 @@ final readonly class SequenceEntryParser implements SubParserInterface
     public function parseSequenceEntryValue(ParseContext $parseContext, int $parentIndentLen, int $compactIndent): ValueNode
     {
         $token = $parseContext->tokens->current();
-        $nodePropertiesFollowedByValueIndicator = false;
-        if (null !== $token && $this->nodePropertyIdentifier->isNodePropertyToken($token)) {
-            $offset = 0;
-            while (true) {
-                $peeked = $parseContext->tokens->peek($offset);
-                if (null === $peeked || TokenType::NEWLINE === $peeked->type) {
-                    break;
-                }
-                if (TokenType::VALUE_INDICATOR === $peeked->type) {
-                    $nodePropertiesFollowedByValueIndicator = true;
-
-                    break;
-                }
-                if ($this->nodePropertyIdentifier->isNodePropertyToken($peeked) || TokenType::WHITESPACE === $peeked->type) {
-                    ++$offset;
-
-                    continue;
-                }
-
-                break;
-            }
-        }
+        $nodePropertiesFollowedByValueIndicator = null !== $token
+            && $this->nodePropertyIdentifier->isNodePropertyToken($token)
+            && $this->nodePropertyIdentifier->isNodePropertiesFollowedByImplicitKeyFromOffset($parseContext, 0);
 
         if (
             $this->keyIdentifier->isScalarFollowedByValueIndicator($parseContext)
