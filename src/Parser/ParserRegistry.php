@@ -59,9 +59,6 @@ final class ParserRegistry
     private ?MergeInstructionParser $mergeInstructionParser = null;
     private ?MultilinePlainScalarParser $multilinePlainScalarParser = null;
     private ?NodePropertiesParser $nodePropertiesParser = null;
-    private ?\Closure $parseCompactBlockMapping = null;
-    private ?\Closure $parseCompactBlockSequence = null;
-    private ?\Closure $parseValue = null;
     private ?SequenceEntryParser $sequenceEntryParser = null;
     private ?SimpleScalarParser $simpleScalarParser = null;
     private ?StreamParser $streamParser = null;
@@ -174,11 +171,7 @@ final class ParserRegistry
 
     public function getSequenceEntryParser(): SequenceEntryParser
     {
-        return $this->sequenceEntryParser ??= $this->assembler->createSequenceEntryParser(
-            $this->parseCompactBlockMapping ?? throw new \LogicException('Block parser bridge not set'),
-            $this->parseCompactBlockSequence ?? throw new \LogicException('Block parser bridge not set'),
-            $this->parseValue ?? throw new \LogicException('Block parser bridge not set'),
-        );
+        return $this->sequenceEntryParser ??= $this->assembler->createSequenceEntryParser($this);
     }
 
     public function getSimpleScalarParser(): SimpleScalarParser
@@ -194,16 +187,6 @@ final class ParserRegistry
     public function getValueParser(): ValueParser
     {
         return $this->valueParser ??= $this->assembler->createValueParser($this);
-    }
-
-    public function setBlockParserBridge(
-        \Closure $parseCompactBlockMapping,
-        \Closure $parseCompactBlockSequence,
-        \Closure $parseValue,
-    ): void {
-        $this->parseCompactBlockMapping = $parseCompactBlockMapping;
-        $this->parseCompactBlockSequence = $parseCompactBlockSequence;
-        $this->parseValue = $parseValue;
     }
 
     public function setFlowHost(FlowHost $flowHost): void

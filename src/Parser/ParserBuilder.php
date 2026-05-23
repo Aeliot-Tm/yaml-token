@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace Aeliot\YamlToken\Parser;
 
-use Aeliot\YamlToken\Node\BlockMappingNode;
-use Aeliot\YamlToken\Node\BlockSequenceNode;
 use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\MergeInstructionNode;
 use Aeliot\YamlToken\Node\ValueNode;
@@ -35,7 +33,6 @@ final class ParserBuilder
         $assembler = $this->createAssembler();
         $parserRegistry = new ParserRegistry($assembler);
 
-        $this->populateBlockParserBridge($parserRegistry);
         $this->populateFlowHost($parserRegistry);
 
         return new Parser($parserRegistry);
@@ -59,15 +56,6 @@ final class ParserBuilder
             $lookAheadHelper,
             $multilineContinuationHelper,
             $nodeFactory,
-        );
-    }
-
-    private function populateBlockParserBridge(ParserRegistry $registry): void
-    {
-        $registry->setBlockParserBridge(
-            fn (ParseContext $parseContext, int $indent): BlockMappingNode => $registry->getCompactBlockMappingParser()->parseCompactBlockMapping($parseContext, $indent),
-            fn (ParseContext $parseContext, int $indent): BlockSequenceNode => $registry->getCompactBlockSequenceParser()->parseCompactBlockSequence($parseContext, $indent),
-            fn (ParseContext $parseContext, int $parentIndentLen): ValueNode => $registry->getValueParser()->parseValue($parseContext, $parentIndentLen),
         );
     }
 

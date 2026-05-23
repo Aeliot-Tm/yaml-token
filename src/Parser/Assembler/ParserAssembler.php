@@ -197,19 +197,14 @@ final class ParserAssembler
         return new NodePropertiesParser($this->errorHelper);
     }
 
-    public function createSequenceEntryParser(
-        \Closure $parseCompactBlockMapping,
-        \Closure $parseCompactBlockSequence,
-        \Closure $parseValue,
-    ): SequenceEntryParser {
+    public function createSequenceEntryParser(ParserRegistry $registry): SequenceEntryParser
+    {
         return new SequenceEntryParser(
             $this->errorHelper,
             $this->getFlowStructureIdentifier(),
             $this->getKeyIdentifier(),
             $this->nodeFactory,
-            $parseCompactBlockMapping,
-            $parseCompactBlockSequence,
-            $parseValue,
+            $registry,
         );
     }
 

@@ -14,8 +14,6 @@ declare(strict_types=1);
 namespace Aeliot\YamlToken\Parser\SubParser\Block;
 
 use Aeliot\YamlToken\Enum\TokenType;
-use Aeliot\YamlToken\Node\BlockMappingNode;
-use Aeliot\YamlToken\Node\BlockSequenceNode;
 use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
@@ -26,23 +24,18 @@ use Aeliot\YamlToken\Parser\Helper\Identifier\FlowStructureIdentifier;
 use Aeliot\YamlToken\Parser\Helper\Identifier\KeyIdentifier;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
 use Aeliot\YamlToken\Parser\ParseContext;
+use Aeliot\YamlToken\Parser\ParserRegistry;
+use Aeliot\YamlToken\Parser\SubParser\ValueParser;
 use Aeliot\YamlToken\Token\Token;
 
 final readonly class SequenceEntryParser implements SubParserInterface
 {
-    /**
-     * @param \Closure(ParseContext, int): BlockMappingNode $parseCompactBlockMapping
-     * @param \Closure(ParseContext, int): BlockSequenceNode $parseCompactBlockSequence
-     * @param \Closure(ParseContext, int): ValueNode $parseValue
-     */
     public function __construct(
         private ErrorHelper $errorHelper,
         private FlowStructureIdentifier $flowStructureIdentifier,
         private KeyIdentifier $keyIdentifier,
         private NodeFactory $nodeFactory,
-        private \Closure $parseCompactBlockMapping,
-        private \Closure $parseCompactBlockSequence,
-        private \Closure $parseValue,
+        private ParserRegistry $registry,
     ) {
     }
 
@@ -84,7 +77,7 @@ final readonly class SequenceEntryParser implements SubParserInterface
      *  - a compact in-line block sequence (rule [186] ns-l-compact-sequence),
      *    when the entry content starts with another '-' on the same line
      *    (Example 8.15);
-     *  - a generic block / flow / scalar node (delegated to {@see parseValue()}).
+     *  - a generic block / flow / scalar node (delegated to {@see ValueParser::parseValue()}).
      *
      * $compactIndent is the column of the entry's first content character,
      * i.e. (indent of '-') + length('-') + length of WHITESPACE tokens
@@ -124,14 +117,14 @@ final readonly class SequenceEntryParser implements SubParserInterface
             || $nodePropertiesFollowedByValueIndicator
         ) {
             $valueNode = new ValueNode();
-            $valueNode->addChild(($this->parseCompactBlockMapping)($parseContext, $compactIndent));
+            $valueNode->addChild($this->registry->getCompactBlockMappingParser()->parseCompactBlockMapping($parseContext, $compactIndent));
 
             return $valueNode;
         }
 
         if (TokenType::SEQUENCE_ENTRY === $parseContext->tokens->current()?->type) {
             $valueNode = new ValueNode();
-            $valueNode->addChild(($this->parseCompactBlockSequence)($parseContext, $compactIndent));
+            $valueNode->addChild($this->registry->getCompactBlockSequenceParser()->parseCompactBlockSequence($parseContext, $compactIndent));
 
             return $valueNode;
         }
@@ -142,12 +135,12 @@ final readonly class SequenceEntryParser implements SubParserInterface
             && $this->flowStructureIdentifier->isFlowCollectionFollowedByBlockValueIndicatorOnSameLine($parseContext, 0)
         ) {
             $valueNode = new ValueNode();
-            $valueNode->addChild(($this->parseCompactBlockMapping)($parseContext, $compactIndent));
+            $valueNode->addChild($this->registry->getCompactBlockMappingParser()->parseCompactBlockMapping($parseContext, $compactIndent));
 
             return $valueNode;
         }
 
-        return ($this->parseValue)($parseContext, $parentIndentLen);
+        return $this->registry->getValueParser()->parseValue($parseContext, $parentIndentLen);
     }
 
     private function isNodePropertyToken(?Token $token): bool
