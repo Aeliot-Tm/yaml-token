@@ -72,7 +72,8 @@ final readonly class KeyValueCoupleParser implements SubParserInterface
         if (null !== $afterKey && TokenType::NEWLINE === $afterKey->type) {
             $head = $this->lookAheadHelper->peekFirstSignificantBlockHead($parseContext->tokens, 1);
             if (null !== $head) {
-                [$headIndentLen, $significantToken] = $head;
+                $headIndentLen = $head->indentLen;
+                $significantToken = $head->significantToken;
                 if (TokenType::VALUE_INDICATOR === $significantToken->type && $headIndentLen === $entryIndentLen) {
                     $this->consumer->collectTypes($parseContext->tokens, [
                         TokenType::COMMENT,

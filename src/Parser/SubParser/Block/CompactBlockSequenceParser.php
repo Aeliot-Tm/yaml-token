@@ -63,7 +63,7 @@ final readonly class CompactBlockSequenceParser implements SubParserInterface
 
         while (!$parseContext->tokens->isEnd()) {
             $head = $this->lookAheadHelper->peekFirstSignificantBlockHead($parseContext->tokens, 0);
-            if (null === $head || $head[0] !== $indentLen) {
+            if (null === $head || $head->indentLen !== $indentLen) {
                 break;
             }
 

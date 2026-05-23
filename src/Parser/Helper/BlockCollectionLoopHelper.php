@@ -56,7 +56,7 @@ final readonly class BlockCollectionLoopHelper
         callable $isBareDocumentEntry,
     ): ?int {
         $head = $this->lookAheadHelper->peekFirstSignificantBlockHead($parseContext->tokens, 0);
-        if (null === $head || $head[0] <= $parentIndentLen) {
+        if (null === $head || $head->indentLen <= $parentIndentLen) {
             return null;
         }
 

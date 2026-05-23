@@ -74,7 +74,9 @@ final readonly class KeyParser implements SubParserInterface
                 return;
             }
 
-            [$indentLen, $significantToken, $scalarPeekOffset] = $head;
+            $indentLen = $head->indentLen;
+            $significantToken = $head->significantToken;
+            $scalarPeekOffset = $head->peekOffset;
             if ($indentLen <= $entryIndentLen) {
                 return;
             }

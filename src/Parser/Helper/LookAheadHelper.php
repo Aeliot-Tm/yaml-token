@@ -17,8 +17,8 @@ use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\IndentationNode;
 use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Parser\Consumer;
+use Aeliot\YamlToken\Parser\Dto\LookAheadResult;
 use Aeliot\YamlToken\Parser\Dto\TokenStreamProxy;
-use Aeliot\YamlToken\Token\Token;
 
 final readonly class LookAheadHelper
 {
@@ -78,16 +78,15 @@ final readonly class LookAheadHelper
      *                    0 - when layout from the current position must be included in the scan;
      *                    1 - when the current token is already known, e.g. NEWLINE after ':';
      *
-     * @return array{int, Token, int}|null Tuple of [indentLen, significantToken, offset] pointing
-     *                                     at the first significant line:
-     *                                     - indentLen is the byte-length of that line's
-     *                                     leading INDENTATION token (0 for column-0 lines);
-     *                                     - significantToken is the first non-WHITESPACE/COMMENT
-     *                                     token of that line.
-     *                                     - offset is the TokenStreamProxy peek offset of significantToken.
-     *                                     Returns null if the stream ends with only insignificant lines.
+     * @return LookAheadResult|null Result pointing at the first significant line:
+     *                              - indentLen is the byte-length of that line's
+     *                              leading INDENTATION token (0 for column-0 lines);
+     *                              - significantToken is the first non-WHITESPACE/COMMENT
+     *                              token of that line.
+     *                              - peekOffset is the TokenStreamProxy peek offset of significantToken.
+     *                              Returns null if the stream ends with only insignificant lines.
      */
-    public function peekFirstSignificantBlockHead(TokenStreamProxy $tokens, int $offset): ?array
+    public function peekFirstSignificantBlockHead(TokenStreamProxy $tokens, int $offset): ?LookAheadResult
     {
         while (true) {
             $token = $tokens->peek($offset);
@@ -111,7 +110,7 @@ final readonly class LookAheadHelper
                     continue 2;
                 }
                 if (TokenType::COMMENT !== $candidate->type && TokenType::WHITESPACE !== $candidate->type) {
-                    return [$indentLen, $candidate, $probe];
+                    return new LookAheadResult($indentLen, $candidate, $probe);
                 }
                 ++$probe;
             }

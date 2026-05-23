@@ -57,7 +57,9 @@ final readonly class IndentedBlockValueParser implements SubParserInterface
         if (null === $head) {
             return;
         }
-        [$indentLen, $afterIndent, $afterIndentOffset] = $head;
+        $indentLen = $head->indentLen;
+        $afterIndent = $head->significantToken;
+        $afterIndentOffset = $head->peekOffset;
 
         if ($indentLen > 0) {
             $this->dispatchIndentedContent(
