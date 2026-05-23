@@ -20,7 +20,6 @@ use Aeliot\YamlToken\Node\IndentationNode;
 use Aeliot\YamlToken\Node\MultilinePlainScalarNode;
 use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\ValueNode;
-use Aeliot\YamlToken\Node\WhitespaceNode;
 use Aeliot\YamlToken\Parser\Consumer;
 use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
 use Aeliot\YamlToken\Parser\Enum\EspecialIndent;
@@ -146,34 +145,7 @@ final readonly class ValueParser implements SubParserInterface
             // trailing "empty" indented lines belong to the block scalar and must be
             // consumed here (even with strip chomping they are excluded from content but
             // still consumed from the token stream).
-            while (true) {
-                $newLineToken = $parseContext->tokens->current();
-                if (TokenType::NEWLINE !== $newLineToken?->type) {
-                    break;
-                }
-                $indentationToken = $parseContext->tokens->peek(1);
-                if (TokenType::INDENTATION !== $indentationToken?->type) {
-                    break;
-                }
-                $probe = 2;
-                while (TokenType::WHITESPACE === $parseContext->tokens->peek($probe)?->type) {
-                    ++$probe;
-                }
-                $afterIndentation = $parseContext->tokens->peek($probe);
-                if (null !== $afterIndentation && TokenType::NEWLINE !== $afterIndentation->type) {
-                    break;
-                }
-                $valueNode->addChild(new NewLineNode($newLineToken));
-                $parseContext->tokens->advance();
-                $valueNode->addChild(new IndentationNode($indentationToken));
-                $parseContext->tokens->advance();
-                $emptyLineSpace = $parseContext->tokens->current();
-                while (TokenType::WHITESPACE === $emptyLineSpace->type) {
-                    $valueNode->addChild(new WhitespaceNode($emptyLineSpace));
-                    $parseContext->tokens->advance();
-                    $emptyLineSpace = $parseContext->tokens->current();
-                }
-            }
+            $this->consumer->consumeTrailingEmptyLines($parseContext->tokens, $valueNode);
 
             // Non-empty continuation lines (| / > body): same newline + indent + scalar
             // structure as multiline plain scalars (YAML 1.2.2 §8.1.1).

@@ -76,4 +76,45 @@ final readonly class Consumer
             $tokens->advance();
         }
     }
+
+    /**
+     * Consumes trailing "empty" indented lines after the first block scalar payload line
+     * (YAML 1.2.2 §8.1.1.2 / rule [166]-[168] l-chomped-empty(n,t)).
+     */
+    public function consumeTrailingEmptyLines(TokenStreamProxy $tokens, Node $target): void
+    {
+        while (true) {
+            $newLineToken = $tokens->current();
+            if (TokenType::NEWLINE !== $newLineToken?->type) {
+                break;
+            }
+
+            $indentationToken = $tokens->peek(1);
+            if (TokenType::INDENTATION !== $indentationToken?->type) {
+                break;
+            }
+
+            $probe = 2;
+            while (TokenType::WHITESPACE === $tokens->peek($probe)?->type) {
+                ++$probe;
+            }
+
+            $afterIndentation = $tokens->peek($probe);
+            if (null !== $afterIndentation && TokenType::NEWLINE !== $afterIndentation->type) {
+                break;
+            }
+
+            $target->addChild($this->nodeFactory->createSimpleNode($newLineToken));
+            $tokens->advance();
+            $target->addChild($this->nodeFactory->createSimpleNode($indentationToken));
+            $tokens->advance();
+
+            $emptyLineSpace = $tokens->current();
+            while (TokenType::WHITESPACE === $emptyLineSpace?->type) {
+                $target->addChild($this->nodeFactory->createSimpleNode($emptyLineSpace));
+                $tokens->advance();
+                $emptyLineSpace = $tokens->current();
+            }
+        }
+    }
 }

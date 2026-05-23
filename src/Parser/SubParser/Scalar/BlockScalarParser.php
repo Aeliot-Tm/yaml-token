@@ -79,39 +79,7 @@ final readonly class BlockScalarParser implements SubParserInterface
         $keyNode->setName($scalarNode);
         $tokens->advance();
 
-        while (true) {
-            $newLineToken = $tokens->current();
-            if (TokenType::NEWLINE !== $newLineToken?->type) {
-                break;
-            }
-
-            $indentationToken = $tokens->peek(1);
-            if (TokenType::INDENTATION !== $indentationToken?->type) {
-                break;
-            }
-
-            $probe = 2;
-            while (TokenType::WHITESPACE === $tokens->peek($probe)?->type) {
-                ++$probe;
-            }
-
-            $afterIndentation = $tokens->peek($probe);
-            if (null !== $afterIndentation && TokenType::NEWLINE !== $afterIndentation->type) {
-                break;
-            }
-
-            $keyNode->addChild(new NewLineNode($newLineToken));
-            $tokens->advance();
-            $keyNode->addChild(new IndentationNode($indentationToken));
-            $tokens->advance();
-
-            $emptyLineSpace = $tokens->current();
-            while (TokenType::WHITESPACE === $emptyLineSpace?->type) {
-                $keyNode->addChild(new WhitespaceNode($emptyLineSpace));
-                $tokens->advance();
-                $emptyLineSpace = $tokens->current();
-            }
-        }
+        $this->consumer->consumeTrailingEmptyLines($tokens, $keyNode);
     }
 
     /**
