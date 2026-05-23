@@ -15,27 +15,22 @@ namespace Aeliot\YamlToken\Parser\SubParser\Block;
 
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\BlockMappingNode;
-use Aeliot\YamlToken\Parser\Consumer;
 use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
-use Aeliot\YamlToken\Parser\Enum\EspecialIndent;
 use Aeliot\YamlToken\Parser\Exception\IndentationInvalidException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
+use Aeliot\YamlToken\Parser\Helper\BlockCollectionLoopHelper;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
 use Aeliot\YamlToken\Parser\Helper\Identifier\BlockStructureIdentifier;
-use Aeliot\YamlToken\Parser\Helper\IndentationHelper;
-use Aeliot\YamlToken\Parser\Helper\LookAheadHelper;
 use Aeliot\YamlToken\Parser\ParseContext;
 use Aeliot\YamlToken\Parser\ParserRegistry;
 
 final readonly class BlockMappingParser implements SubParserInterface
 {
     public function __construct(
+        private BlockCollectionLoopHelper $blockCollectionLoopHelper,
         private BlockStructureIdentifier $blockStructureIdentifier,
-        private Consumer $consumer,
         private ErrorHelper $errorHelper,
-        private IndentationHelper $indentationHelper,
-        private LookAheadHelper $lookAheadHelper,
         private ParserRegistry $registry,
     ) {
     }
@@ -48,38 +43,17 @@ final readonly class BlockMappingParser implements SubParserInterface
         $previousCoupleIndentLen = null;
 
         while (!$parseContext->tokens->isEnd()) {
-            $head = $this->lookAheadHelper->peekFirstSignificantBlockHead($parseContext->tokens, 0);
-            if (null === $head || $head[0] <= $parentIndentLen) {
+            $indentLen = $this->blockCollectionLoopHelper->advanceToNextBlockEntry(
+                $parseContext,
+                $blockMapping,
+                $parentIndentLen,
+                fn (ParseContext $ctx): bool => $this->blockStructureIdentifier->isKeyValueCoupleStart($ctx),
+            );
+            if (null === $indentLen) {
                 break;
             }
-
-            $this->consumer->collectSpaceCommentEnds($parseContext->tokens, $blockMapping);
-            $this->lookAheadHelper->collectInsignificantIndentationLines($parseContext->tokens, $blockMapping);
 
             $token = $parseContext->tokens->current();
-            if (null === $token) {
-                break;
-            }
-
-            if (TokenType::INDENTATION === $token->type) {
-                $indentLen = \strlen($token->text);
-            } elseif (
-                EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value === $parentIndentLen
-                && $this->blockStructureIdentifier->isKeyValueCoupleStart($parseContext)
-            ) {
-                $indentLen = 0;
-            } else {
-                break;
-            }
-
-            if ($indentLen > 0) {
-                $this->indentationHelper->registerIndentStepIfNeeded($parseContext->state, $parseContext->tokens, $indentLen);
-                $this->indentationHelper->assertIndentLenIsValid($parseContext->state, $parseContext->tokens, $indentLen);
-            }
-
-            if ($indentLen <= $parentIndentLen) {
-                break;
-            }
 
             if (null === $baseIndentLen) {
                 $baseIndentLen = $indentLen;

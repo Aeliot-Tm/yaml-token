@@ -15,6 +15,7 @@ namespace Aeliot\YamlToken\Parser\Assembler;
 
 use Aeliot\YamlToken\Parser\Consumer;
 use Aeliot\YamlToken\Parser\Helper\AnchorPostProcessor;
+use Aeliot\YamlToken\Parser\Helper\BlockCollectionLoopHelper;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
 use Aeliot\YamlToken\Parser\Helper\FlowCollectionHelper;
 use Aeliot\YamlToken\Parser\Helper\Identifier\BlockStructureIdentifier;
@@ -51,6 +52,7 @@ use Aeliot\YamlToken\Parser\SubParser\ValueParser;
 
 final class ParserAssembler
 {
+    private ?BlockCollectionLoopHelper $blockCollectionLoopHelper = null;
     private ?BlockStructureIdentifier $blockStructureIdentifier = null;
     private ?FlowCollectionHelper $flowCollectionHelper = null;
     private ?FlowStructureIdentifier $flowStructureIdentifier = null;
@@ -72,11 +74,9 @@ final class ParserAssembler
     public function createBlockMappingParser(ParserRegistry $registry): BlockMappingParser
     {
         return new BlockMappingParser(
+            $this->getBlockCollectionLoopHelper(),
             $this->getBlockStructureIdentifier(),
-            $this->consumer,
             $this->errorHelper,
-            $this->indentationHelper,
-            $this->lookAheadHelper,
             $registry,
         );
     }
@@ -94,10 +94,8 @@ final class ParserAssembler
     public function createBlockSequenceParser(ParserRegistry $registry): BlockSequenceParser
     {
         return new BlockSequenceParser(
-            $this->consumer,
+            $this->getBlockCollectionLoopHelper(),
             $this->errorHelper,
-            $this->indentationHelper,
-            $this->lookAheadHelper,
             $this->getSequenceIdentifier(),
             $registry,
         );
@@ -249,6 +247,15 @@ final class ParserAssembler
     public function getAnchorPostProcessor(): AnchorPostProcessor
     {
         return $this->anchorPostProcessor;
+    }
+
+    public function getBlockCollectionLoopHelper(): BlockCollectionLoopHelper
+    {
+        return $this->blockCollectionLoopHelper ??= new BlockCollectionLoopHelper(
+            $this->consumer,
+            $this->indentationHelper,
+            $this->lookAheadHelper,
+        );
     }
 
     public function getBlockStructureIdentifier(): BlockStructureIdentifier
