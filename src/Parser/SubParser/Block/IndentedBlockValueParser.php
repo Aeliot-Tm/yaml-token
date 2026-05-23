@@ -74,28 +74,7 @@ final readonly class IndentedBlockValueParser implements SubParserInterface
         }
 
         if (EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value === $parentIndentLen) {
-            if (TokenType::SEQUENCE_ENTRY === $afterIndent->type) {
-                $this->consumeBlockValueOpeningLayout($parseContext, $valueNode);
-                $valueNode->addChild(
-                    $this->registry
-                        ->getBlockSequenceParser()
-                        ->parseBlockSequenceValue($parseContext, EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value),
-                );
-
-                return;
-            }
-            if (
-                TokenType::EXPLICIT_KEY_INDICATOR === $afterIndent->type
-                || TokenType::MERGE_INDICATOR === $afterIndent->type
-                || $afterIndent->type->isScalar()
-            ) {
-                $this->consumeBlockValueOpeningLayout($parseContext, $valueNode);
-                $valueNode->addChild(
-                    $this->registry
-                        ->getBlockMappingParser()
-                        ->parseBlockMappingValue($parseContext, EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value),
-                );
-            }
+            $this->dispatchBareDocumentContent($parseContext, $valueNode, $afterIndent);
         }
     }
 
@@ -187,6 +166,36 @@ final readonly class IndentedBlockValueParser implements SubParserInterface
         }
 
         $this->finishScalarWithPossibleMultiline($parseContext, $valueNode, $scalarToken, $parentIndentLen);
+    }
+
+    private function dispatchBareDocumentContent(
+        ParseContext $parseContext,
+        ValueNode $valueNode,
+        Token $afterIndent,
+    ): void {
+        if (TokenType::SEQUENCE_ENTRY === $afterIndent->type) {
+            $this->consumeBlockValueOpeningLayout($parseContext, $valueNode);
+            $valueNode->addChild(
+                $this->registry
+                    ->getBlockSequenceParser()
+                    ->parseBlockSequenceValue($parseContext, EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value),
+            );
+
+            return;
+        }
+
+        if (
+            TokenType::EXPLICIT_KEY_INDICATOR === $afterIndent->type
+            || TokenType::MERGE_INDICATOR === $afterIndent->type
+            || $afterIndent->type->isScalar()
+        ) {
+            $this->consumeBlockValueOpeningLayout($parseContext, $valueNode);
+            $valueNode->addChild(
+                $this->registry
+                    ->getBlockMappingParser()
+                    ->parseBlockMappingValue($parseContext, EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value),
+            );
+        }
     }
 
     /**
