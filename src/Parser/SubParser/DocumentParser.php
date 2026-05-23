@@ -33,6 +33,7 @@ use Aeliot\YamlToken\Parser\Helper\Identifier\FlowStructureIdentifier;
 use Aeliot\YamlToken\Parser\Helper\Identifier\NodePropertyIdentifier;
 use Aeliot\YamlToken\Parser\ParseContext;
 use Aeliot\YamlToken\Parser\ParserRegistry;
+use Aeliot\YamlToken\Token\Token;
 
 final readonly class DocumentParser implements SubParserInterface
 {
@@ -50,179 +51,20 @@ final readonly class DocumentParser implements SubParserInterface
         $addedDocs = [];
         $document = new DocumentNode();
         while (!$parseContext->tokens->isEnd()) {
+            if ($this->tryConsumeDocumentMarker($parseContext, $document, $stream, $addedDocs)) {
+                continue;
+            }
+            if ($this->tryConsumeDirectiveToken($parseContext, $document)) {
+                continue;
+            }
+            if ($this->tryConsumeDocumentLayoutToken($parseContext, $document)) {
+                continue;
+            }
+            if ($this->tryParseDocumentRootContent($parseContext, $document)) {
+                continue;
+            }
+
             $token = $parseContext->tokens->current();
-
-            if (TokenType::DOCUMENT_START === $token->type) {
-                if ($document->getChildren()) {
-                    $this->tryAddDocumentToStream($stream, $document, $addedDocs);
-                    $document = new DocumentNode();
-                }
-
-                $document->addChild(new DocumentStartNode($token));
-                $this->tryAddDocumentToStream($stream, $document, $addedDocs);
-                $parseContext->tokens->advance();
-                continue;
-            }
-
-            if (TokenType::DOCUMENT_END === $token->type) {
-                $document->addChild(new DocumentEndNode($token));
-                $this->tryAddDocumentToStream($stream, $document, $addedDocs);
-                $parseContext->tokens->advance();
-                $this->consumeDocumentEndLineSuffix($parseContext, $document);
-                $document = new DocumentNode();
-                continue;
-            }
-
-            if (TokenType::DIRECTIVE === $token->type) {
-                $document->addChild(new DirectiveNode($token));
-                $parseContext->tokens->advance();
-                continue;
-            }
-
-            if (TokenType::DIRECTIVE_YAML_INDICATOR === $token->type) {
-                $document->addChild($this->registry->getDirectiveParser()->parseYamlDirective($parseContext));
-                continue;
-            }
-
-            if (TokenType::DIRECTIVE_TAG_INDICATOR === $token->type) {
-                $document->addChild($this->registry->getDirectiveParser()->parseTagDirective($parseContext));
-                continue;
-            }
-
-            if (TokenType::COMMENT === $token->type) {
-                $document->addChild(new CommentNode($token));
-                $parseContext->tokens->advance();
-                continue;
-            }
-
-            if (TokenType::NEWLINE === $token->type) {
-                $document->addChild(new NewLineNode($token));
-                $parseContext->tokens->advance();
-                continue;
-            }
-
-            // Preserve trailing spaces on otherwise blank lines: whitespace before NEWLINE is not structural.
-            if (TokenType::WHITESPACE === $token->type && TokenType::NEWLINE === $parseContext->tokens->peek(1)?->type) {
-                $document->addChild(new WhitespaceNode($token));
-                $parseContext->tokens->advance();
-                continue;
-            }
-
-            if (TokenType::INDENTATION === $token->type && TokenType::COMMENT === $parseContext->tokens->peek(1)?->type) {
-                $document->addChild(new IndentationNode($token));
-                $parseContext->tokens->advance();
-                continue;
-            }
-
-            // YAML 1.2.2 §6.6 Comments: "Comments must be separated from other tokens by white space characters."
-            // Handles `s-separate-in-line` between a preceding token on the same line (e.g. DOCUMENT_START/END) and a trailing comment.
-            if (TokenType::WHITESPACE === $token->type && TokenType::COMMENT === $parseContext->tokens->peek(1)?->type) {
-                $document->addChild(new WhitespaceNode($token));
-                $parseContext->tokens->advance();
-                continue;
-            }
-
-            if ($this->blockStructureIdentifier->isBlockScalarStartAtDocumentRoot($parseContext)) {
-                while (true) {
-                    $separation = $parseContext->tokens->current();
-                    if (TokenType::INDENTATION === $separation?->type) {
-                        $document->addChild(new IndentationNode($separation));
-                        $parseContext->tokens->advance();
-                        continue;
-                    }
-                    if (TokenType::WHITESPACE === $separation?->type) {
-                        $document->addChild(new WhitespaceNode($separation));
-                        $parseContext->tokens->advance();
-                        continue;
-                    }
-                    break;
-                }
-
-                $document->addChild($this->registry->getValueParser()->parseValue($parseContext, EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value));
-                continue;
-            }
-
-            if (TokenType::ALIAS === $token->type) {
-                $document->addChild($this->registry->getValueParser()->parseValue($parseContext, EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value));
-                continue;
-            }
-
-            if ($this->blockStructureIdentifier->isSequenceStart($parseContext)) {
-                $sequenceEntry = new BlockSequenceEntryNode();
-                $document->addChild($sequenceEntry);
-
-                $leadingIndent = 0;
-                if (TokenType::INDENTATION === $token->type) {
-                    $sequenceEntry->addChild(new IndentationNode($token));
-                    $leadingIndent = \strlen($token->text);
-                    $parseContext->tokens->advance();
-                }
-
-                $compactIndent = $leadingIndent + $this->registry
-                        ->getSequenceEntryParser()
-                        ->consumeSequenceEntryIndicatorAndSpaces($parseContext, $sequenceEntry);
-
-                $sequenceEntry->addChild(
-                    $this->registry
-                        ->getSequenceEntryParser()
-                        ->parseSequenceEntryValue($parseContext, $leadingIndent, $compactIndent),
-                );
-                continue;
-            }
-
-            if ($this->blockStructureIdentifier->isKeyValueCoupleStart($parseContext)) {
-                $indentLen = 0;
-                if (TokenType::INDENTATION === $token->type) {
-                    $indentLen = \strlen($token->text);
-                }
-
-                $this->registry
-                    ->getKeyValueCoupleParser()
-                    ->parseKeyValueCoupleAtCurrentPosition($parseContext, $document, $indentLen);
-                continue;
-            }
-
-            if ($token->type->isScalar()) {
-                $document->addChild($this->registry->getValueParser()->parseValue($parseContext, EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value));
-                continue;
-            }
-
-            if ($this->nodePropertyIdentifier->isNodePropertyAtDocumentRoot($parseContext)) {
-                if (TokenType::INDENTATION === $token->type) {
-                    $document->addChild(new IndentationNode($token));
-                    $parseContext->tokens->advance();
-                }
-
-                $document->addChild($this->registry->getValueParser()->parseValue($parseContext, EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value));
-                continue;
-            }
-
-            if ($this->flowStructureIdentifier->isFlowMappingStart($parseContext)) {
-                if (TokenType::INDENTATION === $token->type) {
-                    $document->addChild(new IndentationNode($token));
-                    $parseContext->tokens->advance();
-                }
-
-                $document->addChild($this->registry->getFlowMappingParser()->parse($parseContext));
-                continue;
-            }
-
-            if ($this->flowStructureIdentifier->isFlowSequenceStart($parseContext)) {
-                if (TokenType::INDENTATION === $token->type) {
-                    $document->addChild(new IndentationNode($token));
-                    $parseContext->tokens->advance();
-                }
-
-                $document->addChild($this->registry->getFlowSequenceParser()->parse($parseContext));
-                continue;
-            }
-
-            if (TokenType::WHITESPACE === $token->type) {
-                $document->addChild(new WhitespaceNode($token));
-                $parseContext->tokens->advance();
-                continue;
-            }
-
             throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Unexpected type: %s', $token->type->value), $token));
         }
 
@@ -263,6 +105,40 @@ final readonly class DocumentParser implements SubParserInterface
         }
     }
 
+    private function consumeOptionalLeadingIndent(ParseContext $parseContext, DocumentNode $document): void
+    {
+        $token = $parseContext->tokens->current();
+        if (TokenType::INDENTATION !== $token->type) {
+            return;
+        }
+
+        $document->addChild(new IndentationNode($token));
+        $parseContext->tokens->advance();
+    }
+
+    private function parseDocumentRootSequenceEntry(ParseContext $parseContext, DocumentNode $document, Token $token): void
+    {
+        $sequenceEntry = new BlockSequenceEntryNode();
+        $document->addChild($sequenceEntry);
+
+        $leadingIndent = 0;
+        if (TokenType::INDENTATION === $token->type) {
+            $sequenceEntry->addChild(new IndentationNode($token));
+            $leadingIndent = \strlen($token->text);
+            $parseContext->tokens->advance();
+        }
+
+        $compactIndent = $leadingIndent + $this->registry
+                ->getSequenceEntryParser()
+                ->consumeSequenceEntryIndicatorAndSpaces($parseContext, $sequenceEntry);
+
+        $sequenceEntry->addChild(
+            $this->registry
+                ->getSequenceEntryParser()
+                ->parseSequenceEntryValue($parseContext, $leadingIndent, $compactIndent),
+        );
+    }
+
     /**
      * @param array<int, bool> $addedDocs
      */
@@ -275,5 +151,200 @@ final readonly class DocumentParser implements SubParserInterface
 
         $stream->addChild($document);
         $addedDocs[$objectId] = true;
+    }
+
+    private function tryConsumeDirectiveToken(ParseContext $parseContext, DocumentNode $document): bool
+    {
+        $token = $parseContext->tokens->current();
+
+        if (TokenType::DIRECTIVE === $token->type) {
+            $document->addChild(new DirectiveNode($token));
+            $parseContext->tokens->advance();
+
+            return true;
+        }
+
+        if (TokenType::DIRECTIVE_YAML_INDICATOR === $token->type) {
+            $document->addChild($this->registry->getDirectiveParser()->parseYamlDirective($parseContext));
+
+            return true;
+        }
+
+        if (TokenType::DIRECTIVE_TAG_INDICATOR === $token->type) {
+            $document->addChild($this->registry->getDirectiveParser()->parseTagDirective($parseContext));
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private function tryConsumeDocumentLayoutToken(ParseContext $parseContext, DocumentNode $document): bool
+    {
+        $token = $parseContext->tokens->current();
+
+        if (TokenType::COMMENT === $token->type) {
+            $document->addChild(new CommentNode($token));
+            $parseContext->tokens->advance();
+
+            return true;
+        }
+
+        if (TokenType::NEWLINE === $token->type) {
+            $document->addChild(new NewLineNode($token));
+            $parseContext->tokens->advance();
+
+            return true;
+        }
+
+        // Preserve trailing spaces on otherwise blank lines: whitespace before NEWLINE is not structural.
+        if (TokenType::WHITESPACE === $token->type && TokenType::NEWLINE === $parseContext->tokens->peek(1)?->type) {
+            $document->addChild(new WhitespaceNode($token));
+            $parseContext->tokens->advance();
+
+            return true;
+        }
+
+        if (TokenType::INDENTATION === $token->type && TokenType::COMMENT === $parseContext->tokens->peek(1)?->type) {
+            $document->addChild(new IndentationNode($token));
+            $parseContext->tokens->advance();
+
+            return true;
+        }
+
+        // YAML 1.2.2 §6.6 Comments: "Comments must be separated from other tokens by white space characters."
+        // Handles `s-separate-in-line` between a preceding token on the same line (e.g. DOCUMENT_START/END) and a trailing comment.
+        if (TokenType::WHITESPACE === $token->type && TokenType::COMMENT === $parseContext->tokens->peek(1)?->type) {
+            $document->addChild(new WhitespaceNode($token));
+            $parseContext->tokens->advance();
+
+            return true;
+        }
+
+        if (TokenType::WHITESPACE === $token->type) {
+            $document->addChild(new WhitespaceNode($token));
+            $parseContext->tokens->advance();
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param array<int, bool> $addedDocs
+     */
+    private function tryConsumeDocumentMarker(
+        ParseContext $parseContext,
+        DocumentNode &$document,
+        StreamNode $stream,
+        array &$addedDocs,
+    ): bool {
+        $token = $parseContext->tokens->current();
+
+        if (TokenType::DOCUMENT_START === $token->type) {
+            if ($document->getChildren()) {
+                $this->tryAddDocumentToStream($stream, $document, $addedDocs);
+                $document = new DocumentNode();
+            }
+
+            $document->addChild(new DocumentStartNode($token));
+            $this->tryAddDocumentToStream($stream, $document, $addedDocs);
+            $parseContext->tokens->advance();
+
+            return true;
+        }
+
+        if (TokenType::DOCUMENT_END === $token->type) {
+            $document->addChild(new DocumentEndNode($token));
+            $this->tryAddDocumentToStream($stream, $document, $addedDocs);
+            $parseContext->tokens->advance();
+            $this->consumeDocumentEndLineSuffix($parseContext, $document);
+            $document = new DocumentNode();
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private function tryParseDocumentRootContent(ParseContext $parseContext, DocumentNode $document): bool
+    {
+        $token = $parseContext->tokens->current();
+
+        if ($this->blockStructureIdentifier->isBlockScalarStartAtDocumentRoot($parseContext)) {
+            while (true) {
+                $separation = $parseContext->tokens->current();
+                if (TokenType::INDENTATION === $separation?->type) {
+                    $document->addChild(new IndentationNode($separation));
+                    $parseContext->tokens->advance();
+                    continue;
+                }
+                if (TokenType::WHITESPACE === $separation?->type) {
+                    $document->addChild(new WhitespaceNode($separation));
+                    $parseContext->tokens->advance();
+                    continue;
+                }
+                break;
+            }
+
+            $document->addChild($this->registry->getValueParser()->parseValue($parseContext, EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value));
+
+            return true;
+        }
+
+        if (TokenType::ALIAS === $token->type) {
+            $document->addChild($this->registry->getValueParser()->parseValue($parseContext, EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value));
+
+            return true;
+        }
+
+        if ($this->blockStructureIdentifier->isSequenceStart($parseContext)) {
+            $this->parseDocumentRootSequenceEntry($parseContext, $document, $token);
+
+            return true;
+        }
+
+        if ($this->blockStructureIdentifier->isKeyValueCoupleStart($parseContext)) {
+            $indentLen = 0;
+            if (TokenType::INDENTATION === $token->type) {
+                $indentLen = \strlen($token->text);
+            }
+
+            $this->registry
+                ->getKeyValueCoupleParser()
+                ->parseKeyValueCoupleAtCurrentPosition($parseContext, $document, $indentLen);
+
+            return true;
+        }
+
+        if ($token->type->isScalar()) {
+            $document->addChild($this->registry->getValueParser()->parseValue($parseContext, EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value));
+
+            return true;
+        }
+
+        if ($this->nodePropertyIdentifier->isNodePropertyAtDocumentRoot($parseContext)) {
+            $this->consumeOptionalLeadingIndent($parseContext, $document);
+            $document->addChild($this->registry->getValueParser()->parseValue($parseContext, EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value));
+
+            return true;
+        }
+
+        if ($this->flowStructureIdentifier->isFlowMappingStart($parseContext)) {
+            $this->consumeOptionalLeadingIndent($parseContext, $document);
+            $document->addChild($this->registry->getFlowMappingParser()->parse($parseContext));
+
+            return true;
+        }
+
+        if ($this->flowStructureIdentifier->isFlowSequenceStart($parseContext)) {
+            $this->consumeOptionalLeadingIndent($parseContext, $document);
+            $document->addChild($this->registry->getFlowSequenceParser()->parse($parseContext));
+
+            return true;
+        }
+
+        return false;
     }
 }
