@@ -15,7 +15,6 @@ namespace Aeliot\YamlToken\Parser\SubParser\Block;
 
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\BlockMappingNode;
-use Aeliot\YamlToken\Node\MergeInstructionNode;
 use Aeliot\YamlToken\Parser\Consumer;
 use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
 use Aeliot\YamlToken\Parser\Enum\EspecialIndent;
@@ -31,16 +30,12 @@ use Aeliot\YamlToken\Parser\ParserRegistry;
 
 final readonly class BlockMappingParser implements SubParserInterface
 {
-    /**
-     * @param \Closure(ParseContext): MergeInstructionNode $parseMergeInstructionAtCurrentPosition
-     */
     public function __construct(
         private BlockStructureIdentifier $blockStructureIdentifier,
         private Consumer $consumer,
         private ErrorHelper $errorHelper,
         private IndentationHelper $indentationHelper,
         private LookAheadHelper $lookAheadHelper,
-        private \Closure $parseMergeInstructionAtCurrentPosition,
         private ParserRegistry $registry,
     ) {
     }
@@ -103,7 +98,9 @@ final readonly class BlockMappingParser implements SubParserInterface
                 ? $parseContext->tokens->peek(1)
                 : $token;
             if (TokenType::MERGE_INDICATOR === $mergeCandidate?->type) {
-                $blockMapping->addChild(($this->parseMergeInstructionAtCurrentPosition)($parseContext));
+                $blockMapping->addChild(
+                    $this->registry->getMergeInstructionParser()->parseMergeInstructionAtCurrentPosition($parseContext),
+                );
 
                 continue;
             }

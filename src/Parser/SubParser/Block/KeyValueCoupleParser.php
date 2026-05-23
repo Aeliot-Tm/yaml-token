@@ -17,7 +17,6 @@ use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\IndentationNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\Node;
-use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Parser\Consumer;
 use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedEndException;
@@ -29,15 +28,11 @@ use Aeliot\YamlToken\Parser\ParserRegistry;
 
 final readonly class KeyValueCoupleParser implements SubParserInterface
 {
-    /**
-     * @param \Closure(ParseContext, int): ValueNode $parseValue
-     */
     public function __construct(
         private AnchorPostProcessor $anchorPostProcessor,
         private Consumer $consumer,
         private ErrorHelper $errorHelper,
         private LookAheadHelper $lookAheadHelper,
-        private \Closure $parseValue,
         private ParserRegistry $registry,
     ) {
     }
@@ -101,7 +96,7 @@ final readonly class KeyValueCoupleParser implements SubParserInterface
         }
 
         $this->consumer->collectTypes($parseContext->tokens, [TokenType::VALUE_INDICATOR, TokenType::WHITESPACE], $keyValueCouple);
-        $keyValueCouple->addChild(($this->parseValue)($parseContext, $indentLen));
+        $keyValueCouple->addChild($this->registry->getValueParser()->parseValue($parseContext, $indentLen));
         $this->anchorPostProcessor->postProcessKeyValueCouple($parseContext->anchorsRegistry, $keyValueCouple);
     }
 }

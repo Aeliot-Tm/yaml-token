@@ -63,7 +63,6 @@ final class ParserRegistry
     private ?\Closure $parseBlockSequenceValue = null;
     private ?\Closure $parseCompactBlockMapping = null;
     private ?\Closure $parseCompactBlockSequence = null;
-    private ?\Closure $parseMergeInstructionAtCurrentPosition = null;
     private ?\Closure $parseValue = null;
     private ?SequenceEntryParser $sequenceEntryParser = null;
     private ?SimpleScalarParser $simpleScalarParser = null;
@@ -77,10 +76,7 @@ final class ParserRegistry
 
     public function getBlockMappingParser(): BlockMappingParser
     {
-        return $this->blockMappingParser ??= $this->assembler->createBlockMappingParser(
-            $this,
-            $this->parseMergeInstructionAtCurrentPosition ?? throw new \LogicException('Block parser bridge not set'),
-        );
+        return $this->blockMappingParser ??= $this->assembler->createBlockMappingParser($this);
     }
 
     public function getBlockScalarParser(): BlockScalarParser
@@ -165,10 +161,7 @@ final class ParserRegistry
 
     public function getKeyValueCoupleParser(): KeyValueCoupleParser
     {
-        return $this->keyValueCoupleParser ??= $this->assembler->createKeyValueCoupleParser(
-            $this,
-            $this->parseValue ?? throw new \LogicException('Block parser bridge not set'),
-        );
+        return $this->keyValueCoupleParser ??= $this->assembler->createKeyValueCoupleParser($this);
     }
 
     public function getMergeInstructionParser(): MergeInstructionParser
@@ -217,14 +210,12 @@ final class ParserRegistry
         \Closure $parseBlockSequenceValue,
         \Closure $parseCompactBlockMapping,
         \Closure $parseCompactBlockSequence,
-        \Closure $parseMergeInstructionAtCurrentPosition,
         \Closure $parseValue,
     ): void {
         $this->parseBlockMappingValue = $parseBlockMappingValue;
         $this->parseBlockSequenceValue = $parseBlockSequenceValue;
         $this->parseCompactBlockMapping = $parseCompactBlockMapping;
         $this->parseCompactBlockSequence = $parseCompactBlockSequence;
-        $this->parseMergeInstructionAtCurrentPosition = $parseMergeInstructionAtCurrentPosition;
         $this->parseValue = $parseValue;
     }
 

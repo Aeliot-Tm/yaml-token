@@ -65,17 +65,14 @@ final class ParserAssembler
     ) {
     }
 
-    public function createBlockMappingParser(
-        ParserRegistry $registry,
-        \Closure $parseMergeInstructionAtCurrentPosition,
-    ): BlockMappingParser {
+    public function createBlockMappingParser(ParserRegistry $registry): BlockMappingParser
+    {
         return new BlockMappingParser(
             $this->getBlockStructureIdentifier(),
             $this->consumer,
             $this->errorHelper,
             $this->indentationHelper,
             $this->lookAheadHelper,
-            $parseMergeInstructionAtCurrentPosition,
             $registry,
         );
     }
@@ -186,16 +183,13 @@ final class ParserAssembler
         );
     }
 
-    public function createKeyValueCoupleParser(
-        ParserRegistry $registry,
-        \Closure $parseValue,
-    ): KeyValueCoupleParser {
+    public function createKeyValueCoupleParser(ParserRegistry $registry): KeyValueCoupleParser
+    {
         return new KeyValueCoupleParser(
             $this->anchorPostProcessor,
             $this->consumer,
             $this->errorHelper,
             $this->lookAheadHelper,
-            $parseValue,
             $registry,
         );
     }
