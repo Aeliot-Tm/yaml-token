@@ -60,97 +60,15 @@ final readonly class IndentedBlockValueParser implements SubParserInterface
         [$indentLen, $afterIndent, $afterIndentOffset] = $head;
 
         if ($indentLen > 0) {
-            if ($indentLen === $parentIndentLen && TokenType::SEQUENCE_ENTRY === $afterIndent->type) {
-                $this->consumeBlockValueOpeningLayout($parseContext, $valueNode);
-                $valueNode->addChild($this->registry->getBlockSequenceParser()->parseBlockSequenceValue($parseContext, $parentIndentLen - 1, true));
-
-                return;
-            }
-
-            if ($indentLen <= $parentIndentLen) {
-                return;
-            }
-
-            if ($this->nodePropertyIdentifier->isNodePropertyToken($afterIndent) && $this->isNodePropertiesOnlyLine($parseContext, $afterIndentOffset)) {
-                $separatorContainer = $valueNode->getProperties() ?? $valueNode;
-                $separatorContainer->addChild(new NewLineNode($token));
-                $parseContext->tokens->advance();
-                $this->consumer->collectSpaceCommentEnds($parseContext->tokens, $separatorContainer);
-                $this->lookAheadHelper->collectInsignificantIndentationLines($parseContext->tokens, $separatorContainer);
-
-                $indentationToken = $parseContext->tokens->current();
-                if (null === $indentationToken || TokenType::INDENTATION !== $indentationToken->type) {
-                    throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Expected INDENTATION before node properties, but %s given', $indentationToken?->type->value ?? '_nothing_'), $parseContext->tokens));
-                }
-                $separatorContainer->addChild(new IndentationNode($indentationToken));
-                $parseContext->tokens->advance();
-
-                $this->registry->getNodePropertiesParser()->collectValueProperties($parseContext, $valueNode);
-
-                $next = $parseContext->tokens->current();
-                if (null === $next || TokenType::NEWLINE !== $next->type) {
-                    throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Expected NEWLINE after node properties, but %s given', $next?->type->value ?? '_nothing_'), $parseContext->tokens));
-                }
-
-                $this->parseIndentedBlockValue($parseContext, $valueNode, $parentIndentLen);
-
-                return;
-            }
-
-            if (TokenType::SEQUENCE_ENTRY === $afterIndent->type) {
-                $this->consumeBlockValueOpeningLayout($parseContext, $valueNode);
-                $valueNode->addChild($this->registry->getBlockSequenceParser()->parseBlockSequenceValue($parseContext, $parentIndentLen));
-
-                return;
-            }
-
-            if (
-                TokenType::FLOW_SEQUENCE_START === $afterIndent->type
-                || TokenType::FLOW_MAPPING_START === $afterIndent->type
-            ) {
-                $this->consumeBlockValueOpeningLayout($parseContext, $valueNode);
-
-                $indentationToken = $parseContext->tokens->current();
-                if (null === $indentationToken || TokenType::INDENTATION !== $indentationToken->type) {
-                    throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Expected INDENTATION before flow node, but %s given', $indentationToken?->type->value ?? '_nothing_'), $parseContext->tokens));
-                }
-                $valueNode->addChild(new IndentationNode($indentationToken));
-                $parseContext->tokens->advance();
-
-                $valueNode->addChild(
-                    TokenType::FLOW_SEQUENCE_START === $afterIndent->type
-                        ? $this->registry->getFlowSequenceParser()->parse($parseContext)
-                        : $this->registry->getFlowMappingParser()->parse($parseContext),
-                );
-
-                return;
-            }
-
-            if (
-                $this->nodePropertyIdentifier->isNodePropertyToken($afterIndent)
-                && !$this->nodePropertyIdentifier->isNodePropertiesFollowedByImplicitKeyFromOffset($parseContext, $afterIndentOffset)
-            ) {
-                $this->consumeIndentedBlockTaggedScalarValue($parseContext, $valueNode, $parentIndentLen);
-
-                return;
-            }
-
-            if (
-                \in_array($afterIndent->type, [
-                    TokenType::DOUBLE_QUOTED_SCALAR,
-                    TokenType::SINGLE_QUOTED_SCALAR,
-                    TokenType::PLAIN_SCALAR,
-                ], true)
-                && !$this->multilineContinuationHelper
-                    ->isImplicitYamlKeyOnContinuationLine($parseContext->tokens, $afterIndentOffset)
-            ) {
-                $this->consumeIndentedBlockScalarValue($parseContext, $valueNode, $parentIndentLen);
-
-                return;
-            }
-
-            $this->consumeBlockValueOpeningLayout($parseContext, $valueNode);
-            $valueNode->addChild($this->registry->getBlockMappingParser()->parseBlockMappingValue($parseContext, $parentIndentLen));
+            $this->dispatchIndentedContent(
+                $parseContext,
+                $valueNode,
+                $parentIndentLen,
+                $indentLen,
+                $afterIndent,
+                $afterIndentOffset,
+                $token,
+            );
 
             return;
         }
@@ -269,6 +187,112 @@ final readonly class IndentedBlockValueParser implements SubParserInterface
         }
 
         $this->finishScalarWithPossibleMultiline($parseContext, $valueNode, $scalarToken, $parentIndentLen);
+    }
+
+    /**
+     * Dispatches indented block value content when the next significant line has positive indent.
+     * Branch order is precedence: earlier branches win over later ones.
+     */
+    private function dispatchIndentedContent(
+        ParseContext $parseContext,
+        ValueNode $valueNode,
+        int $parentIndentLen,
+        int $indentLen,
+        Token $afterIndent,
+        int $afterIndentOffset,
+        Token $newlineToken,
+    ): void {
+        if ($indentLen === $parentIndentLen && TokenType::SEQUENCE_ENTRY === $afterIndent->type) {
+            $this->consumeBlockValueOpeningLayout($parseContext, $valueNode);
+            $valueNode->addChild($this->registry->getBlockSequenceParser()->parseBlockSequenceValue($parseContext, $parentIndentLen - 1, true));
+
+            return;
+        }
+
+        if ($indentLen <= $parentIndentLen) {
+            return;
+        }
+
+        if ($this->nodePropertyIdentifier->isNodePropertyToken($afterIndent) && $this->isNodePropertiesOnlyLine($parseContext, $afterIndentOffset)) {
+            $separatorContainer = $valueNode->getProperties() ?? $valueNode;
+            $separatorContainer->addChild(new NewLineNode($newlineToken));
+            $parseContext->tokens->advance();
+            $this->consumer->collectSpaceCommentEnds($parseContext->tokens, $separatorContainer);
+            $this->lookAheadHelper->collectInsignificantIndentationLines($parseContext->tokens, $separatorContainer);
+
+            $indentationToken = $parseContext->tokens->current();
+            if (null === $indentationToken || TokenType::INDENTATION !== $indentationToken->type) {
+                throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Expected INDENTATION before node properties, but %s given', $indentationToken?->type->value ?? '_nothing_'), $parseContext->tokens));
+            }
+            $separatorContainer->addChild(new IndentationNode($indentationToken));
+            $parseContext->tokens->advance();
+
+            $this->registry->getNodePropertiesParser()->collectValueProperties($parseContext, $valueNode);
+
+            $next = $parseContext->tokens->current();
+            if (null === $next || TokenType::NEWLINE !== $next->type) {
+                throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Expected NEWLINE after node properties, but %s given', $next?->type->value ?? '_nothing_'), $parseContext->tokens));
+            }
+
+            $this->parseIndentedBlockValue($parseContext, $valueNode, $parentIndentLen);
+
+            return;
+        }
+
+        if (TokenType::SEQUENCE_ENTRY === $afterIndent->type) {
+            $this->consumeBlockValueOpeningLayout($parseContext, $valueNode);
+            $valueNode->addChild($this->registry->getBlockSequenceParser()->parseBlockSequenceValue($parseContext, $parentIndentLen));
+
+            return;
+        }
+
+        if (
+            TokenType::FLOW_SEQUENCE_START === $afterIndent->type
+            || TokenType::FLOW_MAPPING_START === $afterIndent->type
+        ) {
+            $this->consumeBlockValueOpeningLayout($parseContext, $valueNode);
+
+            $indentationToken = $parseContext->tokens->current();
+            if (null === $indentationToken || TokenType::INDENTATION !== $indentationToken->type) {
+                throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Expected INDENTATION before flow node, but %s given', $indentationToken?->type->value ?? '_nothing_'), $parseContext->tokens));
+            }
+            $valueNode->addChild(new IndentationNode($indentationToken));
+            $parseContext->tokens->advance();
+
+            $valueNode->addChild(
+                TokenType::FLOW_SEQUENCE_START === $afterIndent->type
+                    ? $this->registry->getFlowSequenceParser()->parse($parseContext)
+                    : $this->registry->getFlowMappingParser()->parse($parseContext),
+            );
+
+            return;
+        }
+
+        if (
+            $this->nodePropertyIdentifier->isNodePropertyToken($afterIndent)
+            && !$this->nodePropertyIdentifier->isNodePropertiesFollowedByImplicitKeyFromOffset($parseContext, $afterIndentOffset)
+        ) {
+            $this->consumeIndentedBlockTaggedScalarValue($parseContext, $valueNode, $parentIndentLen);
+
+            return;
+        }
+
+        if (
+            \in_array($afterIndent->type, [
+                TokenType::DOUBLE_QUOTED_SCALAR,
+                TokenType::SINGLE_QUOTED_SCALAR,
+                TokenType::PLAIN_SCALAR,
+            ], true)
+            && !$this->multilineContinuationHelper
+                ->isImplicitYamlKeyOnContinuationLine($parseContext->tokens, $afterIndentOffset)
+        ) {
+            $this->consumeIndentedBlockScalarValue($parseContext, $valueNode, $parentIndentLen);
+
+            return;
+        }
+
+        $this->consumeBlockValueOpeningLayout($parseContext, $valueNode);
+        $valueNode->addChild($this->registry->getBlockMappingParser()->parseBlockMappingValue($parseContext, $parentIndentLen));
     }
 
     /**
