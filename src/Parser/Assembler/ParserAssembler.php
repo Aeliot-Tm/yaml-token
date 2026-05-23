@@ -186,7 +186,7 @@ final class ParserAssembler
             $this->errorHelper,
             $this->lookAheadHelper,
             $this->multilineContinuationHelper,
-            $this->getNodePropertyIdentifier(),
+            $registry->getNodePropertiesParser(),
             $registry,
         );
     }

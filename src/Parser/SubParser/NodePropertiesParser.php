@@ -14,7 +14,9 @@ declare(strict_types=1);
 namespace Aeliot\YamlToken\Parser\SubParser;
 
 use Aeliot\YamlToken\Enum\TokenType;
+use Aeliot\YamlToken\Node\AbstractNode;
 use Aeliot\YamlToken\Node\AnchorNode;
+use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\NodePropertiesNode;
 use Aeliot\YamlToken\Node\TagNode;
 use Aeliot\YamlToken\Node\ValueNode;
@@ -31,6 +33,11 @@ final readonly class NodePropertiesParser implements SubParserInterface
     ) {
     }
 
+    public function collectKeyProperties(ParseContext $parseContext, KeyNode $keyNode): void
+    {
+        $this->collectPropertiesInto($parseContext, $keyNode, null, 'key');
+    }
+
     public function collectValueProperties(ParseContext $parseContext, ValueNode $valueNode): void
     {
         // Per YAML 1.2.2 rule [96] c-ns-properties(n,c), a node has at most one anchor and one tag.
@@ -38,7 +45,16 @@ final readonly class NodePropertiesParser implements SubParserInterface
         // s-l+block-collection). When the parser re-enters this routine after consuming the
         // s-separate between the parts, an existing NodePropertiesNode on the value must be
         // reused so the second property does not produce a duplicate properties node.
-        $properties = $valueNode->getProperties();
+        $this->collectPropertiesInto($parseContext, $valueNode, $valueNode->getProperties(), 'value');
+    }
+
+    private function collectPropertiesInto(
+        ParseContext $parseContext,
+        AbstractNode $parentNode,
+        ?NodePropertiesNode $existingProperties,
+        string $nodeTypeLabel,
+    ): void {
+        $properties = $existingProperties;
         $hadProperties = null !== $properties;
         $whitespaceBuffer = [];
 
@@ -46,7 +62,7 @@ final readonly class NodePropertiesParser implements SubParserInterface
             $token = $parseContext->tokens->current();
             if (TokenType::WHITESPACE === $token->type) {
                 if (null === $properties) {
-                    $valueNode->addChild(new WhitespaceNode($token));
+                    $parentNode->addChild(new WhitespaceNode($token));
                 } else {
                     $whitespaceBuffer[] = new WhitespaceNode($token);
                 }
@@ -56,7 +72,7 @@ final readonly class NodePropertiesParser implements SubParserInterface
 
             if (TokenType::ANCHOR === $token->type) {
                 if (null !== $properties?->getAnchor()) {
-                    throw new UnexpectedStateException($this->errorHelper->appendTokenLocation('Only one anchor is supported per value node', $token));
+                    throw new UnexpectedStateException($this->errorHelper->appendTokenLocation(\sprintf('Only one anchor is supported per %s node', $nodeTypeLabel), $token));
                 }
                 $properties ??= new NodePropertiesNode();
                 foreach ($whitespaceBuffer as $whitespace) {
@@ -70,7 +86,7 @@ final readonly class NodePropertiesParser implements SubParserInterface
 
             if (TokenType::TAG === $token->type) {
                 if (null !== $properties?->getTag()) {
-                    throw new UnexpectedStateException($this->errorHelper->appendTokenLocation('Only one tag is supported per value node', $token));
+                    throw new UnexpectedStateException($this->errorHelper->appendTokenLocation(\sprintf('Only one tag is supported per %s node', $nodeTypeLabel), $token));
                 }
                 $properties ??= new NodePropertiesNode();
                 foreach ($whitespaceBuffer as $whitespace) {
@@ -86,10 +102,10 @@ final readonly class NodePropertiesParser implements SubParserInterface
         }
 
         if (null !== $properties && !$hadProperties) {
-            $valueNode->addChild($properties);
+            $parentNode->addChild($properties);
         }
         foreach ($whitespaceBuffer as $whitespace) {
-            $valueNode->addChild($whitespace);
+            $parentNode->addChild($whitespace);
         }
     }
 }

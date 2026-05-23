@@ -15,22 +15,18 @@ namespace Aeliot\YamlToken\Parser\SubParser\Block;
 
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\AliasNode;
-use Aeliot\YamlToken\Node\AnchorNode;
 use Aeliot\YamlToken\Node\ExplicitKeyIndicatorNode;
 use Aeliot\YamlToken\Node\KeyNode;
-use Aeliot\YamlToken\Node\NodePropertiesNode;
-use Aeliot\YamlToken\Node\TagNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
 use Aeliot\YamlToken\Parser\Exception\AnchorUndefinedException;
-use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
-use Aeliot\YamlToken\Parser\Helper\Identifier\NodePropertyIdentifier;
 use Aeliot\YamlToken\Parser\Helper\LookAheadHelper;
 use Aeliot\YamlToken\Parser\Helper\MultilineContinuationHelper;
 use Aeliot\YamlToken\Parser\ParseContext;
 use Aeliot\YamlToken\Parser\ParserRegistry;
+use Aeliot\YamlToken\Parser\SubParser\NodePropertiesParser;
 
 final readonly class KeyParser implements SubParserInterface
 {
@@ -38,7 +34,7 @@ final readonly class KeyParser implements SubParserInterface
         private ErrorHelper $errorHelper,
         private LookAheadHelper $lookAheadHelper,
         private MultilineContinuationHelper $multilineContinuationHelper,
-        private NodePropertyIdentifier $nodePropertyIdentifier,
+        private NodePropertiesParser $nodePropertiesParser,
         private ParserRegistry $registry,
     ) {
     }
@@ -46,7 +42,7 @@ final readonly class KeyParser implements SubParserInterface
     public function getKeyNode(ParseContext $parseContext, ?int $entryIndentLen = null): KeyNode
     {
         $keyNode = new KeyNode();
-        $this->collectKeyProperties($parseContext, $keyNode);
+        $this->nodePropertiesParser->collectKeyProperties($parseContext, $keyNode);
         $token = $parseContext->tokens->current();
 
         if (TokenType::EXPLICIT_KEY_INDICATOR === $token->type) {
@@ -59,69 +55,13 @@ final readonly class KeyParser implements SubParserInterface
                 $parseContext->tokens->advance();
             }
 
-            $this->collectKeyProperties($parseContext, $keyNode);
+            $this->nodePropertiesParser->collectKeyProperties($parseContext, $keyNode);
             $this->parseExplicitKeyContent($parseContext, $keyNode, $entryIndentLen);
         } else {
             $this->parseImplicitKeyContent($parseContext, $keyNode, $entryIndentLen);
         }
 
         return $keyNode;
-    }
-
-    private function collectKeyProperties(ParseContext $parseContext, KeyNode $keyNode): void
-    {
-        $properties = null;
-        $whitespaceBuffer = [];
-
-        while (!$parseContext->tokens->isEnd()) {
-            $token = $parseContext->tokens->current();
-            if (TokenType::WHITESPACE === $token->type) {
-                if (null === $properties) {
-                    $keyNode->addChild(new WhitespaceNode($token));
-                } else {
-                    $whitespaceBuffer[] = new WhitespaceNode($token);
-                }
-                $parseContext->tokens->advance();
-
-                continue;
-            }
-
-            if (TokenType::ANCHOR === $token->type) {
-                $properties ??= new NodePropertiesNode();
-                foreach ($whitespaceBuffer as $whitespace) {
-                    $properties->addChild($whitespace);
-                }
-                $whitespaceBuffer = [];
-                $properties->addChild(new AnchorNode($token));
-                $parseContext->tokens->advance();
-
-                continue;
-            }
-
-            if ($this->nodePropertyIdentifier->isNodePropertyToken($token)) {
-                if (null !== $properties?->getTag()) {
-                    throw new UnexpectedStateException($this->errorHelper->appendTokenLocation('Only one tag is supported per key node', $token));
-                }
-                $properties ??= new NodePropertiesNode();
-                foreach ($whitespaceBuffer as $whitespace) {
-                    $properties->addChild($whitespace);
-                }
-                $whitespaceBuffer = [];
-                $properties->addChild(new TagNode($token));
-                $parseContext->tokens->advance();
-
-                continue;
-            }
-
-            break;
-        }
-
-        if (null !== $properties) {
-            $keyNode->addChild($properties);
-        }
-        foreach ($whitespaceBuffer as $whitespace) {
-            $keyNode->addChild($whitespace);
-        }
     }
 
     private function parseExplicitKeyContent(ParseContext $parseContext, KeyNode $keyNode, ?int $entryIndentLen): void
