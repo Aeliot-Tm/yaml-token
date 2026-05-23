@@ -19,6 +19,7 @@ use Aeliot\YamlToken\Node\ValueIndicatorNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Parser\Consumer;
 use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
+use Aeliot\YamlToken\Parser\Enum\EspecialIndent;
 use Aeliot\YamlToken\Parser\Helper\AnchorPostProcessor;
 use Aeliot\YamlToken\Parser\ParseContext;
 use Aeliot\YamlToken\Parser\ParserRegistry;
@@ -35,13 +36,13 @@ final readonly class FlowMappingPairParser implements SubParserInterface
     public function parse(ParseContext $parseContext): KeyValueCoupleNode
     {
         $couple = new KeyValueCoupleNode();
-        $couple->addChild($this->registry->getFlowHost()->getFlowEntryKeyNode($parseContext));
+        $couple->addChild($this->registry->getKeyParser()->getKeyNode($parseContext));
 
         if ($this->tryConsumeFlowMappingValueIndicator($parseContext, $couple)) {
             if ($this->isAtFlowMappingEntryBoundary($parseContext)) {
                 $couple->addChild(new ValueNode());
             } else {
-                $couple->addChild($this->registry->getFlowHost()->parseFlowContextValue($parseContext));
+                $couple->addChild($this->registry->getValueParser()->parseValue($parseContext, EspecialIndent::FLOW_COLLECTION_VALUE_PARENT->value));
             }
         }
 

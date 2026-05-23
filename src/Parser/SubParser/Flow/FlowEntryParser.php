@@ -24,6 +24,7 @@ use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
+use Aeliot\YamlToken\Parser\Enum\EspecialIndent;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
 use Aeliot\YamlToken\Parser\Helper\AnchorPostProcessor;
 use Aeliot\YamlToken\Parser\Helper\Identifier\FlowStructureIdentifier;
@@ -65,7 +66,7 @@ final readonly class FlowEntryParser implements SubParserInterface
 
         return $this->finishPostOperand(
             $parseContext,
-            $this->registry->getFlowHost()->parseFlowContextValue($parseContext),
+            $this->registry->getValueParser()->parseValue($parseContext, EspecialIndent::FLOW_COLLECTION_VALUE_PARENT->value),
         );
     }
 
@@ -99,7 +100,7 @@ final readonly class FlowEntryParser implements SubParserInterface
         if ($this->isAtFlowSequenceEntryBoundary($parseContext)) {
             $couple->addChild(new ValueNode());
         } else {
-            $couple->addChild($this->registry->getFlowHost()->parseFlowContextValue($parseContext));
+            $couple->addChild($this->registry->getValueParser()->parseValue($parseContext, EspecialIndent::FLOW_COLLECTION_VALUE_PARENT->value));
         }
 
         $this->anchorPostProcessor->postProcessKeyValueCouple($parseContext->anchorsRegistry, $couple);
@@ -146,14 +147,14 @@ final readonly class FlowEntryParser implements SubParserInterface
     private function parseLegacyFlowPair(ParseContext $parseContext): ValueNode
     {
         $couple = new KeyValueCoupleNode();
-        $couple->addChild($this->registry->getFlowHost()->getFlowEntryKeyNode($parseContext));
+        $couple->addChild($this->registry->getKeyParser()->getKeyNode($parseContext));
 
         $this->registry->getFlowMappingPairParser()->tryConsumeFlowMappingValueIndicator($parseContext, $couple);
 
         if ($this->isAtFlowSequenceEntryBoundary($parseContext)) {
             $couple->addChild(new ValueNode());
         } else {
-            $couple->addChild($this->registry->getFlowHost()->parseFlowContextValue($parseContext));
+            $couple->addChild($this->registry->getValueParser()->parseValue($parseContext, EspecialIndent::FLOW_COLLECTION_VALUE_PARENT->value));
         }
 
         $this->anchorPostProcessor->postProcessKeyValueCouple($parseContext->anchorsRegistry, $couple);

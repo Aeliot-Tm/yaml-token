@@ -16,7 +16,6 @@ namespace Aeliot\YamlToken\Parser;
 use Aeliot\YamlToken\Parser\Assembler\ParserAssembler;
 use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
 use Aeliot\YamlToken\Parser\Enum\StructureType;
-use Aeliot\YamlToken\Parser\Flow\FlowHost;
 use Aeliot\YamlToken\Parser\SubParser\Block\BlockMappingParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\BlockSequenceParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\CompactBlockMappingParser;
@@ -51,7 +50,6 @@ final class ParserRegistry
     private ?FlowEntryParser $flowEntryParser = null;
     private ?FlowMappingPairParser $flowMappingPairParser = null;
     private ?FlowMappingParser $flowMappingParser = null;
-    private ?FlowHost $flowHost = null;
     private ?FlowSequenceParser $flowSequenceParser = null;
     private ?IndentedBlockValueParser $indentedBlockValueParser = null;
     private ?KeyParser $keyParser = null;
@@ -112,11 +110,6 @@ final class ParserRegistry
             StructureType::SINGLE_QUOTED_SCALAR => $this->getSimpleScalarParser(),
             default => throw new \LogicException(\sprintf('No sub-parser registered for structure type "%s"', $type->value)),
         };
-    }
-
-    public function getFlowHost(): FlowHost
-    {
-        return $this->flowHost ?? throw new \LogicException('FlowHost not set');
     }
 
     public function getFlowEntryParser(): FlowEntryParser
@@ -187,10 +180,5 @@ final class ParserRegistry
     public function getValueParser(): ValueParser
     {
         return $this->valueParser ??= $this->assembler->createValueParser($this);
-    }
-
-    public function setFlowHost(FlowHost $flowHost): void
-    {
-        $this->flowHost = $flowHost;
     }
 }

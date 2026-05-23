@@ -68,7 +68,7 @@ final readonly class FlowMappingParser implements SubParserInterface
             }
 
             if (TokenType::MERGE_INDICATOR === $token->type) {
-                $node->addChild($this->registry->getFlowHost()->parseMergeInstructionAtCurrentPosition($parseContext));
+                $node->addChild($this->registry->getMergeInstructionParser()->parseMergeInstructionAtCurrentPosition($parseContext));
 
                 continue;
             }

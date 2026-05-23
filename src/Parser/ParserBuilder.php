@@ -13,12 +13,7 @@ declare(strict_types=1);
 
 namespace Aeliot\YamlToken\Parser;
 
-use Aeliot\YamlToken\Node\KeyNode;
-use Aeliot\YamlToken\Node\MergeInstructionNode;
-use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Parser\Assembler\ParserAssembler;
-use Aeliot\YamlToken\Parser\Enum\EspecialIndent;
-use Aeliot\YamlToken\Parser\Flow\FlowHost;
 use Aeliot\YamlToken\Parser\Helper\AnchorPostProcessor;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
 use Aeliot\YamlToken\Parser\Helper\IndentationHelper;
@@ -31,11 +26,8 @@ final class ParserBuilder
     public function createParser(): Parser
     {
         $assembler = $this->createAssembler();
-        $parserRegistry = new ParserRegistry($assembler);
 
-        $this->populateFlowHost($parserRegistry);
-
-        return new Parser($parserRegistry);
+        return new Parser(new ParserRegistry($assembler));
     }
 
     private function createAssembler(): ParserAssembler
@@ -57,14 +49,5 @@ final class ParserBuilder
             $multilineContinuationHelper,
             $nodeFactory,
         );
-    }
-
-    private function populateFlowHost(ParserRegistry $registry): void
-    {
-        $registry->setFlowHost(new FlowHost(
-            fn (ParseContext $parseContext): KeyNode => $registry->getKeyParser()->getKeyNode($parseContext),
-            fn (ParseContext $parseContext): ValueNode => $registry->getValueParser()->parseValue($parseContext, EspecialIndent::FLOW_COLLECTION_VALUE_PARENT->value),
-            fn (ParseContext $parseContext): MergeInstructionNode => $registry->getMergeInstructionParser()->parseMergeInstructionAtCurrentPosition($parseContext),
-        ));
     }
 }
