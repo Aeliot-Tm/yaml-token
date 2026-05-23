@@ -14,8 +14,6 @@ declare(strict_types=1);
 namespace Aeliot\YamlToken\Parser;
 
 use Aeliot\YamlToken\Parser\Assembler\ParserAssembler;
-use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
-use Aeliot\YamlToken\Parser\Enum\StructureType;
 use Aeliot\YamlToken\Parser\SubParser\Block\BlockMappingParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\BlockSequenceParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\CompactBlockMappingParser;
@@ -100,16 +98,6 @@ final class ParserRegistry
     public function getDocumentParser(): DocumentParser
     {
         return $this->documentParser ??= $this->assembler->createDocumentParser($this);
-    }
-
-    public function getByType(StructureType $type): SubParserInterface
-    {
-        return match ($type) {
-            StructureType::DOUBLE_QUOTED_SCALAR,
-            StructureType::PLAIN_SCALAR,
-            StructureType::SINGLE_QUOTED_SCALAR => $this->getSimpleScalarParser(),
-            default => throw new \LogicException(\sprintf('No sub-parser registered for structure type "%s"', $type->value)),
-        };
     }
 
     public function getFlowEntryParser(): FlowEntryParser

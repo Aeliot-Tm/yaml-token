@@ -255,11 +255,6 @@ final class ParserAssembler
         return $this->aliasResolver ??= new AliasResolver($this->errorHelper);
     }
 
-    public function getAnchorPostProcessor(): AnchorPostProcessor
-    {
-        return $this->anchorPostProcessor;
-    }
-
     public function getBlockCollectionLoopHelper(): BlockCollectionLoopHelper
     {
         return $this->blockCollectionLoopHelper ??= new BlockCollectionLoopHelper(
@@ -279,16 +274,6 @@ final class ParserAssembler
         );
     }
 
-    public function getConsumer(): Consumer
-    {
-        return $this->consumer;
-    }
-
-    public function getErrorHelper(): ErrorHelper
-    {
-        return $this->errorHelper;
-    }
-
     public function getFlowCollectionHelper(): FlowCollectionHelper
     {
         return $this->flowCollectionHelper ??= new FlowCollectionHelper($this->consumer, $this->errorHelper, $this->nodeFactory);
@@ -299,29 +284,9 @@ final class ParserAssembler
         return $this->flowStructureIdentifier ??= new FlowStructureIdentifier($this->peekOffsetHelper);
     }
 
-    public function getIndentationHelper(): IndentationHelper
-    {
-        return $this->indentationHelper;
-    }
-
     public function getKeyIdentifier(): KeyIdentifier
     {
         return $this->keyIdentifier ??= new KeyIdentifier();
-    }
-
-    public function getLookAheadHelper(): LookAheadHelper
-    {
-        return $this->lookAheadHelper;
-    }
-
-    public function getMultilineContinuationHelper(): MultilineContinuationHelper
-    {
-        return $this->multilineContinuationHelper;
-    }
-
-    public function getNodeFactory(): NodeFactory
-    {
-        return $this->nodeFactory;
     }
 
     public function getNodePropertyIdentifier(): NodePropertyIdentifier

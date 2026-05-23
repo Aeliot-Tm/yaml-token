@@ -86,10 +86,6 @@ cycles such as `ValueParser ↔ BlockMappingParser` resolve safely at parse time
 instances and structure identifiers (also lazy via assembler getters). One
 `create*Parser(ParserRegistry)` factory exists per sub-parser.
 
-[`StructureType`](../../../src/Parser/Enum/StructureType.php) and
-`ParserRegistry::getByType()` support dynamic scalar dispatch; most code uses typed
-getters instead.
-
 ## Runtime state: ParseContext
 
 [`ParseContext`](../../../src/Parser/ParseContext.php) is created per `parseStream()`
@@ -100,8 +96,6 @@ call and passed into every sub-parser method. It holds all mutable parse-time st
 | `tokens` | `TokenStreamProxy` | Cursor over the lexer stream |
 | `anchorsRegistry` | `AnchorsRegistry` | Named anchors for alias resolution |
 | `state` | `ParseState` | Block-indent steps |
-| `depth` | `int` | Reserved counter on the context object |
-| context stack | `ContextFrame[]` | Stack API (`pushContext` / `popContext` / `getCurrentContext`) backed by [`ParsingContext`](../../../src/Parser/Enum/ParsingContext.php) |
 
 `ParseContext` does not reference `StreamNode` or any sub-parser.
 
@@ -215,8 +209,8 @@ src/Parser/
 ├── Assembler/ParserAssembler.php
 ├── Contract/SubParserInterface.php
 ├── Consumer.php
-├── Dto/               AnchorsRegistry, ContextFrame, ParseState, TokenStreamProxy
-├── Enum/              EspecialIndent, ParsingContext, StructureType
+├── Dto/               AnchorsRegistry, ParseState, TokenStreamProxy
+├── Enum/              EspecialIndent, ParsingContext
 ├── Exception/
 ├── Helper/            NodeFactory, Consumer helpers, Identifier/*
 └── SubParser/         Stream, Document, Value, Block/*, Flow/*, Scalar/*

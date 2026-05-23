@@ -15,12 +15,11 @@ namespace Aeliot\YamlToken\Parser\SubParser\Flow;
 
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\FlowMappingNode;
-use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
 use Aeliot\YamlToken\Parser\Helper\FlowCollectionHelper;
 use Aeliot\YamlToken\Parser\ParseContext;
 use Aeliot\YamlToken\Parser\ParserRegistry;
 
-final readonly class FlowMappingParser implements SubParserInterface
+final readonly class FlowMappingParser
 {
     public function __construct(
         private FlowCollectionHelper $flowCollectionHelper,

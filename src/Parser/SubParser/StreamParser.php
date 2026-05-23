@@ -16,11 +16,10 @@ namespace Aeliot\YamlToken\Parser\SubParser;
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\ByteOrderNode;
 use Aeliot\YamlToken\Node\StreamNode;
-use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
 use Aeliot\YamlToken\Parser\ParseContext;
 use Aeliot\YamlToken\Parser\ParserRegistry;
 
-final readonly class StreamParser implements SubParserInterface
+final readonly class StreamParser
 {
     public function __construct(
         private ParserRegistry $registry,

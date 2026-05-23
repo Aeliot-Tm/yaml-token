@@ -14,11 +14,10 @@ declare(strict_types=1);
 namespace Aeliot\YamlToken\Parser\SubParser\Scalar;
 
 use Aeliot\YamlToken\Node\ScalarNode;
-use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
 use Aeliot\YamlToken\Parser\ParseContext;
 
-final readonly class SimpleScalarParser implements SubParserInterface
+final readonly class SimpleScalarParser
 {
     public function __construct(
         private NodeFactory $nodeFactory,

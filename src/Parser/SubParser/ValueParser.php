@@ -17,7 +17,6 @@ use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\MultilinePlainScalarNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Parser\Consumer;
-use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
 use Aeliot\YamlToken\Parser\Enum\EspecialIndent;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Helper\AliasResolver;
@@ -28,7 +27,7 @@ use Aeliot\YamlToken\Parser\ParseContext;
 use Aeliot\YamlToken\Parser\ParserRegistry;
 use Aeliot\YamlToken\Token\Token;
 
-final readonly class ValueParser implements SubParserInterface
+final readonly class ValueParser
 {
     public function __construct(
         private AliasResolver $aliasResolver,
