@@ -20,6 +20,7 @@ use Aeliot\YamlToken\Parser\Helper\IndentationHelper;
 use Aeliot\YamlToken\Parser\Helper\LookAheadHelper;
 use Aeliot\YamlToken\Parser\Helper\MultilineContinuationHelper;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
+use Aeliot\YamlToken\Parser\Helper\PeekOffsetHelper;
 
 final class ParserBuilder
 {
@@ -35,9 +36,10 @@ final class ParserBuilder
         $anchorPostProcessor = new AnchorPostProcessor();
         $errorHelper = new ErrorHelper();
         $indentationHelper = new IndentationHelper($errorHelper);
-        $multilineContinuationHelper = new MultilineContinuationHelper();
+        $peekOffsetHelper = new PeekOffsetHelper();
+        $multilineContinuationHelper = new MultilineContinuationHelper($peekOffsetHelper);
         $nodeFactory = new NodeFactory();
-        $consumer = new Consumer($nodeFactory);
+        $consumer = new Consumer($nodeFactory, $peekOffsetHelper);
         $lookAheadHelper = new LookAheadHelper($consumer);
 
         return new ParserAssembler(
@@ -48,6 +50,7 @@ final class ParserBuilder
             $lookAheadHelper,
             $multilineContinuationHelper,
             $nodeFactory,
+            $peekOffsetHelper,
         );
     }
 }

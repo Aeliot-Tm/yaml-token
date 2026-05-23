@@ -14,10 +14,16 @@ declare(strict_types=1);
 namespace Aeliot\YamlToken\Parser\Helper\Identifier;
 
 use Aeliot\YamlToken\Enum\TokenType;
+use Aeliot\YamlToken\Parser\Helper\PeekOffsetHelper;
 use Aeliot\YamlToken\Parser\ParseContext;
 
 final readonly class FlowStructureIdentifier
 {
+    public function __construct(
+        private PeekOffsetHelper $peekOffsetHelper,
+    ) {
+    }
+
     /**
      * True when a flow sequence or flow mapping at {@code $collectionStartPeekOffset} is closed and
      * the next non-layout token on the same line is {@code VALUE_INDICATOR} (block implicit key
@@ -95,9 +101,7 @@ final readonly class FlowStructureIdentifier
         $hasContinuation = false;
 
         while (true) {
-            while (TokenType::WHITESPACE === $parseContext->tokens->peek($offset)?->type) {
-                ++$offset;
-            }
+            $offset = $this->peekOffsetHelper->skipWhitespaceOffset($parseContext->tokens, $offset);
 
             $peeked = $parseContext->tokens->peek($offset);
             if (null === $peeked) {
@@ -113,9 +117,7 @@ final readonly class FlowStructureIdentifier
             }
             ++$offset;
 
-            while (TokenType::WHITESPACE === $parseContext->tokens->peek($offset)?->type) {
-                ++$offset;
-            }
+            $offset = $this->peekOffsetHelper->skipWhitespaceOffset($parseContext->tokens, $offset);
 
             if (TokenType::PLAIN_SCALAR !== $parseContext->tokens->peek($offset)?->type) {
                 return false;

@@ -27,6 +27,7 @@ use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
 use Aeliot\YamlToken\Parser\Helper\MultilineContinuationHelper;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
+use Aeliot\YamlToken\Parser\Helper\PeekOffsetHelper;
 use Aeliot\YamlToken\Parser\ParserRegistry;
 use Aeliot\YamlToken\Token\Token;
 
@@ -36,6 +37,7 @@ final readonly class MultilinePlainScalarParser implements SubParserInterface
         private ErrorHelper $errorHelper,
         private MultilineContinuationHelper $multilineContinuationHelper,
         private NodeFactory $nodeFactory,
+        private PeekOffsetHelper $peekOffsetHelper,
         private ParserRegistry $registry,
     ) {
     }
@@ -157,20 +159,14 @@ final readonly class MultilinePlainScalarParser implements SubParserInterface
             return false;
         }
 
-        $scalarOffset = 1;
-        while (TokenType::WHITESPACE === $tokens->peek($scalarOffset)?->type) {
-            ++$scalarOffset;
-        }
+        $scalarOffset = $this->peekOffsetHelper->skipWhitespaceOffset($tokens, 1);
         $scalarToken = $tokens->peek($scalarOffset);
         if (TokenType::PLAIN_SCALAR !== $scalarToken?->type) {
             return false;
         }
 
         if ($rejectValueIndicatorAfterScalar) {
-            $afterScalar = $scalarOffset + 1;
-            while (TokenType::WHITESPACE === $tokens->peek($afterScalar)?->type) {
-                ++$afterScalar;
-            }
+            $afterScalar = $this->peekOffsetHelper->skipWhitespaceOffset($tokens, $scalarOffset + 1);
             if (TokenType::VALUE_INDICATOR === $tokens->peek($afterScalar)?->type) {
                 return false;
             }
@@ -274,10 +270,7 @@ final readonly class MultilinePlainScalarParser implements SubParserInterface
             return false;
         }
 
-        $afterIndentOffset = 2;
-        while (TokenType::WHITESPACE === $tokens->peek($afterIndentOffset)?->type) {
-            ++$afterIndentOffset;
-        }
+        $afterIndentOffset = $this->peekOffsetHelper->skipWhitespaceOffset($tokens, 2);
         if (
             TokenType::NEWLINE !== $tokens->peek($afterIndentOffset)?->type
             || !$this->multilineContinuationHelper->isAnyContinuationAt($tokens, $afterIndentOffset + 1, $parentIndentLen)

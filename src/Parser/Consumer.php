@@ -17,6 +17,7 @@ use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Parser\Dto\TokenStreamProxy;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
+use Aeliot\YamlToken\Parser\Helper\PeekOffsetHelper;
 
 final readonly class Consumer
 {
@@ -33,6 +34,7 @@ final readonly class Consumer
 
     public function __construct(
         private NodeFactory $nodeFactory,
+        private PeekOffsetHelper $peekOffsetHelper,
     ) {
     }
 
@@ -94,10 +96,7 @@ final readonly class Consumer
                 break;
             }
 
-            $probe = 2;
-            while (TokenType::WHITESPACE === $tokens->peek($probe)?->type) {
-                ++$probe;
-            }
+            $probe = $this->peekOffsetHelper->skipWhitespaceOffset($tokens, 2);
 
             $afterIndentation = $tokens->peek($probe);
             if (null !== $afterIndentation && TokenType::NEWLINE !== $afterIndentation->type) {

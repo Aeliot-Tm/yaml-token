@@ -29,6 +29,7 @@ use Aeliot\YamlToken\Parser\Dto\TokenStreamProxy;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
+use Aeliot\YamlToken\Parser\Helper\PeekOffsetHelper;
 
 final readonly class BlockScalarParser implements SubParserInterface
 {
@@ -37,6 +38,7 @@ final readonly class BlockScalarParser implements SubParserInterface
         private ErrorHelper $errorHelper,
         private MultilinePlainScalarParser $multilinePlainScalarParser,
         private NodeFactory $nodeFactory,
+        private PeekOffsetHelper $peekOffsetHelper,
     ) {
     }
 
@@ -132,19 +134,13 @@ final readonly class BlockScalarParser implements SubParserInterface
             return false;
         }
 
-        $scalarOffset = 2;
-        while (TokenType::WHITESPACE === $tokens->peek($scalarOffset)?->type) {
-            ++$scalarOffset;
-        }
+        $scalarOffset = $this->peekOffsetHelper->skipWhitespaceOffset($tokens, 2);
         $scalarToken = $tokens->peek($scalarOffset);
         if (!$scalarToken?->type->isScalar()) {
             return false;
         }
 
-        $keyProbe = $scalarOffset + 1;
-        while (TokenType::WHITESPACE === $tokens->peek($keyProbe)?->type) {
-            ++$keyProbe;
-        }
+        $keyProbe = $this->peekOffsetHelper->skipWhitespaceOffset($tokens, $scalarOffset + 1);
         if (TokenType::VALUE_INDICATOR === $tokens->peek($keyProbe)?->type) {
             return false;
         }

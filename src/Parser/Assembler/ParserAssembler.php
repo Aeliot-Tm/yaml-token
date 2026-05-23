@@ -28,6 +28,7 @@ use Aeliot\YamlToken\Parser\Helper\IndentationHelper;
 use Aeliot\YamlToken\Parser\Helper\LookAheadHelper;
 use Aeliot\YamlToken\Parser\Helper\MultilineContinuationHelper;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
+use Aeliot\YamlToken\Parser\Helper\PeekOffsetHelper;
 use Aeliot\YamlToken\Parser\ParserRegistry;
 use Aeliot\YamlToken\Parser\SubParser\Block\BlockMappingParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\BlockSequenceParser;
@@ -70,6 +71,7 @@ final class ParserAssembler
         private LookAheadHelper $lookAheadHelper,
         private MultilineContinuationHelper $multilineContinuationHelper,
         private NodeFactory $nodeFactory,
+        private PeekOffsetHelper $peekOffsetHelper,
     ) {
     }
 
@@ -90,6 +92,7 @@ final class ParserAssembler
             $this->errorHelper,
             $registry->getMultilinePlainScalarParser(),
             $this->nodeFactory,
+            $this->peekOffsetHelper,
         );
     }
 
@@ -229,7 +232,7 @@ final class ParserAssembler
 
     public function createMultilinePlainScalarParser(ParserRegistry $registry): MultilinePlainScalarParser
     {
-        return new MultilinePlainScalarParser($this->errorHelper, $this->multilineContinuationHelper, $this->nodeFactory, $registry);
+        return new MultilinePlainScalarParser($this->errorHelper, $this->multilineContinuationHelper, $this->nodeFactory, $this->peekOffsetHelper, $registry);
     }
 
     public function createSimpleScalarParser(ParserRegistry $registry): SimpleScalarParser
@@ -293,7 +296,7 @@ final class ParserAssembler
 
     public function getFlowStructureIdentifier(): FlowStructureIdentifier
     {
-        return $this->flowStructureIdentifier ??= new FlowStructureIdentifier();
+        return $this->flowStructureIdentifier ??= new FlowStructureIdentifier($this->peekOffsetHelper);
     }
 
     public function getIndentationHelper(): IndentationHelper

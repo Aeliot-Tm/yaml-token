@@ -19,6 +19,11 @@ use Aeliot\YamlToken\Parser\Enum\EspecialIndent;
 
 final readonly class MultilineContinuationHelper
 {
+    public function __construct(
+        private PeekOffsetHelper $peekOffsetHelper,
+    ) {
+    }
+
     public function isAnyContinuationAt(TokenStreamProxy $tokens, int $offset, int $parentIndentLen): bool
     {
         return $this->isIndentedMultilinePlainContinuationAt($tokens, $offset, $parentIndentLen)
@@ -30,10 +35,7 @@ final readonly class MultilineContinuationHelper
 
     public function isBareDocumentFlushMultilinePlainContinuationAt(TokenStreamProxy $tokens, int $scalarPeekOffset): bool
     {
-        $offset = $scalarPeekOffset;
-        while (TokenType::WHITESPACE === $tokens->peek($offset)?->type) {
-            ++$offset;
-        }
+        $offset = $this->peekOffsetHelper->skipWhitespaceOffset($tokens, $scalarPeekOffset);
         $scalarToken = $tokens->peek($offset);
         if (!$scalarToken?->type->isScalar()) {
             return false;
@@ -75,19 +77,13 @@ final readonly class MultilineContinuationHelper
             return false;
         }
 
-        $scalarOffset = $indentPeekOffset + 1;
-        while (TokenType::WHITESPACE === $tokens->peek($scalarOffset)?->type) {
-            ++$scalarOffset;
-        }
+        $scalarOffset = $this->peekOffsetHelper->skipWhitespaceOffset($tokens, $indentPeekOffset + 1);
         $scalarToken = $tokens->peek($scalarOffset);
         if (!$scalarToken?->type->isScalar()) {
             return false;
         }
 
-        $keyProbe = $scalarOffset + 1;
-        while (TokenType::WHITESPACE === $tokens->peek($keyProbe)?->type) {
-            ++$keyProbe;
-        }
+        $keyProbe = $this->peekOffsetHelper->skipWhitespaceOffset($tokens, $scalarOffset + 1);
 
         return TokenType::VALUE_INDICATOR !== $tokens->peek($keyProbe)?->type;
     }
@@ -118,10 +114,7 @@ final readonly class MultilineContinuationHelper
 
         $maybeIndent = $tokens->peek($offset + 1);
         if (TokenType::INDENTATION === $maybeIndent?->type && \strlen($maybeIndent->text) > $parentIndentLen) {
-            $afterIndentOffset = $offset + 2;
-            while (TokenType::WHITESPACE === $tokens->peek($afterIndentOffset)?->type) {
-                ++$afterIndentOffset;
-            }
+            $afterIndentOffset = $this->peekOffsetHelper->skipWhitespaceOffset($tokens, $offset + 2);
             if (TokenType::NEWLINE === $tokens->peek($afterIndentOffset)?->type) {
                 return $this->isAnyContinuationAt($tokens, $afterIndentOffset + 1, $parentIndentLen);
             }
