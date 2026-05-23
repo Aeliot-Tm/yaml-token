@@ -48,102 +48,22 @@ final readonly class MultilinePlainScalarParser implements SubParserInterface
     public function appendMultilinePlainScalarContinuations(TokenStreamProxy $tokens, Node $targetNode, int $parentIndentLen): void
     {
         while (true) {
-            while (
-                TokenType::WHITESPACE === $tokens->current()?->type
-                && TokenType::NEWLINE === $tokens->peek(1)?->type
-            ) {
-                $targetNode->addChild(new WhitespaceNode($tokens->current()));
-                $tokens->advance();
-            }
+            $this->consumeTrailingWhitespaceBeforeNewline($tokens, $targetNode);
 
             if (TokenType::NEWLINE !== $tokens->current()?->type) {
                 break;
             }
 
-            $newLine = $tokens->current();
-
-            if (TokenType::NEWLINE === $tokens->peek(1)?->type) {
-                if (!$this->multilineContinuationHelper->isAnyContinuationAt($tokens, 2, $parentIndentLen)) {
-                    break;
-                }
-
-                $targetNode->addChild(new NewLineNode($newLine));
-                $tokens->advance();
+            if ($this->tryConsumeBlankLineContinuation($tokens, $targetNode, $parentIndentLen)) {
                 continue;
             }
-
-            $maybeIndent = $tokens->peek(1);
-            if (TokenType::INDENTATION === $maybeIndent?->type && \strlen($maybeIndent->text) > $parentIndentLen) {
-                $afterIndentOffset = 2;
-                while (TokenType::WHITESPACE === $tokens->peek($afterIndentOffset)?->type) {
-                    ++$afterIndentOffset;
-                }
-                if (
-                    TokenType::NEWLINE === $tokens->peek($afterIndentOffset)?->type
-                    && $this->multilineContinuationHelper->isAnyContinuationAt($tokens, $afterIndentOffset + 1, $parentIndentLen)
-                ) {
-                    $targetNode->addChild(new NewLineNode($newLine));
-                    $tokens->advance();
-                    $indentationToken = $tokens->current();
-                    if (TokenType::INDENTATION !== $indentationToken->type) {
-                        throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Expected INDENTATION after newline in multiline plain empty line, got %s', $indentationToken->type->value), $tokens));
-                    }
-                    $targetNode->addChild(new IndentationNode($indentationToken));
-                    $tokens->advance();
-                    for ($w = 2; $w < $afterIndentOffset; ++$w) {
-                        $wsToken = $tokens->current();
-                        if (TokenType::WHITESPACE !== $wsToken->type) {
-                            throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Expected WHITESPACE in multiline plain empty line, got %s', $wsToken->type->value), $tokens));
-                        }
-                        $targetNode->addChild(new WhitespaceNode($wsToken));
-                        $tokens->advance();
-                    }
-                    $closingNewline = $tokens->current();
-                    if (TokenType::NEWLINE !== $closingNewline->type) {
-                        throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Expected NEWLINE after multiline plain empty line content, got %s', $closingNewline->type->value), $tokens));
-                    }
-                    continue;
-                }
-            }
-
-            if ($this->multilineContinuationHelper->isIndentedMultilinePlainContinuationAt($tokens, 1, $parentIndentLen)) {
-                $indentation = $tokens->peek(1);
-
-                $targetNode->addChild(new NewLineNode($newLine));
-                $targetNode->addChild(new IndentationNode($indentation));
-                $tokens->advance();
-                $tokens->advance();
-
-                $contentHead = $tokens->current();
-                while (TokenType::WHITESPACE === $contentHead->type) {
-                    $targetNode->addChild(new WhitespaceNode($contentHead));
-                    $tokens->advance();
-                    $contentHead = $tokens->current();
-                }
-
-                $targetNode->addChild($this->nodeFactory->createScalarNode($contentHead));
-                $tokens->advance();
-
+            if ($this->tryConsumeIndentedEmptyLineContinuation($tokens, $targetNode, $parentIndentLen)) {
                 continue;
             }
-
-            if (
-                EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value === $parentIndentLen
-                && $this->multilineContinuationHelper->isBareDocumentFlushMultilinePlainContinuationAt($tokens, 1)
-            ) {
-                $targetNode->addChild(new NewLineNode($newLine));
-                $tokens->advance();
-
-                $contentHead = $tokens->current();
-                while (TokenType::WHITESPACE === $contentHead->type) {
-                    $targetNode->addChild(new WhitespaceNode($contentHead));
-                    $tokens->advance();
-                    $contentHead = $tokens->current();
-                }
-
-                $targetNode->addChild($this->nodeFactory->createScalarNode($contentHead));
-                $tokens->advance();
-
+            if ($this->tryConsumeIndentedContentLine($tokens, $targetNode, $parentIndentLen)) {
+                continue;
+            }
+            if ($this->tryConsumeBareDocumentFlushLine($tokens, $targetNode, $parentIndentLen)) {
                 continue;
             }
 
@@ -286,6 +206,122 @@ final readonly class MultilinePlainScalarParser implements SubParserInterface
 
         $multiline->addChild($this->nodeFactory->createScalarNode($scalarToken));
         $tokens->advance();
+
+        return true;
+    }
+
+    private function appendWhitespaceThenScalar(TokenStreamProxy $tokens, Node $targetNode): void
+    {
+        $contentHead = $tokens->current();
+        while (TokenType::WHITESPACE === $contentHead->type) {
+            $targetNode->addChild(new WhitespaceNode($contentHead));
+            $tokens->advance();
+            $contentHead = $tokens->current();
+        }
+
+        $targetNode->addChild($this->nodeFactory->createScalarNode($contentHead));
+        $tokens->advance();
+    }
+
+    private function consumeTrailingWhitespaceBeforeNewline(TokenStreamProxy $tokens, Node $targetNode): void
+    {
+        while (
+            TokenType::WHITESPACE === $tokens->current()?->type
+            && TokenType::NEWLINE === $tokens->peek(1)?->type
+        ) {
+            $targetNode->addChild(new WhitespaceNode($tokens->current()));
+            $tokens->advance();
+        }
+    }
+
+    private function tryConsumeBareDocumentFlushLine(TokenStreamProxy $tokens, Node $targetNode, int $parentIndentLen): bool
+    {
+        if (
+            EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value !== $parentIndentLen
+            || !$this->multilineContinuationHelper->isBareDocumentFlushMultilinePlainContinuationAt($tokens, 1)
+        ) {
+            return false;
+        }
+
+        $targetNode->addChild(new NewLineNode($tokens->current()));
+        $tokens->advance();
+        $this->appendWhitespaceThenScalar($tokens, $targetNode);
+
+        return true;
+    }
+
+    private function tryConsumeBlankLineContinuation(TokenStreamProxy $tokens, Node $targetNode, int $parentIndentLen): bool
+    {
+        if (TokenType::NEWLINE !== $tokens->peek(1)?->type) {
+            return false;
+        }
+
+        if (!$this->multilineContinuationHelper->isAnyContinuationAt($tokens, 2, $parentIndentLen)) {
+            return false;
+        }
+
+        $targetNode->addChild(new NewLineNode($tokens->current()));
+        $tokens->advance();
+
+        return true;
+    }
+
+    private function tryConsumeIndentedContentLine(TokenStreamProxy $tokens, Node $targetNode, int $parentIndentLen): bool
+    {
+        if (!$this->multilineContinuationHelper->isIndentedMultilinePlainContinuationAt($tokens, 1, $parentIndentLen)) {
+            return false;
+        }
+
+        $indentation = $tokens->peek(1);
+
+        $targetNode->addChild(new NewLineNode($tokens->current()));
+        $targetNode->addChild(new IndentationNode($indentation));
+        $tokens->advance();
+        $tokens->advance();
+        $this->appendWhitespaceThenScalar($tokens, $targetNode);
+
+        return true;
+    }
+
+    private function tryConsumeIndentedEmptyLineContinuation(TokenStreamProxy $tokens, Node $targetNode, int $parentIndentLen): bool
+    {
+        $newLine = $tokens->current();
+        $maybeIndent = $tokens->peek(1);
+        if (TokenType::INDENTATION !== $maybeIndent?->type || \strlen($maybeIndent->text) <= $parentIndentLen) {
+            return false;
+        }
+
+        $afterIndentOffset = 2;
+        while (TokenType::WHITESPACE === $tokens->peek($afterIndentOffset)?->type) {
+            ++$afterIndentOffset;
+        }
+        if (
+            TokenType::NEWLINE !== $tokens->peek($afterIndentOffset)?->type
+            || !$this->multilineContinuationHelper->isAnyContinuationAt($tokens, $afterIndentOffset + 1, $parentIndentLen)
+        ) {
+            return false;
+        }
+
+        $targetNode->addChild(new NewLineNode($newLine));
+        $tokens->advance();
+        $indentationToken = $tokens->current();
+        if (TokenType::INDENTATION !== $indentationToken->type) {
+            throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Expected INDENTATION after newline in multiline plain empty line, got %s', $indentationToken->type->value), $tokens));
+        }
+        $targetNode->addChild(new IndentationNode($indentationToken));
+        $tokens->advance();
+        for ($w = 2; $w < $afterIndentOffset; ++$w) {
+            $wsToken = $tokens->current();
+            if (TokenType::WHITESPACE !== $wsToken->type) {
+                throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Expected WHITESPACE in multiline plain empty line, got %s', $wsToken->type->value), $tokens));
+            }
+            $targetNode->addChild(new WhitespaceNode($wsToken));
+            $tokens->advance();
+        }
+        $closingNewline = $tokens->current();
+        if (TokenType::NEWLINE !== $closingNewline->type) {
+            throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Expected NEWLINE after multiline plain empty line content, got %s', $closingNewline->type->value), $tokens));
+        }
 
         return true;
     }
