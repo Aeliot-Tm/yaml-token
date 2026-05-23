@@ -21,6 +21,10 @@ interface TokenStreamInterface
 
     public function current(): ?Token;
 
+    public function getLastObservedColumn(): ?int;
+
+    public function getLastObservedLine(): ?int;
+
     public function getLength(): int;
 
     /**

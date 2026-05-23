@@ -20,8 +20,8 @@ final readonly class ErrorHelper
 {
     public function appendTokenLocation(string $message, Token|TokenStreamProxy $tokens): string
     {
-        $line = $tokens instanceof Token ? $tokens->line : $tokens->getLine();
-        $column = $tokens instanceof Token ? $tokens->column : $tokens->getColumn();
+        $line = $tokens instanceof Token ? $tokens->line : $tokens->getLastObservedLine();
+        $column = $tokens instanceof Token ? $tokens->column : $tokens->getLastObservedColumn();
         if (null !== $line && null !== $column) {
             $message .= \sprintf(' in line %d column %d', $line, $column);
         }

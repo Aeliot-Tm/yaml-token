@@ -42,6 +42,16 @@ final class TokenStream implements TokenStreamInterface
         return $this->tokens[$this->position] ?? null;
     }
 
+    public function getLastObservedColumn(): ?int
+    {
+        return $this->lastObserved()?->column;
+    }
+
+    public function getLastObservedLine(): ?int
+    {
+        return $this->lastObserved()?->line;
+    }
+
     public function getLength(): int
     {
         return \count($this->tokens);
@@ -65,5 +75,10 @@ final class TokenStream implements TokenStreamInterface
         $index = $this->position + $offset;
 
         return $this->tokens[$index] ?? null;
+    }
+
+    private function lastObserved(): ?Token
+    {
+        return $this->tokens[$this->position] ?? $this->tokens[array_key_last($this->tokens)] ?? null;
     }
 }

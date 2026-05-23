@@ -18,16 +18,11 @@ use Aeliot\YamlToken\Token\TokenStream;
 use Aeliot\YamlToken\Token\TokenStreamInterface;
 
 /**
- * Wraps {@see TokenStream} and records the last non-null token returned from
- * {@see self::current()} and {@see self::advance()} for parser error locations.
- *
- * @mixin TokenStream
+ * @deprecated use TokenStream (TokenStreamInterface)
  */
 final class TokenStreamProxy implements TokenStreamInterface
 {
     private TokenStream $inner;
-
-    private ?Token $lastObserved = null;
 
     public function __construct(TokenStream $inner)
     {
@@ -36,22 +31,12 @@ final class TokenStreamProxy implements TokenStreamInterface
 
     public function advance(): ?Token
     {
-        $token = $this->inner->advance();
-        if (null !== $token) {
-            $this->lastObserved = $token;
-        }
-
-        return $token;
+        return $this->inner->advance();
     }
 
     public function current(): ?Token
     {
-        $token = $this->inner->current();
-        if (null !== $token) {
-            $this->lastObserved = $token;
-        }
-
-        return $token;
+        return $this->inner->current();
     }
 
     public function addToken(Token $token): void
@@ -79,13 +64,13 @@ final class TokenStreamProxy implements TokenStreamInterface
         return $this->inner->peek($offset);
     }
 
-    public function getColumn(): ?int
+    public function getLastObservedColumn(): ?int
     {
-        return $this->lastObserved?->column;
+        return $this->inner->getLastObservedColumn();
     }
 
-    public function getLine(): ?int
+    public function getLastObservedLine(): ?int
     {
-        return $this->lastObserved?->line;
+        return $this->inner->getLastObservedLine();
     }
 }
