@@ -17,6 +17,7 @@ use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\IndentationNode;
 use Aeliot\YamlToken\Node\MultilinePlainScalarNode;
 use Aeliot\YamlToken\Node\NewLineNode;
+use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Parser\Consumer;
 use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
@@ -30,6 +31,7 @@ use Aeliot\YamlToken\Parser\Helper\MultilineContinuationHelper;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
 use Aeliot\YamlToken\Parser\ParseContext;
 use Aeliot\YamlToken\Parser\ParserRegistry;
+use Aeliot\YamlToken\Token\Token;
 
 final readonly class IndentedBlockValueParser implements SubParserInterface
 {
@@ -225,30 +227,13 @@ final readonly class IndentedBlockValueParser implements SubParserInterface
             throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Scalar expected for indented block value, but %s given', $scalarToken?->type->value ?? '_nothing_'), $parseContext->tokens));
         }
 
-        if (
-            TokenType::PLAIN_SCALAR === $scalarToken->type
-            && $this->multilineContinuationHelper
-                ->isMultilinePlainContinuationAhead($parseContext->tokens, 1, $parentIndentLen)
-        ) {
-            $multiline = new MultilinePlainScalarNode();
-            $multiline->addChild($indentationNode);
-            foreach ($layoutBuffer as $layoutNode) {
-                $multiline->addChild($layoutNode);
-            }
-            $multiline->addChild($this->nodeFactory->createScalarNode($scalarToken));
-            $parseContext->tokens->advance();
-            $this->registry
-                ->getMultilinePlainScalarParser()
-                ->appendMultilinePlainScalarContinuations($parseContext->tokens, $multiline, $parentIndentLen);
-            $valueNode->addChild($multiline);
-        } else {
-            $valueNode->addChild($indentationNode);
-            foreach ($layoutBuffer as $layoutNode) {
-                $valueNode->addChild($layoutNode);
-            }
-            $valueNode->addChild($this->nodeFactory->createScalarNode($scalarToken));
-            $parseContext->tokens->advance();
-        }
+        $this->finishScalarWithPossibleMultiline(
+            $parseContext,
+            $valueNode,
+            $scalarToken,
+            $parentIndentLen,
+            [$indentationNode, ...$layoutBuffer],
+        );
     }
 
     private function consumeIndentedBlockTaggedScalarValue(ParseContext $parseContext, ValueNode $valueNode, int $parentIndentLen): void
@@ -283,22 +268,43 @@ final readonly class IndentedBlockValueParser implements SubParserInterface
             throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Scalar expected for indented block tagged scalar value, but %s given', $scalarToken?->type->value ?? '_nothing_'), $parseContext->tokens));
         }
 
+        $this->finishScalarWithPossibleMultiline($parseContext, $valueNode, $scalarToken, $parentIndentLen);
+    }
+
+    /**
+     * @param array<Node> $layoutPrefix
+     */
+    private function finishScalarWithPossibleMultiline(
+        ParseContext $parseContext,
+        ValueNode $valueNode,
+        Token $scalarToken,
+        int $parentIndentLen,
+        array $layoutPrefix = [],
+    ): void {
         if (
             TokenType::PLAIN_SCALAR === $scalarToken->type
             && $this->multilineContinuationHelper
                 ->isMultilinePlainContinuationAhead($parseContext->tokens, 1, $parentIndentLen)
         ) {
             $multiline = new MultilinePlainScalarNode();
+            foreach ($layoutPrefix as $layoutNode) {
+                $multiline->addChild($layoutNode);
+            }
             $multiline->addChild($this->nodeFactory->createScalarNode($scalarToken));
             $parseContext->tokens->advance();
             $this->registry
                 ->getMultilinePlainScalarParser()
                 ->appendMultilinePlainScalarContinuations($parseContext->tokens, $multiline, $parentIndentLen);
             $valueNode->addChild($multiline);
-        } else {
-            $valueNode->addChild($this->nodeFactory->createScalarNode($scalarToken));
-            $parseContext->tokens->advance();
+
+            return;
         }
+
+        foreach ($layoutPrefix as $layoutNode) {
+            $valueNode->addChild($layoutNode);
+        }
+        $valueNode->addChild($this->nodeFactory->createScalarNode($scalarToken));
+        $parseContext->tokens->advance();
     }
 
     private function isNodePropertiesOnlyLine(ParseContext $parseContext, int $offset): bool
