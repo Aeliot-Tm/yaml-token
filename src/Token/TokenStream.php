@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Aeliot\YamlToken\Token;
 
-final class TokenStream
+final class TokenStream implements TokenStreamInterface
 {
     private int $position = 0;
 

@@ -15,6 +15,7 @@ namespace Aeliot\YamlToken\Parser\Dto;
 
 use Aeliot\YamlToken\Token\Token;
 use Aeliot\YamlToken\Token\TokenStream;
+use Aeliot\YamlToken\Token\TokenStreamInterface;
 
 /**
  * Wraps {@see TokenStream} and records the last non-null token returned from
@@ -22,19 +23,11 @@ use Aeliot\YamlToken\Token\TokenStream;
  *
  * @mixin TokenStream
  */
-final class TokenStreamProxy
+final class TokenStreamProxy implements TokenStreamInterface
 {
     private TokenStream $inner;
 
     private ?Token $lastObserved = null;
-
-    /**
-     * @param array<int, mixed> $arguments
-     */
-    public function __call(string $name, array $arguments): mixed
-    {
-        return $this->inner->{$name}(...$arguments);
-    }
 
     public function __construct(TokenStream $inner)
     {
@@ -59,6 +52,31 @@ final class TokenStreamProxy
         }
 
         return $token;
+    }
+
+    public function addToken(Token $token): void
+    {
+        $this->inner->addToken($token);
+    }
+
+    public function getLength(): int
+    {
+        return $this->inner->getLength();
+    }
+
+    public function getTokens(): array
+    {
+        return $this->inner->getTokens();
+    }
+
+    public function isEnd(): bool
+    {
+        return $this->inner->isEnd();
+    }
+
+    public function peek(int $offset): ?Token
+    {
+        return $this->inner->peek($offset);
     }
 
     public function getColumn(): ?int
