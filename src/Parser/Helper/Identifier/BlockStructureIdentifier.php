@@ -23,6 +23,7 @@ final readonly class BlockStructureIdentifier
         private FlowStructureIdentifier $flowStructureIdentifier,
         private MultilineContinuationHelper $multilineContinuationHelper,
         private NodePropertyIdentifier $nodePropertyIdentifier,
+        private SequenceIdentifier $sequenceIdentifier,
     ) {
     }
 
@@ -106,11 +107,6 @@ final readonly class BlockStructureIdentifier
 
     public function isSequenceStart(ParseContext $parseContext): bool
     {
-        $token = $parseContext->tokens->current();
-        if (TokenType::INDENTATION === $token->type) {
-            $token = $parseContext->tokens->peek(1);
-        }
-
-        return TokenType::SEQUENCE_ENTRY === $token?->type;
+        return $this->sequenceIdentifier->isSequenceStart($parseContext);
     }
 }

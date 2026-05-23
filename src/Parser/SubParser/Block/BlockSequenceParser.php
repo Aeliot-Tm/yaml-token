@@ -24,6 +24,7 @@ use Aeliot\YamlToken\Parser\Exception\IndentationInvalidException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
+use Aeliot\YamlToken\Parser\Helper\Identifier\SequenceIdentifier;
 use Aeliot\YamlToken\Parser\Helper\IndentationHelper;
 use Aeliot\YamlToken\Parser\Helper\LookAheadHelper;
 use Aeliot\YamlToken\Parser\ParseContext;
@@ -36,6 +37,7 @@ final readonly class BlockSequenceParser implements SubParserInterface
         private ErrorHelper $errorHelper,
         private IndentationHelper $indentationHelper,
         private LookAheadHelper $lookAheadHelper,
+        private SequenceIdentifier $sequenceIdentifier,
         private ParserRegistry $registry,
     ) {
     }
@@ -83,7 +85,7 @@ final readonly class BlockSequenceParser implements SubParserInterface
                 throw new IndentationInvalidException($this->errorHelper->appendTokenLocation(\sprintf('Unexpected indentation %d while base indentation is %d', $indentLen, $baseIndentLen), $token));
             }
 
-            if (!$this->isSequenceStart($parseContext)) {
+            if (!$this->sequenceIdentifier->isSequenceStart($parseContext)) {
                 if ($allowNonSequenceAtBaseIndentAsTerminator && $indentLen === $baseIndentLen) {
                     break;
                 }
@@ -113,15 +115,5 @@ final readonly class BlockSequenceParser implements SubParserInterface
         }
 
         return $blockSequence;
-    }
-
-    private function isSequenceStart(ParseContext $parseContext): bool
-    {
-        $token = $parseContext->tokens->current();
-        if (TokenType::INDENTATION === $token->type) {
-            $token = $parseContext->tokens->peek(1);
-        }
-
-        return TokenType::SEQUENCE_ENTRY === $token?->type;
     }
 }

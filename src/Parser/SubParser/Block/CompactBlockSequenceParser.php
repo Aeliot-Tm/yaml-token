@@ -19,6 +19,7 @@ use Aeliot\YamlToken\Node\BlockSequenceNode;
 use Aeliot\YamlToken\Node\IndentationNode;
 use Aeliot\YamlToken\Parser\Consumer;
 use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
+use Aeliot\YamlToken\Parser\Helper\Identifier\SequenceIdentifier;
 use Aeliot\YamlToken\Parser\Helper\LookAheadHelper;
 use Aeliot\YamlToken\Parser\ParseContext;
 use Aeliot\YamlToken\Parser\ParserRegistry;
@@ -28,6 +29,7 @@ final readonly class CompactBlockSequenceParser implements SubParserInterface
     public function __construct(
         private Consumer $consumer,
         private LookAheadHelper $lookAheadHelper,
+        private SequenceIdentifier $sequenceIdentifier,
         private ParserRegistry $registry,
     ) {
     }
@@ -75,7 +77,7 @@ final readonly class CompactBlockSequenceParser implements SubParserInterface
             if (\strlen($token->text) !== $indentLen) {
                 break;
             }
-            if (!$this->isSequenceStart($parseContext)) {
+            if (!$this->sequenceIdentifier->isSequenceStart($parseContext)) {
                 break;
             }
 
@@ -96,15 +98,5 @@ final readonly class CompactBlockSequenceParser implements SubParserInterface
         }
 
         return $blockSequence;
-    }
-
-    private function isSequenceStart(ParseContext $parseContext): bool
-    {
-        $token = $parseContext->tokens->current();
-        if (TokenType::INDENTATION === $token->type) {
-            $token = $parseContext->tokens->peek(1);
-        }
-
-        return TokenType::SEQUENCE_ENTRY === $token?->type;
     }
 }

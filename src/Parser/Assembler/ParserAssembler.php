@@ -20,6 +20,7 @@ use Aeliot\YamlToken\Parser\Helper\Identifier\BlockStructureIdentifier;
 use Aeliot\YamlToken\Parser\Helper\Identifier\FlowStructureIdentifier;
 use Aeliot\YamlToken\Parser\Helper\Identifier\KeyIdentifier;
 use Aeliot\YamlToken\Parser\Helper\Identifier\NodePropertyIdentifier;
+use Aeliot\YamlToken\Parser\Helper\Identifier\SequenceIdentifier;
 use Aeliot\YamlToken\Parser\Helper\IndentationHelper;
 use Aeliot\YamlToken\Parser\Helper\LookAheadHelper;
 use Aeliot\YamlToken\Parser\Helper\MultilineContinuationHelper;
@@ -53,6 +54,7 @@ final class ParserAssembler
     private ?FlowStructureIdentifier $flowStructureIdentifier = null;
     private ?KeyIdentifier $keyIdentifier = null;
     private ?NodePropertyIdentifier $nodePropertyIdentifier = null;
+    private ?SequenceIdentifier $sequenceIdentifier = null;
 
     public function __construct(
         private AnchorPostProcessor $anchorPostProcessor,
@@ -89,6 +91,7 @@ final class ParserAssembler
             $this->errorHelper,
             $this->indentationHelper,
             $this->lookAheadHelper,
+            $this->getSequenceIdentifier(),
             $registry,
         );
     }
@@ -108,6 +111,7 @@ final class ParserAssembler
         return new CompactBlockSequenceParser(
             $this->consumer,
             $this->lookAheadHelper,
+            $this->getSequenceIdentifier(),
             $registry,
         );
     }
@@ -241,6 +245,7 @@ final class ParserAssembler
             $this->getFlowStructureIdentifier(),
             $this->multilineContinuationHelper,
             $this->getNodePropertyIdentifier(),
+            $this->getSequenceIdentifier(),
         );
     }
 
@@ -289,5 +294,10 @@ final class ParserAssembler
         return $this->nodePropertyIdentifier ??= new NodePropertyIdentifier(
             $this->getFlowStructureIdentifier(),
         );
+    }
+
+    public function getSequenceIdentifier(): SequenceIdentifier
+    {
+        return $this->sequenceIdentifier ??= new SequenceIdentifier();
     }
 }
