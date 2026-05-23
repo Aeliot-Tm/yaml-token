@@ -20,12 +20,12 @@ use Aeliot\YamlToken\Parser\Helper\NodeFactory;
 
 final readonly class Consumer
 {
-    private const TOKEN_TYPES_SPASE_AND_COMMENT = [
+    private const TOKEN_TYPES_SPACE_AND_COMMENT = [
         TokenType::COMMENT,
         TokenType::WHITESPACE,
     ];
 
-    private const TOKEN_TYPES_SPASE_COMMENT_END = [
+    private const TOKEN_TYPES_SPACE_COMMENT_END = [
         TokenType::COMMENT,
         TokenType::NEWLINE,
         TokenType::WHITESPACE,
@@ -38,12 +38,12 @@ final readonly class Consumer
 
     public function collectSpaceAndComments(TokenStreamProxy $tokens, Node $root): void
     {
-        $this->collectTypes($tokens, self::TOKEN_TYPES_SPASE_AND_COMMENT, $root);
+        $this->collectTypes($tokens, self::TOKEN_TYPES_SPACE_AND_COMMENT, $root);
     }
 
     public function collectSpaceCommentEnds(TokenStreamProxy $tokens, Node $root): void
     {
-        $this->collectTypes($tokens, self::TOKEN_TYPES_SPASE_COMMENT_END, $root);
+        $this->collectTypes($tokens, self::TOKEN_TYPES_SPACE_COMMENT_END, $root);
     }
 
     /**
