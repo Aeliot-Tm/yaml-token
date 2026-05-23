@@ -1,12 +1,20 @@
 # Parser Refactoring: Sub-Parser Composition
 
+## Status
+
+**Completed** on branch `refactor-parser`. The former ~3 000-line `Parser.php`
+God-class, the **Driver / Frame / Builder** flow runtime, **`FlowHost`** closure
+bridge, and **`Harvester`** DTO were replaced by sub-parser composition described
+below. User-facing behaviour and fixture expectations are unchanged.
+
+See [Parser](Parser.md) for parsing semantics and [Parser Architecture](../Architecture/ParserDriver.md)
+for the current component layout.
+
 ## Motivation
 
-`Parser.php` has grown to ~3 000 lines / ~74 methods. It is a God-class that
-owns all block-parsing logic directly and reaches into flow builders only
-through the `FlowHost` closure bridge. The `FlowHost` callback mechanism
-(11 closures wrapping `private` methods of `Parser`) obscures control flow
-more than it helps. The class is hard to navigate, test in isolation, and extend.
+The monolithic `Parser.php` owned all block-parsing logic and reached flow parsing
+only through an 11-closure `FlowHost` bridge. That made control flow hard to
+follow, isolated testing difficult, and extension risky.
 
 ## Design Principles
 
@@ -14,16 +22,14 @@ more than it helps. The class is hard to navigate, test in isolation, and extend
    production (e.g. flow sequence, block mapping, plain scalar).
 2. **Direct delegation** — parsers call each other through the PHP call stack,
    not through a Driver / Frame state machine or closure bridge.
-3. **Dynamic dispatch via registry** — when the next construct is unknown at
-   compile time, a `ParserRegistry` + `OngoingStructureIdentifier` pair
-   resolves the type at runtime and returns the appropriate sub-parser.
+3. **Structure identifiers** — look-ahead predicates live in
+   `Helper/Identifier/*` classes and are injected into the sub-parsers that need them.
 4. **Lazy resolution via registry** — sub-parsers receive `ParserRegistry` in
    their constructors; the registry creates each sub-parser on first access
-   (via `ParserAssembler`) and caches it. This naturally resolves circular
-   dependencies (e.g. `ValueParser ↔ BlockMappingParser`) without setter
-   injection or two-phase wiring.
-5. **Gradual migration** — refactor one group at a time, keeping tests green
-   after every step.
+   (via `ParserAssembler`) and caches it. This resolves circular dependencies
+   (e.g. `ValueParser ↔ BlockMappingParser`) without setter injection.
+5. **Incremental migration** — the refactor landed in small steps; see
+   [Migration Plan](ParserRefactoring-MigrationPlan.md) for the historical sequence.
 
 See [Design Decisions](ParserRefactoring-Decisions.md) for rationale behind
 each principle.
@@ -31,38 +37,36 @@ each principle.
 ## Related Documents
 
 - [Core Abstractions](ParserRefactoring-CoreAbstractions.md) — `ParseContext`,
-  `ParserRegistry`, `ParserAssembler`, `StructureType`, `SubParserInterface`
-  with code examples.
-- [Sub-Parser Catalog](ParserRefactoring-SubParsers.md) — full list of
-  sub-parsers (structural, block, flow, scalar) and helper classes with mapping
-  to current `Parser.php` methods.
-- [Design Decisions](ParserRefactoring-Decisions.md) — key architectural
-  decisions and their rationale (lazy resolution, single assembler, recursion
-  depth protection).
+  `ParserRegistry`, `ParserAssembler`, `ParserBuilder`, `StructureType`,
+  `SubParserInterface`.
+- [Sub-Parser Catalog](ParserRefactoring-SubParsers.md) — sub-parsers, helpers,
+  and mapping from former `Parser.php` methods.
+- [Design Decisions](ParserRefactoring-Decisions.md) — lazy resolution, single
+  assembler, recursion depth protection, context stack.
+- [Migration Plan](ParserRefactoring-MigrationPlan.md) — phased commit plan
+  (historical; all phases complete).
 
 ## Control-Flow Example
 
-```
-ValueParser::parse(ctx, parentIndentLen)
+```text
+ValueParser::parseValue(ctx, parentIndentLen)
   │
-  ├── NodePropertiesParser::parse(ctx)         // &anchor !tag if present
+  ├── NodePropertiesParser::collectValueProperties(ctx, valueNode)
   │
-  ├── identifier->identifyBlockValue(ctx, …)   // look-ahead → StructureType::FlowSequence
+  ├── token → block scalar / NEWLINE / scalar / alias / flow start …
   │
   └── registry->getFlowSequenceParser()->parse(ctx)
         │
         ├── consume `[`
         ├── loop:
         │   ├── FlowEntryParser::parse(ctx)
-        │   │   ├── identifier->identifyFlowValue(ctx) → PlainScalar
-        │   │   └── registry->getByType(PlainScalar)->parse(ctx)
-        │   │       └── return ScalarNode
+        │   │   └── ValueParser::parseValue(ctx, FLOW_COLLECTION_VALUE_PARENT)
+        │   │       └── SimpleScalarParser::parse(ctx) → ScalarNode
         │   └── return ValueNode
         │
         │   consume `,`
         │
         │   FlowEntryParser::parse(ctx)
-        │   ├── identifier->identifyFlowValue(ctx) → FlowMapping
         │   └── registry->getFlowMappingParser()->parse(ctx)
         │       └── … recursive delegation …
         │
@@ -70,19 +74,20 @@ ValueParser::parse(ctx, parentIndentLen)
         └── return FlowSequenceNode
 ```
 
-## What Gets Removed
+## Removed Components
 
-- **`FlowHost`** — entirely; the closure bridge is no longer needed.
-- **`Driver`**, **`Frame`**, **`BuilderInterface`**, **`BuilderResult/*`** — the
-  stack-machine runtime is replaced by direct PHP call-stack delegation.
-- **`Builder/*`** (`FlowSequenceBuilder`, etc.) — replaced by `SubParser/Flow/*`.
+- **`FlowHost`** — closure bridge to private `Parser` helpers.
+- **`Driver`**, **`Frame`**, **`BuilderInterface`**, **`BuilderResult/*`** —
+  stack-machine runtime for flow collections.
+- **`Builder/*`** — replaced by `SubParser/Flow/*`.
 - **`Harvester`** — replaced by `ParseContext`.
 
 ## File Layout
 
-```
+```text
 src/Parser/
-├── Parser.php                          # Thin façade: Lexer → ParseContext → StreamParser
+├── Parser.php                          # Thin façade
+├── ParserBuilder.php                   # Production wiring
 ├── ParseContext.php
 ├── ParserRegistry.php
 │
@@ -90,6 +95,8 @@ src/Parser/
 │   └── SubParserInterface.php
 │
 ├── Enum/
+│   ├── EspecialIndent.php
+│   ├── ParsingContext.php
 │   └── StructureType.php
 │
 ├── SubParser/
@@ -100,35 +107,12 @@ src/Parser/
 │   ├── NodePropertiesParser.php
 │   ├── MergeInstructionParser.php
 │   │
-│   ├── Block/
-│   │   ├── BlockMappingParser.php
-│   │   ├── BlockSequenceParser.php
-│   │   ├── CompactBlockMappingParser.php
-│   │   ├── CompactBlockSequenceParser.php
-│   │   ├── KeyParser.php
-│   │   ├── KeyValueCoupleParser.php
-│   │   ├── SequenceEntryParser.php
-│   │   └── IndentedBlockValueParser.php
-│   │
-│   ├── Flow/
-│   │   ├── FlowSequenceParser.php
-│   │   ├── FlowMappingParser.php
-│   │   ├── FlowEntryParser.php
-│   │   └── FlowMappingPairParser.php
-│   │
-│   └── Scalar/
-│       ├── PlainScalarParser.php
-│       ├── QuotedScalarParser.php
-│       ├── MultilinePlainScalarParser.php
-│       └── BlockScalarParser.php
+│   ├── Block/          (8 parsers)
+│   ├── Flow/           (4 parsers)
+│   └── Scalar/         (SimpleScalarParser, MultilinePlainScalarParser, BlockScalarParser)
 │
 ├── Helper/
-│   ├── Identifier/
-│   │   ├── OngoingStructureIdentifier.php  # Facade
-│   │   ├── BlockStructureIdentifier.php
-│   │   ├── FlowStructureIdentifier.php
-│   │   ├── NodePropertyIdentifier.php
-│   │   └── KeyIdentifier.php
+│   ├── Identifier/     (Block, Flow, Key, NodeProperty — no facade class)
 │   ├── NodeFactory.php
 │   ├── Consumer.php
 │   ├── LookAheadHelper.php
@@ -141,28 +125,10 @@ src/Parser/
 │   └── ParserAssembler.php
 │
 ├── Dto/
-│   ├── AnchorsRegistry.php             # kept
-│   ├── ParseState.php                  # kept
-│   └── TokenStreamProxy.php            # kept
+│   ├── AnchorsRegistry.php
+│   ├── ContextFrame.php
+│   ├── ParseState.php
+│   └── TokenStreamProxy.php
 │
-└── Exception/                          # kept as-is
+└── Exception/
 ```
-
-## Migration Strategy
-
-Refactor incrementally, keeping all tests green after every step:
-
-1. **Infrastructure** — `ParseContext`, `ParserRegistry`, `ParserAssembler`,
-   `SubParserInterface`, `StructureType`, `NodeFactory`, `ErrorHelper`. The
-   registry + assembler pair is the backbone — once they exist, sub-parsers
-   can be migrated in any order.
-2. **Helpers** — `LookAheadHelper`, `IndentationHelper`, evolve `Consumer`
-   (switch from `FlowHost` to `NodeFactory`), `MultilineContinuationHelper`.
-3. **Scalar parsers** — simplest, fewest dependencies.
-4. **Flow parsers** — replace `Builder/*` + `Driver` + `FlowHost` with direct
-   `FlowSequenceParser` etc.
-5. **Block parsers** — largest group.
-6. **Structural parsers** — `DocumentParser`, `StreamParser`.
-7. **`OngoingStructureIdentifier`** — migrate all `is*` predicates.
-8. **Slim `Parser.php`** — reduce to façade:
-   `parse()` → `new ParserRegistry(new ParserAssembler())` → `registry->getStreamParser()->parse(ctx)`.

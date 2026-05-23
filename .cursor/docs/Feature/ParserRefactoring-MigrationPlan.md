@@ -2,6 +2,13 @@
 
 Parent: [Parser Refactoring](ParserRefactoring.md)
 
+## Status
+
+**All phases below are complete** on branch `refactor-parser`. This document
+is kept as a historical record of the incremental migration. Current architecture
+is described in [Parser Architecture](../Architecture/ParserDriver.md) and
+[Parser](Parser.md).
+
 ## Overview
 
 Incremental refactoring of the ~2970-line `Parser.php` God-class into a
@@ -342,12 +349,10 @@ final class Parser
 - Remove any dead imports, unused helper methods, or unreachable code paths.
 - Run `cs-fix` and `phpstan` for final cleanup.
 
-### Commit 25 — Update documentation
+### Commit 25 — Update documentation ✓
 
-- Update [Parser feature doc](Parser.md): remove Driver/Builder/FlowHost
-  description, document sub-parser architecture.
-- Update [Parser Driver Architecture doc](../Architecture/ParserDriver.md):
-  mark as superseded or rewrite.
+- Updated [Parser feature doc](Parser.md): sub-parser architecture, removed Driver/Builder/FlowHost.
+- Rewrote [Parser Architecture doc](../Architecture/ParserDriver.md).
 
 ---
 

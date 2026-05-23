@@ -2,6 +2,24 @@
 
 Parent: [Parser Refactoring](ParserRefactoring.md)
 
+## Implementation notes (post-migration)
+
+The refactor is complete. A few decisions below describe the **target** design;
+the shipped code differs in these ways:
+
+- **`EspecialIndent` sentinels remain** — `ValueParser::parseValue($ctx, $parentIndentLen)`
+  still uses `BARE_DOCUMENT_BLOCK_PARENT` and `FLOW_COLLECTION_VALUE_PARENT`.
+  `ParseContext` exposes a context stack API, but sub-parsers do not push/pop
+  frames yet; indent sentinels carry flow vs bare-root semantics for now.
+- **No `OngoingStructureIdentifier` facade** — look-ahead predicates live in
+  four identifier classes injected directly into the sub-parsers that need them.
+- **`SimpleScalarParser`** — plain and quoted scalars share one leaf parser
+  (via `NodeFactory::createScalarNode()`), not separate `PlainScalarParser` /
+  `QuotedScalarParser` classes.
+- **`ParserBuilder`** — production wiring creates helpers, assembler, registry,
+  and `Parser` in one place; `Parser` receives `ParserRegistry` by constructor
+  injection.
+
 ## Lazy Resolution via Registry
 
 **Problem:** Circular dependencies between sub-parsers
@@ -88,11 +106,11 @@ public function parse(ParseContext $ctx, int $parentIndentLen): BlockMappingNode
 
 `MAX_DEPTH` is a constant on each sub-parser (or a shared constant). Only
 parsers that delegate recursively need the guard — leaf parsers (e.g.
-`PlainScalarParser`, `QuotedScalarParser`) do not increment the counter.
+`SimpleScalarParser`) do not increment the counter.
 
-## Context Stack (Replaces Sentinel Constants)
+## Context Stack (Partial — Sentinels Still in Use)
 
-**Problem:** The current `Parser` uses `$parentIndentLen` to carry two
+**Problem:** The former `Parser` used `$parentIndentLen` to carry two
 unrelated meanings in one parameter:
 
 1. The actual parent indent level (≥ 0).
@@ -117,10 +135,15 @@ to forward magic integers.
   `FlowValueParser`, `BareDocumentRootValueParser`) — significant code
   duplication.
 
-**Decision:** Variant B — context stack on `ParseContext`.
+**Decision:** Variant B — context stack on `ParseContext` (infrastructure in place).
 
-Each parser that introduces a new context pushes a `ContextFrame` on entry
-and pops in a `finally` block (same pattern as the depth counter):
+**Shipped state:** `ContextFrame`, `ParsingContext`, and push/pop APIs exist on
+`ParseContext`, but `ValueParser` and block parsers still pass
+`EspecialIndent` sentinels as `$parentIndentLen`. Eliminating sentinels in
+favour of stack-only context is a possible follow-up.
+
+Each parser that introduces a new context *would* push a `ContextFrame` on entry
+and pop in a `finally` block (same pattern as the depth counter):
 
 ```php
 enum ParsingContext
@@ -193,15 +216,15 @@ public function parse(ParseContext $ctx): ValueNode
 }
 ```
 
-**Consequences:**
-- Sentinel constants `-1` / `-2` are eliminated.
+**Consequences (target vs shipped):**
+- Target: sentinel constants `-1` / `-2` eliminated; `ValueParser` reads the stack.
+- Shipped: sentinels remain; context stack API is reserved for a later step.
 - `FlowValueParser` as a separate class is not needed — `ValueParser` checks
-  the stack.
-- `OngoingStructureIdentifier` and any other helper can inspect the context
-  without receiving it as a parameter.
-- `$parentIndentLen` may still appear as a parameter in block-specific parsers
-  for locally computed values (e.g. `compactIndent`), but it is always a real
-  value ≥ 0, never a sentinel.
+  `$parentIndentLen` / flow sentinel.
+- Structure identifiers are injected per sub-parser; there is no
+  `OngoingStructureIdentifier` facade.
+- `$parentIndentLen` in block-specific parsers is still a real value ≥ 0 or an
+  `EspecialIndent` sentinel where flow/bare-root semantics apply.
 
 ## ParserRegistry Caching in the Façade
 
@@ -209,50 +232,38 @@ public function parse(ParseContext $ctx): ValueNode
 `ParserRegistry` caches sub-parsers lazily. Should this object graph be
 rebuilt on every `Parser::parse()` call?
 
-**Decision:** `Parser` (the façade) creates `ParserRegistry` once in its
-constructor and reuses it across `parse()` calls. Only `ParseContext` is
-created per invocation — it holds the mutable runtime state (tokens, anchors,
-indent state, context stack, depth counter). Sub-parsers are stateless between
-calls: all per-parse state lives in `ParseContext`.
+**Decision:** `ParserRegistry` (and its `ParserAssembler`) are created once per
+`Parser` instance — typically via [`ParserBuilder`](../../../src/Parser/ParserBuilder.php).
+Only `ParseContext` is created per `parseStream()` call.
 
 ```php
 final class Parser
 {
-    private readonly ParserRegistry $registry;
+    public function __construct(private ParserRegistry $parserRegistry) {}
 
-    public function __construct()
+    public function parseStream(TokenStream $tokens): StreamNode
     {
-        $this->registry = new ParserRegistry(new ParserAssembler());
-    }
-
-    public function parse(string $input): StreamNode
-    {
-        $tokens = (new Lexer())->tokenize($input);
-        $ctx = new ParseContext(
+        $parseContext = new ParseContext(
             new TokenStreamProxy($tokens),
             new AnchorsRegistry(),
             new ParseState(),
         );
 
-        return $this->registry->getStreamParser()->parse($ctx);
+        return $this->parserRegistry->getStreamParser()->parseStream($parseContext);
     }
 }
 ```
 
 ## Context-Sensitive Identification Signatures
 
-**Problem:** `OngoingStructureIdentifier` needs to know the current parsing
-context (flow / block / bare-document-root) to apply the correct rules.
+**Problem:** Structure identifiers need to know the current parsing context
+(flow / block / bare-document-root) to apply the correct rules.
 
-**Decision:** Resolved by two prior decisions:
-
-1. The [context stack](#context-stack-replaces-sentinel-constants) makes the
-   current context available via `$ctx->getCurrentContext()` — identifiers
-   read it directly, no extra parameters needed.
-2. The [identifier decomposition](ParserRefactoring-SubParsers.md#structure-identification)
-   splits predicates into `BlockStructureIdentifier`, `FlowStructureIdentifier`,
-   etc. Each specialized identifier inherently knows its context; the facade
-   routes based on the context stack.
+**Decision:** Split predicates into `BlockStructureIdentifier`,
+`FlowStructureIdentifier`, `NodePropertyIdentifier`, and `KeyIdentifier`.
+Each sub-parser receives the identifiers it needs. Identifiers take
+`ParseContext` (token stream) as their primary input; they do not rely on a
+separate facade class.
 
 ## Testing Strategy
 

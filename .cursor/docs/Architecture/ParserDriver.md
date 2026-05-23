@@ -1,195 +1,145 @@
-# Parser Driver Architecture
+# Parser Architecture
 
 ## Goal
 
-The parser uses a small **Driver / Frame / Builder** runtime to compose flow-collection
-parsing (`[ ... ]`, `{ ... }`) from independent, single-responsibility builders.
-The driver replaces deeply nested, mutually-recursive private methods inside
-[`Parser`](../../../src/Parser/Parser.php) for flow contexts and gives every flow
-construct (sequence, sequence entry, sequence operand, mapping, mapping pair)
-its own dedicated builder class. Block parsing remains directly in `Parser`
-because the driver was introduced specifically to disentangle flow collections
-where YAML 1.2.2 §7.4 allows arbitrary mutual nesting (sequence inside mapping
-inside sequence …).
+The parser builds a `Node` tree from a lexer `TokenStream` through **sub-parser
+composition**: each YAML construct has a dedicated class, helpers hold shared
+logic, and [`Parser`](../../../src/Parser/Parser.php) is a thin façade. The previous
+**Driver / Frame / Builder** runtime and **`FlowHost`** closure bridge were removed;
+flow and block parsing now use the same direct-delegation model.
 
-## Components
+## Entry point
 
-### Driver
-
-[`Driver`](../../../src/Parser/Driver/Driver.php) owns the **frame stack** and the
-single `while (true)` dispatch loop:
-
-1. `step()` is called on the top frame.
-2. The returned [`BuilderResultInterface`](../../../src/Parser/Driver/BuilderResult/BuilderResultInterface.php)
-   is dispatched (in an inner loop, using `continue 2` to restart from the top
-   of the outer loop):
-   - `Continued` — same frame keeps running, take the next outer iteration.
-   - `Delegate` — push a child frame and run it; the new top-of-stack drives
-     the next outer iteration.
-   - `Completed` — pop the current frame and either return its node when the
-     stack becomes empty, or hand the result to the parent's
-     `onChildCompleted()` (which itself returns another `BuilderResultInterface`,
-     dispatched in the same inner loop).
-3. Any other return value throws `UnexpectedStateException`.
-
-The driver never advances tokens directly: every consumption happens inside a
-builder via `Harvester::tokens` (a [`TokenStream`](../../../src/Token/TokenStream.php)
-proxy). This keeps the loop generic and makes builders testable in isolation.
-
-### Frame
-
-[`Frame`](../../../src/Parser/Driver/Frame.php) is an immutable pair
-`(BuilderInterface $builder, Node $node)` plus thin forwarders `step()` and
-`onChildCompleted()`. The builder decides how to advance parsing; the node is
-the in-progress AST fragment for that frame.
-
-### BuilderInterface
-
-[`BuilderInterface`](../../../src/Parser/Driver/BuilderInterface.php) has two
-methods:
-
-```php
-public function step(Harvester $harvester, Frame $self): BuilderResultInterface;
-public function onChildCompleted(Harvester $harvester, Frame $self, Node $child): BuilderResultInterface;
+```text
+Parser::parse(input)
+  → Lexer::tokenize
+  → Parser::parseStream(TokenStream)
+       → new ParseContext(TokenStreamProxy, AnchorsRegistry, ParseState)
+       → ParserRegistry::getStreamParser()->parseStream(ctx)
+            → StreamParser → DocumentParser → …
 ```
 
-`step()` advances the in-progress node when no child sub-builder is running.
-`onChildCompleted()` is invoked when a delegated child frame completes and its
-result must be folded back into the current frame's node (e.g. attach a parsed
-flow node to a mapping pair, decide whether to continue iterating, etc.).
+[`ParserBuilder`](../../../src/Parser/ParserBuilder.php) is the production factory:
+it creates shared helpers once, wraps them in [`ParserAssembler`](../../../src/Parser/Assembler/ParserAssembler.php),
+and injects the assembler into [`ParserRegistry`](../../../src/Parser/ParserRegistry.php).
 
-### BuilderResult
+## Runtime state: ParseContext
 
-The three result classes describe the only transitions a builder can request:
+[`ParseContext`](../../../src/Parser/ParseContext.php) replaces the former `Harvester`.
+It is passed to every sub-parser method and holds:
 
-- [`Continued`](../../../src/Parser/Driver/BuilderResult/Continued.php) — keep
-  this frame on top of the stack; `step()` will be called again.
-- [`Delegate`](../../../src/Parser/Driver/BuilderResult/Delegate.php) — push
-  the wrapped frame; control transfers to it until it completes.
-- [`Completed`](../../../src/Parser/Driver/BuilderResult/Completed.php) — this
-  frame is finished; the wrapped node bubbles up to the parent's
-  `onChildCompleted()` (or becomes the driver's final return value at the
-  bottom of the stack).
+| Member | Role |
+|--------|------|
+| `tokens` | [`TokenStreamProxy`](../../../src/Parser/Dto/TokenStreamProxy.php) — cursor over the lexer stream |
+| `anchorsRegistry` | [`AnchorsRegistry`](../../../src/Parser/Dto/AnchorsRegistry.php) — named anchors for alias resolution |
+| `state` | [`ParseState`](../../../src/Parser/Dto/ParseState.php) — indentation steps |
+| `depth` | Recursion depth counter (safety threshold in sub-parsers) |
+| context stack | [`ContextFrame`](../../../src/Parser/Dto/ContextFrame.php) + [`ParsingContext`](../../../src/Parser/Enum/ParsingContext.php) enum (Block / Flow / BareDocumentRoot) |
 
-This three-state vocabulary intentionally matches the recursive descent shape
-that the legacy code expressed with nested `private function parse*()` calls,
-so each old recursion site maps to a single builder method.
+`ParseContext` does not reference `StreamNode` or any sub-parser instance.
 
-### FlowHost
+## Registry and assembler
 
-[`FlowHost`](../../../src/Parser/Flow/FlowHost.php) is the bridge between flow
-builders (which live in their own namespace) and the private parsing helpers
-on [`Parser`](../../../src/Parser/Parser.php). It is constructed by
-`Parser::createFlowHost()` and receives one closure per exposed helper:
+[`ParserRegistry`](../../../src/Parser/ParserRegistry.php) lazy-creates and caches
+sub-parsers on first access via typed getters (`getValueParser()`, `getFlowSequenceParser()`, …).
+Each sub-parser receives the registry in its constructor, which resolves circular
+dependencies (e.g. `ValueParser ↔ BlockMappingParser`) without two-phase wiring.
 
-- `collectSpaceAndComments`
-- `createSimpleNode` (closure parameter `createStructuralNode`; wraps structural tokens
-  into typed syntax nodes via `Parser::createSimpleNode()`)
-- `getFlowEntryKeyNode` (delegates to `Parser::getKeyNode()`; builds the
-  complete `KeyNode` including multiline plain-scalar handling)
-- `isScalarFollowedByValueIndicatorInFlow`
-- `parseFlowContextValue`
-- `parseFlowMapping` (allows `FlowEntryBuilder` to recurse into a nested mapping
-  flow-pair without re-running the driver itself)
-- `parseMergeInstructionAtCurrentPosition`
-- `postProcessKeyValueCouple` (for deep-anchor registration; see below)
-- `tryConsumeFlowMappingValueIndicator`
+[`ParserAssembler`](../../../src/Parser/Assembler/ParserAssembler.php) owns stateless
+helpers (created eagerly) and exposes one `create*Parser(ParserRegistry)` factory
+per sub-parser. Structure identifiers (`BlockStructureIdentifier`, `FlowStructureIdentifier`,
+`KeyIdentifier`, `NodePropertyIdentifier`) are also lazily created on the assembler
+and injected into the sub-parsers that need them.
 
-This keeps `Parser` private methods truly private (no public accessors leak
-out for builder needs) while letting builders call them through a single
-typed seam. Adding a new flow-builder helper is a one-line change to the
-`FlowHost` constructor signature plus the matching closure in
-`Parser::createFlowHost()`.
+[`StructureType`](../../../src/Parser/Enum/StructureType.php) and
+`ParserRegistry::getByType()` exist for dynamic scalar dispatch; most delegation
+uses typed registry getters instead.
 
-## Builders
+## Sub-parsers
 
-All flow-collection builders live under
-[`src/Parser/Builder/`](../../../src/Parser/Builder).
+All sub-parsers implement the marker [`SubParserInterface`](../../../src/Parser/Contract/SubParserInterface.php)
+and define their own `parse()` (or similarly named) signatures.
 
-- [`FlowSequenceBuilder`](../../../src/Parser/Builder/FlowSequenceBuilder.php)
-  builds a [`FlowSequenceNode`](../../../src/Node/FlowSequenceNode.php). It
-  consumes the opening `[`, alternates between entries (delegated to
-  `FlowEntryBuilder`) and `,` separators with surrounding layout, and closes
-  on `]`.
-- [`FlowEntryBuilder`](../../../src/Parser/Builder/FlowEntryBuilder.php) parses
-  a single flow-sequence entry, which per YAML 1.2.2 §7.4.1 is either a
-  flow node or a flow pair (legacy `key: value` form). After a JSON-style
-  key operand (quoted scalar or flow collection), it peeks for
-  `VALUE_INDICATOR` and builds a `KeyValueCoupleNode` via
-  `tryConsumeFlowMappingValueIndicator()`. It also peeks through layout
-  tokens to detect entry/sequence-end boundaries
-  (`isAtFlowSequenceEntryBoundary()`), enabling implicit empty values.
-- [`FlowOperandBuilder`](../../../src/Parser/Builder/FlowOperandBuilder.php)
-  parses a single flow-sequence operand as a `ValueNode` via
-  `FlowHost::parseFlowContextValue()`. It always returns `Completed` directly
-  from `step()` (no delegation).
-- [`FlowMappingBuilder`](../../../src/Parser/Builder/FlowMappingBuilder.php)
-  builds a [`FlowMappingNode`](../../../src/Node/FlowMappingNode.php). It
-  consumes `{`, iterates over key/value pairs (delegated to
-  `FlowMappingPairBuilder`) and `,` separators, and closes on `}`. Merge
-  instructions (`<<: *alias`) are handled by calling
-  `FlowHost::parseMergeInstructionAtCurrentPosition()` for the matching
-  position.
-- [`FlowMappingPairBuilder`](../../../src/Parser/Builder/FlowMappingPairBuilder.php)
-  builds a single [`KeyValueCoupleNode`](../../../src/Node/KeyValueCoupleNode.php).
-  It parses the key, optionally consumes the `:` value indicator, and
-  delegates value parsing through `FlowHost::parseFlowContextValue()`. Like
-  the sequence-entry builder, it peeks through layout tokens
-  (`isAtFlowMappingEntryBoundary()`) so empty values like `{"empty":\n}` are
-  represented by an empty `ValueNode` and the trailing layout is collected
-  by the outer mapping builder.
+| Group | Path | Responsibility |
+|-------|------|------------------|
+| Structural | `SubParser/StreamParser`, `DocumentParser`, `ValueParser`, `DirectiveParser`, `MergeInstructionParser`, `NodePropertiesParser` | Stream, documents, universal value entry, directives, merge keys, anchor/tag properties |
+| Block | `SubParser/Block/*` | Block mappings/sequences, compact collections, keys, couples, sequence entries, indented values |
+| Flow | `SubParser/Flow/*` | Flow sequences/mappings, entries, mapping pairs |
+| Scalar | `SubParser/Scalar/*` | Simple scalars, multiline plain, block scalars |
 
-## Parser integration
+Full mapping from legacy `Parser.php` methods: [Sub-Parser Catalog](../Feature/ParserRefactoring-SubParsers.md).
 
-[`Parser`](../../../src/Parser/Parser.php) keeps two thin entry points for
-flow contexts:
+### Control-flow example
 
-- `Parser::runFlowSequenceDriver(Harvester): FlowSequenceNode` — wraps
-  `FlowSequenceBuilder` in an initial frame and runs the driver.
-- `Parser::runFlowMappingDriver(Harvester): FlowMappingNode` — same for
-  `FlowMappingBuilder`.
+```text
+ValueParser::parseValue(ctx, parentIndentLen)
+  ├── NodePropertiesParser::collectValueProperties(ctx, valueNode)
+  ├── block scalar / NEWLINE → IndentedBlockValueParser::parseIndentedBlockValue
+  ├── scalar → SimpleScalarParser or MultilinePlainScalarParser
+  ├── alias / compact sequence / flow start
+  │     └── registry->getFlowSequenceParser()->parse(ctx)
+  │           ├── consume `[`
+  │           ├── loop: FlowEntryParser::parse(ctx)
+  │           │     └── ValueParser::parseValue(ctx, FLOW_COLLECTION_VALUE_PARENT)
+  │           └── consume `]`
+  └── return ValueNode
+```
 
-Both are reached from the same call sites that previously invoked
-`parseFlowSequence` / `parseFlowMapping`. `Parser::createFlowHost()` builds
-and returns the shared `FlowHost` for the duration of a single driver run
-(its closures bind to `$this`, so each call captures the current
-`Harvester`-agnostic helpers).
+## Helpers
+
+| Class | Purpose |
+|-------|---------|
+| [`NodeFactory`](../../../src/Parser/Helper/NodeFactory.php) | Map structural/scalar tokens to typed nodes |
+| [`Consumer`](../../../src/Parser/Consumer.php) | Collect layout tokens, comments, spaces by type |
+| [`ErrorHelper`](../../../src/Parser/Helper/ErrorHelper.php) | Append line/column to error messages |
+| [`IndentationHelper`](../../../src/Parser/Helper/IndentationHelper.php) | Validate and register indent steps |
+| [`LookAheadHelper`](../../../src/Parser/Helper/LookAheadHelper.php) | Peek significant block heads, insignificant lines |
+| [`MultilineContinuationHelper`](../../../src/Parser/Helper/MultilineContinuationHelper.php) | Multiline plain scalar continuation predicates |
+| [`AnchorPostProcessor`](../../../src/Parser/Helper/AnchorPostProcessor.php) | Wire anchors to declaring key/value couples |
+
+### Structure identifiers
+
+Look-ahead predicates from the former monolithic `Parser.php` live under
+[`src/Parser/Helper/Identifier/`](../../../src/Parser/Helper/Identifier):
+
+- [`BlockStructureIdentifier`](../../../src/Parser/Helper/Identifier/BlockStructureIdentifier.php) — block mapping/sequence starts, implicit keys
+- [`FlowStructureIdentifier`](../../../src/Parser/Helper/Identifier/FlowStructureIdentifier.php) — flow collection starts, JSON-style keys
+- [`NodePropertyIdentifier`](../../../src/Parser/Helper/Identifier/NodePropertyIdentifier.php) — anchor/tag lines and follow-on patterns
+- [`KeyIdentifier`](../../../src/Parser/Helper/Identifier/KeyIdentifier.php) — scalar + `:` implicit keys
+
+Sub-parsers receive the identifiers they need directly (there is no separate facade class).
+
+## Parent indent sentinels
+
+Block and flow contexts share `ValueParser::parseValue()` but use different parent
+indent semantics via [`EspecialIndent`](../../../src/Parser/Enum/EspecialIndent.php):
+
+- `BARE_DOCUMENT_BLOCK_PARENT` (-1) — bare document root (YAML 1.2.2 rule [211])
+- `FLOW_COLLECTION_VALUE_PARENT` (-2) — values inside `[ … ]`, `{ … }`, or merge RHS
+
+Flow lines use `WHITESPACE` (not `INDENTATION`) before continuation content; the
+flow sentinel prevents misrouting newline-prefixed values into
+`IndentedBlockValueParser` at indent 0.
 
 ## Token-stream interaction
 
-Builders observe and consume tokens through the `Harvester::tokens` proxy
-([`TokenStreamProxy`](../../../src/Parser/Dto/TokenStreamProxy.php)), which
-wraps the lexer [`TokenStream`](../../../src/Token/TokenStream.php). Adjacent
-`:` after a JSON-style key inside a flow sequence (production [153]) is
-emitted as `VALUE_INDICATOR` by the lexer (`FlowSequenceFrame` phase tracking);
-builders only peek and consume those tokens.
+Sub-parsers observe and consume tokens only through `ParseContext::tokens`
+(`TokenStreamProxy` over [`TokenStream`](../../../src/Token/TokenStream.php)).
+Adjacent `:` after a JSON-style key inside a flow sequence (production [153]) is
+emitted as `VALUE_INDICATOR` by the lexer; flow sub-parsers peek and consume those tokens.
 
-## Anchor declaration in complex keys
+## Adding a new sub-parser
 
-`Parser::postProcessKeyValueCouple()` is invoked by both block and flow
-key/value couple sites. It records the couple as the **declaring couple**
-of every anchor that belongs to it:
+1. Add a class implementing `SubParserInterface` under the appropriate
+   `src/Parser/SubParser/` subdirectory.
+2. Add `create*Parser()` to `ParserAssembler` and a typed getter to `ParserRegistry`.
+3. Delegate from an existing sub-parser (or extend `ValueParser` dispatch) via the registry.
+4. Cover the branch with a fixture and regenerate expectations via
+   `bin/dev/generate-parser-expectations.php` (inside the `php-cli` container when using Docker).
 
-- The value's direct anchor, via `ValueNode::getAnchor()`.
-- All anchors inside the **key subtree**, via the recursive helper
-  `Parser::collectKeyAnchorsRecursive()`. The recursion stops at any nested
-  `KeyValueCoupleNode` so anchors declared inside an inner couple keep their
-  inner-couple declaration (every couple owns its own scope).
+## Historical note
 
-This lets aliases resolve back to the surrounding couple even when the anchor
-is buried inside a flow sequence or flow mapping that serves as the key, e.g.
-`[ &a foo, bar ]: value` or `? [ &a foo, bar ]\n: value`.
-
-## Adding a new flow builder
-
-1. Define a new class implementing `BuilderInterface` under
-   `src/Parser/Builder/`.
-2. If the new builder needs a private `Parser` helper, add a typed closure
-   to `FlowHost::__construct()` (alphabetical order) and bind it inside
-   `Parser::createFlowHost()`.
-3. Reach the builder from a thin `Parser::run*Driver()` entry point or via a
-   `Delegate` from an existing builder.
-4. Cover the new branch with a fixture under `tests/fixture/edge_cases_extra/`
-   (or the matching bucket) and regenerate expectations via
-   `bin/dev/generate-lexer-expectations.php` and
-   `bin/dev/generate-parser-expectations.php`.
+Flow collections were previously parsed by a **Driver / Frame / Builder** stack under
+`src/Parser/Driver/` and `src/Parser/Builder/`, with private `Parser` helpers
+exposed through `FlowHost` closures. That infrastructure was replaced by the
+sub-parsers listed above; behaviour is preserved, control flow is direct recursion.

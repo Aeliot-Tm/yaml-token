@@ -6,70 +6,68 @@ Parent: [Parser Refactoring](ParserRefactoring.md)
 
 ### Structural
 
-| Class | Replaces | Responsibility |
-|-------|----------|----------------|
-| `StreamParser` | `Parser::parseStream` | BOM + document iteration |
-| `DocumentParser` | `Parser::parseDocuments` (per-document body) | Directives + root content of one document |
-| `ValueParser` | `Parser::parseValue` + `parseValuePrimaryPayload` | Universal entry: identify type → delegate |
+| Class | Former location | Responsibility |
+|-------|-----------------|----------------|
+| `StreamParser` | `Parser::parseStream` body | BOM + document iteration |
+| `DocumentParser` | `Parser::parseDocuments` | Directives + root content of one document |
+| `ValueParser` | `Parser::parseValue`, `parseValuePrimaryPayload` | Universal value entry and dispatch |
 | `DirectiveParser` | `Parser::parseYamlDirective`, `parseTagDirective` | `%YAML` / `%TAG` |
-| `MergeInstructionParser` | `Parser::parseMergeInstructionAtCurrentPosition`, `collectMergeAliases` | `<<: *alias`; `collectMergeAliases` as private tree-walking method |
-| `NodePropertiesParser` | `Parser::collectKeyProperties`, `collectValueProperties` | Anchor + tag before a value |
+| `MergeInstructionParser` | `Parser::parseMergeInstructionAtCurrentPosition`, `collectMergeAliases` | `<<: *alias` |
+| `NodePropertiesParser` | `Parser::collectKeyProperties`, `collectValueProperties` | Anchor + tag before a node |
 
 ### Block
 
-| Class | Replaces | Responsibility |
-|-------|----------|----------------|
-| `BlockMappingParser` | `Parser::parseBlockMappingValue` | Iterate key-value couples at one indent level |
-| `BlockSequenceParser` | `Parser::parseBlockSequenceValue` | Iterate `- entry` items at one indent level |
+| Class | Former location | Responsibility |
+|-------|-----------------|----------------|
+| `BlockMappingParser` | `Parser::parseBlockMappingValue` | Key-value couples at one indent level |
+| `BlockSequenceParser` | `Parser::parseBlockSequenceValue` | `- entry` items at one indent level |
 | `CompactBlockMappingParser` | `Parser::parseCompactBlockMapping` | Compact mapping after `- ` |
 | `CompactBlockSequenceParser` | `Parser::parseCompactBlockSequence` | Compact sequence |
-| `KeyParser` | `Parser::getKeyNode` | One key: explicit `?` / implicit / flow multiline plain / block scalar key |
-| `KeyValueCoupleParser` | `Parser::parseKeyValueCoupleAtCurrentPosition` | One `key: value` pair; delegates key parsing to `KeyParser` |
+| `KeyParser` | `Parser::getKeyNode` | One key (explicit `?`, implicit, multiline plain, block scalar) |
+| `KeyValueCoupleParser` | `Parser::parseKeyValueCoupleAtCurrentPosition` | One `key: value` pair |
 | `SequenceEntryParser` | `Parser::parseSequenceEntryValue` | One `- value` entry |
 | `IndentedBlockValueParser` | `Parser::parseIndentedBlockValue` | Value after `:` with newline + indent |
 
 ### Flow
 
-| Class | Replaces | Responsibility |
-|-------|----------|----------------|
-| `FlowSequenceParser` | `FlowSequenceBuilder` + `runFlowSequenceDriver` | `[…]` iteration |
-| `FlowMappingParser` | `FlowMappingBuilder` + `runFlowMappingDriver` | `{…}` iteration |
-| `FlowEntryParser` | `FlowEntryBuilder` | One element of a flow collection |
+| Class | Former location | Responsibility |
+|-------|-----------------|----------------|
+| `FlowSequenceParser` | `FlowSequenceBuilder`, `runFlowSequenceDriver` | `[…]` iteration |
+| `FlowMappingParser` | `FlowMappingBuilder`, `runFlowMappingDriver` | `{…}` iteration |
+| `FlowEntryParser` | `FlowEntryBuilder` | One flow-sequence element |
 | `FlowMappingPairParser` | `FlowMappingPairBuilder` | One `key: value` in `{…}` |
 
 ### Scalar
 
-| Class | Replaces | Responsibility |
-|-------|----------|----------------|
-| `PlainScalarParser` | part of `parseValuePrimaryPayload` | Plain scalar token |
-| `QuotedScalarParser` | part of `parseValuePrimaryPayload` | `'…'` / `"…"` |
-| `MultilinePlainScalarParser` | `appendMultilinePlainScalarContinuations` + predicates | Multiline plain (YAML §7.3.3) |
-| `BlockScalarParser` | `consumeBlockScalar*`, `consumeIndentedBlockScalarValue` | `\|` / `>` block scalars |
+| Class | Former location | Responsibility |
+|-------|-----------------|----------------|
+| `SimpleScalarParser` | plain/quoted branches of `parseValuePrimaryPayload` | Single plain, single-quoted, or double-quoted scalar token |
+| `MultilinePlainScalarParser` | `appendMultilinePlainScalarContinuations` + flow/block key builders | Multiline plain (YAML §7.3.3) |
+| `BlockScalarParser` | `consumeBlockScalar*`, block scalar key paths | `\|` / `>` block scalars as keys |
 
 ## Helpers
 
-### Structure Identification
+### Structure identification
 
-`OngoingStructureIdentifier` is a **facade** with high-level methods
-(`identifyBlockValue`, `identifyFlowValue`, `identifyDocumentRootContent`)
-that delegates to four specialized identifiers:
+Look-ahead predicates were extracted from `Parser.php` into four identifier classes
+under `Helper/Identifier/`. Sub-parsers receive the identifiers they need directly
+(there is no separate facade class):
 
-| Class | Current methods from `Parser.php` | Purpose |
-|-------|-----------------------------------|---------|
-| `OngoingStructureIdentifier` | — | Facade: routes `identify*()` calls to specialized identifiers below |
+| Class | Former `Parser.php` methods | Purpose |
+|-------|------------------------------|---------|
 | `BlockStructureIdentifier` | `isSequenceStart`, `isKeyValueCoupleStart`, `isKeyValueCoupleStartAllowingNodeProperties`, `isBlockScalarStartAtDocumentRoot` | Block-context construct identification |
 | `FlowStructureIdentifier` | `isFlowMappingStart`, `isFlowSequenceStart`, `isFlowMultilinePlainKeyStart`, `isFlowCollectionFollowedByBlockValueIndicatorOnSameLine` | Flow-context construct identification |
-| `NodePropertyIdentifier` | `isNodePropertyToken`, `isNodePropertiesOnlyLine`, `isNodePropertyAtDocumentRoot`, `isNodePropertiesFollowedByImplicitYamlKeyOnSameLine`, `isNodePropertiesFollowedByFlowCollectionImplicitBlockKeyOnSameLine`, `isNodePropertiesFollowedByImplicitKeyFromOffset` | Node property (anchor/tag) analysis |
+| `NodePropertyIdentifier` | `isNodePropertyToken`, `isNodePropertiesOnlyLine`, `isNodePropertyAtDocumentRoot`, `isNodePropertiesFollowedBy*` | Anchor/tag line analysis |
 | `KeyIdentifier` | `isScalarFollowedByValueIndicator`, `isImplicitYamlKeyOnContinuationLine` | Implicit/explicit key recognition |
 
-### Other Helpers
+### Other helpers
 
-| Class | Current methods | Purpose |
-|-------|-----------------|---------|
-| `NodeFactory` | `createSimpleNode`, `createScalarNode` | Token → Node mapping (replaces `FlowHost::createSimpleNode`) |
-| `Consumer` | Already exists; evolves | Token collection by types; depends on `NodeFactory` instead of `FlowHost` |
-| `LookAheadHelper` | `peekFirstSignificantBlockHead`, `isInsignificantIndentationLine` | General-purpose peek utilities |
+| Class | Former methods | Purpose |
+|-------|----------------|---------|
+| `NodeFactory` | `createSimpleNode`, `createScalarNode` | Token → node mapping |
+| `Consumer` | (existing; evolved) | Token collection by types; uses `NodeFactory` |
+| `LookAheadHelper` | `peekFirstSignificantBlockHead`, `isInsignificantIndentationLine`, `collectInsignificantIndentationLines` | General-purpose peek utilities |
 | `IndentationHelper` | `assertIndentLenIsValid`, `registerIndentStepIfNeeded` | Indent validation / registration |
-| `MultilineContinuationHelper` | `isIndentedMultilinePlainContinuationAt`, `isBareDocumentFlushMultilinePlainContinuationAt` | Multiline plain scalar continuation predicates |
+| `MultilineContinuationHelper` | `isIndentedMultilinePlainContinuationAt`, `isBareDocumentFlushMultilinePlainContinuationAt`, `isMultilinePlainContinuationAhead` | Multiline plain continuation predicates |
 | `ErrorHelper` | `appendTokenLocation`, `wrapParseStateIndentationException` | Error message formatting |
-| `AnchorPostProcessor` | `postProcessKeyValueCouple`, `collecAnchorsRecursive` | Anchor registration + couple wiring after key-value pair is built; injected into `KeyValueCoupleParser` and `FlowMappingPairParser` |
+| `AnchorPostProcessor` | `postProcessKeyValueCouple`, `collectAnchorsRecursive` | Anchor registration after key-value pairs |
