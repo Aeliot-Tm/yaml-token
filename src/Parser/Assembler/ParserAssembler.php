@@ -81,7 +81,12 @@ final class ParserAssembler
 
     public function createBlockScalarParser(ParserRegistry $registry): BlockScalarParser
     {
-        return new BlockScalarParser($this->consumer, $this->errorHelper, $this->nodeFactory);
+        return new BlockScalarParser(
+            $this->consumer,
+            $this->errorHelper,
+            $registry->getMultilinePlainScalarParser(),
+            $this->nodeFactory,
+        );
     }
 
     public function createBlockSequenceParser(ParserRegistry $registry): BlockSequenceParser

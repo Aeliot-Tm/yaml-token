@@ -21,6 +21,7 @@ use Aeliot\YamlToken\Node\MultilinePlainScalarNode;
 use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Node\ScalarNode;
+use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 use Aeliot\YamlToken\Parser\Consumer;
 use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
@@ -34,6 +35,7 @@ final readonly class BlockScalarParser implements SubParserInterface
     public function __construct(
         private Consumer $consumer,
         private ErrorHelper $errorHelper,
+        private MultilinePlainScalarParser $multilinePlainScalarParser,
         private NodeFactory $nodeFactory,
     ) {
     }
@@ -47,39 +49,28 @@ final readonly class BlockScalarParser implements SubParserInterface
      */
     public function consumeBlockScalarKeyName(TokenStreamProxy $tokens, KeyNode $keyNode): void
     {
-        $token = $tokens->current();
-        $keyNode->addChild(new BlockScalarIndicatorNode($token));
-        $tokens->advance();
+        $scalar = $this->consumeBlockScalarFirstFragment($tokens, $keyNode, failOnTruncatedStream: true);
+        $keyNode->setName($scalar);
+    }
 
-        $this->consumer->collectUntil($tokens, TokenType::NEWLINE, $keyNode);
-
-        $token = $tokens->current();
-        if (null === $token || TokenType::NEWLINE !== $token->type) {
-            throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Expected NEWLINE after block scalar indicator in key, got %s', $token?->type->value ?? '_nothing_'), $tokens));
-        }
-        $keyNode->addChild(new NewLineNode($token));
-        $tokens->advance();
-
-        while (TokenType::NEWLINE === $tokens->current()?->type) {
-            $keyNode->addChild(new NewLineNode($tokens->current()));
-            $tokens->advance();
-        }
-
-        if (TokenType::INDENTATION === $tokens->current()?->type) {
-            $keyNode->addChild(new IndentationNode($tokens->current()));
-            $tokens->advance();
+    /**
+     * Consumes a block scalar (literal | or folded >) used as a mapping value
+     * (YAML 1.2.2 §8.1.1). The first fragment and trailing empty lines are attached to
+     * {@see ValueNode}; non-empty continuation lines are appended via
+     * {@see MultilinePlainScalarParser::appendMultilinePlainScalarContinuations()}.
+     */
+    public function consumeBlockScalarValue(
+        TokenStreamProxy $tokens,
+        ValueNode $valueNode,
+        int $parentIndentLen,
+    ): void {
+        $scalar = $this->consumeBlockScalarFirstFragment($tokens, $valueNode, failOnTruncatedStream: false);
+        if (null === $scalar) {
+            return;
         }
 
-        $token = $tokens->current();
-        if (null === $token || !$token->type->isScalar()) {
-            throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Expected scalar payload for block scalar key, got %s', $token?->type->value ?? '_nothing_'), $tokens));
-        }
-
-        $scalarNode = $this->nodeFactory->createScalarNode($token);
-        $keyNode->setName($scalarNode);
-        $tokens->advance();
-
-        $this->consumer->consumeTrailingEmptyLines($tokens, $keyNode);
+        $valueNode->addChild($scalar);
+        $this->multilinePlainScalarParser->appendMultilinePlainScalarContinuations($tokens, $valueNode, $parentIndentLen);
     }
 
     /**
@@ -174,6 +165,62 @@ final readonly class BlockScalarParser implements SubParserInterface
         $tokens->advance();
 
         return true;
+    }
+
+    private function consumeBlockScalarFirstFragment(
+        TokenStreamProxy $tokens,
+        Node $layoutTarget,
+        bool $failOnTruncatedStream,
+    ): ?ScalarNode {
+        $token = $tokens->current();
+        $layoutTarget->addChild(new BlockScalarIndicatorNode($token));
+        $tokens->advance();
+
+        $this->consumer->collectUntil($tokens, TokenType::NEWLINE, $layoutTarget);
+
+        $token = $tokens->current();
+        if (null === $token) {
+            if ($failOnTruncatedStream) {
+                throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation('Expected NEWLINE after block scalar indicator, got _nothing_', $tokens));
+            }
+
+            return null;
+        }
+
+        if (TokenType::NEWLINE !== $token->type) {
+            throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Expected NEWLINE after block scalar indicator, got %s', $token->type->value), $token));
+        }
+        $layoutTarget->addChild(new NewLineNode($token));
+        $tokens->advance();
+
+        while (TokenType::NEWLINE === $tokens->current()?->type) {
+            $layoutTarget->addChild(new NewLineNode($tokens->current()));
+            $tokens->advance();
+        }
+
+        // YAML 1.2.2 §8.1.1.1: with an explicit indentation indicator (|N, >N, |N-, >N+, ...),
+        // the body may start with leading spaces that are part of the content but surface
+        // to the parser as a separate INDENTATION token before the scalar payload.
+        if (TokenType::INDENTATION === $tokens->current()?->type) {
+            $layoutTarget->addChild(new IndentationNode($tokens->current()));
+            $tokens->advance();
+        }
+
+        $token = $tokens->current();
+        if (null === $token || !$token->type->isScalar()) {
+            throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Expected scalar payload for block scalar, got %s', $token?->type->value ?? '_nothing_'), $token));
+        }
+
+        $scalarNode = $this->nodeFactory->createScalarNode($token);
+        $tokens->advance();
+
+        // YAML 1.2.2 §8.1.1.2 / rule [166]-[168] l-chomped-empty(n,t):
+        // trailing "empty" indented lines belong to the block scalar and must be
+        // consumed here (even with strip chomping they are excluded from content but
+        // still consumed from the token stream).
+        $this->consumer->consumeTrailingEmptyLines($tokens, $layoutTarget);
+
+        return $scalarNode;
     }
 
     private function consumeExplicitKeyMultilinePlainScalarLine(

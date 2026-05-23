@@ -15,10 +15,7 @@ namespace Aeliot\YamlToken\Parser\SubParser;
 
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\AliasNode;
-use Aeliot\YamlToken\Node\BlockScalarIndicatorNode;
-use Aeliot\YamlToken\Node\IndentationNode;
 use Aeliot\YamlToken\Node\MultilinePlainScalarNode;
-use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Parser\Consumer;
 use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
@@ -96,57 +93,11 @@ final readonly class ValueParser implements SubParserInterface
 
     private function parseBlockScalarPayload(ParseContext $parseContext, ValueNode $valueNode, int $parentIndentLen): void
     {
-        $token = $parseContext->tokens->current();
-        if (null === $token) {
+        if (null === $parseContext->tokens->current()) {
             return;
         }
 
-        $valueNode->addChild(new BlockScalarIndicatorNode($token));
-        $parseContext->tokens->advance();
-        $this->consumer->collectUntil($parseContext->tokens, TokenType::NEWLINE, $valueNode);
-
-        $token = $parseContext->tokens->current();
-        if (!$token) {
-            return;
-        }
-
-        if (TokenType::NEWLINE !== $token->type) {
-            throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Unexpected newline, but %s given', $token->type->value), $token));
-        }
-        $valueNode->addChild(new NewLineNode($token));
-        $parseContext->tokens->advance();
-
-        while (TokenType::NEWLINE === $parseContext->tokens->current()?->type) {
-            $leadingEmptyLineBreak = $parseContext->tokens->current();
-            $valueNode->addChild(new NewLineNode($leadingEmptyLineBreak));
-            $parseContext->tokens->advance();
-        }
-
-        // YAML 1.2.2 §8.1.1.1: with an explicit indentation indicator (|N, >N, |N-, >N+, ...),
-        // the body may start with leading spaces that are part of the content but surface
-        // to the parser as a separate INDENTATION token before the scalar payload.
-        if (TokenType::INDENTATION === $parseContext->tokens->current()?->type) {
-            $valueNode->addChild(new IndentationNode($parseContext->tokens->current()));
-            $parseContext->tokens->advance();
-        }
-
-        $token = $parseContext->tokens->current();
-        if (null === $token || !$token->type->isScalar()) {
-            throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Scalar expected, but %s given', $token?->type->value ?? '_nothing_'), $token));
-        }
-
-        $valueNode->addChild($this->nodeFactory->createScalarNode($token));
-        $parseContext->tokens->advance();
-
-        // YAML 1.2.2 §8.1.1.2 / rule [166]-[168] l-chomped-empty(n,t):
-        // trailing "empty" indented lines belong to the block scalar and must be
-        // consumed here (even with strip chomping they are excluded from content but
-        // still consumed from the token stream).
-        $this->consumer->consumeTrailingEmptyLines($parseContext->tokens, $valueNode);
-
-        // Non-empty continuation lines (| / > body): same newline + indent + scalar
-        // structure as multiline plain scalars (YAML 1.2.2 §8.1.1).
-        $this->registry->getMultilinePlainScalarParser()->appendMultilinePlainScalarContinuations(
+        $this->registry->getBlockScalarParser()->consumeBlockScalarValue(
             $parseContext->tokens,
             $valueNode,
             $parentIndentLen,
