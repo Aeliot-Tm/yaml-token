@@ -30,6 +30,7 @@ use Aeliot\YamlToken\Parser\Helper\MultilineContinuationHelper;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
 use Aeliot\YamlToken\Parser\ParseContext;
 use Aeliot\YamlToken\Parser\ParserRegistry;
+use Aeliot\YamlToken\Token\Token;
 
 final readonly class ValueParser implements SubParserInterface
 {
@@ -80,6 +81,127 @@ final readonly class ValueParser implements SubParserInterface
     }
 
     /**
+     * YAML 1.2.2 §7.2 e-node / §7.4: in flow contexts, scalar content may be empty right
+     * after c-ns-properties (tag/anchor) — the next ',' / '}' / ']' terminates the entry.
+     */
+    private function isFlowEmptyValueTerminator(Token $token, int $parentIndentLen): bool
+    {
+        return EspecialIndent::FLOW_COLLECTION_VALUE_PARENT->value === $parentIndentLen
+            && \in_array($token->type, [
+                TokenType::FLOW_ENTRY,
+                TokenType::FLOW_MAPPING_END,
+                TokenType::FLOW_SEQUENCE_END,
+            ], true);
+    }
+
+    private function parseBlockScalarPayload(ParseContext $parseContext, ValueNode $valueNode, int $parentIndentLen): void
+    {
+        $token = $parseContext->tokens->current();
+        if (null === $token) {
+            return;
+        }
+
+        $valueNode->addChild(new BlockScalarIndicatorNode($token));
+        $parseContext->tokens->advance();
+        $this->consumer->collectUntil($parseContext->tokens, TokenType::NEWLINE, $valueNode);
+
+        $token = $parseContext->tokens->current();
+        if (!$token) {
+            return;
+        }
+
+        if (TokenType::NEWLINE !== $token->type) {
+            throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Unexpected newline, but %s given', $token->type->value), $token));
+        }
+        $valueNode->addChild(new NewLineNode($token));
+        $parseContext->tokens->advance();
+
+        while (TokenType::NEWLINE === $parseContext->tokens->current()?->type) {
+            $leadingEmptyLineBreak = $parseContext->tokens->current();
+            $valueNode->addChild(new NewLineNode($leadingEmptyLineBreak));
+            $parseContext->tokens->advance();
+        }
+
+        // YAML 1.2.2 §8.1.1.1: with an explicit indentation indicator (|N, >N, |N-, >N+, ...),
+        // the body may start with leading spaces that are part of the content but surface
+        // to the parser as a separate INDENTATION token before the scalar payload.
+        if (TokenType::INDENTATION === $parseContext->tokens->current()?->type) {
+            $valueNode->addChild(new IndentationNode($parseContext->tokens->current()));
+            $parseContext->tokens->advance();
+        }
+
+        $token = $parseContext->tokens->current();
+        if (null === $token || !$token->type->isScalar()) {
+            throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Scalar expected, but %s given', $token?->type->value ?? '_nothing_'), $token));
+        }
+
+        $valueNode->addChild($this->nodeFactory->createScalarNode($token));
+        $parseContext->tokens->advance();
+
+        // YAML 1.2.2 §8.1.1.2 / rule [166]-[168] l-chomped-empty(n,t):
+        // trailing "empty" indented lines belong to the block scalar and must be
+        // consumed here (even with strip chomping they are excluded from content but
+        // still consumed from the token stream).
+        $this->consumer->consumeTrailingEmptyLines($parseContext->tokens, $valueNode);
+
+        // Non-empty continuation lines (| / > body): same newline + indent + scalar
+        // structure as multiline plain scalars (YAML 1.2.2 §8.1.1).
+        $this->registry->getMultilinePlainScalarParser()->appendMultilinePlainScalarContinuations(
+            $parseContext->tokens,
+            $valueNode,
+            $parentIndentLen,
+        );
+    }
+
+    private function parseNewlinePayload(ParseContext $parseContext, ValueNode $valueNode, int $parentIndentLen): void
+    {
+        if (EspecialIndent::FLOW_COLLECTION_VALUE_PARENT->value === $parentIndentLen) {
+            $this->consumer->collectSpaceCommentEnds($parseContext->tokens, $valueNode);
+            $this->parseValuePrimaryPayload($parseContext, $valueNode, $parentIndentLen);
+
+            return;
+        }
+
+        $this->registry->getIndentedBlockValueParser()->parseIndentedBlockValue($parseContext, $valueNode, $parentIndentLen);
+    }
+
+    private function parsePlainScalarPayload(
+        ParseContext $parseContext,
+        ValueNode $valueNode,
+        int $parentIndentLen,
+        Token $token,
+    ): void {
+        $multilinePlainScalarParser = $this->registry->getMultilinePlainScalarParser();
+
+        if (
+            TokenType::PLAIN_SCALAR === $token->type
+            && $this->multilineContinuationHelper
+                ->isMultilinePlainContinuationAhead($parseContext->tokens, 1, $parentIndentLen)
+        ) {
+            $multiline = new MultilinePlainScalarNode();
+            $multiline->addChild($this->nodeFactory->createScalarNode($token));
+            $parseContext->tokens->advance();
+            $multilinePlainScalarParser->appendMultilinePlainScalarContinuations($parseContext->tokens, $multiline, $parentIndentLen);
+            $valueNode->addChild($multiline);
+        } elseif (
+            TokenType::PLAIN_SCALAR === $token->type
+            && EspecialIndent::FLOW_COLLECTION_VALUE_PARENT->value === $parentIndentLen
+        ) {
+            $head = $this->nodeFactory->createScalarNode($token);
+            $parseContext->tokens->advance();
+            $multiline = new MultilinePlainScalarNode();
+            $multiline->addChild($head);
+            $consumedAny = false;
+            while ($multilinePlainScalarParser->tryConsumeFlowValueMultilinePlainScalarLine($parseContext->tokens, $multiline)) {
+                $consumedAny = true;
+            }
+            $valueNode->addChild($consumedAny ? $multiline : $head);
+        } else {
+            $valueNode->addChild($this->registry->getSimpleScalarParser()->parse($parseContext));
+        }
+    }
+
+    /**
      * Parses the main value payload (block scalar, block-after-newline, scalars, aliases, compact collections, flow nodes).
      */
     private function parseValuePrimaryPayload(ParseContext $parseContext, ValueNode $valueNode, int $parentIndentLen): void
@@ -88,103 +210,17 @@ final readonly class ValueParser implements SubParserInterface
         if (null === $token) {
             return;
         }
-        // YAML 1.2.2 §7.2 e-node / §7.4: in flow contexts, scalar content may be empty right
-        // after c-ns-properties (tag/anchor) — the next ',' / '}' / ']' terminates the entry.
-        if (
-            EspecialIndent::FLOW_COLLECTION_VALUE_PARENT->value === $parentIndentLen
-            && \in_array($token->type, [
-                TokenType::FLOW_ENTRY,
-                TokenType::FLOW_MAPPING_END,
-                TokenType::FLOW_SEQUENCE_END,
-            ], true)
-        ) {
+
+        if ($this->isFlowEmptyValueTerminator($token, $parentIndentLen)) {
             return;
         }
 
-        $multilinePlainScalarParser = $this->registry->getMultilinePlainScalarParser();
-
         if (\in_array($token->type, TokenType::BLOCK_SCALAR_INDICATORS, true)) {
-            $valueNode->addChild(new BlockScalarIndicatorNode($token));
-            $parseContext->tokens->advance();
-            $this->consumer->collectUntil($parseContext->tokens, TokenType::NEWLINE, $valueNode);
-
-            $token = $parseContext->tokens->current();
-            if (!$token) {
-                return;
-            }
-
-            if (TokenType::NEWLINE !== $token->type) {
-                throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Unexpected newline, but %s given', $token->type->value), $token));
-            }
-            $valueNode->addChild(new NewLineNode($token));
-            $parseContext->tokens->advance();
-
-            while (TokenType::NEWLINE === $parseContext->tokens->current()?->type) {
-                $leadingEmptyLineBreak = $parseContext->tokens->current();
-                $valueNode->addChild(new NewLineNode($leadingEmptyLineBreak));
-                $parseContext->tokens->advance();
-            }
-
-            // YAML 1.2.2 §8.1.1.1: with an explicit indentation indicator (|N, >N, |N-, >N+, ...),
-            // the body may start with leading spaces that are part of the content but surface
-            // to the parser as a separate INDENTATION token before the scalar payload.
-            if (TokenType::INDENTATION === $parseContext->tokens->current()?->type) {
-                $valueNode->addChild(new IndentationNode($parseContext->tokens->current()));
-                $parseContext->tokens->advance();
-            }
-
-            $token = $parseContext->tokens->current();
-            if (null === $token || !$token->type->isScalar()) {
-                throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Scalar expected, but %s given', $token?->type->value ?? '_nothing_'), $token));
-            }
-
-            $valueNode->addChild($this->nodeFactory->createScalarNode($token));
-            $parseContext->tokens->advance();
-
-            // YAML 1.2.2 §8.1.1.2 / rule [166]-[168] l-chomped-empty(n,t):
-            // trailing "empty" indented lines belong to the block scalar and must be
-            // consumed here (even with strip chomping they are excluded from content but
-            // still consumed from the token stream).
-            $this->consumer->consumeTrailingEmptyLines($parseContext->tokens, $valueNode);
-
-            // Non-empty continuation lines (| / > body): same newline + indent + scalar
-            // structure as multiline plain scalars (YAML 1.2.2 §8.1.1).
-            $multilinePlainScalarParser->appendMultilinePlainScalarContinuations($parseContext->tokens, $valueNode, $parentIndentLen);
+            $this->parseBlockScalarPayload($parseContext, $valueNode, $parentIndentLen);
         } elseif (TokenType::NEWLINE === $token->type) {
-            if (EspecialIndent::FLOW_COLLECTION_VALUE_PARENT->value === $parentIndentLen) {
-                $this->consumer->collectSpaceCommentEnds($parseContext->tokens, $valueNode);
-                $this->parseValuePrimaryPayload($parseContext, $valueNode, $parentIndentLen);
-
-                return;
-            }
-            $this->registry->getIndentedBlockValueParser()->parseIndentedBlockValue($parseContext, $valueNode, $parentIndentLen);
+            $this->parseNewlinePayload($parseContext, $valueNode, $parentIndentLen);
         } elseif ($token->type->isScalar()) {
-            if (
-                TokenType::PLAIN_SCALAR === $token->type
-                && $this->multilineContinuationHelper
-                    ->isMultilinePlainContinuationAhead($parseContext->tokens, 1, $parentIndentLen)
-            ) {
-                $multiline = new MultilinePlainScalarNode();
-                $multiline->addChild($this->nodeFactory->createScalarNode($token));
-                $parseContext->tokens->advance();
-                $multilinePlainScalarParser->appendMultilinePlainScalarContinuations($parseContext->tokens, $multiline, $parentIndentLen);
-                $valueNode->addChild($multiline);
-            } elseif (
-                TokenType::PLAIN_SCALAR === $token->type
-                && EspecialIndent::FLOW_COLLECTION_VALUE_PARENT->value === $parentIndentLen
-            ) {
-                $head = $this->nodeFactory->createScalarNode($token);
-                $parseContext->tokens->advance();
-                $multiline = new MultilinePlainScalarNode();
-                $multiline->addChild($head);
-                $consumedAny = false;
-                while ($multilinePlainScalarParser->tryConsumeFlowValueMultilinePlainScalarLine($parseContext->tokens, $multiline)) {
-                    $consumedAny = true;
-                }
-                $valueNode->addChild($consumedAny ? $multiline : $head);
-            } else {
-                $valueNode->addChild($this->registry->getSimpleScalarParser()->parse($parseContext));
-            }
+            $this->parsePlainScalarPayload($parseContext, $valueNode, $parentIndentLen, $token);
         } elseif (TokenType::ALIAS === $token->type) {
             $aliasNode = new AliasNode($token);
             $aliasName = $aliasNode->getName();
