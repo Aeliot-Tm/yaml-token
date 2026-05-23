@@ -187,9 +187,9 @@ final class ParserAssembler
         );
     }
 
-    public function createMergeInstructionParser(\Closure $parseValue): MergeInstructionParser
+    public function createMergeInstructionParser(ParserRegistry $registry): MergeInstructionParser
     {
-        return new MergeInstructionParser($this->consumer, $this->errorHelper, $this->nodeFactory, $parseValue);
+        return new MergeInstructionParser($this->consumer, $this->errorHelper, $this->nodeFactory, $registry);
     }
 
     public function createNodePropertiesParser(): NodePropertiesParser

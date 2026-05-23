@@ -159,9 +159,7 @@ final class ParserRegistry
 
     public function getMergeInstructionParser(): MergeInstructionParser
     {
-        return $this->mergeInstructionParser ??= $this->assembler->createMergeInstructionParser(
-            $this->parseValue ?? throw new \LogicException('Block parser bridge not set'),
-        );
+        return $this->mergeInstructionParser ??= $this->assembler->createMergeInstructionParser($this);
     }
 
     public function getMultilinePlainScalarParser(): MultilinePlainScalarParser

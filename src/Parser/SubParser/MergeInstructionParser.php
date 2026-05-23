@@ -28,17 +28,15 @@ use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
 use Aeliot\YamlToken\Parser\ParseContext;
+use Aeliot\YamlToken\Parser\ParserRegistry;
 
 final readonly class MergeInstructionParser implements SubParserInterface
 {
-    /**
-     * @param \Closure(ParseContext, int): ValueNode $parseValue
-     */
     public function __construct(
         private Consumer $consumer,
         private ErrorHelper $errorHelper,
         private NodeFactory $nodeFactory,
-        private \Closure $parseValue,
+        private ParserRegistry $registry,
     ) {
     }
 
@@ -61,7 +59,7 @@ final readonly class MergeInstructionParser implements SubParserInterface
 
         $this->consumer->collectTypes($parseContext->tokens, [TokenType::VALUE_INDICATOR, TokenType::WHITESPACE], $mergeInstruction);
 
-        $value = ($this->parseValue)($parseContext, EspecialIndent::FLOW_COLLECTION_VALUE_PARENT->value);
+        $value = $this->registry->getValueParser()->parseValue($parseContext, EspecialIndent::FLOW_COLLECTION_VALUE_PARENT->value);
         $mergeInstruction->addChild($value);
 
         $aliases = $this->collectMergeAliases($value);
