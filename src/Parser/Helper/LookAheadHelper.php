@@ -18,7 +18,7 @@ use Aeliot\YamlToken\Node\IndentationNode;
 use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Parser\Consumer;
 use Aeliot\YamlToken\Parser\Dto\LookAheadResult;
-use Aeliot\YamlToken\Parser\Dto\TokenStreamProxy;
+use Aeliot\YamlToken\Token\TokenStreamInterface;
 
 final readonly class LookAheadHelper
 {
@@ -33,7 +33,7 @@ final readonly class LookAheadHelper
      * s-indent(n). Tokens are still attached to $root verbatim so the
      * emitter can reproduce the original text.
      */
-    public function collectInsignificantIndentationLines(TokenStreamProxy $tokens, Node $root): void
+    public function collectInsignificantIndentationLines(TokenStreamInterface $tokens, Node $root): void
     {
         while ($this->isInsignificantIndentationLine($tokens)) {
             $token = $tokens->current();
@@ -43,7 +43,7 @@ final readonly class LookAheadHelper
         }
     }
 
-    public function isInsignificantIndentationLine(TokenStreamProxy $tokens): bool
+    public function isInsignificantIndentationLine(TokenStreamInterface $tokens): bool
     {
         if (TokenType::INDENTATION !== $tokens->current()?->type) {
             return false;
@@ -74,7 +74,7 @@ final readonly class LookAheadHelper
      * skipped, since the lexer omits the leading INDENTATION token only
      * for the latter.
      *
-     * @param int $offset TokenStreamProxy peek offset of the first token to consider:
+     * @param int $offset TokenStreamInterface peek offset of the first token to consider:
      *                    0 - when layout from the current position must be included in the scan;
      *                    1 - when the current token is already known, e.g. NEWLINE after ':';
      *
@@ -83,10 +83,10 @@ final readonly class LookAheadHelper
      *                              leading INDENTATION token (0 for column-0 lines);
      *                              - significantToken is the first non-WHITESPACE/COMMENT
      *                              token of that line.
-     *                              - peekOffset is the TokenStreamProxy peek offset of significantToken.
+     *                              - peekOffset is the TokenStreamInterface peek offset of significantToken.
      *                              Returns null if the stream ends with only insignificant lines.
      */
-    public function peekFirstSignificantBlockHead(TokenStreamProxy $tokens, int $offset): ?LookAheadResult
+    public function peekFirstSignificantBlockHead(TokenStreamInterface $tokens, int $offset): ?LookAheadResult
     {
         while (true) {
             $token = $tokens->peek($offset);

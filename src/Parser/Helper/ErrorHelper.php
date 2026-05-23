@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace Aeliot\YamlToken\Parser\Helper;
 
-use Aeliot\YamlToken\Parser\Dto\TokenStreamProxy;
 use Aeliot\YamlToken\Token\Token;
+use Aeliot\YamlToken\Token\TokenStreamInterface;
 
 final readonly class ErrorHelper
 {
-    public function appendTokenLocation(string $message, Token|TokenStreamProxy $tokens): string
+    public function appendTokenLocation(string $message, Token|TokenStreamInterface $tokens): string
     {
         $line = $tokens instanceof Token ? $tokens->line : $tokens->getLastObservedLine();
         $column = $tokens instanceof Token ? $tokens->column : $tokens->getLastObservedColumn();
@@ -32,7 +32,7 @@ final readonly class ErrorHelper
     /**
      * @throws \Exception
      */
-    public function wrapParseStateIndentationException(\Exception $previous, TokenStreamProxy $tokens): never
+    public function wrapParseStateIndentationException(\Exception $previous, TokenStreamInterface $tokens): never
     {
         throw new ($previous::class)($this->appendTokenLocation($previous->getMessage(), $tokens), (int) $previous->getCode(), $previous);
     }

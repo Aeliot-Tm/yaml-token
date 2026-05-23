@@ -14,14 +14,14 @@ declare(strict_types=1);
 namespace Aeliot\YamlToken\Parser\Helper;
 
 use Aeliot\YamlToken\Enum\TokenType;
-use Aeliot\YamlToken\Parser\Dto\TokenStreamProxy;
+use Aeliot\YamlToken\Token\TokenStreamInterface;
 
 final readonly class PeekOffsetHelper
 {
     /**
      * Returns the first peek offset >= $offset that is not a WHITESPACE token.
      */
-    public function skipWhitespaceOffset(TokenStreamProxy $tokens, int $offset): int
+    public function skipWhitespaceOffset(TokenStreamInterface $tokens, int $offset): int
     {
         while (TokenType::WHITESPACE === $tokens->peek($offset)?->type) {
             ++$offset;

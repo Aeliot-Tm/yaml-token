@@ -24,11 +24,11 @@ use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 use Aeliot\YamlToken\Parser\Consumer;
-use Aeliot\YamlToken\Parser\Dto\TokenStreamProxy;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
 use Aeliot\YamlToken\Parser\Helper\PeekOffsetHelper;
+use Aeliot\YamlToken\Token\TokenStreamInterface;
 
 final readonly class BlockScalarParser
 {
@@ -48,7 +48,7 @@ final readonly class BlockScalarParser
      * optional leading empty lines, optional INDENTATION, and the scalar payload.
      * The resulting scalar node is set as the {@see KeyNode::setName() name} of the key.
      */
-    public function consumeBlockScalarKeyName(TokenStreamProxy $tokens, KeyNode $keyNode): void
+    public function consumeBlockScalarKeyName(TokenStreamInterface $tokens, KeyNode $keyNode): void
     {
         $scalar = $this->consumeBlockScalarFirstFragment($tokens, $keyNode, failOnTruncatedStream: true);
         $keyNode->setName($scalar);
@@ -61,7 +61,7 @@ final readonly class BlockScalarParser
      * {@see MultilinePlainScalarParser::appendMultilinePlainScalarContinuations()}.
      */
     public function consumeBlockScalarValue(
-        TokenStreamProxy $tokens,
+        TokenStreamInterface $tokens,
         ValueNode $valueNode,
         int $parentIndentLen,
     ): void {
@@ -82,7 +82,7 @@ final readonly class BlockScalarParser
      * and the name becomes a plain {@see ScalarNode}; otherwise the whole sequence is wrapped in a
      * {@see MultilinePlainScalarNode}.
      */
-    public function consumeExplicitKeyMultilinePlainScalar(TokenStreamProxy $tokens, KeyNode $keyNode, int $entryIndentLen): void
+    public function consumeExplicitKeyMultilinePlainScalar(TokenStreamInterface $tokens, KeyNode $keyNode, int $entryIndentLen): void
     {
         if (TokenType::NEWLINE !== $tokens->current()?->type) {
             return;
@@ -115,7 +115,7 @@ final readonly class BlockScalarParser
     }
 
     public function tryConsumeExplicitKeyMultilinePlainScalarLine(
-        TokenStreamProxy $tokens,
+        TokenStreamInterface $tokens,
         MultilinePlainScalarNode $multiline,
         int $entryIndentLen,
     ): bool {
@@ -163,7 +163,7 @@ final readonly class BlockScalarParser
     }
 
     private function consumeBlockScalarFirstFragment(
-        TokenStreamProxy $tokens,
+        TokenStreamInterface $tokens,
         Node $layoutTarget,
         bool $failOnTruncatedStream,
     ): ?ScalarNode {
@@ -219,7 +219,7 @@ final readonly class BlockScalarParser
     }
 
     private function consumeExplicitKeyMultilinePlainScalarLine(
-        TokenStreamProxy $tokens,
+        TokenStreamInterface $tokens,
         MultilinePlainScalarNode $multiline,
         int $entryIndentLen,
     ): void {

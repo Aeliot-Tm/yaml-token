@@ -15,9 +15,9 @@ namespace Aeliot\YamlToken\Parser;
 
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\Node;
-use Aeliot\YamlToken\Parser\Dto\TokenStreamProxy;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
 use Aeliot\YamlToken\Parser\Helper\PeekOffsetHelper;
+use Aeliot\YamlToken\Token\TokenStreamInterface;
 
 final readonly class Consumer
 {
@@ -38,12 +38,12 @@ final readonly class Consumer
     ) {
     }
 
-    public function collectSpaceAndComments(TokenStreamProxy $tokens, Node $root): void
+    public function collectSpaceAndComments(TokenStreamInterface $tokens, Node $root): void
     {
         $this->collectTypes($tokens, self::TOKEN_TYPES_SPACE_AND_COMMENT, $root);
     }
 
-    public function collectSpaceCommentEnds(TokenStreamProxy $tokens, Node $root): void
+    public function collectSpaceCommentEnds(TokenStreamInterface $tokens, Node $root): void
     {
         $this->collectTypes($tokens, self::TOKEN_TYPES_SPACE_COMMENT_END, $root);
     }
@@ -51,7 +51,7 @@ final readonly class Consumer
     /**
      * @param TokenType[] $types
      */
-    public function collectTypes(TokenStreamProxy $tokens, array $types, Node $root): void
+    public function collectTypes(TokenStreamInterface $tokens, array $types, Node $root): void
     {
         while (true) {
             $token = $tokens->current();
@@ -67,7 +67,7 @@ final readonly class Consumer
         }
     }
 
-    public function collectUntil(TokenStreamProxy $tokens, TokenType $until, Node $root): void
+    public function collectUntil(TokenStreamInterface $tokens, TokenType $until, Node $root): void
     {
         while (true) {
             $token = $tokens->current();
@@ -83,7 +83,7 @@ final readonly class Consumer
      * Consumes trailing "empty" indented lines after the first block scalar payload line
      * (YAML 1.2.2 §8.1.1.2 / rule [166]-[168] l-chomped-empty(n,t)).
      */
-    public function consumeTrailingEmptyLines(TokenStreamProxy $tokens, Node $target): void
+    public function consumeTrailingEmptyLines(TokenStreamInterface $tokens, Node $target): void
     {
         while (true) {
             $newLineToken = $tokens->current();

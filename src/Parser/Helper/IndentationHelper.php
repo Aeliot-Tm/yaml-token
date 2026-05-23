@@ -14,10 +14,10 @@ declare(strict_types=1);
 namespace Aeliot\YamlToken\Parser\Helper;
 
 use Aeliot\YamlToken\Parser\Dto\ParseState;
-use Aeliot\YamlToken\Parser\Dto\TokenStreamProxy;
 use Aeliot\YamlToken\Parser\Exception\IndentationInvalidException;
 use Aeliot\YamlToken\Parser\Exception\IndentationOverrideException;
 use Aeliot\YamlToken\Parser\Exception\IndentationUndefinedException;
+use Aeliot\YamlToken\Token\TokenStreamInterface;
 
 final readonly class IndentationHelper
 {
@@ -26,7 +26,7 @@ final readonly class IndentationHelper
     ) {
     }
 
-    public function assertIndentLenIsValid(ParseState $state, TokenStreamProxy $tokens, int $indentLen): void
+    public function assertIndentLenIsValid(ParseState $state, TokenStreamInterface $tokens, int $indentLen): void
     {
         try {
             $state->assertIndentLenIsValid($indentLen);
@@ -35,7 +35,7 @@ final readonly class IndentationHelper
         }
     }
 
-    public function registerIndentStepIfNeeded(ParseState $state, TokenStreamProxy $tokens, int $indentLen): void
+    public function registerIndentStepIfNeeded(ParseState $state, TokenStreamInterface $tokens, int $indentLen): void
     {
         if ($state->isIndentLenRegistered()) {
             return;

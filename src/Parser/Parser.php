@@ -18,8 +18,7 @@ use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Parser\Dto\AnchorsRegistry;
 use Aeliot\YamlToken\Parser\Dto\ParseContext;
 use Aeliot\YamlToken\Parser\Dto\ParseState;
-use Aeliot\YamlToken\Parser\Dto\TokenStreamProxy;
-use Aeliot\YamlToken\Token\TokenStream;
+use Aeliot\YamlToken\Token\TokenStreamInterface;
 
 final class Parser
 {
@@ -33,10 +32,10 @@ final class Parser
         return $this->parseStream((new Lexer())->tokenize($input));
     }
 
-    public function parseStream(TokenStream $tokens): StreamNode
+    public function parseStream(TokenStreamInterface $tokens): StreamNode
     {
         $parseContext = new ParseContext(
-            new TokenStreamProxy($tokens),
+            $tokens,
             new AnchorsRegistry(),
             new ParseState(),
         );

@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace Aeliot\YamlToken\Parser\Helper;
 
 use Aeliot\YamlToken\Enum\TokenType;
-use Aeliot\YamlToken\Parser\Dto\TokenStreamProxy;
 use Aeliot\YamlToken\Parser\Enum\EspecialIndent;
+use Aeliot\YamlToken\Token\TokenStreamInterface;
 
 final readonly class MultilineContinuationHelper
 {
@@ -24,7 +24,7 @@ final readonly class MultilineContinuationHelper
     ) {
     }
 
-    public function isAnyContinuationAt(TokenStreamProxy $tokens, int $offset, int $parentIndentLen): bool
+    public function isAnyContinuationAt(TokenStreamInterface $tokens, int $offset, int $parentIndentLen): bool
     {
         return $this->isIndentedMultilinePlainContinuationAt($tokens, $offset, $parentIndentLen)
             || (
@@ -33,7 +33,7 @@ final readonly class MultilineContinuationHelper
             );
     }
 
-    public function isBareDocumentFlushMultilinePlainContinuationAt(TokenStreamProxy $tokens, int $scalarPeekOffset): bool
+    public function isBareDocumentFlushMultilinePlainContinuationAt(TokenStreamInterface $tokens, int $scalarPeekOffset): bool
     {
         $offset = $this->peekOffsetHelper->skipWhitespaceOffset($tokens, $scalarPeekOffset);
         $scalarToken = $tokens->peek($offset);
@@ -50,7 +50,7 @@ final readonly class MultilineContinuationHelper
      *
      * @see Parser::parseValue() Plain scalar continuation guard (~1633–1639)
      */
-    public function isImplicitYamlKeyOnContinuationLine(TokenStreamProxy $tokens, int $scalarPeekOffset): bool
+    public function isImplicitYamlKeyOnContinuationLine(TokenStreamInterface $tokens, int $scalarPeekOffset): bool
     {
         $offset = $scalarPeekOffset + 1;
         while (true) {
@@ -67,7 +67,7 @@ final readonly class MultilineContinuationHelper
         }
     }
 
-    public function isIndentedMultilinePlainContinuationAt(TokenStreamProxy $tokens, int $indentPeekOffset, int $parentIndentLen): bool
+    public function isIndentedMultilinePlainContinuationAt(TokenStreamInterface $tokens, int $indentPeekOffset, int $parentIndentLen): bool
     {
         $indentation = $tokens->peek($indentPeekOffset);
         if (TokenType::INDENTATION !== $indentation?->type) {
@@ -94,7 +94,7 @@ final readonly class MultilineContinuationHelper
      *
      * @see MultilinePlainScalarParser::appendMultilinePlainScalarContinuations()
      */
-    public function isMultilinePlainContinuationAhead(TokenStreamProxy $tokens, int $peekOffset, int $parentIndentLen): bool
+    public function isMultilinePlainContinuationAhead(TokenStreamInterface $tokens, int $peekOffset, int $parentIndentLen): bool
     {
         $offset = $peekOffset;
         if (TokenType::WHITESPACE === $tokens->peek($offset)?->type) {

@@ -13,10 +13,12 @@ declare(strict_types=1);
 
 namespace Aeliot\YamlToken\Parser\Dto;
 
+use Aeliot\YamlToken\Token\TokenStreamInterface;
+
 final class ParseContext
 {
     public function __construct(
-        public readonly TokenStreamProxy $tokens,
+        public readonly TokenStreamInterface $tokens,
         public readonly AnchorsRegistry $anchorsRegistry,
         public readonly ParseState $state,
     ) {

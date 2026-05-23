@@ -18,10 +18,10 @@ The second argument of `appendTokenLocation()` is either:
    token are used). Prefer this whenever that reference exists, so the suffix matches
    the token described in the message even if the stream cursor has moved.
 
-2. **`TokenStreamProxy` (from `ParseContext::$tokens`)** — when there is no safe non-null
+2. **`TokenStreamInterface` (from `ParseContext::$tokens`)** — when there is no safe non-null
    `Token` to pass (for example after `current()` returned `null` at end-of-stream,
    or when the diagnostic variable is explicitly nullable). The proxy exposes
-   `getLine()` / `getColumn()` derived from the last token observed through
+   `getLastObservedLine()` / `getLastObservedColumn()` derived from the last token observed through
    the proxy’s `current()` and `advance()` calls on the underlying `TokenStream`.
 
 Call sites should not add extra null-coalescing logic: if the relevant token
@@ -29,7 +29,5 @@ might be `null`, pass the proxy directly; otherwise pass the concrete `Token`.
 
 ## Implementation notes
 
-- `TokenStreamProxy` wraps the lexer’s `TokenStream` for the parse pass
-  and is constructed in `Parser::parseStream()` inside the `ParseContext`.
-- `appendTokenLocation(string $message, Token|TokenStreamProxy $tokens)` branches
+- `appendTokenLocation(string $message, Token|TokenStreamInterface $tokens)` branches
   on the type of the second argument and reads line/column accordingly.

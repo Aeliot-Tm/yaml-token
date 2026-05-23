@@ -20,7 +20,6 @@ use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Node\PlainScalarNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
-use Aeliot\YamlToken\Parser\Dto\TokenStreamProxy;
 use Aeliot\YamlToken\Parser\Enum\EspecialIndent;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
@@ -29,6 +28,7 @@ use Aeliot\YamlToken\Parser\Helper\NodeFactory;
 use Aeliot\YamlToken\Parser\Helper\PeekOffsetHelper;
 use Aeliot\YamlToken\Parser\ParserRegistry;
 use Aeliot\YamlToken\Token\Token;
+use Aeliot\YamlToken\Token\TokenStreamInterface;
 
 final readonly class MultilinePlainScalarParser
 {
@@ -46,7 +46,7 @@ final readonly class MultilinePlainScalarParser
      *
      * @see Parser::parseValue() YAML 1.2.2 §7.3.3 / §8.1.1
      */
-    public function appendMultilinePlainScalarContinuations(TokenStreamProxy $tokens, Node $targetNode, int $parentIndentLen): void
+    public function appendMultilinePlainScalarContinuations(TokenStreamInterface $tokens, Node $targetNode, int $parentIndentLen): void
     {
         while (true) {
             $this->consumeTrailingWhitespaceBeforeNewline($tokens, $targetNode);
@@ -73,7 +73,7 @@ final readonly class MultilinePlainScalarParser
     }
 
     public function buildExplicitBlockKeyMultilinePlainScalarName(
-        TokenStreamProxy $tokens,
+        TokenStreamInterface $tokens,
         PlainScalarNode $head,
         int $entryIndentLen,
     ): Node {
@@ -93,7 +93,7 @@ final readonly class MultilinePlainScalarParser
      * fragments may follow the first scalar. Returns the head scalar when no continuation is consumed,
      * otherwise a {@see MultilinePlainScalarNode} that wraps the head plus consumed fragments.
      */
-    public function buildFlowKeyMultilinePlainScalarName(TokenStreamProxy $tokens, PlainScalarNode $head): Node
+    public function buildFlowKeyMultilinePlainScalarName(TokenStreamInterface $tokens, PlainScalarNode $head): Node
     {
         $multiline = new MultilinePlainScalarNode();
         $multiline->addChild($head);
@@ -111,7 +111,7 @@ final readonly class MultilinePlainScalarParser
      * consuming any multiline plain-scalar continuation lines.
      */
     public function buildScalarKeyName(
-        TokenStreamProxy $tokens,
+        TokenStreamInterface $tokens,
         Token $headToken,
         ?int $entryIndentLen,
         bool $hasExplicitKeyIndicator,
@@ -134,7 +134,7 @@ final readonly class MultilinePlainScalarParser
         return $head;
     }
 
-    public function tryConsumeFlowKeyMultilinePlainScalarLine(TokenStreamProxy $tokens, MultilinePlainScalarNode $multiline): bool
+    public function tryConsumeFlowKeyMultilinePlainScalarLine(TokenStreamInterface $tokens, MultilinePlainScalarNode $multiline): bool
     {
         return $this->tryConsumeFlowMultilinePlainScalarLine($tokens, $multiline, false);
     }
@@ -144,13 +144,13 @@ final readonly class MultilinePlainScalarParser
      * fragments may follow the first scalar. Unlike {@see tryConsumeFlowKeyMultilinePlainScalarLine},
      * the continuation must not be a flow-pair key (PLAIN_SCALAR followed by VALUE_INDICATOR).
      */
-    public function tryConsumeFlowValueMultilinePlainScalarLine(TokenStreamProxy $tokens, MultilinePlainScalarNode $multiline): bool
+    public function tryConsumeFlowValueMultilinePlainScalarLine(TokenStreamInterface $tokens, MultilinePlainScalarNode $multiline): bool
     {
         return $this->tryConsumeFlowMultilinePlainScalarLine($tokens, $multiline, true);
     }
 
     private function tryConsumeFlowMultilinePlainScalarLine(
-        TokenStreamProxy $tokens,
+        TokenStreamInterface $tokens,
         MultilinePlainScalarNode $multiline,
         bool $rejectValueIndicatorAfterScalar,
     ): bool {
@@ -188,7 +188,7 @@ final readonly class MultilinePlainScalarParser
         return true;
     }
 
-    private function appendWhitespaceThenScalar(TokenStreamProxy $tokens, Node $targetNode): void
+    private function appendWhitespaceThenScalar(TokenStreamInterface $tokens, Node $targetNode): void
     {
         $contentHead = $tokens->current();
         while (TokenType::WHITESPACE === $contentHead->type) {
@@ -201,7 +201,7 @@ final readonly class MultilinePlainScalarParser
         $tokens->advance();
     }
 
-    private function consumeTrailingWhitespaceBeforeNewline(TokenStreamProxy $tokens, Node $targetNode): void
+    private function consumeTrailingWhitespaceBeforeNewline(TokenStreamInterface $tokens, Node $targetNode): void
     {
         while (
             TokenType::WHITESPACE === $tokens->current()?->type
@@ -212,7 +212,7 @@ final readonly class MultilinePlainScalarParser
         }
     }
 
-    private function tryConsumeBareDocumentFlushLine(TokenStreamProxy $tokens, Node $targetNode, int $parentIndentLen): bool
+    private function tryConsumeBareDocumentFlushLine(TokenStreamInterface $tokens, Node $targetNode, int $parentIndentLen): bool
     {
         if (
             EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value !== $parentIndentLen
@@ -228,7 +228,7 @@ final readonly class MultilinePlainScalarParser
         return true;
     }
 
-    private function tryConsumeBlankLineContinuation(TokenStreamProxy $tokens, Node $targetNode, int $parentIndentLen): bool
+    private function tryConsumeBlankLineContinuation(TokenStreamInterface $tokens, Node $targetNode, int $parentIndentLen): bool
     {
         if (TokenType::NEWLINE !== $tokens->peek(1)?->type) {
             return false;
@@ -244,7 +244,7 @@ final readonly class MultilinePlainScalarParser
         return true;
     }
 
-    private function tryConsumeIndentedContentLine(TokenStreamProxy $tokens, Node $targetNode, int $parentIndentLen): bool
+    private function tryConsumeIndentedContentLine(TokenStreamInterface $tokens, Node $targetNode, int $parentIndentLen): bool
     {
         if (!$this->multilineContinuationHelper->isIndentedMultilinePlainContinuationAt($tokens, 1, $parentIndentLen)) {
             return false;
@@ -261,7 +261,7 @@ final readonly class MultilinePlainScalarParser
         return true;
     }
 
-    private function tryConsumeIndentedEmptyLineContinuation(TokenStreamProxy $tokens, Node $targetNode, int $parentIndentLen): bool
+    private function tryConsumeIndentedEmptyLineContinuation(TokenStreamInterface $tokens, Node $targetNode, int $parentIndentLen): bool
     {
         $newLine = $tokens->current();
         $maybeIndent = $tokens->peek(1);

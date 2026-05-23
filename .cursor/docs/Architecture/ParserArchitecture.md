@@ -27,7 +27,7 @@ ParserBuilder::createParser()
 Parser::parse(input)
   → Lexer::tokenize(input)
   → Parser::parseStream(TokenStream)
-       → new ParseContext(TokenStreamProxy, AnchorsRegistry, ParseState)
+       → new ParseContext(TokenStreamInterface, AnchorsRegistry, ParseState)
        → StreamParser::parseStream(ctx)
             → optional ByteOrderNode
             → DocumentParser::parseDocuments(ctx, stream)
@@ -93,7 +93,7 @@ call and passed into every sub-parser method. It holds all mutable parse-time st
 
 | Member | Type | Role |
 |--------|------|------|
-| `tokens` | `TokenStreamProxy` | Cursor over the lexer stream |
+| `tokens` | `TokenStreamInterface` | Cursor over the lexer stream |
 | `anchorsRegistry` | `AnchorsRegistry` | Named anchors for alias resolution |
 | `state` | `ParseState` | Block-indent steps |
 
@@ -193,8 +193,7 @@ routes newline-prefixed values through flow-aware paths instead of
 ## Token stream
 
 Sub-parsers read and consume tokens only through `ParseContext::tokens`
-([`TokenStreamProxy`](../../../src/Parser/Dto/TokenStreamProxy.php) wrapping
-[`TokenStream`](../../../src/Token/TokenStream.php)). Error positions are formatted
+([`TokenStreamInterface`](../../../src/Token/TokenStreamInterface.php)). Error positions are formatted
 via [`ErrorHelper`](../../../src/Parser/Helper/ErrorHelper.php); see
 [Showing of problematic position](../Feature/ShowingProblematicPosition.md).
 
@@ -209,7 +208,7 @@ src/Parser/
 ├── Assembler/ParserAssembler.php
 ├── Contract/SubParserInterface.php
 ├── Consumer.php
-├── Dto/               AnchorsRegistry, ParseState, TokenStreamProxy
+├── Dto/               AnchorsRegistry, ParseState
 ├── Enum/              EspecialIndent, ParsingContext
 ├── Exception/
 ├── Helper/            NodeFactory, Consumer helpers, Identifier/*
