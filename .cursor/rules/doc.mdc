@@ -7,13 +7,11 @@ alwaysApply: true
 Download descriptions from files IF you need to understand the work:
 1. Architecture (Technical solutions):
    - [Fixtures Structure](../docs/Architecture/FixturesStructure.md)
-   - [Parser Architecture](../docs/Architecture/ParserDriver.md)
+   - [Parser Architecture](../docs/Architecture/ParserArchitecture.md)
 
 2. Features:
    - [Lexer](../docs/Feature/Lexer.md)
    - [Parser](../docs/Feature/Parser.md)
-   - [Parser Refactoring](../docs/Feature/ParserRefactoring.md)
-   - [Parser Refactoring: Migration Plan](../docs/Feature/ParserRefactoring-MigrationPlan.md)
    - [Showing of problematic position](../docs/Feature/ShowingProblematicPosition.md)
    - [Specification Cover Fixtures Structure](../docs/Feature/SpecificationCoverFixtures.md)
 

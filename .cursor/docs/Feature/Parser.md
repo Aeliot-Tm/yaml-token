@@ -10,17 +10,13 @@ block and flow collections, scalars, and layout (comments, indentation, newlines
 Parsing is split into **sub-parsers** (one class per YAML construct), **helpers**
 (token consumption, indentation, look-ahead, node creation, structure identification),
 and a thin [`Parser`](../../../src/Parser/Parser.php) façade. Each `parseStream()`
-call builds a [`ParseContext`](../../../src/Parser/ParseContext.php) (token proxy,
-anchor registry, parse state) and delegates to [`StreamParser`](../../../src/Parser/SubParser/StreamParser.php)
-via [`ParserRegistry`](../../../src/Parser/ParserRegistry.php). Sub-parsers call
-each other through the PHP call stack and the registry; there is no Driver/Frame
-state machine and no closure bridge.
+call builds a [`ParseContext`](../../../src/Parser/ParseContext.php) and delegates
+to [`StreamParser`](../../../src/Parser/SubParser/StreamParser.php) through
+[`ParserRegistry`](../../../src/Parser/ParserRegistry.php). Production wiring uses
+[`ParserBuilder`](../../../src/Parser/ParserBuilder.php).
 
-Production wiring is assembled by [`ParserBuilder`](../../../src/Parser/ParserBuilder.php)
-(eager helpers + lazy sub-parsers through [`ParserAssembler`](../../../src/Parser/Assembler/ParserAssembler.php)).
-
-See [Parser Architecture](../Architecture/ParserDriver.md) for component-level
-details and [Parser Refactoring](ParserRefactoring.md) for the full sub-parser catalog.
+See [Parser Architecture](../Architecture/ParserArchitecture.md) for the full
+component layout, sub-parser catalog, and control-flow description.
 
 ## Flow collections
 
