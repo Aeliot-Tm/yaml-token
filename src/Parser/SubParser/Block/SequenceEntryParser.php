@@ -22,6 +22,7 @@ use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
 use Aeliot\YamlToken\Parser\Helper\Identifier\FlowStructureIdentifier;
 use Aeliot\YamlToken\Parser\Helper\Identifier\KeyIdentifier;
+use Aeliot\YamlToken\Parser\Helper\Identifier\NodePropertyIdentifier;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
 use Aeliot\YamlToken\Parser\ParseContext;
 use Aeliot\YamlToken\Parser\ParserRegistry;
@@ -35,6 +36,7 @@ final readonly class SequenceEntryParser implements SubParserInterface
         private FlowStructureIdentifier $flowStructureIdentifier,
         private KeyIdentifier $keyIdentifier,
         private NodeFactory $nodeFactory,
+        private NodePropertyIdentifier $nodePropertyIdentifier,
         private ParserRegistry $registry,
     ) {
     }
@@ -88,7 +90,7 @@ final readonly class SequenceEntryParser implements SubParserInterface
     {
         $token = $parseContext->tokens->current();
         $nodePropertiesFollowedByValueIndicator = false;
-        if (null !== $token && $this->isNodePropertyToken($token)) {
+        if (null !== $token && $this->nodePropertyIdentifier->isNodePropertyToken($token)) {
             $offset = 0;
             while (true) {
                 $peeked = $parseContext->tokens->peek($offset);
@@ -100,7 +102,7 @@ final readonly class SequenceEntryParser implements SubParserInterface
 
                     break;
                 }
-                if ($this->isNodePropertyToken($peeked) || TokenType::WHITESPACE === $peeked->type) {
+                if ($this->nodePropertyIdentifier->isNodePropertyToken($peeked) || TokenType::WHITESPACE === $peeked->type) {
                     ++$offset;
 
                     continue;
@@ -141,17 +143,5 @@ final readonly class SequenceEntryParser implements SubParserInterface
         }
 
         return $this->registry->getValueParser()->parseValue($parseContext, $parentIndentLen);
-    }
-
-    private function isNodePropertyToken(?Token $token): bool
-    {
-        if (null === $token) {
-            return false;
-        }
-
-        return \in_array($token->type, [
-            TokenType::ANCHOR,
-            TokenType::TAG,
-        ], true);
     }
 }

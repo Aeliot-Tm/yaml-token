@@ -172,6 +172,7 @@ final class ParserAssembler
             $this->errorHelper,
             $this->lookAheadHelper,
             $this->multilineContinuationHelper,
+            $this->getNodePropertyIdentifier(),
             $registry,
         );
     }
@@ -204,6 +205,7 @@ final class ParserAssembler
             $this->getFlowStructureIdentifier(),
             $this->getKeyIdentifier(),
             $this->nodeFactory,
+            $this->getNodePropertyIdentifier(),
             $registry,
         );
     }

@@ -26,11 +26,11 @@ use Aeliot\YamlToken\Parser\Exception\AnchorUndefinedException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
+use Aeliot\YamlToken\Parser\Helper\Identifier\NodePropertyIdentifier;
 use Aeliot\YamlToken\Parser\Helper\LookAheadHelper;
 use Aeliot\YamlToken\Parser\Helper\MultilineContinuationHelper;
 use Aeliot\YamlToken\Parser\ParseContext;
 use Aeliot\YamlToken\Parser\ParserRegistry;
-use Aeliot\YamlToken\Token\Token;
 
 final readonly class KeyParser implements SubParserInterface
 {
@@ -38,6 +38,7 @@ final readonly class KeyParser implements SubParserInterface
         private ErrorHelper $errorHelper,
         private LookAheadHelper $lookAheadHelper,
         private MultilineContinuationHelper $multilineContinuationHelper,
+        private NodePropertyIdentifier $nodePropertyIdentifier,
         private ParserRegistry $registry,
     ) {
     }
@@ -209,7 +210,7 @@ final readonly class KeyParser implements SubParserInterface
                 continue;
             }
 
-            if ($this->isNodePropertyToken($token)) {
+            if ($this->nodePropertyIdentifier->isNodePropertyToken($token)) {
                 if (null !== $properties?->getTag()) {
                     throw new UnexpectedStateException($this->errorHelper->appendTokenLocation('Only one tag is supported per key node', $token));
                 }
@@ -233,17 +234,5 @@ final readonly class KeyParser implements SubParserInterface
         foreach ($whitespaceBuffer as $whitespace) {
             $keyNode->addChild($whitespace);
         }
-    }
-
-    private function isNodePropertyToken(?Token $token): bool
-    {
-        if (null === $token) {
-            return false;
-        }
-
-        return \in_array($token->type, [
-            TokenType::ANCHOR,
-            TokenType::TAG,
-        ], true);
     }
 }

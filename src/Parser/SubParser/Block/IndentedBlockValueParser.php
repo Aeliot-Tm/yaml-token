@@ -30,7 +30,6 @@ use Aeliot\YamlToken\Parser\Helper\MultilineContinuationHelper;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
 use Aeliot\YamlToken\Parser\ParseContext;
 use Aeliot\YamlToken\Parser\ParserRegistry;
-use Aeliot\YamlToken\Token\Token;
 
 final readonly class IndentedBlockValueParser implements SubParserInterface
 {
@@ -70,7 +69,7 @@ final readonly class IndentedBlockValueParser implements SubParserInterface
                 return;
             }
 
-            if ($this->isNodePropertyToken($afterIndent) && $this->isNodePropertiesOnlyLine($parseContext, $afterIndentOffset)) {
+            if ($this->nodePropertyIdentifier->isNodePropertyToken($afterIndent) && $this->isNodePropertiesOnlyLine($parseContext, $afterIndentOffset)) {
                 $separatorContainer = $valueNode->getProperties() ?? $valueNode;
                 $separatorContainer->addChild(new NewLineNode($token));
                 $parseContext->tokens->advance();
@@ -126,7 +125,7 @@ final readonly class IndentedBlockValueParser implements SubParserInterface
             }
 
             if (
-                $this->isNodePropertyToken($afterIndent)
+                $this->nodePropertyIdentifier->isNodePropertyToken($afterIndent)
                 && !$this->nodePropertyIdentifier->isNodePropertiesFollowedByImplicitKeyFromOffset($parseContext, $afterIndentOffset)
             ) {
                 $this->consumeIndentedBlockTaggedScalarValue($parseContext, $valueNode, $parentIndentLen);
@@ -327,7 +326,7 @@ final readonly class IndentedBlockValueParser implements SubParserInterface
                 continue;
             }
 
-            if ($this->isNodePropertyToken($token)) {
+            if ($this->nodePropertyIdentifier->isNodePropertyToken($token)) {
                 if ($seenTag) {
                     return false;
                 }
@@ -339,17 +338,5 @@ final readonly class IndentedBlockValueParser implements SubParserInterface
 
             return false;
         }
-    }
-
-    private function isNodePropertyToken(?Token $token): bool
-    {
-        if (null === $token) {
-            return false;
-        }
-
-        return \in_array($token->type, [
-            TokenType::ANCHOR,
-            TokenType::TAG,
-        ], true);
     }
 }
