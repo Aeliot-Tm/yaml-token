@@ -13,21 +13,18 @@ declare(strict_types=1);
 
 namespace Aeliot\YamlToken\Parser\SubParser\Block;
 
-use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\BlockSequenceEntryNode;
 use Aeliot\YamlToken\Node\BlockSequenceNode;
 use Aeliot\YamlToken\Node\IndentationNode;
-use Aeliot\YamlToken\Parser\Consumer;
 use Aeliot\YamlToken\Parser\Dto\ParseContext;
+use Aeliot\YamlToken\Parser\Helper\BlockCollectionLoopHelper;
 use Aeliot\YamlToken\Parser\Helper\Identifier\SequenceIdentifier;
-use Aeliot\YamlToken\Parser\Helper\LookAheadHelper;
 use Aeliot\YamlToken\Parser\ParserRegistry;
 
 final readonly class CompactBlockSequenceParser
 {
     public function __construct(
-        private Consumer $consumer,
-        private LookAheadHelper $lookAheadHelper,
+        private BlockCollectionLoopHelper $blockCollectionLoopHelper,
         private SequenceIdentifier $sequenceIdentifier,
         private ParserRegistry $registry,
     ) {
@@ -61,25 +58,15 @@ final readonly class CompactBlockSequenceParser
         );
 
         while (!$parseContext->tokens->isEnd()) {
-            $head = $this->lookAheadHelper->peekFirstSignificantBlockHead($parseContext->tokens, 0);
-            if (null === $head || $head->indentLen !== $indentLen) {
+            if (!$this->blockCollectionLoopHelper->advanceToNextCompactBlockEntry($parseContext, $blockSequence, $indentLen)) {
                 break;
             }
 
-            $this->consumer->collectSpaceCommentEnds($parseContext->tokens, $blockSequence);
-            $this->lookAheadHelper->collectInsignificantIndentationLines($parseContext->tokens, $blockSequence);
-
-            $token = $parseContext->tokens->current();
-            if (null === $token || TokenType::INDENTATION !== $token->type) {
-                break;
-            }
-            if (\strlen($token->text) !== $indentLen) {
-                break;
-            }
             if (!$this->sequenceIdentifier->isSequenceStart($parseContext)) {
                 break;
             }
 
+            $token = $parseContext->tokens->current();
             $sequenceEntry = new BlockSequenceEntryNode();
             $blockSequence->addChild($sequenceEntry);
             $sequenceEntry->addChild(new IndentationNode($token));

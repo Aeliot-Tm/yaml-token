@@ -109,9 +109,8 @@ final class ParserAssembler
     public function createCompactBlockMappingParser(ParserRegistry $registry): CompactBlockMappingParser
     {
         return new CompactBlockMappingParser(
+            $this->getBlockCollectionLoopHelper(),
             $this->getBlockStructureIdentifier(),
-            $this->consumer,
-            $this->lookAheadHelper,
             $registry,
         );
     }
@@ -119,8 +118,7 @@ final class ParserAssembler
     public function createCompactBlockSequenceParser(ParserRegistry $registry): CompactBlockSequenceParser
     {
         return new CompactBlockSequenceParser(
-            $this->consumer,
-            $this->lookAheadHelper,
+            $this->getBlockCollectionLoopHelper(),
             $this->getSequenceIdentifier(),
             $registry,
         );

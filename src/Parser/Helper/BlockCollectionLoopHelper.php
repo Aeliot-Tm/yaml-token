@@ -29,6 +29,43 @@ final readonly class BlockCollectionLoopHelper
     }
 
     /**
+     * Advances past layout tokens and checks that the next entry is at exactly $indentLen.
+     *
+     * Compact-collection variant of advanceToNextBlockEntry: uses strict equality for
+     * the indentation check and skips registerIndentStepIfNeeded/assertIndentLenIsValid
+     * because the step was already registered when the first entry was parsed.
+     *
+     * After a true return, $parseContext->tokens->current() points at the INDENTATION
+     * token whose length equals $indentLen.
+     *
+     * @return bool true when the loop should continue, false when it should break
+     */
+    public function advanceToNextCompactBlockEntry(
+        ParseContext $parseContext,
+        Node $collection,
+        int $indentLen,
+    ): bool {
+        $head = $this->lookAheadHelper->peekFirstSignificantBlockHead($parseContext->tokens, 0);
+        if (null === $head || $head->indentLen !== $indentLen) {
+            return false;
+        }
+
+        $this->consumer->collectSpaceCommentEnds($parseContext->tokens, $collection);
+        $this->lookAheadHelper->collectInsignificantIndentationLines($parseContext->tokens, $collection);
+
+        $token = $parseContext->tokens->current();
+        if (null === $token || TokenType::INDENTATION !== $token->type) {
+            return false;
+        }
+
+        if (\strlen($token->text) !== $indentLen) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Advances past layout tokens (space, comments, insignificant indentation lines) and
      * returns the indent length of the next block entry, or null when the loop should break.
      *
