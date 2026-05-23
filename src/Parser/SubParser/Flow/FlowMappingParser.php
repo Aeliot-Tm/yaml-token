@@ -15,65 +15,34 @@ namespace Aeliot\YamlToken\Parser\SubParser\Flow;
 
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\FlowMappingNode;
-use Aeliot\YamlToken\Parser\Consumer;
 use Aeliot\YamlToken\Parser\Contract\SubParserInterface;
-use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
-use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
-use Aeliot\YamlToken\Parser\Helper\NodeFactory;
+use Aeliot\YamlToken\Parser\Helper\FlowCollectionHelper;
 use Aeliot\YamlToken\Parser\ParseContext;
 use Aeliot\YamlToken\Parser\ParserRegistry;
 
 final readonly class FlowMappingParser implements SubParserInterface
 {
     public function __construct(
-        private Consumer $consumer,
-        private ErrorHelper $errorHelper,
-        private NodeFactory $nodeFactory,
+        private FlowCollectionHelper $flowCollectionHelper,
         private ParserRegistry $registry,
     ) {
     }
 
     public function parse(ParseContext $parseContext): FlowMappingNode
     {
-        $node = new FlowMappingNode();
-        $token = $parseContext->tokens->current();
-        if (TokenType::FLOW_MAPPING_START !== $token?->type) {
-            throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('There is no expected FLOW_MAPPING_START token, but %s given', $token?->type->value ?? '_nothing_'), $parseContext->tokens));
-        }
-
-        $node->addChild($this->nodeFactory->createSimpleNode($token));
-        $parseContext->tokens->advance();
-
-        while (true) {
-            $this->consumer->collectSpaceCommentEnds($parseContext->tokens, $node);
-
-            $token = $parseContext->tokens->current();
-            if (null === $token || TokenType::FLOW_MAPPING_END === $token->type) {
-                if (TokenType::FLOW_MAPPING_END !== $token?->type) {
-                    throw new UnexpectedTokenException(\sprintf('There is no expected FLOW_MAPPING_END token, but %s given', $token?->type->value ?? '_nothing_'));
+        return $this->flowCollectionHelper->parseFlowCollection(
+            $parseContext,
+            new FlowMappingNode(),
+            TokenType::FLOW_MAPPING_START,
+            TokenType::FLOW_MAPPING_END,
+            function (ParseContext $ctx) {
+                $token = $ctx->tokens->current();
+                if (TokenType::MERGE_INDICATOR === $token?->type) {
+                    return $this->registry->getMergeInstructionParser()->parseMergeInstructionAtCurrentPosition($ctx);
                 }
 
-                $node->addChild($this->nodeFactory->createSimpleNode($token));
-                $parseContext->tokens->advance();
-                $this->consumer->collectSpaceAndComments($parseContext->tokens, $node);
-
-                return $node;
-            }
-
-            if (TokenType::FLOW_ENTRY === $token->type) {
-                $node->addChild($this->nodeFactory->createSimpleNode($token));
-                $parseContext->tokens->advance();
-
-                continue;
-            }
-
-            if (TokenType::MERGE_INDICATOR === $token->type) {
-                $node->addChild($this->registry->getMergeInstructionParser()->parseMergeInstructionAtCurrentPosition($parseContext));
-
-                continue;
-            }
-
-            $node->addChild($this->registry->getFlowMappingPairParser()->parse($parseContext));
-        }
+                return $this->registry->getFlowMappingPairParser()->parse($ctx);
+            },
+        );
     }
 }

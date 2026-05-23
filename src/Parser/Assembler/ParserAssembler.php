@@ -16,6 +16,7 @@ namespace Aeliot\YamlToken\Parser\Assembler;
 use Aeliot\YamlToken\Parser\Consumer;
 use Aeliot\YamlToken\Parser\Helper\AnchorPostProcessor;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
+use Aeliot\YamlToken\Parser\Helper\FlowCollectionHelper;
 use Aeliot\YamlToken\Parser\Helper\Identifier\BlockStructureIdentifier;
 use Aeliot\YamlToken\Parser\Helper\Identifier\FlowStructureIdentifier;
 use Aeliot\YamlToken\Parser\Helper\Identifier\KeyIdentifier;
@@ -51,6 +52,7 @@ use Aeliot\YamlToken\Parser\SubParser\ValueParser;
 final class ParserAssembler
 {
     private ?BlockStructureIdentifier $blockStructureIdentifier = null;
+    private ?FlowCollectionHelper $flowCollectionHelper = null;
     private ?FlowStructureIdentifier $flowStructureIdentifier = null;
     private ?KeyIdentifier $keyIdentifier = null;
     private ?NodePropertyIdentifier $nodePropertyIdentifier = null;
@@ -159,12 +161,12 @@ final class ParserAssembler
 
     public function createFlowMappingParser(ParserRegistry $registry): FlowMappingParser
     {
-        return new FlowMappingParser($this->consumer, $this->errorHelper, $this->nodeFactory, $registry);
+        return new FlowMappingParser($this->getFlowCollectionHelper(), $registry);
     }
 
     public function createFlowSequenceParser(ParserRegistry $registry): FlowSequenceParser
     {
-        return new FlowSequenceParser($this->consumer, $this->errorHelper, $this->nodeFactory, $registry);
+        return new FlowSequenceParser($this->getFlowCollectionHelper(), $registry);
     }
 
     public function createIndentedBlockValueParser(ParserRegistry $registry): IndentedBlockValueParser
@@ -267,6 +269,11 @@ final class ParserAssembler
     public function getErrorHelper(): ErrorHelper
     {
         return $this->errorHelper;
+    }
+
+    public function getFlowCollectionHelper(): FlowCollectionHelper
+    {
+        return $this->flowCollectionHelper ??= new FlowCollectionHelper($this->consumer, $this->errorHelper, $this->nodeFactory);
     }
 
     public function getFlowStructureIdentifier(): FlowStructureIdentifier

@@ -21,7 +21,7 @@ namespace Aeliot\YamlToken\Node;
  * the usual ValueNode getters (scalar, flowMapping, etc.); a flow-pair entry
  * (YAML 1.2.2 §7.4.1 ns-flow-pair) is exposed via {@see ValueNode::getPayload()}.
  */
-class FlowSequenceNode extends AbstractNode
+class FlowSequenceNode extends FlowNode
 {
     /**
      * @return list<ValueNode>

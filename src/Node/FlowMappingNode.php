@@ -20,7 +20,7 @@ namespace Aeliot\YamlToken\Node;
  * A {@see MergeInstructionNode} (the YAML 1.1 merge-key extension `<< : *anchor`)
  * may also appear among the children but is not exposed via {@see self::getEntries()}.
  */
-class FlowMappingNode extends AbstractNode
+class FlowMappingNode extends FlowNode
 {
     /**
      * @return list<KeyValueCoupleNode>
