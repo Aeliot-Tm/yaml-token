@@ -17,6 +17,7 @@ use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\BlockSequenceEntryNode;
 use Aeliot\YamlToken\Node\BlockSequenceNode;
 use Aeliot\YamlToken\Node\IndentationNode;
+use Aeliot\YamlToken\Parser\Dto\IndentContext;
 use Aeliot\YamlToken\Parser\Dto\ParseContext;
 use Aeliot\YamlToken\Parser\Exception\IndentationInvalidException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
@@ -36,7 +37,7 @@ final readonly class BlockSequenceParser
     ) {
     }
 
-    public function parseBlockSequenceValue(ParseContext $parseContext, int $parentIndentLen, bool $allowNonSequenceAtBaseIndentAsTerminator = false): BlockSequenceNode
+    public function parseBlockSequenceValue(ParseContext $parseContext, IndentContext $parentIndent, bool $allowNonSequenceAtBaseIndentAsTerminator = false): BlockSequenceNode
     {
         $blockSequence = new BlockSequenceNode();
 
@@ -46,7 +47,7 @@ final readonly class BlockSequenceParser
             $indentLen = $this->blockCollectionLoopHelper->advanceToNextBlockEntry(
                 $parseContext,
                 $blockSequence,
-                $parentIndentLen,
+                $parentIndent,
                 fn (ParseContext $ctx): bool => TokenType::SEQUENCE_ENTRY === $ctx->tokens->current()?->type,
             );
             if (null === $indentLen) {
@@ -82,7 +83,7 @@ final readonly class BlockSequenceParser
             $sequenceEntry->addChild(
                 $this->registry
                     ->getSequenceEntryParser()
-                    ->parseSequenceEntryValue($parseContext, $indentLen, $compactIndent),
+                    ->parseSequenceEntryValue($parseContext, IndentContext::createForBlock($indentLen), $compactIndent),
             );
         }
 

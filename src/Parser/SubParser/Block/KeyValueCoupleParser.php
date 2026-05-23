@@ -18,6 +18,7 @@ use Aeliot\YamlToken\Node\IndentationNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Parser\Consumer;
+use Aeliot\YamlToken\Parser\Dto\IndentContext;
 use Aeliot\YamlToken\Parser\Dto\ParseContext;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedEndException;
 use Aeliot\YamlToken\Parser\Helper\AnchorPostProcessor;
@@ -96,7 +97,7 @@ final readonly class KeyValueCoupleParser
         }
 
         $this->consumer->collectTypes($parseContext->tokens, [TokenType::VALUE_INDICATOR, TokenType::WHITESPACE], $keyValueCouple);
-        $keyValueCouple->addChild($this->registry->getValueParser()->parseValue($parseContext, $indentLen));
+        $keyValueCouple->addChild($this->registry->getValueParser()->parseValue($parseContext, IndentContext::createForBlock($indentLen)));
         $this->anchorPostProcessor->postProcessKeyValueCouple($parseContext->anchorsRegistry, $keyValueCouple);
     }
 }

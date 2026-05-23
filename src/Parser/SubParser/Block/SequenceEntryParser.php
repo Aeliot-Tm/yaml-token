@@ -17,6 +17,7 @@ use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
+use Aeliot\YamlToken\Parser\Dto\IndentContext;
 use Aeliot\YamlToken\Parser\Dto\ParseContext;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
@@ -84,7 +85,7 @@ final readonly class SequenceEntryParser
      * that follow '-'. Per §8.2.1 this length defines the indentation
      * of the nested compact collection.
      */
-    public function parseSequenceEntryValue(ParseContext $parseContext, int $parentIndentLen, int $compactIndent): ValueNode
+    public function parseSequenceEntryValue(ParseContext $parseContext, IndentContext $parentIndent, int $compactIndent): ValueNode
     {
         $token = $parseContext->tokens->current();
         $nodePropertiesFollowedByValueIndicator = null !== $token
@@ -121,6 +122,6 @@ final readonly class SequenceEntryParser
             return $valueNode;
         }
 
-        return $this->registry->getValueParser()->parseValue($parseContext, $parentIndentLen);
+        return $this->registry->getValueParser()->parseValue($parseContext, $parentIndent);
     }
 }

@@ -17,8 +17,8 @@ use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\MultilinePlainScalarNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Parser\Consumer;
+use Aeliot\YamlToken\Parser\Dto\IndentContext;
 use Aeliot\YamlToken\Parser\Dto\ParseContext;
-use Aeliot\YamlToken\Parser\Enum\EspecialIndent;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Helper\AliasResolver;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
@@ -40,11 +40,11 @@ final readonly class ValueParser
     }
 
     /**
-     * @param int $parentIndentLen Key-line indent length (spaces),
-     *                             {@see EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value} at bare document root (YAML 1.2.2 rule [211]),
-     *                             or {@see EspecialIndent::FLOW_COLLECTION_VALUE_PARENT->value} for flow / merge RHS values.
+     * @param IndentContext $parentIndent Key-line indent context: a real block indent,
+     *                                    {@see IndentContext::createForBareDocument()} at bare document root (YAML 1.2.2 rule [211]),
+     *                                    or {@see IndentContext::createForFlow()} for flow / merge RHS values.
      */
-    public function parseValue(ParseContext $parseContext, int $parentIndentLen): ValueNode
+    public function parseValue(ParseContext $parseContext, IndentContext $parentIndent): ValueNode
     {
         $valueNode = new ValueNode();
 
@@ -60,16 +60,16 @@ final readonly class ValueParser
         if (
             null !== $token
             && TokenType::NEWLINE === $token->type
-            && EspecialIndent::FLOW_COLLECTION_VALUE_PARENT->value === $parentIndentLen
+            && $parentIndent->isFlowCollection
         ) {
             $this->consumer->collectSpaceCommentEnds($parseContext->tokens, $valueNode);
         }
 
-        $this->parseValuePrimaryPayload($parseContext, $valueNode, $parentIndentLen);
+        $this->parseValuePrimaryPayload($parseContext, $valueNode, $parentIndent);
 
         // Trailing s-separate / s-l-comments before ',', ']', or '}' belong to the enclosing
         // FlowSequenceBuilder / FlowMappingBuilder (YAML 1.2.2 §6.3, §7.1), not this ValueNode.
-        if (EspecialIndent::FLOW_COLLECTION_VALUE_PARENT->value !== $parentIndentLen) {
+        if (!$parentIndent->isFlowCollection) {
             $this->consumer->collectSpaceAndComments($parseContext->tokens, $valueNode);
         }
 
@@ -80,9 +80,9 @@ final readonly class ValueParser
      * YAML 1.2.2 §7.2 e-node / §7.4: in flow contexts, scalar content may be empty right
      * after c-ns-properties (tag/anchor) — the next ',' / '}' / ']' terminates the entry.
      */
-    private function isFlowEmptyValueTerminator(Token $token, int $parentIndentLen): bool
+    private function isFlowEmptyValueTerminator(Token $token, IndentContext $parentIndent): bool
     {
-        return EspecialIndent::FLOW_COLLECTION_VALUE_PARENT->value === $parentIndentLen
+        return $parentIndent->isFlowCollection
             && \in_array($token->type, [
                 TokenType::FLOW_ENTRY,
                 TokenType::FLOW_MAPPING_END,
@@ -90,7 +90,7 @@ final readonly class ValueParser
             ], true);
     }
 
-    private function parseBlockScalarPayload(ParseContext $parseContext, ValueNode $valueNode, int $parentIndentLen): void
+    private function parseBlockScalarPayload(ParseContext $parseContext, ValueNode $valueNode, IndentContext $parentIndent): void
     {
         if (null === $parseContext->tokens->current()) {
             return;
@@ -99,41 +99,41 @@ final readonly class ValueParser
         $this->registry->getBlockScalarParser()->consumeBlockScalarValue(
             $parseContext->tokens,
             $valueNode,
-            $parentIndentLen,
+            $parentIndent,
         );
     }
 
-    private function parseNewlinePayload(ParseContext $parseContext, ValueNode $valueNode, int $parentIndentLen): void
+    private function parseNewlinePayload(ParseContext $parseContext, ValueNode $valueNode, IndentContext $parentIndent): void
     {
-        if (EspecialIndent::FLOW_COLLECTION_VALUE_PARENT->value === $parentIndentLen) {
+        if ($parentIndent->isFlowCollection) {
             $this->consumer->collectSpaceCommentEnds($parseContext->tokens, $valueNode);
-            $this->parseValuePrimaryPayload($parseContext, $valueNode, $parentIndentLen);
+            $this->parseValuePrimaryPayload($parseContext, $valueNode, $parentIndent);
 
             return;
         }
 
-        $this->registry->getIndentedBlockValueParser()->parseIndentedBlockValue($parseContext, $valueNode, $parentIndentLen);
+        $this->registry->getIndentedBlockValueParser()->parseIndentedBlockValue($parseContext, $valueNode, $parentIndent);
     }
 
     private function parsePlainScalarPayload(
         ParseContext $parseContext,
         ValueNode $valueNode,
-        int $parentIndentLen,
+        IndentContext $parentIndent,
         Token $token,
     ): void {
         if (
             TokenType::PLAIN_SCALAR === $token->type
             && $this->multilineContinuationHelper
-                ->isMultilinePlainContinuationAhead($parseContext->tokens, 1, $parentIndentLen)
+                ->isMultilinePlainContinuationAhead($parseContext->tokens, 1, $parentIndent)
         ) {
             $multiline = new MultilinePlainScalarNode();
             $multiline->addChild($this->nodeFactory->createScalarNode($token));
             $parseContext->tokens->advance();
-            $this->registry->getMultilinePlainScalarParser()->appendMultilinePlainScalarContinuations($parseContext->tokens, $multiline, $parentIndentLen);
+            $this->registry->getMultilinePlainScalarParser()->appendMultilinePlainScalarContinuations($parseContext->tokens, $multiline, $parentIndent);
             $valueNode->addChild($multiline);
         } elseif (
             TokenType::PLAIN_SCALAR === $token->type
-            && EspecialIndent::FLOW_COLLECTION_VALUE_PARENT->value === $parentIndentLen
+            && $parentIndent->isFlowCollection
         ) {
             $head = $this->nodeFactory->createScalarNode($token);
             $parseContext->tokens->advance();
@@ -152,23 +152,23 @@ final readonly class ValueParser
     /**
      * Parses the main value payload (block scalar, block-after-newline, scalars, aliases, compact collections, flow nodes).
      */
-    private function parseValuePrimaryPayload(ParseContext $parseContext, ValueNode $valueNode, int $parentIndentLen): void
+    private function parseValuePrimaryPayload(ParseContext $parseContext, ValueNode $valueNode, IndentContext $parentIndent): void
     {
         $token = $parseContext->tokens->current();
         if (null === $token) {
             return;
         }
 
-        if ($this->isFlowEmptyValueTerminator($token, $parentIndentLen)) {
+        if ($this->isFlowEmptyValueTerminator($token, $parentIndent)) {
             return;
         }
 
         if (\in_array($token->type, TokenType::BLOCK_SCALAR_INDICATORS, true)) {
-            $this->parseBlockScalarPayload($parseContext, $valueNode, $parentIndentLen);
+            $this->parseBlockScalarPayload($parseContext, $valueNode, $parentIndent);
         } elseif (TokenType::NEWLINE === $token->type) {
-            $this->parseNewlinePayload($parseContext, $valueNode, $parentIndentLen);
+            $this->parseNewlinePayload($parseContext, $valueNode, $parentIndent);
         } elseif ($token->type->isScalar()) {
-            $this->parsePlainScalarPayload($parseContext, $valueNode, $parentIndentLen, $token);
+            $this->parsePlainScalarPayload($parseContext, $valueNode, $parentIndent, $token);
         } elseif (TokenType::ALIAS === $token->type) {
             $aliasNode = $this->aliasResolver->resolveAlias($parseContext, $token);
             $valueNode->addChild($aliasNode);

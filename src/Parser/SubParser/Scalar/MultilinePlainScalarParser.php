@@ -20,7 +20,7 @@ use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Node\PlainScalarNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
-use Aeliot\YamlToken\Parser\Enum\EspecialIndent;
+use Aeliot\YamlToken\Parser\Dto\IndentContext;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
 use Aeliot\YamlToken\Parser\Helper\MultilineContinuationHelper;
@@ -46,7 +46,7 @@ final readonly class MultilinePlainScalarParser
      *
      * @see Parser::parseValue() YAML 1.2.2 §7.3.3 / §8.1.1
      */
-    public function appendMultilinePlainScalarContinuations(TokenStreamInterface $tokens, Node $targetNode, int $parentIndentLen): void
+    public function appendMultilinePlainScalarContinuations(TokenStreamInterface $tokens, Node $targetNode, IndentContext $parentIndent): void
     {
         while (true) {
             $this->consumeTrailingWhitespaceBeforeNewline($tokens, $targetNode);
@@ -55,16 +55,16 @@ final readonly class MultilinePlainScalarParser
                 break;
             }
 
-            if ($this->tryConsumeBlankLineContinuation($tokens, $targetNode, $parentIndentLen)) {
+            if ($this->tryConsumeBlankLineContinuation($tokens, $targetNode, $parentIndent)) {
                 continue;
             }
-            if ($this->tryConsumeIndentedEmptyLineContinuation($tokens, $targetNode, $parentIndentLen)) {
+            if ($this->tryConsumeIndentedEmptyLineContinuation($tokens, $targetNode, $parentIndent)) {
                 continue;
             }
-            if ($this->tryConsumeIndentedContentLine($tokens, $targetNode, $parentIndentLen)) {
+            if ($this->tryConsumeIndentedContentLine($tokens, $targetNode, $parentIndent)) {
                 continue;
             }
-            if ($this->tryConsumeBareDocumentFlushLine($tokens, $targetNode, $parentIndentLen)) {
+            if ($this->tryConsumeBareDocumentFlushLine($tokens, $targetNode, $parentIndent)) {
                 continue;
             }
 
@@ -140,10 +140,10 @@ final readonly class MultilinePlainScalarParser
         }
     }
 
-    private function tryConsumeBareDocumentFlushLine(TokenStreamInterface $tokens, Node $targetNode, int $parentIndentLen): bool
+    private function tryConsumeBareDocumentFlushLine(TokenStreamInterface $tokens, Node $targetNode, IndentContext $parentIndent): bool
     {
         if (
-            EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value !== $parentIndentLen
+            !$parentIndent->isBareDocumentRoot
             || !$this->multilineContinuationHelper->isBareDocumentFlushMultilinePlainContinuationAt($tokens, 1)
         ) {
             return false;
@@ -156,13 +156,13 @@ final readonly class MultilinePlainScalarParser
         return true;
     }
 
-    private function tryConsumeBlankLineContinuation(TokenStreamInterface $tokens, Node $targetNode, int $parentIndentLen): bool
+    private function tryConsumeBlankLineContinuation(TokenStreamInterface $tokens, Node $targetNode, IndentContext $parentIndent): bool
     {
         if (TokenType::NEWLINE !== $tokens->peek(1)?->type) {
             return false;
         }
 
-        if (!$this->multilineContinuationHelper->isAnyContinuationAt($tokens, 2, $parentIndentLen)) {
+        if (!$this->multilineContinuationHelper->isAnyContinuationAt($tokens, 2, $parentIndent)) {
             return false;
         }
 
@@ -172,9 +172,9 @@ final readonly class MultilinePlainScalarParser
         return true;
     }
 
-    private function tryConsumeIndentedContentLine(TokenStreamInterface $tokens, Node $targetNode, int $parentIndentLen): bool
+    private function tryConsumeIndentedContentLine(TokenStreamInterface $tokens, Node $targetNode, IndentContext $parentIndent): bool
     {
-        if (!$this->multilineContinuationHelper->isIndentedMultilinePlainContinuationAt($tokens, 1, $parentIndentLen)) {
+        if (!$this->multilineContinuationHelper->isIndentedMultilinePlainContinuationAt($tokens, 1, $parentIndent)) {
             return false;
         }
 
@@ -189,18 +189,18 @@ final readonly class MultilinePlainScalarParser
         return true;
     }
 
-    private function tryConsumeIndentedEmptyLineContinuation(TokenStreamInterface $tokens, Node $targetNode, int $parentIndentLen): bool
+    private function tryConsumeIndentedEmptyLineContinuation(TokenStreamInterface $tokens, Node $targetNode, IndentContext $parentIndent): bool
     {
         $newLine = $tokens->current();
         $maybeIndent = $tokens->peek(1);
-        if (TokenType::INDENTATION !== $maybeIndent?->type || \strlen($maybeIndent->text) <= $parentIndentLen) {
+        if (TokenType::INDENTATION !== $maybeIndent?->type || \strlen($maybeIndent->text) <= $parentIndent->indentLen) {
             return false;
         }
 
         $afterIndentOffset = $this->peekOffsetHelper->skipWhitespaceOffset($tokens, 2);
         if (
             TokenType::NEWLINE !== $tokens->peek($afterIndentOffset)?->type
-            || !$this->multilineContinuationHelper->isAnyContinuationAt($tokens, $afterIndentOffset + 1, $parentIndentLen)
+            || !$this->multilineContinuationHelper->isAnyContinuationAt($tokens, $afterIndentOffset + 1, $parentIndent)
         ) {
             return false;
         }

@@ -17,6 +17,7 @@ use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\ExplicitKeyIndicatorNode;
 use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
+use Aeliot\YamlToken\Parser\Dto\IndentContext;
 use Aeliot\YamlToken\Parser\Dto\ParseContext;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Helper\AliasResolver;
@@ -81,7 +82,7 @@ final readonly class KeyParser
             }
 
             if (TokenType::SEQUENCE_ENTRY === $significantToken->type) {
-                $keyNode->setName($this->registry->getBlockSequenceParser()->parseBlockSequenceValue($parseContext, $entryIndentLen));
+                $keyNode->setName($this->registry->getBlockSequenceParser()->parseBlockSequenceValue($parseContext, IndentContext::createForBlock($entryIndentLen)));
 
                 return;
             }
@@ -90,14 +91,14 @@ final readonly class KeyParser
                 TokenType::EXPLICIT_KEY_INDICATOR === $significantToken->type
                 || TokenType::MERGE_INDICATOR === $significantToken->type
             ) {
-                $keyNode->setName($this->registry->getBlockMappingParser()->parseBlockMappingValue($parseContext, $entryIndentLen));
+                $keyNode->setName($this->registry->getBlockMappingParser()->parseBlockMappingValue($parseContext, IndentContext::createForBlock($entryIndentLen)));
 
                 return;
             }
 
             if ($significantToken->type->isScalar()) {
                 if ($this->multilineContinuationHelper->isImplicitYamlKeyOnContinuationLine($parseContext->tokens, $scalarPeekOffset)) {
-                    $keyNode->setName($this->registry->getBlockMappingParser()->parseBlockMappingValue($parseContext, $entryIndentLen));
+                    $keyNode->setName($this->registry->getBlockMappingParser()->parseBlockMappingValue($parseContext, IndentContext::createForBlock($entryIndentLen)));
                 } else {
                     $this->registry->getBlockScalarParser()->consumeExplicitKeyMultilinePlainScalar($parseContext->tokens, $keyNode, $entryIndentLen);
                 }

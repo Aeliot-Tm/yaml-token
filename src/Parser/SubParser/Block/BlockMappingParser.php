@@ -15,6 +15,7 @@ namespace Aeliot\YamlToken\Parser\SubParser\Block;
 
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\BlockMappingNode;
+use Aeliot\YamlToken\Parser\Dto\IndentContext;
 use Aeliot\YamlToken\Parser\Dto\ParseContext;
 use Aeliot\YamlToken\Parser\Exception\IndentationInvalidException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
@@ -34,7 +35,7 @@ final readonly class BlockMappingParser
     ) {
     }
 
-    public function parseBlockMappingValue(ParseContext $parseContext, int $parentIndentLen): BlockMappingNode
+    public function parseBlockMappingValue(ParseContext $parseContext, IndentContext $parentIndent): BlockMappingNode
     {
         $blockMapping = new BlockMappingNode();
 
@@ -45,7 +46,7 @@ final readonly class BlockMappingParser
             $indentLen = $this->blockCollectionLoopHelper->advanceToNextBlockEntry(
                 $parseContext,
                 $blockMapping,
-                $parentIndentLen,
+                $parentIndent,
                 fn (ParseContext $ctx): bool => $this->blockStructureIdentifier->isKeyValueCoupleStart($ctx),
             );
             if (null === $indentLen) {

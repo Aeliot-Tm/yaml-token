@@ -16,8 +16,8 @@ namespace Aeliot\YamlToken\Parser\Helper;
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Parser\Consumer;
+use Aeliot\YamlToken\Parser\Dto\IndentContext;
 use Aeliot\YamlToken\Parser\Dto\ParseContext;
-use Aeliot\YamlToken\Parser\Enum\EspecialIndent;
 
 final readonly class BlockCollectionLoopHelper
 {
@@ -70,17 +70,17 @@ final readonly class BlockCollectionLoopHelper
      * returns the indent length of the next block entry, or null when the loop should break.
      *
      * Encapsulates the shared scaffolding of block-collection main loops:
-     *   1. peek → break if out-of-scope (no significant head or indent ≤ $parentIndentLen)
+     *   1. peek → break if out-of-scope (no significant head or indent ≤ $parentIndent->indentLen)
      *   2. collectSpaceCommentEnds + collectInsignificantIndentationLines
-     *   3. determine $indentLen from INDENTATION token or BARE_DOCUMENT_BLOCK_PARENT zero-indent
+     *   3. determine $indentLen from INDENTATION token or bare-document zero-indent
      *   4. registerIndentStepIfNeeded + assertIndentLenIsValid for $indentLen > 0
-     *   5. break if $indentLen ≤ $parentIndentLen
+     *   5. break if $indentLen ≤ $parentIndent->indentLen
      *
      * After a non-null return, $parseContext->tokens->current() still points at the same
      * token that was used to determine $indentLen (INDENTATION or the entry token itself).
      *
      * @param callable(ParseContext): bool $isBareDocumentEntry
-     *                                                          Called only when $parentIndentLen equals EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT
+     *                                                          Called only when $parentIndent->isBareDocumentRoot is true
      *                                                          and the current token is not INDENTATION. Should return true when the token at the
      *                                                          current stream position is a valid zero-indent entry for this collection type.
      *
@@ -89,11 +89,11 @@ final readonly class BlockCollectionLoopHelper
     public function advanceToNextBlockEntry(
         ParseContext $parseContext,
         Node $collection,
-        int $parentIndentLen,
+        IndentContext $parentIndent,
         callable $isBareDocumentEntry,
     ): ?int {
         $head = $this->lookAheadHelper->peekFirstSignificantBlockHead($parseContext->tokens, 0);
-        if (null === $head || $head->indentLen <= $parentIndentLen) {
+        if (null === $head || $head->indentLen <= $parentIndent->indentLen) {
             return null;
         }
 
@@ -108,7 +108,7 @@ final readonly class BlockCollectionLoopHelper
         if (TokenType::INDENTATION === $token->type) {
             $indentLen = \strlen($token->text);
         } elseif (
-            EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value === $parentIndentLen
+            $parentIndent->isBareDocumentRoot
             && $isBareDocumentEntry($parseContext)
         ) {
             $indentLen = 0;
@@ -121,7 +121,7 @@ final readonly class BlockCollectionLoopHelper
             $this->indentationHelper->assertIndentLenIsValid($parseContext->state, $parseContext->tokens, $indentLen);
         }
 
-        if ($indentLen <= $parentIndentLen) {
+        if ($indentLen <= $parentIndent->indentLen) {
             return null;
         }
 

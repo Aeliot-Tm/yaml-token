@@ -24,8 +24,8 @@ use Aeliot\YamlToken\Node\IndentationNode;
 use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
+use Aeliot\YamlToken\Parser\Dto\IndentContext;
 use Aeliot\YamlToken\Parser\Dto\ParseContext;
-use Aeliot\YamlToken\Parser\Enum\EspecialIndent;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
 use Aeliot\YamlToken\Parser\Helper\Identifier\BlockStructureIdentifier;
@@ -134,7 +134,7 @@ final readonly class DocumentParser
         $sequenceEntry->addChild(
             $this->registry
                 ->getSequenceEntryParser()
-                ->parseSequenceEntryValue($parseContext, $leadingIndent, $compactIndent),
+                ->parseSequenceEntryValue($parseContext, IndentContext::createForBlock($leadingIndent), $compactIndent),
         );
     }
 
@@ -287,13 +287,13 @@ final readonly class DocumentParser
                 break;
             }
 
-            $document->addChild($this->registry->getValueParser()->parseValue($parseContext, EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value));
+            $document->addChild($this->registry->getValueParser()->parseValue($parseContext, IndentContext::createForBareDocument()));
 
             return true;
         }
 
         if (TokenType::ALIAS === $token->type) {
-            $document->addChild($this->registry->getValueParser()->parseValue($parseContext, EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value));
+            $document->addChild($this->registry->getValueParser()->parseValue($parseContext, IndentContext::createForBareDocument()));
 
             return true;
         }
@@ -318,14 +318,14 @@ final readonly class DocumentParser
         }
 
         if ($token->type->isScalar()) {
-            $document->addChild($this->registry->getValueParser()->parseValue($parseContext, EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value));
+            $document->addChild($this->registry->getValueParser()->parseValue($parseContext, IndentContext::createForBareDocument()));
 
             return true;
         }
 
         if ($this->nodePropertyIdentifier->isNodePropertyAtDocumentRoot($parseContext)) {
             $this->consumeOptionalLeadingIndent($parseContext, $document);
-            $document->addChild($this->registry->getValueParser()->parseValue($parseContext, EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value));
+            $document->addChild($this->registry->getValueParser()->parseValue($parseContext, IndentContext::createForBareDocument()));
 
             return true;
         }

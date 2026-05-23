@@ -24,6 +24,7 @@ use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 use Aeliot\YamlToken\Parser\Consumer;
+use Aeliot\YamlToken\Parser\Dto\IndentContext;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
@@ -63,7 +64,7 @@ final readonly class BlockScalarParser
     public function consumeBlockScalarValue(
         TokenStreamInterface $tokens,
         ValueNode $valueNode,
-        int $parentIndentLen,
+        IndentContext $parentIndent,
     ): void {
         $scalar = $this->consumeBlockScalarFirstFragment($tokens, $valueNode, failOnTruncatedStream: false);
         if (null === $scalar) {
@@ -71,7 +72,7 @@ final readonly class BlockScalarParser
         }
 
         $valueNode->addChild($scalar);
-        $this->multilinePlainScalarParser->appendMultilinePlainScalarContinuations($tokens, $valueNode, $parentIndentLen);
+        $this->multilinePlainScalarParser->appendMultilinePlainScalarContinuations($tokens, $valueNode, $parentIndent);
     }
 
     /**

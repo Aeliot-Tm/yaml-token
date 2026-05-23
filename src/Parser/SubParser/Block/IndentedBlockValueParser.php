@@ -20,9 +20,9 @@ use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Parser\Consumer;
+use Aeliot\YamlToken\Parser\Dto\IndentContext;
 use Aeliot\YamlToken\Parser\Dto\LookAheadResult;
 use Aeliot\YamlToken\Parser\Dto\ParseContext;
-use Aeliot\YamlToken\Parser\Enum\EspecialIndent;
 use Aeliot\YamlToken\Parser\Exception\IndentationInvalidException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
@@ -46,7 +46,7 @@ final readonly class IndentedBlockValueParser
     ) {
     }
 
-    public function parseIndentedBlockValue(ParseContext $parseContext, ValueNode $valueNode, int $parentIndentLen): void
+    public function parseIndentedBlockValue(ParseContext $parseContext, ValueNode $valueNode, IndentContext $parentIndent): void
     {
         $token = $parseContext->tokens->current();
         if (TokenType::NEWLINE !== $token?->type) {
@@ -59,12 +59,12 @@ final readonly class IndentedBlockValueParser
         }
 
         if ($head->indentLen > 0) {
-            $this->dispatchIndentedContent($parseContext, $valueNode, $parentIndentLen, $head, $token);
+            $this->dispatchIndentedContent($parseContext, $valueNode, $parentIndent, $head, $token);
 
             return;
         }
 
-        if (EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value === $parentIndentLen) {
+        if ($parentIndent->isBareDocumentRoot) {
             $this->dispatchBareDocumentContent($parseContext, $valueNode, $head->significantToken);
         }
     }
@@ -78,7 +78,7 @@ final readonly class IndentedBlockValueParser
         $this->lookAheadHelper->collectInsignificantIndentationLines($parseContext->tokens, $valueNode);
     }
 
-    private function consumeIndentedBlockScalarValue(ParseContext $parseContext, ValueNode $valueNode, int $parentIndentLen, bool $expectNodeProperties = false): void
+    private function consumeIndentedBlockScalarValue(ParseContext $parseContext, ValueNode $valueNode, IndentContext $parentIndent, bool $expectNodeProperties = false): void
     {
         $this->consumeBlockValueOpeningLayout($parseContext, $valueNode);
 
@@ -86,8 +86,8 @@ final readonly class IndentedBlockValueParser
         if (TokenType::INDENTATION !== $indentationToken?->type) {
             throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Expected INDENTATION for indented block %s value, but %s given', $expectNodeProperties ? 'tagged scalar' : 'scalar', $indentationToken?->type->value ?? '_nothing_'), $parseContext->tokens));
         }
-        if (\strlen($indentationToken->text) <= $parentIndentLen) {
-            throw new IndentationInvalidException($this->errorHelper->appendTokenLocation(\sprintf('Indented block %s must be deeper than parent key line indent (%d spaces)', $expectNodeProperties ? 'tagged scalar' : 'scalar', $parentIndentLen), $indentationToken));
+        if (\strlen($indentationToken->text) <= $parentIndent->indentLen) {
+            throw new IndentationInvalidException($this->errorHelper->appendTokenLocation(\sprintf('Indented block %s must be deeper than parent key line indent (%d spaces)', $expectNodeProperties ? 'tagged scalar' : 'scalar', $parentIndent->indentLen), $indentationToken));
         }
 
         $layoutPrefix = [];
@@ -129,7 +129,7 @@ final readonly class IndentedBlockValueParser
             throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Scalar expected for indented block %s, but %s given', $expectNodeProperties ? 'tagged scalar value' : 'value', $scalarToken?->type->value ?? '_nothing_'), $parseContext->tokens));
         }
 
-        $this->finishScalarWithPossibleMultiline($parseContext, $valueNode, $scalarToken, $parentIndentLen, $layoutPrefix);
+        $this->finishScalarWithPossibleMultiline($parseContext, $valueNode, $scalarToken, $parentIndent, $layoutPrefix);
     }
 
     private function dispatchBareDocumentContent(
@@ -142,7 +142,7 @@ final readonly class IndentedBlockValueParser
             $valueNode->addChild(
                 $this->registry
                     ->getBlockSequenceParser()
-                    ->parseBlockSequenceValue($parseContext, EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value),
+                    ->parseBlockSequenceValue($parseContext, IndentContext::createForBareDocument()),
             );
 
             return;
@@ -157,7 +157,7 @@ final readonly class IndentedBlockValueParser
             $valueNode->addChild(
                 $this->registry
                     ->getBlockMappingParser()
-                    ->parseBlockMappingValue($parseContext, EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value),
+                    ->parseBlockMappingValue($parseContext, IndentContext::createForBareDocument()),
             );
         }
     }
@@ -169,30 +169,30 @@ final readonly class IndentedBlockValueParser
     private function dispatchIndentedContent(
         ParseContext $parseContext,
         ValueNode $valueNode,
-        int $parentIndentLen,
+        IndentContext $parentIndent,
         LookAheadResult $head,
         Token $newlineToken,
     ): void {
-        if ($head->indentLen === $parentIndentLen && TokenType::SEQUENCE_ENTRY === $head->significantToken->type) {
+        if ($head->indentLen === $parentIndent->indentLen && TokenType::SEQUENCE_ENTRY === $head->significantToken->type) {
             $this->consumeBlockValueOpeningLayout($parseContext, $valueNode);
-            $valueNode->addChild($this->registry->getBlockSequenceParser()->parseBlockSequenceValue($parseContext, $parentIndentLen - 1, true));
+            $valueNode->addChild($this->registry->getBlockSequenceParser()->parseBlockSequenceValue($parseContext, IndentContext::createForBlock($parentIndent->indentLen - 1), true));
 
             return;
         }
 
-        if ($head->indentLen <= $parentIndentLen) {
+        if ($head->indentLen <= $parentIndent->indentLen) {
             return;
         }
 
         if ($this->nodePropertyIdentifier->isNodePropertyToken($head->significantToken) && $this->isNodePropertiesOnlyLine($parseContext, $head->peekOffset)) {
-            $this->parseNodePropertiesOnlyLine($parseContext, $valueNode, $parentIndentLen, $newlineToken);
+            $this->parseNodePropertiesOnlyLine($parseContext, $valueNode, $parentIndent, $newlineToken);
 
             return;
         }
 
         if (TokenType::SEQUENCE_ENTRY === $head->significantToken->type) {
             $this->consumeBlockValueOpeningLayout($parseContext, $valueNode);
-            $valueNode->addChild($this->registry->getBlockSequenceParser()->parseBlockSequenceValue($parseContext, $parentIndentLen));
+            $valueNode->addChild($this->registry->getBlockSequenceParser()->parseBlockSequenceValue($parseContext, $parentIndent));
 
             return;
         }
@@ -210,7 +210,7 @@ final readonly class IndentedBlockValueParser
             $this->nodePropertyIdentifier->isNodePropertyToken($head->significantToken)
             && !$this->nodePropertyIdentifier->isNodePropertiesFollowedByImplicitKeyFromOffset($parseContext, $head->peekOffset)
         ) {
-            $this->consumeIndentedBlockScalarValue($parseContext, $valueNode, $parentIndentLen, true);
+            $this->consumeIndentedBlockScalarValue($parseContext, $valueNode, $parentIndent, true);
 
             return;
         }
@@ -224,13 +224,13 @@ final readonly class IndentedBlockValueParser
             && !$this->multilineContinuationHelper
                 ->isImplicitYamlKeyOnContinuationLine($parseContext->tokens, $head->peekOffset)
         ) {
-            $this->consumeIndentedBlockScalarValue($parseContext, $valueNode, $parentIndentLen);
+            $this->consumeIndentedBlockScalarValue($parseContext, $valueNode, $parentIndent);
 
             return;
         }
 
         $this->consumeBlockValueOpeningLayout($parseContext, $valueNode);
-        $valueNode->addChild($this->registry->getBlockMappingParser()->parseBlockMappingValue($parseContext, $parentIndentLen));
+        $valueNode->addChild($this->registry->getBlockMappingParser()->parseBlockMappingValue($parseContext, $parentIndent));
     }
 
     /**
@@ -240,13 +240,13 @@ final readonly class IndentedBlockValueParser
         ParseContext $parseContext,
         ValueNode $valueNode,
         Token $scalarToken,
-        int $parentIndentLen,
+        IndentContext $parentIndent,
         array $layoutPrefix = [],
     ): void {
         if (
             TokenType::PLAIN_SCALAR === $scalarToken->type
             && $this->multilineContinuationHelper
-                ->isMultilinePlainContinuationAhead($parseContext->tokens, 1, $parentIndentLen)
+                ->isMultilinePlainContinuationAhead($parseContext->tokens, 1, $parentIndent)
         ) {
             $multiline = new MultilinePlainScalarNode();
             foreach ($layoutPrefix as $layoutNode) {
@@ -256,7 +256,7 @@ final readonly class IndentedBlockValueParser
             $parseContext->tokens->advance();
             $this->registry
                 ->getMultilinePlainScalarParser()
-                ->appendMultilinePlainScalarContinuations($parseContext->tokens, $multiline, $parentIndentLen);
+                ->appendMultilinePlainScalarContinuations($parseContext->tokens, $multiline, $parentIndent);
             $valueNode->addChild($multiline);
 
             return;
@@ -332,7 +332,7 @@ final readonly class IndentedBlockValueParser
     private function parseNodePropertiesOnlyLine(
         ParseContext $parseContext,
         ValueNode $valueNode,
-        int $parentIndentLen,
+        IndentContext $parentIndent,
         Token $newlineToken,
     ): void {
         $separatorContainer = $valueNode->getProperties() ?? $valueNode;
@@ -355,6 +355,6 @@ final readonly class IndentedBlockValueParser
             throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Expected NEWLINE after node properties, but %s given', $next?->type->value ?? '_nothing_'), $parseContext->tokens));
         }
 
-        $this->parseIndentedBlockValue($parseContext, $valueNode, $parentIndentLen);
+        $this->parseIndentedBlockValue($parseContext, $valueNode, $parentIndent);
     }
 }

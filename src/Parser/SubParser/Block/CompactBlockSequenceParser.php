@@ -16,6 +16,7 @@ namespace Aeliot\YamlToken\Parser\SubParser\Block;
 use Aeliot\YamlToken\Node\BlockSequenceEntryNode;
 use Aeliot\YamlToken\Node\BlockSequenceNode;
 use Aeliot\YamlToken\Node\IndentationNode;
+use Aeliot\YamlToken\Parser\Dto\IndentContext;
 use Aeliot\YamlToken\Parser\Dto\ParseContext;
 use Aeliot\YamlToken\Parser\Helper\BlockCollectionLoopHelper;
 use Aeliot\YamlToken\Parser\Helper\Identifier\SequenceIdentifier;
@@ -54,7 +55,7 @@ final readonly class CompactBlockSequenceParser
         $firstEntry->addChild(
             $this->registry
                 ->getSequenceEntryParser()
-                ->parseSequenceEntryValue($parseContext, $indentLen, $firstCompactIndent),
+                ->parseSequenceEntryValue($parseContext, IndentContext::createForBlock($indentLen), $firstCompactIndent),
         );
 
         while (!$parseContext->tokens->isEnd()) {
@@ -79,7 +80,7 @@ final readonly class CompactBlockSequenceParser
             $sequenceEntry->addChild(
                 $this->registry
                     ->getSequenceEntryParser()
-                    ->parseSequenceEntryValue($parseContext, $indentLen, $compactIndent),
+                    ->parseSequenceEntryValue($parseContext, IndentContext::createForBlock($indentLen), $compactIndent),
             );
         }
 
