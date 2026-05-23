@@ -89,24 +89,6 @@ final readonly class MultilinePlainScalarParser
     }
 
     /**
-     * Flow-context multiline plain key (YAML 1.2.2 §7.3.3 / §7.4.1): NEWLINE WHITESPACE* PLAIN_SCALAR
-     * fragments may follow the first scalar. Returns the head scalar when no continuation is consumed,
-     * otherwise a {@see MultilinePlainScalarNode} that wraps the head plus consumed fragments.
-     */
-    public function buildFlowKeyMultilinePlainScalarName(TokenStreamInterface $tokens, PlainScalarNode $head): Node
-    {
-        $multiline = new MultilinePlainScalarNode();
-        $multiline->addChild($head);
-
-        $consumedAny = false;
-        while ($this->tryConsumeFlowKeyMultilinePlainScalarLine($tokens, $multiline)) {
-            $consumedAny = true;
-        }
-
-        return $consumedAny ? $multiline : $head;
-    }
-
-    /**
      * Builds the {@see \Aeliot\YamlToken\Node\KeyNode} name node for a leading scalar key token, eagerly
      * consuming any multiline plain-scalar continuation lines.
      */
@@ -124,7 +106,7 @@ final readonly class MultilinePlainScalarParser
         }
 
         if (null === $entryIndentLen) {
-            return $this->buildFlowKeyMultilinePlainScalarName($tokens, $head);
+            return $this->registry->getFlowMultilinePlainScalarHelper()->buildFlowKeyMultilinePlainScalarName($tokens, $head);
         }
 
         if ($hasExplicitKeyIndicator) {
@@ -132,60 +114,6 @@ final readonly class MultilinePlainScalarParser
         }
 
         return $head;
-    }
-
-    public function tryConsumeFlowKeyMultilinePlainScalarLine(TokenStreamInterface $tokens, MultilinePlainScalarNode $multiline): bool
-    {
-        return $this->tryConsumeFlowMultilinePlainScalarLine($tokens, $multiline, false);
-    }
-
-    /**
-     * Flow-context multiline plain value (YAML 1.2.2 §7.3.3 / §7.4.1): NEWLINE WHITESPACE* PLAIN_SCALAR
-     * fragments may follow the first scalar. Unlike {@see tryConsumeFlowKeyMultilinePlainScalarLine},
-     * the continuation must not be a flow-pair key (PLAIN_SCALAR followed by VALUE_INDICATOR).
-     */
-    public function tryConsumeFlowValueMultilinePlainScalarLine(TokenStreamInterface $tokens, MultilinePlainScalarNode $multiline): bool
-    {
-        return $this->tryConsumeFlowMultilinePlainScalarLine($tokens, $multiline, true);
-    }
-
-    private function tryConsumeFlowMultilinePlainScalarLine(
-        TokenStreamInterface $tokens,
-        MultilinePlainScalarNode $multiline,
-        bool $rejectValueIndicatorAfterScalar,
-    ): bool {
-        if (TokenType::NEWLINE !== $tokens->current()?->type) {
-            return false;
-        }
-
-        $scalarOffset = $this->peekOffsetHelper->skipWhitespaceOffset($tokens, 1);
-        $scalarToken = $tokens->peek($scalarOffset);
-        if (TokenType::PLAIN_SCALAR !== $scalarToken?->type) {
-            return false;
-        }
-
-        if ($rejectValueIndicatorAfterScalar) {
-            $afterScalar = $this->peekOffsetHelper->skipWhitespaceOffset($tokens, $scalarOffset + 1);
-            if (TokenType::VALUE_INDICATOR === $tokens->peek($afterScalar)?->type) {
-                return false;
-            }
-        }
-
-        $newLine = $tokens->current();
-        $multiline->addChild(new NewLineNode($newLine));
-        $tokens->advance();
-
-        $contentHead = $tokens->current();
-        while (TokenType::WHITESPACE === $contentHead->type) {
-            $multiline->addChild(new WhitespaceNode($contentHead));
-            $tokens->advance();
-            $contentHead = $tokens->current();
-        }
-
-        $multiline->addChild($this->nodeFactory->createScalarNode($scalarToken));
-        $tokens->advance();
-
-        return true;
     }
 
     private function appendWhitespaceThenScalar(TokenStreamInterface $tokens, Node $targetNode): void

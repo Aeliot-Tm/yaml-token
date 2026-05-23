@@ -19,6 +19,7 @@ use Aeliot\YamlToken\Parser\Helper\AnchorPostProcessor;
 use Aeliot\YamlToken\Parser\Helper\BlockCollectionLoopHelper;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
 use Aeliot\YamlToken\Parser\Helper\FlowCollectionHelper;
+use Aeliot\YamlToken\Parser\Helper\FlowMultilinePlainScalarHelper;
 use Aeliot\YamlToken\Parser\Helper\Identifier\BlockStructureIdentifier;
 use Aeliot\YamlToken\Parser\Helper\Identifier\FlowStructureIdentifier;
 use Aeliot\YamlToken\Parser\Helper\Identifier\KeyIdentifier;
@@ -163,6 +164,11 @@ final class ParserAssembler
     public function createFlowMappingParser(ParserRegistry $registry): FlowMappingParser
     {
         return new FlowMappingParser($this->getFlowCollectionHelper(), $registry);
+    }
+
+    public function createFlowMultilinePlainScalarHelper(): FlowMultilinePlainScalarHelper
+    {
+        return new FlowMultilinePlainScalarHelper($this->nodeFactory, $this->peekOffsetHelper);
     }
 
     public function createFlowSequenceParser(ParserRegistry $registry): FlowSequenceParser

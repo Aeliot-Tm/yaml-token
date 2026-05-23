@@ -121,8 +121,6 @@ final readonly class ValueParser
         int $parentIndentLen,
         Token $token,
     ): void {
-        $multilinePlainScalarParser = $this->registry->getMultilinePlainScalarParser();
-
         if (
             TokenType::PLAIN_SCALAR === $token->type
             && $this->multilineContinuationHelper
@@ -131,7 +129,7 @@ final readonly class ValueParser
             $multiline = new MultilinePlainScalarNode();
             $multiline->addChild($this->nodeFactory->createScalarNode($token));
             $parseContext->tokens->advance();
-            $multilinePlainScalarParser->appendMultilinePlainScalarContinuations($parseContext->tokens, $multiline, $parentIndentLen);
+            $this->registry->getMultilinePlainScalarParser()->appendMultilinePlainScalarContinuations($parseContext->tokens, $multiline, $parentIndentLen);
             $valueNode->addChild($multiline);
         } elseif (
             TokenType::PLAIN_SCALAR === $token->type
@@ -142,7 +140,7 @@ final readonly class ValueParser
             $multiline = new MultilinePlainScalarNode();
             $multiline->addChild($head);
             $consumedAny = false;
-            while ($multilinePlainScalarParser->tryConsumeFlowValueMultilinePlainScalarLine($parseContext->tokens, $multiline)) {
+            while ($this->registry->getFlowMultilinePlainScalarHelper()->tryConsumeFlowValueMultilinePlainScalarLine($parseContext->tokens, $multiline)) {
                 $consumedAny = true;
             }
             $valueNode->addChild($consumedAny ? $multiline : $head);

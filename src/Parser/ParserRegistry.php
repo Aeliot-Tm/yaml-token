@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Aeliot\YamlToken\Parser;
 
 use Aeliot\YamlToken\Parser\Assembler\ParserAssembler;
+use Aeliot\YamlToken\Parser\Helper\FlowMultilinePlainScalarHelper;
 use Aeliot\YamlToken\Parser\SubParser\Block\BlockMappingParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\BlockSequenceParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\CompactBlockMappingParser;
@@ -48,6 +49,7 @@ final class ParserRegistry
     private ?FlowEntryParser $flowEntryParser = null;
     private ?FlowMappingPairParser $flowMappingPairParser = null;
     private ?FlowMappingParser $flowMappingParser = null;
+    private ?FlowMultilinePlainScalarHelper $flowMultilinePlainScalarHelper = null;
     private ?FlowSequenceParser $flowSequenceParser = null;
     private ?IndentedBlockValueParser $indentedBlockValueParser = null;
     private ?KeyParser $keyParser = null;
@@ -113,6 +115,11 @@ final class ParserRegistry
     public function getFlowMappingParser(): FlowMappingParser
     {
         return $this->flowMappingParser ??= $this->assembler->createFlowMappingParser($this);
+    }
+
+    public function getFlowMultilinePlainScalarHelper(): FlowMultilinePlainScalarHelper
+    {
+        return $this->flowMultilinePlainScalarHelper ??= $this->assembler->createFlowMultilinePlainScalarHelper();
     }
 
     public function getFlowSequenceParser(): FlowSequenceParser
