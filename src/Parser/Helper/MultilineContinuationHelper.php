@@ -19,6 +19,15 @@ use Aeliot\YamlToken\Parser\Enum\EspecialIndent;
 
 final readonly class MultilineContinuationHelper
 {
+    public function isAnyContinuationAt(TokenStreamProxy $tokens, int $offset, int $parentIndentLen): bool
+    {
+        return $this->isIndentedMultilinePlainContinuationAt($tokens, $offset, $parentIndentLen)
+            || (
+                EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value === $parentIndentLen
+                && $this->isBareDocumentFlushMultilinePlainContinuationAt($tokens, $offset)
+            );
+    }
+
     public function isBareDocumentFlushMultilinePlainContinuationAt(TokenStreamProxy $tokens, int $scalarPeekOffset): bool
     {
         $offset = $scalarPeekOffset;
@@ -104,11 +113,7 @@ final readonly class MultilineContinuationHelper
         }
 
         if (TokenType::NEWLINE === $tokens->peek($offset + 1)?->type) {
-            return $this->isIndentedMultilinePlainContinuationAt($tokens, $offset + 2, $parentIndentLen)
-                || (
-                    EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value === $parentIndentLen
-                    && $this->isBareDocumentFlushMultilinePlainContinuationAt($tokens, $offset + 2)
-                );
+            return $this->isAnyContinuationAt($tokens, $offset + 2, $parentIndentLen);
         }
 
         $maybeIndent = $tokens->peek($offset + 1);
@@ -118,18 +123,10 @@ final readonly class MultilineContinuationHelper
                 ++$afterIndentOffset;
             }
             if (TokenType::NEWLINE === $tokens->peek($afterIndentOffset)?->type) {
-                return $this->isIndentedMultilinePlainContinuationAt($tokens, $afterIndentOffset + 1, $parentIndentLen)
-                    || (
-                        EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value === $parentIndentLen
-                        && $this->isBareDocumentFlushMultilinePlainContinuationAt($tokens, $afterIndentOffset + 1)
-                    );
+                return $this->isAnyContinuationAt($tokens, $afterIndentOffset + 1, $parentIndentLen);
             }
         }
 
-        return $this->isIndentedMultilinePlainContinuationAt($tokens, $offset + 1, $parentIndentLen)
-            || (
-                EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value === $parentIndentLen
-                && $this->isBareDocumentFlushMultilinePlainContinuationAt($tokens, $offset + 1)
-            );
+        return $this->isAnyContinuationAt($tokens, $offset + 1, $parentIndentLen);
     }
 }

@@ -63,13 +63,7 @@ final readonly class MultilinePlainScalarParser implements SubParserInterface
             $newLine = $tokens->current();
 
             if (TokenType::NEWLINE === $tokens->peek(1)?->type) {
-                $continuesAfterBlankLine =
-                    $this->multilineContinuationHelper->isIndentedMultilinePlainContinuationAt($tokens, 2, $parentIndentLen)
-                    || (
-                        EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value === $parentIndentLen
-                        && $this->multilineContinuationHelper->isBareDocumentFlushMultilinePlainContinuationAt($tokens, 2)
-                    );
-                if (!$continuesAfterBlankLine) {
+                if (!$this->multilineContinuationHelper->isAnyContinuationAt($tokens, 2, $parentIndentLen)) {
                     break;
                 }
 
@@ -86,13 +80,7 @@ final readonly class MultilinePlainScalarParser implements SubParserInterface
                 }
                 if (
                     TokenType::NEWLINE === $tokens->peek($afterIndentOffset)?->type
-                    && (
-                        $this->multilineContinuationHelper->isIndentedMultilinePlainContinuationAt($tokens, $afterIndentOffset + 1, $parentIndentLen)
-                        || (
-                            EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT->value === $parentIndentLen
-                            && $this->multilineContinuationHelper->isBareDocumentFlushMultilinePlainContinuationAt($tokens, $afterIndentOffset + 1)
-                        )
-                    )
+                    && $this->multilineContinuationHelper->isAnyContinuationAt($tokens, $afterIndentOffset + 1, $parentIndentLen)
                 ) {
                     $targetNode->addChild(new NewLineNode($newLine));
                     $tokens->advance();
