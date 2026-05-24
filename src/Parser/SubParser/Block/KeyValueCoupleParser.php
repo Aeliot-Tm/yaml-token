@@ -74,7 +74,7 @@ final readonly class KeyValueCoupleParser
             if (null !== $head) {
                 $headIndentLen = $head->indentLen;
                 $significantToken = $head->significantToken;
-                if (TokenType::VALUE_INDICATOR === $significantToken->type && $headIndentLen === $entryIndentLen) {
+                if (TokenType::VALUE_INDICATOR === $significantToken->type && $headIndentLen === $indentLen) {
                     $this->consumer->collectTypes($parseContext->tokens, [
                         TokenType::COMMENT,
                         TokenType::INDENTATION,
@@ -90,7 +90,7 @@ final readonly class KeyValueCoupleParser
             null !== $afterKey
             && null !== $keyValueCouple->getKey()->getExplicitKeyIndicatorNode()
             && TokenType::INDENTATION === $afterKey->type
-            && \strlen($afterKey->text) === $entryIndentLen
+            && \strlen($afterKey->text) === $indentLen
             && TokenType::VALUE_INDICATOR === $parseContext->tokens->peek(1)?->type
         ) {
             $this->consumer->collectTypes($parseContext->tokens, [TokenType::INDENTATION], $keyValueCouple);

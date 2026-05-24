@@ -167,7 +167,19 @@ final readonly class ValueParser
         } elseif (TokenType::NEWLINE === $token->type) {
             $this->parseNewlinePayload($parseContext, $valueNode, $parentIndent);
         } elseif ($token->type->isScalar()) {
-            $this->parsePlainScalarPayload($parseContext, $valueNode, $parentIndent, $token);
+            if (
+                !$parentIndent->isFlowCollection
+                && TokenType::PLAIN_SCALAR === $token->type
+                && $this->multilineContinuationHelper->isImplicitYamlKeyOnContinuationLine($parseContext->tokens, 0)
+            ) {
+                $valueNode->addChild(
+                    $this->registry
+                        ->getCompactBlockMappingParser()
+                        ->parseCompactBlockMapping($parseContext, $token->column - 1),
+                );
+            } else {
+                $this->parsePlainScalarPayload($parseContext, $valueNode, $parentIndent, $token);
+            }
         } elseif (TokenType::ALIAS === $token->type) {
             $aliasNode = $this->aliasResolver->resolveAlias($parseContext, $token);
             $valueNode->addChild($aliasNode);

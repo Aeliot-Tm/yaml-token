@@ -231,6 +231,16 @@ final readonly class ExplicitKeyParser
             return;
         }
 
+        if (
+            null !== $entryIndentLen
+            && TokenType::PLAIN_SCALAR === $token->type
+            && $this->multilineContinuationHelper->isImplicitYamlKeyOnContinuationLine($parseContext->tokens, 0)
+        ) {
+            $keyNode->setName($this->registry->getCompactBlockMappingParser()->parseCompactBlockMapping($parseContext, $token->column - 1));
+
+            return;
+        }
+
         if (!$token->type->isScalar() && !$token->type->isMergeIndicator()) {
             return;
         }
