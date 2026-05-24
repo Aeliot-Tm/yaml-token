@@ -15,7 +15,7 @@ namespace Aeliot\YamlToken\Node;
 
 use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
 
-class KeyNode extends AbstractNode
+class KeyNode extends AbstractNode implements NodePropertiesHolderInterface
 {
     private ?ExplicitKeyIndicatorNode $explicitKeyIndicatorNode = null;
     private ?Node $name = null;

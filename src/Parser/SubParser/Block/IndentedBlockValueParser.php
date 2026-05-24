@@ -96,7 +96,7 @@ final readonly class IndentedBlockValueParser
             $valueNode->addChild(new IndentationNode($indentationToken));
             $parseContext->tokens->advance();
 
-            $this->registry->getNodePropertiesParser()->collectValueProperties($parseContext, $valueNode);
+            $this->registry->getNodePropertiesParser()->collectProperties($parseContext, $valueNode);
 
             if ($anchor = $valueNode->getAnchor()) {
                 $parseContext->anchorsRegistry->anchors[$anchor->getName()] = $anchor;
@@ -348,7 +348,7 @@ final readonly class IndentedBlockValueParser
         $separatorContainer->addChild(new IndentationNode($indentationToken));
         $parseContext->tokens->advance();
 
-        $this->registry->getNodePropertiesParser()->collectValueProperties($parseContext, $valueNode);
+        $this->registry->getNodePropertiesParser()->collectProperties($parseContext, $valueNode);
 
         $next = $parseContext->tokens->current();
         if (null === $next || TokenType::NEWLINE !== $next->type) {

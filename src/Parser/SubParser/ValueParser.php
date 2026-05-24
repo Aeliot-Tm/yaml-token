@@ -48,7 +48,7 @@ final readonly class ValueParser
     {
         $valueNode = new ValueNode();
 
-        $this->registry->getNodePropertiesParser()->collectValueProperties($parseContext, $valueNode);
+        $this->registry->getNodePropertiesParser()->collectProperties($parseContext, $valueNode);
 
         if ($anchor = $valueNode->getAnchor()) {
             $parseContext->anchorsRegistry->anchors[$anchor->getName()] = $anchor;

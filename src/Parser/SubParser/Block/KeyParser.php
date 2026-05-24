@@ -42,7 +42,7 @@ final readonly class KeyParser
     public function getKeyNode(ParseContext $parseContext, ?int $entryIndentLen = null): KeyNode
     {
         $keyNode = new KeyNode();
-        $this->nodePropertiesParser->collectKeyProperties($parseContext, $keyNode);
+        $this->nodePropertiesParser->collectProperties($parseContext, $keyNode);
         $token = $parseContext->tokens->current();
 
         if (TokenType::EXPLICIT_KEY_INDICATOR === $token->type) {
@@ -55,7 +55,7 @@ final readonly class KeyParser
                 $parseContext->tokens->advance();
             }
 
-            $this->nodePropertiesParser->collectKeyProperties($parseContext, $keyNode);
+            $this->nodePropertiesParser->collectProperties($parseContext, $keyNode);
             $this->parseExplicitKeyContent($parseContext, $keyNode, $entryIndentLen);
         } else {
             $this->parseImplicitKeyContent($parseContext, $keyNode, $entryIndentLen);
