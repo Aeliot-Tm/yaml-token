@@ -69,6 +69,59 @@ final readonly class ExplicitKeyParser
         $this->parseContent($parseContext, $keyNode, $entryIndentLen);
     }
 
+    /**
+     * YAML 1.2.2 §8.2.2: explicit block key whose body starts on a following line
+     * (after optional same-line trailing comment).
+     */
+    public function parseIndentedKeyBodyIfPresent(ParseContext $parseContext, KeyNode $keyNode, int $entryIndentLen): void
+    {
+        if (null !== $keyNode->getName()) {
+            return;
+        }
+
+        $this->consumeSameLineTrailingCommentForBlockExplicitKey($parseContext, $keyNode);
+
+        $token = $parseContext->tokens->current();
+        if (TokenType::NEWLINE !== $token?->type) {
+            return;
+        }
+
+        $head = $this->lookAheadHelper->peekFirstSignificantBlockHead($parseContext->tokens, 1);
+        if (null === $head) {
+            return;
+        }
+
+        $indentLen = $head->indentLen;
+        $significantToken = $head->significantToken;
+        $scalarPeekOffset = $head->peekOffset;
+        if ($indentLen <= $entryIndentLen) {
+            return;
+        }
+
+        if (TokenType::SEQUENCE_ENTRY === $significantToken->type) {
+            $keyNode->setName($this->registry->getBlockSequenceParser()->parseBlockSequenceValue($parseContext, IndentContext::createForBlock($entryIndentLen)));
+
+            return;
+        }
+
+        if (
+            TokenType::EXPLICIT_KEY_INDICATOR === $significantToken->type
+            || TokenType::MERGE_INDICATOR === $significantToken->type
+        ) {
+            $keyNode->setName($this->registry->getBlockMappingParser()->parseBlockMappingValue($parseContext, IndentContext::createForBlock($entryIndentLen)));
+
+            return;
+        }
+
+        if ($significantToken->type->isScalar()) {
+            if ($this->multilineContinuationHelper->isImplicitYamlKeyOnContinuationLine($parseContext->tokens, $scalarPeekOffset)) {
+                $keyNode->setName($this->registry->getBlockMappingParser()->parseBlockMappingValue($parseContext, IndentContext::createForBlock($entryIndentLen)));
+            } else {
+                $this->consumeExplicitKeyMultilinePlainScalar($parseContext->tokens, $keyNode, $entryIndentLen);
+            }
+        }
+    }
+
     private function buildExplicitBlockKeyMultilinePlainScalarName(
         TokenStreamInterface $tokens,
         PlainScalarNode $head,
@@ -152,48 +205,23 @@ final readonly class ExplicitKeyParser
         }
     }
 
+    private function consumeSameLineTrailingCommentForBlockExplicitKey(ParseContext $parseContext, KeyNode $keyNode): void
+    {
+        if (TokenType::COMMENT === $parseContext->tokens->current()?->type) {
+            $this->consumer->collectTypes($parseContext->tokens, [TokenType::COMMENT], $keyNode);
+        }
+    }
+
     private function parseContent(ParseContext $parseContext, KeyNode $keyNode, ?int $entryIndentLen): void
     {
-        $token = $parseContext->tokens->current();
-
-        if (null !== $entryIndentLen && TokenType::NEWLINE === $token->type) {
-            $head = $this->lookAheadHelper->peekFirstSignificantBlockHead($parseContext->tokens, 1);
-            if (null === $head) {
+        if (null !== $entryIndentLen) {
+            $this->parseIndentedKeyBodyIfPresent($parseContext, $keyNode, $entryIndentLen);
+            if (null !== $keyNode->getName()) {
                 return;
             }
-
-            $indentLen = $head->indentLen;
-            $significantToken = $head->significantToken;
-            $scalarPeekOffset = $head->peekOffset;
-            if ($indentLen <= $entryIndentLen) {
-                return;
-            }
-
-            if (TokenType::SEQUENCE_ENTRY === $significantToken->type) {
-                $keyNode->setName($this->registry->getBlockSequenceParser()->parseBlockSequenceValue($parseContext, IndentContext::createForBlock($entryIndentLen)));
-
-                return;
-            }
-
-            if (
-                TokenType::EXPLICIT_KEY_INDICATOR === $significantToken->type
-                || TokenType::MERGE_INDICATOR === $significantToken->type
-            ) {
-                $keyNode->setName($this->registry->getBlockMappingParser()->parseBlockMappingValue($parseContext, IndentContext::createForBlock($entryIndentLen)));
-
-                return;
-            }
-
-            if ($significantToken->type->isScalar()) {
-                if ($this->multilineContinuationHelper->isImplicitYamlKeyOnContinuationLine($parseContext->tokens, $scalarPeekOffset)) {
-                    $keyNode->setName($this->registry->getBlockMappingParser()->parseBlockMappingValue($parseContext, IndentContext::createForBlock($entryIndentLen)));
-                } else {
-                    $this->consumeExplicitKeyMultilinePlainScalar($parseContext->tokens, $keyNode, $entryIndentLen);
-                }
-            }
-
-            return;
         }
+
+        $token = $parseContext->tokens->current();
 
         if (TokenType::VALUE_INDICATOR === $token->type) {
             return;

@@ -96,6 +96,18 @@ final readonly class KeyValueCoupleParser
             $this->consumer->collectTypes($parseContext->tokens, [TokenType::INDENTATION], $keyValueCouple);
         }
 
+        if (
+            null !== $keyValueCouple->getKey()->getExplicitKeyIndicatorNode()
+            && null === $keyValueCouple->getKey()->getName()
+            && TokenType::VALUE_INDICATOR !== $parseContext->tokens->current()?->type
+        ) {
+            $this->registry->getExplicitKeyParser()->parseIndentedKeyBodyIfPresent(
+                $parseContext,
+                $keyValueCouple->getKey(),
+                $entryIndentLen,
+            );
+        }
+
         $this->consumer->collectTypes($parseContext->tokens, [TokenType::VALUE_INDICATOR, TokenType::WHITESPACE], $keyValueCouple);
         $keyValueCouple->addChild($this->registry->getValueParser()->parseValue($parseContext, IndentContext::createForBlock($indentLen)));
         $this->anchorPostProcessor->postProcessKeyValueCouple($parseContext->anchorsRegistry, $keyValueCouple);

@@ -1,0 +1,4 @@
+? # key-line-comment
+ - x
+: # value-line-comment
+ - y

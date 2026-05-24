@@ -105,7 +105,7 @@ Inside each document, all content paths converge on `ValueParser::parseValue()`:
 | `CompactBlockMappingParser` | Compact mapping nested after `- ` |
 | `CompactBlockSequenceParser` | Compact nested sequence after `- ` |
 | `KeyParser` | One key: dispatches to explicit or implicit key parser |
-| `ExplicitKeyParser` | Explicit key with `?` indicator |
+| `ExplicitKeyParser` | Explicit key with `?` indicator; same-line trailing comment before an indented key body; deferred `:` at the couple indent (YAML 1.2.2 §8.2.2) |
 | `ImplicitKeyParser` | Implicit key (scalar, alias, or flow collection as key) |
 | `KeyValueCoupleParser` | One `key: value` pair |
 | `SequenceEntryParser` | One `- value` sequence entry |
@@ -202,6 +202,15 @@ A block scalar (`|` / `>`) is assembled as `BlockScalarEntryNode`:
 
 When the stream ends before the newline that follows the header, the entry is returned
 with only the options child and no scalar payload.
+
+### Explicit block keys split across lines
+
+When `?` starts a block mapping entry and the key body is on following lines (for example a block
+sequence or mapping at a greater indent), a same-line trailing comment after `?` is attached to
+`KeyNode` and does not end key parsing. `KeyValueCoupleParser` finishes the indented key body via
+`ExplicitKeyParser::parseIndentedKeyBodyIfPresent` when needed, then collects a deferred `:`
+at the same indent as the `?` line before parsing the value (see
+`tests/fixture/edge_cases_extra/explicit-key-same-line-comment-indented-body.yaml`).
 
 ### Multiline Plain Scalars
 
