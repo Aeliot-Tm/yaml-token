@@ -11,7 +11,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace Aeliot\YamlToken\Parser;
+namespace Aeliot\YamlToken\Parser\SubParser;
 
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\Node;

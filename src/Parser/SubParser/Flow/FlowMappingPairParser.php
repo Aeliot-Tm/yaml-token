@@ -20,7 +20,6 @@ use Aeliot\YamlToken\Parser\Assembler\ParserRegistry;
 use Aeliot\YamlToken\Parser\Dto\IndentContext;
 use Aeliot\YamlToken\Parser\Dto\ParseContext;
 use Aeliot\YamlToken\Parser\Helper\AnchorPostProcessor;
-use Aeliot\YamlToken\Parser\Helper\FlowValueIndicatorConsumer;
 use Aeliot\YamlToken\Parser\Helper\Identifier\FlowStructureIdentifier;
 
 final readonly class FlowMappingPairParser

@@ -20,7 +20,6 @@ use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Parser\Assembler\ParserRegistry;
-use Aeliot\YamlToken\Parser\Consumer;
 use Aeliot\YamlToken\Parser\Dto\IndentContext;
 use Aeliot\YamlToken\Parser\Dto\LookAheadResult;
 use Aeliot\YamlToken\Parser\Dto\ParseContext;
@@ -31,6 +30,7 @@ use Aeliot\YamlToken\Parser\Helper\Identifier\NodePropertyIdentifier;
 use Aeliot\YamlToken\Parser\Helper\LookAheadHelper;
 use Aeliot\YamlToken\Parser\Helper\MultilineContinuationHelper;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
+use Aeliot\YamlToken\Parser\SubParser\Consumer;
 use Aeliot\YamlToken\Token\Token;
 
 final readonly class IndentedBlockValueParser

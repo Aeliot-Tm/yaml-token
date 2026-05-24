@@ -18,7 +18,6 @@ use Aeliot\YamlToken\Node\TagDirectiveHandleNode;
 use Aeliot\YamlToken\Node\TagDirectiveIndicatorNode;
 use Aeliot\YamlToken\Node\TagDirectiveNode;
 use Aeliot\YamlToken\Node\TagDirectivePrefixNode;
-use Aeliot\YamlToken\Parser\Consumer;
 use Aeliot\YamlToken\Parser\Dto\ParseContext;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedEndException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;

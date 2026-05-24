@@ -17,7 +17,6 @@ use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\MultilinePlainScalarNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Parser\Assembler\ParserRegistry;
-use Aeliot\YamlToken\Parser\Consumer;
 use Aeliot\YamlToken\Parser\Dto\IndentContext;
 use Aeliot\YamlToken\Parser\Dto\ParseContext;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;

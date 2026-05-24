@@ -13,14 +13,12 @@ declare(strict_types=1);
 
 namespace Aeliot\YamlToken\Parser\Assembler;
 
-use Aeliot\YamlToken\Parser\Consumer;
 use Aeliot\YamlToken\Parser\Helper\AliasResolver;
 use Aeliot\YamlToken\Parser\Helper\AnchorPostProcessor;
 use Aeliot\YamlToken\Parser\Helper\BlockCollectionLoopHelper;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
 use Aeliot\YamlToken\Parser\Helper\FlowCollectionHelper;
 use Aeliot\YamlToken\Parser\Helper\FlowMultilinePlainScalarHelper;
-use Aeliot\YamlToken\Parser\Helper\FlowValueIndicatorConsumer;
 use Aeliot\YamlToken\Parser\Helper\Identifier\BlockStructureIdentifier;
 use Aeliot\YamlToken\Parser\Helper\Identifier\FlowStructureIdentifier;
 use Aeliot\YamlToken\Parser\Helper\Identifier\KeyIdentifier;
@@ -38,11 +36,13 @@ use Aeliot\YamlToken\Parser\SubParser\Block\IndentedBlockValueParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\KeyParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\KeyValueCoupleParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\SequenceEntryParser;
+use Aeliot\YamlToken\Parser\SubParser\Consumer;
 use Aeliot\YamlToken\Parser\SubParser\DocumentParser;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowEntryParser;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowMappingPairParser;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowMappingParser;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowSequenceParser;
+use Aeliot\YamlToken\Parser\SubParser\Flow\FlowValueIndicatorConsumer;
 use Aeliot\YamlToken\Parser\SubParser\MergeInstructionParser;
 use Aeliot\YamlToken\Parser\SubParser\NodePropertiesParser;
 use Aeliot\YamlToken\Parser\SubParser\Scalar\BlockScalarParser;

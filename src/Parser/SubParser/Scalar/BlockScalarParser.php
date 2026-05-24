@@ -21,11 +21,11 @@ use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\ValueNode;
-use Aeliot\YamlToken\Parser\Consumer;
 use Aeliot\YamlToken\Parser\Dto\IndentContext;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
+use Aeliot\YamlToken\Parser\SubParser\Consumer;
 use Aeliot\YamlToken\Token\TokenStreamInterface;
 
 final readonly class BlockScalarParser

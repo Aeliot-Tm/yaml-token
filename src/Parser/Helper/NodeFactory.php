@@ -54,8 +54,8 @@ final readonly class NodeFactory
     }
 
     /**
-     * Wraps layout/indicator tokens collected by {@see \Aeliot\YamlToken\Parser\Consumer::collectTypes()}
-     * and {@see \Aeliot\YamlToken\Parser\Consumer::collectUntil()} with their corresponding nodes.
+     * Wraps layout/indicator tokens collected by {@see \Aeliot\YamlToken\Parser\SubParser\Consumer::collectTypes()}
+     * and {@see \Aeliot\YamlToken\Parser\SubParser\Consumer::collectUntil()} with their corresponding nodes.
      * Only token types that those collectors can deliver are listed here; structural tokens
      * (anchors, tags, block scalar indicators) are wrapped at their dedicated parsing call sites
      * and never reach this method.

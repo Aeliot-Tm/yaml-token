@@ -16,8 +16,8 @@ namespace Aeliot\YamlToken\Parser\Helper;
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\IndentationNode;
 use Aeliot\YamlToken\Node\Node;
-use Aeliot\YamlToken\Parser\Consumer;
 use Aeliot\YamlToken\Parser\Dto\LookAheadResult;
+use Aeliot\YamlToken\Parser\SubParser\Consumer;
 use Aeliot\YamlToken\Token\TokenStreamInterface;
 
 final readonly class LookAheadHelper

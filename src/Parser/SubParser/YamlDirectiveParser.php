@@ -16,7 +16,6 @@ namespace Aeliot\YamlToken\Parser\SubParser;
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\YamlDirectiveIndicatorNode;
 use Aeliot\YamlToken\Node\YamlDirectiveNode;
-use Aeliot\YamlToken\Parser\Consumer;
 use Aeliot\YamlToken\Parser\Dto\ParseContext;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedEndException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;

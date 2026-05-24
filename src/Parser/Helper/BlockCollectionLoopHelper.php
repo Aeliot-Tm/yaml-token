@@ -15,13 +15,13 @@ namespace Aeliot\YamlToken\Parser\Helper;
 
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\Node;
-use Aeliot\YamlToken\Parser\Consumer;
 use Aeliot\YamlToken\Parser\Dto\IndentContext;
 use Aeliot\YamlToken\Parser\Dto\ParseContext;
 use Aeliot\YamlToken\Parser\Dto\ParseState;
 use Aeliot\YamlToken\Parser\Exception\IndentationInvalidException;
 use Aeliot\YamlToken\Parser\Exception\IndentationOverrideException;
 use Aeliot\YamlToken\Parser\Exception\IndentationUndefinedException;
+use Aeliot\YamlToken\Parser\SubParser\Consumer;
 use Aeliot\YamlToken\Token\TokenStreamInterface;
 
 final readonly class BlockCollectionLoopHelper
