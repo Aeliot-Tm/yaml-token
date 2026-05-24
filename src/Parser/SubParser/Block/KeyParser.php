@@ -100,7 +100,7 @@ final readonly class KeyParser
                 if ($this->multilineContinuationHelper->isImplicitYamlKeyOnContinuationLine($parseContext->tokens, $scalarPeekOffset)) {
                     $keyNode->setName($this->registry->getBlockMappingParser()->parseBlockMappingValue($parseContext, IndentContext::createForBlock($entryIndentLen)));
                 } else {
-                    $this->registry->getBlockScalarParser()->consumeExplicitKeyMultilinePlainScalar($parseContext->tokens, $keyNode, $entryIndentLen);
+                    $this->registry->getMultilinePlainScalarParser()->consumeExplicitKeyMultilinePlainScalar($parseContext->tokens, $keyNode, $entryIndentLen);
                 }
             }
 

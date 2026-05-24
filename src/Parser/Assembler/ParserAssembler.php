@@ -96,7 +96,6 @@ final class ParserAssembler
             $this->errorHelper,
             $registry->getMultilinePlainScalarParser(),
             $this->nodeFactory,
-            $this->peekOffsetHelper,
         );
     }
 

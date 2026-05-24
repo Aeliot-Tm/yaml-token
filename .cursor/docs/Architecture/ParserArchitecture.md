@@ -148,8 +148,8 @@ class defines its own `parse()` (or similarly named) signature.
 | Class | Responsibility |
 |-------|----------------|
 | [`SimpleScalarParser`](../../../src/Parser/SubParser/Scalar/SimpleScalarParser.php) | Single plain, single-quoted, or double-quoted scalar token |
-| [`MultilinePlainScalarParser`](../../../src/Parser/SubParser/Scalar/MultilinePlainScalarParser.php) | Multiline plain scalars and continuation lines |
-| [`BlockScalarParser`](../../../src/Parser/SubParser/Scalar/BlockScalarParser.php) | Block scalar keys (`\|` / `>`) |
+| [`MultilinePlainScalarParser`](../../../src/Parser/SubParser/Scalar/MultilinePlainScalarParser.php) | Multiline plain scalars, continuation lines, explicit-block-key plain scalars |
+| [`BlockScalarParser`](../../../src/Parser/SubParser/Scalar/BlockScalarParser.php) | Block scalars (`\|` / `>`) as mapping keys and values |
 
 ## Helpers
 
