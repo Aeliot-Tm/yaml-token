@@ -110,7 +110,7 @@ final readonly class KeyParser
         }
 
         if (null === $entryIndentLen) {
-            return $this->registry->getFlowMultilinePlainScalarHelper()->buildFlowKeyMultilinePlainScalarName($tokens, $head);
+            return $this->registry->getFlowMultilinePlainScalarKeyParser()->parse($tokens, $head);
         }
 
         if ($hasExplicitKeyIndicator) {

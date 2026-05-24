@@ -139,7 +139,7 @@ final readonly class ValueParser
             $multiline = new MultilinePlainScalarNode();
             $multiline->addChild($head);
             $consumedAny = false;
-            while ($this->registry->getFlowMultilinePlainScalarHelper()->tryConsumeFlowValueMultilinePlainScalarLine($parseContext->tokens, $multiline)) {
+            while ($this->registry->getFlowMultilinePlainScalarConsumer()->tryConsume($parseContext->tokens, $multiline, true)) {
                 $consumedAny = true;
             }
             $valueNode->addChild($consumedAny ? $multiline : $head);

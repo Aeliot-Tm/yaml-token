@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Aeliot\YamlToken\Parser\Assembler;
 
-use Aeliot\YamlToken\Parser\Helper\FlowMultilinePlainScalarHelper;
 use Aeliot\YamlToken\Parser\SubParser\Block\BlockMappingParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\BlockSequenceParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\CompactBlockMappingParser;
@@ -26,6 +25,8 @@ use Aeliot\YamlToken\Parser\SubParser\DocumentParser;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowEntryParser;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowMappingPairParser;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowMappingParser;
+use Aeliot\YamlToken\Parser\SubParser\Flow\FlowMultilinePlainScalarConsumer;
+use Aeliot\YamlToken\Parser\SubParser\Flow\FlowMultilinePlainScalarKeyParser;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowSequenceParser;
 use Aeliot\YamlToken\Parser\SubParser\MergeInstructionParser;
 use Aeliot\YamlToken\Parser\SubParser\NodePropertiesParser;
@@ -48,7 +49,8 @@ final class ParserRegistry
     private ?FlowEntryParser $flowEntryParser = null;
     private ?FlowMappingPairParser $flowMappingPairParser = null;
     private ?FlowMappingParser $flowMappingParser = null;
-    private ?FlowMultilinePlainScalarHelper $flowMultilinePlainScalarHelper = null;
+    private ?FlowMultilinePlainScalarConsumer $flowMultilinePlainScalarConsumer = null;
+    private ?FlowMultilinePlainScalarKeyParser $flowMultilinePlainScalarKeyParser = null;
     private ?FlowSequenceParser $flowSequenceParser = null;
     private ?IndentedBlockValueParser $indentedBlockValueParser = null;
     private ?KeyParser $keyParser = null;
@@ -113,9 +115,14 @@ final class ParserRegistry
         return $this->flowMappingParser ??= $this->assembler->createFlowMappingParser($this);
     }
 
-    public function getFlowMultilinePlainScalarHelper(): FlowMultilinePlainScalarHelper
+    public function getFlowMultilinePlainScalarConsumer(): FlowMultilinePlainScalarConsumer
     {
-        return $this->flowMultilinePlainScalarHelper ??= $this->assembler->createFlowMultilinePlainScalarHelper();
+        return $this->flowMultilinePlainScalarConsumer ??= $this->assembler->createFlowMultilinePlainScalarConsumer();
+    }
+
+    public function getFlowMultilinePlainScalarKeyParser(): FlowMultilinePlainScalarKeyParser
+    {
+        return $this->flowMultilinePlainScalarKeyParser ??= $this->assembler->createFlowMultilinePlainScalarKeyParser($this);
     }
 
     public function getFlowSequenceParser(): FlowSequenceParser
