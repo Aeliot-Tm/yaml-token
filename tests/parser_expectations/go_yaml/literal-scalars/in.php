@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\BlockMappingNode;
+use Aeliot\YamlToken\Node\BlockScalarEntryNode;
 use Aeliot\YamlToken\Node\BlockScalarIndentationIndicatorNode;
 use Aeliot\YamlToken\Node\BlockScalarIndicatorNode;
+use Aeliot\YamlToken\Node\BlockScalarOptionsNode;
 use Aeliot\YamlToken\Node\BlockSequenceEntryNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\IndentationNode;
@@ -22,21 +24,21 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 1187890842,
+    'hash' => 2476236930,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 1062350367,
+            'hash' => 3434354817,
             'properties' => [],
             'children' => [
                 [
                     'type' => BlockSequenceEntryNode::class,
-                    'hash' => 661366624,
+                    'hash' => 1793456319,
                     'properties' => [
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 233115715,
+                            'hash' => 3283761887,
                         ],
                     ],
                     'children' => [
@@ -64,33 +66,33 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 233115715,
+                            'hash' => 3283761887,
                             'properties' => [
                                 'payload' => [
                                     'type' => BlockMappingNode::class,
-                                    'hash' => 168556156,
+                                    'hash' => 2106413546,
                                 ],
                             ],
                             'children' => [
                                 [
                                     'type' => BlockMappingNode::class,
-                                    'hash' => 168556156,
+                                    'hash' => 2106413546,
                                     'properties' => [
                                         'entries' => [
                                             [
                                                 'type' => KeyValueCoupleNode::class,
-                                                'hash' => 3620194876,
+                                                'hash' => 2331474300,
                                             ],
                                             [
                                                 'type' => KeyValueCoupleNode::class,
-                                                'hash' => 572426648,
+                                                'hash' => 262207426,
                                             ],
                                         ],
                                     ],
                                     'children' => [
                                         [
                                             'type' => KeyValueCoupleNode::class,
-                                            'hash' => 3620194876,
+                                            'hash' => 2331474300,
                                             'properties' => [
                                                 'key' => [
                                                     'type' => KeyNode::class,
@@ -102,7 +104,7 @@ return [
                                                 ],
                                                 'value' => [
                                                     'type' => ValueNode::class,
-                                                    'hash' => 1214365286,
+                                                    'hash' => 2921686279,
                                                 ],
                                             ],
                                             'children' => [
@@ -153,57 +155,80 @@ return [
                                                 ],
                                                 [
                                                     'type' => ValueNode::class,
-                                                    'hash' => 1214365286,
+                                                    'hash' => 2921686279,
                                                     'properties' => [
                                                         'payload' => [
-                                                            'type' => LiteralBlockScalarNode::class,
-                                                            'hash' => 2108195102,
+                                                            'type' => BlockScalarEntryNode::class,
+                                                            'hash' => 1259756036,
                                                         ],
                                                     ],
                                                     'children' => [
                                                         [
-                                                            'type' => BlockScalarIndicatorNode::class,
-                                                            'hash' => 1768284065,
-                                                            'properties' => [
-                                                                'token' => [
-                                                                    'type' => TokenType::LITERAL_BLOCK_SCALAR_INDICATOR,
-                                                                    'text' => '|',
+                                                            'type' => BlockScalarEntryNode::class,
+                                                            'hash' => 1259756036,
+                                                            'properties' => [],
+                                                            'children' => [
+                                                                [
+                                                                    'type' => BlockScalarOptionsNode::class,
+                                                                    'hash' => 4110697338,
+                                                                    'properties' => [
+                                                                        'typeIndicator' => [
+                                                                            'type' => BlockScalarIndicatorNode::class,
+                                                                            'hash' => 1768284065,
+                                                                        ],
+                                                                        'indentationIndicator' => [
+                                                                            'type' => BlockScalarIndentationIndicatorNode::class,
+                                                                            'hash' => 2586049209,
+                                                                        ],
+                                                                    ],
+                                                                    'children' => [
+                                                                        [
+                                                                            'type' => BlockScalarIndicatorNode::class,
+                                                                            'hash' => 1768284065,
+                                                                            'properties' => [
+                                                                                'token' => [
+                                                                                    'type' => TokenType::LITERAL_BLOCK_SCALAR_INDICATOR,
+                                                                                    'text' => '|',
+                                                                                ],
+                                                                            ],
+                                                                            'children' => [],
+                                                                        ],
+                                                                        [
+                                                                            'type' => BlockScalarIndentationIndicatorNode::class,
+                                                                            'hash' => 2586049209,
+                                                                            'properties' => [
+                                                                                'token' => [
+                                                                                    'type' => TokenType::BLOCK_SCALAR_INDENTATION_INDICATOR,
+                                                                                    'text' => '2',
+                                                                                ],
+                                                                            ],
+                                                                            'children' => [],
+                                                                        ],
+                                                                    ],
+                                                                ],
+                                                                [
+                                                                    'type' => NewLineNode::class,
+                                                                    'hash' => 763369711,
+                                                                    'properties' => [
+                                                                        'token' => [
+                                                                            'type' => TokenType::NEWLINE,
+                                                                            'text' => "\n",
+                                                                        ],
+                                                                    ],
+                                                                    'children' => [],
+                                                                ],
+                                                                [
+                                                                    'type' => LiteralBlockScalarNode::class,
+                                                                    'hash' => 2108195102,
+                                                                    'properties' => [
+                                                                        'token' => [
+                                                                            'type' => TokenType::LITERAL_BLOCK_SCALAR,
+                                                                            'text' => "    xxx\n",
+                                                                        ],
+                                                                    ],
+                                                                    'children' => [],
                                                                 ],
                                                             ],
-                                                            'children' => [],
-                                                        ],
-                                                        [
-                                                            'type' => BlockScalarIndentationIndicatorNode::class,
-                                                            'hash' => 2586049209,
-                                                            'properties' => [
-                                                                'token' => [
-                                                                    'type' => TokenType::BLOCK_SCALAR_INDENTATION_INDICATOR,
-                                                                    'text' => '2',
-                                                                ],
-                                                            ],
-                                                            'children' => [],
-                                                        ],
-                                                        [
-                                                            'type' => NewLineNode::class,
-                                                            'hash' => 763369711,
-                                                            'properties' => [
-                                                                'token' => [
-                                                                    'type' => TokenType::NEWLINE,
-                                                                    'text' => "\n",
-                                                                ],
-                                                            ],
-                                                            'children' => [],
-                                                        ],
-                                                        [
-                                                            'type' => LiteralBlockScalarNode::class,
-                                                            'hash' => 2108195102,
-                                                            'properties' => [
-                                                                'token' => [
-                                                                    'type' => TokenType::LITERAL_BLOCK_SCALAR,
-                                                                    'text' => "    xxx\n",
-                                                                ],
-                                                            ],
-                                                            'children' => [],
                                                         ],
                                                     ],
                                                 ],
@@ -211,7 +236,7 @@ return [
                                         ],
                                         [
                                             'type' => KeyValueCoupleNode::class,
-                                            'hash' => 572426648,
+                                            'hash' => 262207426,
                                             'properties' => [
                                                 'indentation' => [
                                                     'type' => IndentationNode::class,
@@ -227,7 +252,7 @@ return [
                                                 ],
                                                 'value' => [
                                                     'type' => ValueNode::class,
-                                                    'hash' => 3436180487,
+                                                    'hash' => 765797328,
                                                 ],
                                             ],
                                             'children' => [
@@ -289,46 +314,65 @@ return [
                                                 ],
                                                 [
                                                     'type' => ValueNode::class,
-                                                    'hash' => 3436180487,
+                                                    'hash' => 765797328,
                                                     'properties' => [
                                                         'payload' => [
-                                                            'type' => LiteralBlockScalarNode::class,
-                                                            'hash' => 2108195102,
+                                                            'type' => BlockScalarEntryNode::class,
+                                                            'hash' => 2018994052,
                                                         ],
                                                     ],
                                                     'children' => [
                                                         [
-                                                            'type' => BlockScalarIndicatorNode::class,
-                                                            'hash' => 1768284065,
-                                                            'properties' => [
-                                                                'token' => [
-                                                                    'type' => TokenType::LITERAL_BLOCK_SCALAR_INDICATOR,
-                                                                    'text' => '|',
+                                                            'type' => BlockScalarEntryNode::class,
+                                                            'hash' => 2018994052,
+                                                            'properties' => [],
+                                                            'children' => [
+                                                                [
+                                                                    'type' => BlockScalarOptionsNode::class,
+                                                                    'hash' => 3707031435,
+                                                                    'properties' => [
+                                                                        'typeIndicator' => [
+                                                                            'type' => BlockScalarIndicatorNode::class,
+                                                                            'hash' => 1768284065,
+                                                                        ],
+                                                                    ],
+                                                                    'children' => [
+                                                                        [
+                                                                            'type' => BlockScalarIndicatorNode::class,
+                                                                            'hash' => 1768284065,
+                                                                            'properties' => [
+                                                                                'token' => [
+                                                                                    'type' => TokenType::LITERAL_BLOCK_SCALAR_INDICATOR,
+                                                                                    'text' => '|',
+                                                                                ],
+                                                                            ],
+                                                                            'children' => [],
+                                                                        ],
+                                                                    ],
+                                                                ],
+                                                                [
+                                                                    'type' => NewLineNode::class,
+                                                                    'hash' => 763369711,
+                                                                    'properties' => [
+                                                                        'token' => [
+                                                                            'type' => TokenType::NEWLINE,
+                                                                            'text' => "\n",
+                                                                        ],
+                                                                    ],
+                                                                    'children' => [],
+                                                                ],
+                                                                [
+                                                                    'type' => LiteralBlockScalarNode::class,
+                                                                    'hash' => 2108195102,
+                                                                    'properties' => [
+                                                                        'token' => [
+                                                                            'type' => TokenType::LITERAL_BLOCK_SCALAR,
+                                                                            'text' => "    xxx\n",
+                                                                        ],
+                                                                    ],
+                                                                    'children' => [],
                                                                 ],
                                                             ],
-                                                            'children' => [],
-                                                        ],
-                                                        [
-                                                            'type' => NewLineNode::class,
-                                                            'hash' => 763369711,
-                                                            'properties' => [
-                                                                'token' => [
-                                                                    'type' => TokenType::NEWLINE,
-                                                                    'text' => "\n",
-                                                                ],
-                                                            ],
-                                                            'children' => [],
-                                                        ],
-                                                        [
-                                                            'type' => LiteralBlockScalarNode::class,
-                                                            'hash' => 2108195102,
-                                                            'properties' => [
-                                                                'token' => [
-                                                                    'type' => TokenType::LITERAL_BLOCK_SCALAR,
-                                                                    'text' => "    xxx\n",
-                                                                ],
-                                                            ],
-                                                            'children' => [],
                                                         ],
                                                     ],
                                                 ],

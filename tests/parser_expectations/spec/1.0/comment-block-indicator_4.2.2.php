@@ -3,7 +3,9 @@
 declare(strict_types=1);
 
 use Aeliot\YamlToken\Enum\TokenType;
+use Aeliot\YamlToken\Node\BlockScalarEntryNode;
 use Aeliot\YamlToken\Node\BlockScalarIndicatorNode;
+use Aeliot\YamlToken\Node\BlockScalarOptionsNode;
 use Aeliot\YamlToken\Node\CommentNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\KeyNode;
@@ -18,17 +20,17 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 2353195776,
+    'hash' => 1980250862,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 2155979871,
+            'hash' => 537740053,
             'properties' => [],
             'children' => [
                 [
                     'type' => KeyValueCoupleNode::class,
-                    'hash' => 3621308836,
+                    'hash' => 2997989925,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
@@ -40,7 +42,7 @@ return [
                         ],
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 1333972360,
+                            'hash' => 3495247503,
                         ],
                     ],
                     'children' => [
@@ -91,68 +93,87 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 1333972360,
+                            'hash' => 3495247503,
                             'properties' => [
                                 'payload' => [
-                                    'type' => LiteralBlockScalarNode::class,
-                                    'hash' => 3964524984,
+                                    'type' => BlockScalarEntryNode::class,
+                                    'hash' => 3490249337,
                                 ],
                             ],
                             'children' => [
                                 [
-                                    'type' => BlockScalarIndicatorNode::class,
-                                    'hash' => 1768284065,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::LITERAL_BLOCK_SCALAR_INDICATOR,
-                                            'text' => '|',
+                                    'type' => BlockScalarEntryNode::class,
+                                    'hash' => 3490249337,
+                                    'properties' => [],
+                                    'children' => [
+                                        [
+                                            'type' => BlockScalarOptionsNode::class,
+                                            'hash' => 2628469016,
+                                            'properties' => [
+                                                'typeIndicator' => [
+                                                    'type' => BlockScalarIndicatorNode::class,
+                                                    'hash' => 1768284065,
+                                                ],
+                                            ],
+                                            'children' => [
+                                                [
+                                                    'type' => BlockScalarIndicatorNode::class,
+                                                    'hash' => 1768284065,
+                                                    'properties' => [
+                                                        'token' => [
+                                                            'type' => TokenType::LITERAL_BLOCK_SCALAR_INDICATOR,
+                                                            'text' => '|',
+                                                        ],
+                                                    ],
+                                                    'children' => [],
+                                                ],
+                                                [
+                                                    'type' => WhitespaceNode::class,
+                                                    'hash' => 1067539092,
+                                                    'properties' => [
+                                                        'token' => [
+                                                            'type' => TokenType::WHITESPACE,
+                                                            'text' => ' ',
+                                                        ],
+                                                    ],
+                                                    'children' => [],
+                                                ],
+                                                [
+                                                    'type' => CommentNode::class,
+                                                    'hash' => 881967407,
+                                                    'properties' => [
+                                                        'token' => [
+                                                            'type' => TokenType::COMMENT,
+                                                            'text' => '# comment after block indicator',
+                                                        ],
+                                                    ],
+                                                    'children' => [],
+                                                ],
+                                            ],
+                                        ],
+                                        [
+                                            'type' => NewLineNode::class,
+                                            'hash' => 763369711,
+                                            'properties' => [
+                                                'token' => [
+                                                    'type' => TokenType::NEWLINE,
+                                                    'text' => "\n",
+                                                ],
+                                            ],
+                                            'children' => [],
+                                        ],
+                                        [
+                                            'type' => LiteralBlockScalarNode::class,
+                                            'hash' => 3964524984,
+                                            'properties' => [
+                                                'token' => [
+                                                    'type' => TokenType::LITERAL_BLOCK_SCALAR,
+                                                    'text' => "  content\n",
+                                                ],
+                                            ],
+                                            'children' => [],
                                         ],
                                     ],
-                                    'children' => [],
-                                ],
-                                [
-                                    'type' => WhitespaceNode::class,
-                                    'hash' => 1067539092,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::WHITESPACE,
-                                            'text' => ' ',
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                                [
-                                    'type' => CommentNode::class,
-                                    'hash' => 881967407,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::COMMENT,
-                                            'text' => '# comment after block indicator',
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                                [
-                                    'type' => NewLineNode::class,
-                                    'hash' => 763369711,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::NEWLINE,
-                                            'text' => "\n",
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                                [
-                                    'type' => LiteralBlockScalarNode::class,
-                                    'hash' => 3964524984,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::LITERAL_BLOCK_SCALAR,
-                                            'text' => "  content\n",
-                                        ],
-                                    ],
-                                    'children' => [],
                                 ],
                             ],
                         ],

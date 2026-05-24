@@ -3,7 +3,9 @@
 declare(strict_types=1);
 
 use Aeliot\YamlToken\Enum\TokenType;
+use Aeliot\YamlToken\Node\BlockScalarEntryNode;
 use Aeliot\YamlToken\Node\BlockScalarIndicatorNode;
+use Aeliot\YamlToken\Node\BlockScalarOptionsNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
@@ -17,17 +19,17 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 3965562938,
+    'hash' => 552168901,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 1202810820,
+            'hash' => 3765707205,
             'properties' => [],
             'children' => [
                 [
                     'type' => KeyValueCoupleNode::class,
-                    'hash' => 2804178820,
+                    'hash' => 2247633074,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
@@ -39,7 +41,7 @@ return [
                         ],
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 1006380311,
+                            'hash' => 2619985983,
                         ],
                     ],
                     'children' => [
@@ -90,46 +92,65 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 1006380311,
+                            'hash' => 2619985983,
                             'properties' => [
                                 'payload' => [
-                                    'type' => LiteralBlockScalarNode::class,
-                                    'hash' => 3111245091,
+                                    'type' => BlockScalarEntryNode::class,
+                                    'hash' => 2193632459,
                                 ],
                             ],
                             'children' => [
                                 [
-                                    'type' => BlockScalarIndicatorNode::class,
-                                    'hash' => 1768284065,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::LITERAL_BLOCK_SCALAR_INDICATOR,
-                                            'text' => '|',
+                                    'type' => BlockScalarEntryNode::class,
+                                    'hash' => 2193632459,
+                                    'properties' => [],
+                                    'children' => [
+                                        [
+                                            'type' => BlockScalarOptionsNode::class,
+                                            'hash' => 3707031435,
+                                            'properties' => [
+                                                'typeIndicator' => [
+                                                    'type' => BlockScalarIndicatorNode::class,
+                                                    'hash' => 1768284065,
+                                                ],
+                                            ],
+                                            'children' => [
+                                                [
+                                                    'type' => BlockScalarIndicatorNode::class,
+                                                    'hash' => 1768284065,
+                                                    'properties' => [
+                                                        'token' => [
+                                                            'type' => TokenType::LITERAL_BLOCK_SCALAR_INDICATOR,
+                                                            'text' => '|',
+                                                        ],
+                                                    ],
+                                                    'children' => [],
+                                                ],
+                                            ],
+                                        ],
+                                        [
+                                            'type' => NewLineNode::class,
+                                            'hash' => 763369711,
+                                            'properties' => [
+                                                'token' => [
+                                                    'type' => TokenType::NEWLINE,
+                                                    'text' => "\n",
+                                                ],
+                                            ],
+                                            'children' => [],
+                                        ],
+                                        [
+                                            'type' => LiteralBlockScalarNode::class,
+                                            'hash' => 3111245091,
+                                            'properties' => [
+                                                'token' => [
+                                                    'type' => TokenType::LITERAL_BLOCK_SCALAR,
+                                                    'text' => "  void main() {\n  \tprintf(\"Hello\\n\");\n  }\n",
+                                                ],
+                                            ],
+                                            'children' => [],
                                         ],
                                     ],
-                                    'children' => [],
-                                ],
-                                [
-                                    'type' => NewLineNode::class,
-                                    'hash' => 763369711,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::NEWLINE,
-                                            'text' => "\n",
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                                [
-                                    'type' => LiteralBlockScalarNode::class,
-                                    'hash' => 3111245091,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::LITERAL_BLOCK_SCALAR,
-                                            'text' => "  void main() {\n  \tprintf(\"Hello\\n\");\n  }\n",
-                                        ],
-                                    ],
-                                    'children' => [],
                                 ],
                             ],
                         ],

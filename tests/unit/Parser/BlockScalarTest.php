@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Aeliot\YamlToken\Test\Unit\Parser;
 
 use Aeliot\YamlToken\Lexer\Lexer;
+use Aeliot\YamlToken\Node\BlockScalarEntryNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\FoldedBlockScalarNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
@@ -28,6 +29,7 @@ use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Parser::class)]
+#[UsesClass(BlockScalarEntryNode::class)]
 #[UsesClass(DocumentNode::class)]
 #[UsesClass(FoldedBlockScalarNode::class)]
 #[UsesClass(KeyValueCoupleNode::class)]
@@ -68,7 +70,10 @@ final class BlockScalarTest extends TestCase
         $value = $couple->getValue();
         self::assertNotNull($value);
 
-        $scalar = $value->getPayload();
+        $entry = $value->getPayload();
+        self::assertInstanceOf(BlockScalarEntryNode::class, $entry);
+        /* @var BlockScalarEntryNode $entry */
+        $scalar = $entry->getPayload();
         self::assertInstanceOf($expectedScalarType, $scalar);
         /* @var LiteralBlockScalarNode|FoldedBlockScalarNode $scalar */
         self::assertSame($expectedValue, $scalar->getToken()->text);

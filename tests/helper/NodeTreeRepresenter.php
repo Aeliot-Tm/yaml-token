@@ -16,6 +16,7 @@ namespace Aeliot\YamlToken\TestHelper;
 use Aeliot\YamlToken\Node\AliasNode;
 use Aeliot\YamlToken\Node\AnchorNode;
 use Aeliot\YamlToken\Node\BlockMappingNode;
+use Aeliot\YamlToken\Node\BlockScalarOptionsNode;
 use Aeliot\YamlToken\Node\BlockSequenceEntryNode;
 use Aeliot\YamlToken\Node\BlockSequenceNode;
 use Aeliot\YamlToken\Node\FlowMappingNode;
@@ -118,6 +119,11 @@ final class NodeTreeRepresenter
             $node instanceof FlowMappingNode,
             $node instanceof FlowSequenceNode => [
                 'entries' => $node->getEntries(),
+            ],
+            $node instanceof BlockScalarOptionsNode => [
+                'typeIndicator' => $node->getTypeIndicator(),
+                'chompingIndicator' => $node->getChompingIndicator(),
+                'indentationIndicator' => $node->getIndentationIndicator(),
             ],
             $node instanceof KeyValueCoupleNode => [
                 'indentation' => $node->getIndentation(),

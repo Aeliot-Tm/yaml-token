@@ -74,6 +74,11 @@ class ValueNode extends AbstractNode implements NodePropertiesHolderInterface
         return $this->payload instanceof BlockMappingNode;
     }
 
+    public function isBlockScalarEntry(): bool
+    {
+        return $this->payload instanceof BlockScalarEntryNode;
+    }
+
     public function isBlockSequence(): bool
     {
         return $this->payload instanceof BlockSequenceNode;

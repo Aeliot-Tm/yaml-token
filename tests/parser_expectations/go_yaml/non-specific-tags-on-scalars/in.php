@@ -3,7 +3,9 @@
 declare(strict_types=1);
 
 use Aeliot\YamlToken\Enum\TokenType;
+use Aeliot\YamlToken\Node\BlockScalarEntryNode;
 use Aeliot\YamlToken\Node\BlockScalarIndicatorNode;
+use Aeliot\YamlToken\Node\BlockScalarOptionsNode;
 use Aeliot\YamlToken\Node\BlockSequenceEntryNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\DoubleQuotedScalarNode;
@@ -18,12 +20,12 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 2784773245,
+    'hash' => 3139549994,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 4220196571,
+            'hash' => 2697660345,
             'properties' => [],
             'children' => [
                 [
@@ -232,11 +234,11 @@ return [
                 ],
                 [
                     'type' => BlockSequenceEntryNode::class,
-                    'hash' => 3410832473,
+                    'hash' => 3043732795,
                     'properties' => [
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 3326935153,
+                            'hash' => 191467041,
                         ],
                     ],
                     'children' => [
@@ -264,46 +266,65 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 3326935153,
+                            'hash' => 191467041,
                             'properties' => [
                                 'payload' => [
-                                    'type' => FoldedBlockScalarNode::class,
-                                    'hash' => 3433016668,
+                                    'type' => BlockScalarEntryNode::class,
+                                    'hash' => 555999413,
                                 ],
                             ],
                             'children' => [
                                 [
-                                    'type' => BlockScalarIndicatorNode::class,
-                                    'hash' => 3228385119,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::FOLDED_BLOCK_SCALAR_INDICATOR,
-                                            'text' => '>',
+                                    'type' => BlockScalarEntryNode::class,
+                                    'hash' => 555999413,
+                                    'properties' => [],
+                                    'children' => [
+                                        [
+                                            'type' => BlockScalarOptionsNode::class,
+                                            'hash' => 556040850,
+                                            'properties' => [
+                                                'typeIndicator' => [
+                                                    'type' => BlockScalarIndicatorNode::class,
+                                                    'hash' => 3228385119,
+                                                ],
+                                            ],
+                                            'children' => [
+                                                [
+                                                    'type' => BlockScalarIndicatorNode::class,
+                                                    'hash' => 3228385119,
+                                                    'properties' => [
+                                                        'token' => [
+                                                            'type' => TokenType::FOLDED_BLOCK_SCALAR_INDICATOR,
+                                                            'text' => '>',
+                                                        ],
+                                                    ],
+                                                    'children' => [],
+                                                ],
+                                            ],
+                                        ],
+                                        [
+                                            'type' => NewLineNode::class,
+                                            'hash' => 763369711,
+                                            'properties' => [
+                                                'token' => [
+                                                    'type' => TokenType::NEWLINE,
+                                                    'text' => "\n",
+                                                ],
+                                            ],
+                                            'children' => [],
+                                        ],
+                                        [
+                                            'type' => FoldedBlockScalarNode::class,
+                                            'hash' => 3433016668,
+                                            'properties' => [
+                                                'token' => [
+                                                    'type' => TokenType::FOLDED_BLOCK_SCALAR,
+                                                    'text' => "  block\n",
+                                                ],
+                                            ],
+                                            'children' => [],
                                         ],
                                     ],
-                                    'children' => [],
-                                ],
-                                [
-                                    'type' => NewLineNode::class,
-                                    'hash' => 763369711,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::NEWLINE,
-                                            'text' => "\n",
-                                        ],
-                                    ],
-                                    'children' => [],
-                                ],
-                                [
-                                    'type' => FoldedBlockScalarNode::class,
-                                    'hash' => 3433016668,
-                                    'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::FOLDED_BLOCK_SCALAR,
-                                            'text' => "  block\n",
-                                        ],
-                                    ],
-                                    'children' => [],
                                 ],
                             ],
                         ],

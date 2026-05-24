@@ -58,12 +58,12 @@ enum TokenType: string
 
     public function isFoldedBlockScalarIndicator(): bool
     {
-        return $this === self::FOLDED_BLOCK_SCALAR_INDICATOR;
+        return self::FOLDED_BLOCK_SCALAR_INDICATOR === $this;
     }
 
     public function isLiteralBlockScalarIndicator(): bool
     {
-        return $this === self::LITERAL_BLOCK_SCALAR_INDICATOR;
+        return self::LITERAL_BLOCK_SCALAR_INDICATOR === $this;
     }
 
     public function isMergeIndicator(): bool

@@ -28,11 +28,11 @@ final readonly class BlockScalarKeyNameConsumer
      * (YAML 1.2.2 §8.2.2 c-l-block-map-explicit-key). Tokens consumed:
      * BLOCK_SCALAR_INDICATOR, optional sub-indicators (chomping/indentation), NEWLINE,
      * optional leading empty lines, optional INDENTATION, and the scalar payload.
-     * The resulting scalar node is set as the {@see KeyNode::setName() name} of the key.
+     * The assembled entry node is set as the {@see KeyNode::setName() name} of the key.
      */
     public function consume(TokenStreamInterface $tokens, KeyNode $keyNode): void
     {
-        $scalar = $this->blockScalarFirstFragmentConsumer->consume($tokens, $keyNode, true);
-        $keyNode->setName($scalar);
+        $entry = $this->blockScalarFirstFragmentConsumer->consume($tokens, true);
+        $keyNode->setName($entry);
     }
 }

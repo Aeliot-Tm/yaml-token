@@ -14,11 +14,12 @@ declare(strict_types=1);
 namespace Aeliot\YamlToken\Parser\SubParser\Scalar;
 
 use Aeliot\YamlToken\Enum\TokenType;
+use Aeliot\YamlToken\Node\BlockScalarEntryNode;
 use Aeliot\YamlToken\Node\BlockScalarIndicatorNode;
+use Aeliot\YamlToken\Node\BlockScalarOptionsNode;
 use Aeliot\YamlToken\Node\IndentationNode;
 use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\Node;
-use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
@@ -40,15 +41,17 @@ final readonly class BlockScalarFirstFragmentConsumer
      * Consumes a block scalar (literal | or folded >) indicator line and the first scalar fragment.
      * Tokens consumed: BLOCK_SCALAR_INDICATOR, optional sub-indicators (chomping/indentation), NEWLINE,
      * optional leading empty lines, optional INDENTATION, and the scalar payload.
-     * Returns the scalar node, or null when the stream is truncated and $failOnTruncatedStream is false.
+     * Returns the assembled entry node. When the stream is truncated and $failOnTruncatedStream is false,
+     * returns a partial entry containing only the options (no scalar payload).
      */
-    public function consume(TokenStreamInterface $tokens, Node $layoutTarget, bool $failOnTruncatedStream): ?ScalarNode
+    public function consume(TokenStreamInterface $tokens, bool $failOnTruncatedStream): BlockScalarEntryNode
     {
         $token = $tokens->current();
-        $layoutTarget->addChild(new BlockScalarIndicatorNode($token));
+        $options = new BlockScalarOptionsNode();
+        $options->addChild(new BlockScalarIndicatorNode($token));
         $tokens->advance();
 
-        $this->consumer->collectUntil($tokens, TokenType::NEWLINE, $layoutTarget);
+        $this->consumer->collectUntil($tokens, TokenType::NEWLINE, $options);
 
         $token = $tokens->current();
         if (null === $token) {
@@ -56,17 +59,23 @@ final readonly class BlockScalarFirstFragmentConsumer
                 throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation('Expected NEWLINE after block scalar indicator, got _nothing_', $tokens));
             }
 
-            return null;
+            $entry = new BlockScalarEntryNode();
+            $entry->addChild($options);
+
+            return $entry;
         }
 
         if (TokenType::NEWLINE !== $token->type) {
             throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Expected NEWLINE after block scalar indicator, got %s', $token->type->value), $token));
         }
-        $layoutTarget->addChild(new NewLineNode($token));
+
+        $entry = new BlockScalarEntryNode();
+        $entry->addChild($options);
+        $entry->addChild(new NewLineNode($token));
         $tokens->advance();
 
         while (TokenType::NEWLINE === $tokens->current()?->type) {
-            $layoutTarget->addChild(new NewLineNode($tokens->current()));
+            $entry->addChild(new NewLineNode($tokens->current()));
             $tokens->advance();
         }
 
@@ -74,7 +83,7 @@ final readonly class BlockScalarFirstFragmentConsumer
         // the body may start with leading spaces that are part of the content but surface
         // to the parser as a separate INDENTATION token before the scalar payload.
         if (TokenType::INDENTATION === $tokens->current()?->type) {
-            $layoutTarget->addChild(new IndentationNode($tokens->current()));
+            $entry->addChild(new IndentationNode($tokens->current()));
             $tokens->advance();
         }
 
@@ -86,13 +95,15 @@ final readonly class BlockScalarFirstFragmentConsumer
         $scalarNode = $this->nodeFactory->createScalarNode($token);
         $tokens->advance();
 
+        $entry->addChild($scalarNode);
+
         // YAML 1.2.2 §8.1.1.2 / rule [166]-[168] l-chomped-empty(n,t):
         // trailing "empty" indented lines belong to the block scalar and must be
         // consumed here (even with strip chomping they are excluded from content but
         // still consumed from the token stream).
-        $this->consumeTrailingEmptyLines($tokens, $layoutTarget);
+        $this->consumeTrailingEmptyLines($tokens, $entry);
 
-        return $scalarNode;
+        return $entry;
     }
 
     /**

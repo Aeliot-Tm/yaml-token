@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\BlockScalarChompingIndicatorNode;
+use Aeliot\YamlToken\Node\BlockScalarEntryNode;
 use Aeliot\YamlToken\Node\BlockScalarIndicatorNode;
+use Aeliot\YamlToken\Node\BlockScalarOptionsNode;
 use Aeliot\YamlToken\Node\DocumentEndNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\DocumentStartNode;
@@ -16,12 +18,12 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 899176583,
+    'hash' => 658709357,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 2570344403,
+            'hash' => 3451145494,
             'properties' => [],
             'children' => [
                 [
@@ -48,57 +50,80 @@ return [
                 ],
                 [
                     'type' => ValueNode::class,
-                    'hash' => 2202553899,
+                    'hash' => 453775933,
                     'properties' => [
                         'payload' => [
-                            'type' => LiteralBlockScalarNode::class,
-                            'hash' => 2975909140,
+                            'type' => BlockScalarEntryNode::class,
+                            'hash' => 2902955675,
                         ],
                     ],
                     'children' => [
                         [
-                            'type' => BlockScalarIndicatorNode::class,
-                            'hash' => 1768284065,
-                            'properties' => [
-                                'token' => [
-                                    'type' => TokenType::LITERAL_BLOCK_SCALAR_INDICATOR,
-                                    'text' => '|',
+                            'type' => BlockScalarEntryNode::class,
+                            'hash' => 2902955675,
+                            'properties' => [],
+                            'children' => [
+                                [
+                                    'type' => BlockScalarOptionsNode::class,
+                                    'hash' => 622944022,
+                                    'properties' => [
+                                        'typeIndicator' => [
+                                            'type' => BlockScalarIndicatorNode::class,
+                                            'hash' => 1768284065,
+                                        ],
+                                        'chompingIndicator' => [
+                                            'type' => BlockScalarChompingIndicatorNode::class,
+                                            'hash' => 414092453,
+                                        ],
+                                    ],
+                                    'children' => [
+                                        [
+                                            'type' => BlockScalarIndicatorNode::class,
+                                            'hash' => 1768284065,
+                                            'properties' => [
+                                                'token' => [
+                                                    'type' => TokenType::LITERAL_BLOCK_SCALAR_INDICATOR,
+                                                    'text' => '|',
+                                                ],
+                                            ],
+                                            'children' => [],
+                                        ],
+                                        [
+                                            'type' => BlockScalarChompingIndicatorNode::class,
+                                            'hash' => 414092453,
+                                            'properties' => [
+                                                'token' => [
+                                                    'type' => TokenType::BLOCK_SCALAR_CHOMPING_INDICATOR,
+                                                    'text' => '+',
+                                                ],
+                                            ],
+                                            'children' => [],
+                                        ],
+                                    ],
+                                ],
+                                [
+                                    'type' => NewLineNode::class,
+                                    'hash' => 763369711,
+                                    'properties' => [
+                                        'token' => [
+                                            'type' => TokenType::NEWLINE,
+                                            'text' => "\n",
+                                        ],
+                                    ],
+                                    'children' => [],
+                                ],
+                                [
+                                    'type' => LiteralBlockScalarNode::class,
+                                    'hash' => 2975909140,
+                                    'properties' => [
+                                        'token' => [
+                                            'type' => TokenType::LITERAL_BLOCK_SCALAR,
+                                            'text' => " ab\n \n  \n",
+                                        ],
+                                    ],
+                                    'children' => [],
                                 ],
                             ],
-                            'children' => [],
-                        ],
-                        [
-                            'type' => BlockScalarChompingIndicatorNode::class,
-                            'hash' => 414092453,
-                            'properties' => [
-                                'token' => [
-                                    'type' => TokenType::BLOCK_SCALAR_CHOMPING_INDICATOR,
-                                    'text' => '+',
-                                ],
-                            ],
-                            'children' => [],
-                        ],
-                        [
-                            'type' => NewLineNode::class,
-                            'hash' => 763369711,
-                            'properties' => [
-                                'token' => [
-                                    'type' => TokenType::NEWLINE,
-                                    'text' => "\n",
-                                ],
-                            ],
-                            'children' => [],
-                        ],
-                        [
-                            'type' => LiteralBlockScalarNode::class,
-                            'hash' => 2975909140,
-                            'properties' => [
-                                'token' => [
-                                    'type' => TokenType::LITERAL_BLOCK_SCALAR,
-                                    'text' => " ab\n \n  \n",
-                                ],
-                            ],
-                            'children' => [],
                         ],
                     ],
                 ],

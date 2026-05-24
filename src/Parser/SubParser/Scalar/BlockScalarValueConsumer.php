@@ -27,18 +27,14 @@ final readonly class BlockScalarValueConsumer
 
     /**
      * Consumes a block scalar (literal | or folded >) used as a mapping value
-     * (YAML 1.2.2 §8.1.1). The first fragment and trailing empty lines are attached to
+     * (YAML 1.2.2 §8.1.1). The assembled {@see BlockScalarEntryNode} is attached to
      * {@see ValueNode}; non-empty continuation lines are appended via
      * {@see MultilinePlainScalarParser::appendMultilinePlainScalarContinuations()}.
      */
     public function consume(TokenStreamInterface $tokens, ValueNode $valueNode, IndentContext $parentIndent): void
     {
-        $scalar = $this->blockScalarFirstFragmentConsumer->consume($tokens, $valueNode, false);
-        if (null === $scalar) {
-            return;
-        }
-
-        $valueNode->addChild($scalar);
+        $entry = $this->blockScalarFirstFragmentConsumer->consume($tokens, false);
+        $valueNode->addChild($entry);
         $this->multilinePlainScalarParser->appendMultilinePlainScalarContinuations($tokens, $valueNode, $parentIndent);
     }
 }
