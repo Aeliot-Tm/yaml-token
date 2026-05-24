@@ -178,7 +178,6 @@ final readonly class IndentedBlockValueParser
         if (
             TokenType::EXPLICIT_KEY_INDICATOR === $afterIndent->type
             || TokenType::MERGE_INDICATOR === $afterIndent->type
-            || $afterIndent->type->isScalar()
         ) {
             $this->consumeBlockValueOpeningLayout($parseContext, $valueNode);
             $valueNode->addChild(
@@ -186,7 +185,37 @@ final readonly class IndentedBlockValueParser
                     ->getBlockMappingParser()
                     ->parseBlockMappingValue($parseContext, IndentContext::createForBareDocument()),
             );
+
+            return;
         }
+
+        if (!$afterIndent->type->isScalar()) {
+            return;
+        }
+
+        $this->consumeBlockValueOpeningLayout($parseContext, $valueNode);
+
+        $scalarToken = $parseContext->tokens->current();
+        if (null === $scalarToken || !$scalarToken->type->isScalar()) {
+            throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Scalar expected for bare document block value, but %s given', $scalarToken?->type->value ?? '_nothing_'), $parseContext->tokens));
+        }
+
+        if ($this->multilineContinuationHelper->isImplicitYamlKeyOnContinuationLine($parseContext->tokens, 0)) {
+            $valueNode->addChild(
+                $this->registry
+                    ->getBlockMappingParser()
+                    ->parseBlockMappingValue($parseContext, IndentContext::createForBareDocument()),
+            );
+
+            return;
+        }
+
+        $this->finishScalarWithPossibleMultiline(
+            $parseContext,
+            $valueNode,
+            $scalarToken,
+            IndentContext::createForBareDocument(),
+        );
     }
 
     /**
