@@ -635,7 +635,7 @@ final class Lexer
             $cursor->blockScalarChomping = BlockScalarChomping::Clip;
         }
         $cursor->inBlockScalarHeaderLine = false;
-        $parentIndent = $cursor->blockScalarValueParentIndent ?? 0;
+        $parentIndent = $cursor->blockScalarValueParentIndent ?? -1;
         $cursor->blockScalarValueParentIndent = null;
         if ($cursor->blockScalarExplicitIndentIndicator) {
             $cursor->inExplicitIndentBlockScalarBody = true;
@@ -705,6 +705,8 @@ final class Lexer
             if (null === $minIndent) {
                 // For auto-detected indent: a non-blank line at indent ≤ parent indent belongs to the
                 // outer context — the block scalar body is empty (YAML 1.2.2 §8.1.1, rule [162]).
+                // A value of -1 means no outer context (bare document or top-level block node at n=-1),
+                // so the check never triggers and content at indent 0 is valid.
                 if (null !== $autoParentIndent && $lineIndent <= $autoParentIndent) {
                     $backtrack = $harvester->cursor->position - $indentStart;
                     if ($backtrack > 0) {
@@ -1162,6 +1164,7 @@ final class Lexer
         if ('-' === $char && $this->isSequenceEntry($harvester) && !$this->isDashBlockPlainContinuationLine($harvester)) {
             if (0 === $harvester->cursor->flowDepth) {
                 $this->resetBlockMappingPlainState($harvester->cursor);
+                $harvester->cursor->blockScalarValueParentIndent = $harvester->cursor->currentIndent;
                 $harvester->cursor->plainScalarContinuationBaseIndent = $harvester->cursor->currentIndent;
                 $harvester->cursor->awaitingBlockPlainContinuation = false;
             }

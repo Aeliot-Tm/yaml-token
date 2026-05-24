@@ -42,10 +42,12 @@ final class Cursor
     public ?int $blockScalarAdditionalIndentFromIndicator = null;
 
     /**
-     * Parent mapping-key indent for a block scalar without an explicit indentation indicator.
+     * Parent context indent for a block scalar without an explicit indentation indicator.
      * Set in {@see Lexer::promoteBlockScalarBodyFromHeader} and consumed in {@see Lexer::readBlockScalarBody}
      * to detect an empty body: when the first non-blank content line is at indent ≤ this value,
      * it belongs to the outer context and the scalar body is empty.
+     * A value of -1 signals no outer context (bare document / top-level block node at n=-1 per
+     * YAML 1.2.2 §9.2), meaning content at any indentation level is valid.
      */
     public ?int $blockScalarAutoContentParentIndent = null;
 
@@ -75,7 +77,10 @@ final class Cursor
     public bool $blockScalarExplicitIndentIndicator = false;
 
     /**
-     * Leading-space count before the block mapping key (same line as {@see TokenType::VALUE_INDICATOR}); cleared when the block scalar header ends.
+     * Leading-space count of the enclosing block context for a block scalar:
+     * set by {@see TokenType::VALUE_INDICATOR} (mapping value) or {@see TokenType::SEQUENCE_ENTRY};
+     * null when the block scalar appears directly in a bare/explicit document (YAML 1.2.2 §9.2, n=-1);
+     * cleared when the block scalar header ends.
      */
     public ?int $blockScalarValueParentIndent = null;
 
