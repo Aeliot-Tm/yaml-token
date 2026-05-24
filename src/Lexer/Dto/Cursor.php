@@ -42,6 +42,14 @@ final class Cursor
     public ?int $blockScalarAdditionalIndentFromIndicator = null;
 
     /**
+     * Parent mapping-key indent for a block scalar without an explicit indentation indicator.
+     * Set in {@see Lexer::promoteBlockScalarBodyFromHeader} and consumed in {@see Lexer::readBlockScalarBody}
+     * to detect an empty body: when the first non-blank content line is at indent ≤ this value,
+     * it belongs to the outer context and the scalar body is empty.
+     */
+    public ?int $blockScalarAutoContentParentIndent = null;
+
+    /**
      * Set when emitting {@see TokenType::LITERAL_BLOCK_SCALAR_INDICATOR} or {@see TokenType::FOLDED_BLOCK_SCALAR_INDICATOR}:
      * {@see TokenType::LITERAL_BLOCK_SCALAR} or {@see TokenType::FOLDED_BLOCK_SCALAR} for the upcoming body token.
      *

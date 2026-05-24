@@ -221,7 +221,8 @@ final class Lexer
         }
 
         if (null === $lastNonEmptyContentEnd) {
-            return 0;
+            // Body consists entirely of trailing empty lines — strip all of them.
+            return $len;
         }
 
         return $len - $lastNonEmptyContentEnd;
@@ -644,6 +645,7 @@ final class Lexer
             $cursor->blockScalarExplicitContentMinIndent = $parentIndent + $additional;
         } else {
             $cursor->blockScalarAdditionalIndentFromIndicator = null;
+            $cursor->blockScalarAutoContentParentIndent = $parentIndent;
             $cursor->pendingBlockScalarBody = $cursor->blockScalarBodyTokenType;
             $cursor->blockScalarBodyTokenType = null;
         }
@@ -672,6 +674,8 @@ final class Lexer
         if (null !== $explicitFloor) {
             $harvester->cursor->blockScalarExplicitContentMinIndent = null;
         }
+        $autoParentIndent = $harvester->cursor->blockScalarAutoContentParentIndent;
+        $harvester->cursor->blockScalarAutoContentParentIndent = null;
         $minIndent = null;
 
         while ($harvester->cursor->position < $harvester->length) {
@@ -699,6 +703,17 @@ final class Lexer
             }
 
             if (null === $minIndent) {
+                // For auto-detected indent: a non-blank line at indent ≤ parent indent belongs to the
+                // outer context — the block scalar body is empty (YAML 1.2.2 §8.1.1, rule [162]).
+                if (null !== $autoParentIndent && $lineIndent <= $autoParentIndent) {
+                    $backtrack = $harvester->cursor->position - $indentStart;
+                    if ($backtrack > 0) {
+                        $result = substr($result, 0, -$backtrack);
+                        $harvester->cursor->position = $indentStart;
+                        $harvester->cursor->column = max(1, $harvester->cursor->column - $backtrack);
+                    }
+                    break;
+                }
                 if (null !== $explicitFloor) {
                     // When the first content line is much deeper than the explicit floor, shallower lines end the body
                     // (e.g. go_yaml/literal-scalars); otherwise the floor alone governs (more-indented-lines fixture).
