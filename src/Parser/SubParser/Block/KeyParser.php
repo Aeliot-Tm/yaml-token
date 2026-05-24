@@ -245,7 +245,7 @@ final readonly class KeyParser
         }
 
         if (\in_array($token->type, TokenType::BLOCK_SCALAR_INDICATORS, true)) {
-            $this->registry->getBlockScalarParser()->consumeBlockScalarKeyName($parseContext->tokens, $keyNode);
+            $this->registry->getBlockScalarKeyNameConsumer()->consume($parseContext->tokens, $keyNode);
 
             return;
         }

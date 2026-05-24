@@ -30,7 +30,9 @@ use Aeliot\YamlToken\Parser\SubParser\Flow\FlowMultilinePlainScalarKeyParser;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowSequenceParser;
 use Aeliot\YamlToken\Parser\SubParser\MergeInstructionParser;
 use Aeliot\YamlToken\Parser\SubParser\NodePropertiesParser;
-use Aeliot\YamlToken\Parser\SubParser\Scalar\BlockScalarParser;
+use Aeliot\YamlToken\Parser\SubParser\Scalar\BlockScalarFirstFragmentConsumer;
+use Aeliot\YamlToken\Parser\SubParser\Scalar\BlockScalarKeyNameConsumer;
+use Aeliot\YamlToken\Parser\SubParser\Scalar\BlockScalarValueConsumer;
 use Aeliot\YamlToken\Parser\SubParser\Scalar\MultilinePlainScalarParser;
 use Aeliot\YamlToken\Parser\SubParser\Scalar\SimpleScalarParser;
 use Aeliot\YamlToken\Parser\SubParser\StreamParser;
@@ -41,7 +43,9 @@ use Aeliot\YamlToken\Parser\SubParser\YamlDirectiveParser;
 final class ParserRegistry
 {
     private ?BlockMappingParser $blockMappingParser = null;
-    private ?BlockScalarParser $blockScalarParser = null;
+    private ?BlockScalarFirstFragmentConsumer $blockScalarFirstFragmentConsumer = null;
+    private ?BlockScalarKeyNameConsumer $blockScalarKeyNameConsumer = null;
+    private ?BlockScalarValueConsumer $blockScalarValueConsumer = null;
     private ?BlockSequenceParser $blockSequenceParser = null;
     private ?CompactBlockMappingParser $compactBlockMappingParser = null;
     private ?CompactBlockSequenceParser $compactBlockSequenceParser = null;
@@ -75,9 +79,19 @@ final class ParserRegistry
         return $this->blockMappingParser ??= $this->assembler->createBlockMappingParser($this);
     }
 
-    public function getBlockScalarParser(): BlockScalarParser
+    public function getBlockScalarFirstFragmentConsumer(): BlockScalarFirstFragmentConsumer
     {
-        return $this->blockScalarParser ??= $this->assembler->createBlockScalarParser($this);
+        return $this->blockScalarFirstFragmentConsumer ??= $this->assembler->createBlockScalarFirstFragmentConsumer();
+    }
+
+    public function getBlockScalarKeyNameConsumer(): BlockScalarKeyNameConsumer
+    {
+        return $this->blockScalarKeyNameConsumer ??= $this->assembler->createBlockScalarKeyNameConsumer($this);
+    }
+
+    public function getBlockScalarValueConsumer(): BlockScalarValueConsumer
+    {
+        return $this->blockScalarValueConsumer ??= $this->assembler->createBlockScalarValueConsumer($this);
     }
 
     public function getBlockSequenceParser(): BlockSequenceParser

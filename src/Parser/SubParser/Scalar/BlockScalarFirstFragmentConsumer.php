@@ -16,66 +16,32 @@ namespace Aeliot\YamlToken\Parser\SubParser\Scalar;
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\BlockScalarIndicatorNode;
 use Aeliot\YamlToken\Node\IndentationNode;
-use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Node\ScalarNode;
-use Aeliot\YamlToken\Node\ValueNode;
-use Aeliot\YamlToken\Parser\Dto\IndentContext;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
 use Aeliot\YamlToken\Parser\SubParser\Consumer;
 use Aeliot\YamlToken\Token\TokenStreamInterface;
 
-final readonly class BlockScalarParser
+final readonly class BlockScalarFirstFragmentConsumer
 {
     public function __construct(
         private Consumer $consumer,
         private ErrorHelper $errorHelper,
-        private MultilinePlainScalarParser $multilinePlainScalarParser,
         private NodeFactory $nodeFactory,
     ) {
     }
 
     /**
-     * Consumes a block scalar (literal | or folded >) used as an explicit mapping key
-     * (YAML 1.2.2 §8.2.2 c-l-block-map-explicit-key). Tokens consumed:
-     * BLOCK_SCALAR_INDICATOR, optional sub-indicators (chomping/indentation), NEWLINE,
+     * Consumes a block scalar (literal | or folded >) indicator line and the first scalar fragment.
+     * Tokens consumed: BLOCK_SCALAR_INDICATOR, optional sub-indicators (chomping/indentation), NEWLINE,
      * optional leading empty lines, optional INDENTATION, and the scalar payload.
-     * The resulting scalar node is set as the {@see KeyNode::setName() name} of the key.
+     * Returns the scalar node, or null when the stream is truncated and $failOnTruncatedStream is false.
      */
-    public function consumeBlockScalarKeyName(TokenStreamInterface $tokens, KeyNode $keyNode): void
+    public function consume(TokenStreamInterface $tokens, Node $layoutTarget, bool $failOnTruncatedStream): ?ScalarNode
     {
-        $scalar = $this->consumeBlockScalarFirstFragment($tokens, $keyNode, failOnTruncatedStream: true);
-        $keyNode->setName($scalar);
-    }
-
-    /**
-     * Consumes a block scalar (literal | or folded >) used as a mapping value
-     * (YAML 1.2.2 §8.1.1). The first fragment and trailing empty lines are attached to
-     * {@see ValueNode}; non-empty continuation lines are appended via
-     * {@see MultilinePlainScalarParser::appendMultilinePlainScalarContinuations()}.
-     */
-    public function consumeBlockScalarValue(
-        TokenStreamInterface $tokens,
-        ValueNode $valueNode,
-        IndentContext $parentIndent,
-    ): void {
-        $scalar = $this->consumeBlockScalarFirstFragment($tokens, $valueNode, failOnTruncatedStream: false);
-        if (null === $scalar) {
-            return;
-        }
-
-        $valueNode->addChild($scalar);
-        $this->multilinePlainScalarParser->appendMultilinePlainScalarContinuations($tokens, $valueNode, $parentIndent);
-    }
-
-    private function consumeBlockScalarFirstFragment(
-        TokenStreamInterface $tokens,
-        Node $layoutTarget,
-        bool $failOnTruncatedStream,
-    ): ?ScalarNode {
         $token = $tokens->current();
         $layoutTarget->addChild(new BlockScalarIndicatorNode($token));
         $tokens->advance();

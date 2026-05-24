@@ -95,7 +95,7 @@ final readonly class ValueParser
             return;
         }
 
-        $this->registry->getBlockScalarParser()->consumeBlockScalarValue(
+        $this->registry->getBlockScalarValueConsumer()->consume(
             $parseContext->tokens,
             $valueNode,
             $parentIndent,

@@ -46,7 +46,9 @@ use Aeliot\YamlToken\Parser\SubParser\Flow\FlowSequenceParser;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowValueIndicatorConsumer;
 use Aeliot\YamlToken\Parser\SubParser\MergeInstructionParser;
 use Aeliot\YamlToken\Parser\SubParser\NodePropertiesParser;
-use Aeliot\YamlToken\Parser\SubParser\Scalar\BlockScalarParser;
+use Aeliot\YamlToken\Parser\SubParser\Scalar\BlockScalarFirstFragmentConsumer;
+use Aeliot\YamlToken\Parser\SubParser\Scalar\BlockScalarKeyNameConsumer;
+use Aeliot\YamlToken\Parser\SubParser\Scalar\BlockScalarValueConsumer;
 use Aeliot\YamlToken\Parser\SubParser\Scalar\MultilinePlainScalarParser;
 use Aeliot\YamlToken\Parser\SubParser\Scalar\SimpleScalarParser;
 use Aeliot\YamlToken\Parser\SubParser\StreamParser;
@@ -87,13 +89,27 @@ final class ParserAssembler
         );
     }
 
-    public function createBlockScalarParser(ParserRegistry $registry): BlockScalarParser
+    public function createBlockScalarFirstFragmentConsumer(): BlockScalarFirstFragmentConsumer
     {
-        return new BlockScalarParser(
+        return new BlockScalarFirstFragmentConsumer(
             $this->consumer,
             $this->errorHelper,
-            $registry->getMultilinePlainScalarParser(),
             $this->nodeFactory,
+        );
+    }
+
+    public function createBlockScalarKeyNameConsumer(ParserRegistry $registry): BlockScalarKeyNameConsumer
+    {
+        return new BlockScalarKeyNameConsumer(
+            $registry->getBlockScalarFirstFragmentConsumer(),
+        );
+    }
+
+    public function createBlockScalarValueConsumer(ParserRegistry $registry): BlockScalarValueConsumer
+    {
+        return new BlockScalarValueConsumer(
+            $registry->getBlockScalarFirstFragmentConsumer(),
+            $registry->getMultilinePlainScalarParser(),
         );
     }
 
