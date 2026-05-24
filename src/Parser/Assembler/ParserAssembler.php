@@ -95,6 +95,7 @@ final class ParserAssembler
             $this->consumer,
             $this->errorHelper,
             $this->nodeFactory,
+            $this->peekOffsetHelper,
         );
     }
 

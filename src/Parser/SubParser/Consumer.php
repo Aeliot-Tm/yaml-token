@@ -16,7 +16,6 @@ namespace Aeliot\YamlToken\Parser\SubParser;
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
-use Aeliot\YamlToken\Parser\Helper\PeekOffsetHelper;
 use Aeliot\YamlToken\Token\TokenStreamInterface;
 
 final readonly class Consumer
@@ -34,7 +33,6 @@ final readonly class Consumer
 
     public function __construct(
         private NodeFactory $nodeFactory,
-        private PeekOffsetHelper $peekOffsetHelper,
     ) {
     }
 
@@ -76,44 +74,6 @@ final readonly class Consumer
             }
             $root->addChild($this->nodeFactory->createSimpleNode($token));
             $tokens->advance();
-        }
-    }
-
-    /**
-     * Consumes trailing "empty" indented lines after the first block scalar payload line
-     * (YAML 1.2.2 §8.1.1.2 / rule [166]-[168] l-chomped-empty(n,t)).
-     */
-    public function consumeTrailingEmptyLines(TokenStreamInterface $tokens, Node $target): void
-    {
-        while (true) {
-            $newLineToken = $tokens->current();
-            if (TokenType::NEWLINE !== $newLineToken?->type) {
-                break;
-            }
-
-            $indentationToken = $tokens->peek(1);
-            if (TokenType::INDENTATION !== $indentationToken?->type) {
-                break;
-            }
-
-            $probe = $this->peekOffsetHelper->skipWhitespaceOffset($tokens, 2);
-
-            $afterIndentation = $tokens->peek($probe);
-            if (null !== $afterIndentation && TokenType::NEWLINE !== $afterIndentation->type) {
-                break;
-            }
-
-            $target->addChild($this->nodeFactory->createSimpleNode($newLineToken));
-            $tokens->advance();
-            $target->addChild($this->nodeFactory->createSimpleNode($indentationToken));
-            $tokens->advance();
-
-            $emptyLineSpace = $tokens->current();
-            while (TokenType::WHITESPACE === $emptyLineSpace?->type) {
-                $target->addChild($this->nodeFactory->createSimpleNode($emptyLineSpace));
-                $tokens->advance();
-                $emptyLineSpace = $tokens->current();
-            }
         }
     }
 }
