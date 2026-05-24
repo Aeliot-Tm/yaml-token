@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\AnchorNode;
 use Aeliot\YamlToken\Node\BlockSequenceEntryNode;
+use Aeliot\YamlToken\Node\BlockSequenceNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\DocumentStartNode;
 use Aeliot\YamlToken\Node\IndentationNode;
@@ -21,12 +22,12 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 1583874188,
+    'hash' => 1831032373,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 1340517457,
+            'hash' => 498834313,
             'properties' => [],
             'children' => [
                 [
@@ -53,7 +54,7 @@ return [
                 ],
                 [
                     'type' => KeyValueCoupleNode::class,
-                    'hash' => 2254164773,
+                    'hash' => 2008102039,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
@@ -65,7 +66,7 @@ return [
                         ],
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 48681764,
+                            'hash' => 1100118611,
                         ],
                     ],
                     'children' => [
@@ -105,11 +106,15 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 48681764,
+                            'hash' => 1100118611,
                             'properties' => [
                                 'nodeProperties' => [
                                     'type' => NodePropertiesNode::class,
                                     'hash' => 947279617,
+                                ],
+                                'payload' => [
+                                    'type' => BlockSequenceNode::class,
+                                    'hash' => 4131609126,
                                 ],
                             ],
                             'children' => [
@@ -159,141 +164,159 @@ return [
                                         ],
                                     ],
                                 ],
-                            ],
-                        ],
-                    ],
-                ],
-                [
-                    'type' => NewLineNode::class,
-                    'hash' => 763369711,
-                    'properties' => [
-                        'token' => [
-                            'type' => TokenType::NEWLINE,
-                            'text' => "\n",
-                        ],
-                    ],
-                    'children' => [],
-                ],
-                [
-                    'type' => BlockSequenceEntryNode::class,
-                    'hash' => 1965716434,
-                    'properties' => [
-                        'value' => [
-                            'type' => ValueNode::class,
-                            'hash' => 1439690933,
-                        ],
-                    ],
-                    'children' => [
-                        [
-                            'type' => SequenceEntryNode::class,
-                            'hash' => 4074150559,
-                            'properties' => [
-                                'token' => [
-                                    'type' => TokenType::SEQUENCE_ENTRY,
-                                    'text' => '-',
-                                ],
-                            ],
-                            'children' => [],
-                        ],
-                        [
-                            'type' => WhitespaceNode::class,
-                            'hash' => 1067539092,
-                            'properties' => [
-                                'token' => [
-                                    'type' => TokenType::WHITESPACE,
-                                    'text' => ' ',
-                                ],
-                            ],
-                            'children' => [],
-                        ],
-                        [
-                            'type' => ValueNode::class,
-                            'hash' => 1439690933,
-                            'properties' => [
-                                'payload' => [
-                                    'type' => PlainScalarNode::class,
-                                    'hash' => 4136715254,
-                                ],
-                            ],
-                            'children' => [
                                 [
-                                    'type' => PlainScalarNode::class,
-                                    'hash' => 4136715254,
+                                    'type' => NewLineNode::class,
+                                    'hash' => 763369711,
                                     'properties' => [
                                         'token' => [
-                                            'type' => TokenType::PLAIN_SCALAR,
-                                            'text' => 'a',
+                                            'type' => TokenType::NEWLINE,
+                                            'text' => "\n",
                                         ],
                                     ],
                                     'children' => [],
                                 ],
-                            ],
-                        ],
-                    ],
-                ],
-                [
-                    'type' => NewLineNode::class,
-                    'hash' => 763369711,
-                    'properties' => [
-                        'token' => [
-                            'type' => TokenType::NEWLINE,
-                            'text' => "\n",
-                        ],
-                    ],
-                    'children' => [],
-                ],
-                [
-                    'type' => BlockSequenceEntryNode::class,
-                    'hash' => 2311313798,
-                    'properties' => [
-                        'value' => [
-                            'type' => ValueNode::class,
-                            'hash' => 1154444269,
-                        ],
-                    ],
-                    'children' => [
-                        [
-                            'type' => SequenceEntryNode::class,
-                            'hash' => 4074150559,
-                            'properties' => [
-                                'token' => [
-                                    'type' => TokenType::SEQUENCE_ENTRY,
-                                    'text' => '-',
-                                ],
-                            ],
-                            'children' => [],
-                        ],
-                        [
-                            'type' => WhitespaceNode::class,
-                            'hash' => 1067539092,
-                            'properties' => [
-                                'token' => [
-                                    'type' => TokenType::WHITESPACE,
-                                    'text' => ' ',
-                                ],
-                            ],
-                            'children' => [],
-                        ],
-                        [
-                            'type' => ValueNode::class,
-                            'hash' => 1154444269,
-                            'properties' => [
-                                'payload' => [
-                                    'type' => PlainScalarNode::class,
-                                    'hash' => 1439155551,
-                                ],
-                            ],
-                            'children' => [
                                 [
-                                    'type' => PlainScalarNode::class,
-                                    'hash' => 1439155551,
+                                    'type' => BlockSequenceNode::class,
+                                    'hash' => 4131609126,
                                     'properties' => [
-                                        'token' => [
-                                            'type' => TokenType::PLAIN_SCALAR,
-                                            'text' => 'b',
+                                        'entries' => [
+                                            [
+                                                'type' => BlockSequenceEntryNode::class,
+                                                'hash' => 1965716434,
+                                            ],
+                                            [
+                                                'type' => BlockSequenceEntryNode::class,
+                                                'hash' => 2311313798,
+                                            ],
                                         ],
                                     ],
-                                    'children' => [],
+                                    'children' => [
+                                        [
+                                            'type' => BlockSequenceEntryNode::class,
+                                            'hash' => 1965716434,
+                                            'properties' => [
+                                                'value' => [
+                                                    'type' => ValueNode::class,
+                                                    'hash' => 1439690933,
+                                                ],
+                                            ],
+                                            'children' => [
+                                                [
+                                                    'type' => SequenceEntryNode::class,
+                                                    'hash' => 4074150559,
+                                                    'properties' => [
+                                                        'token' => [
+                                                            'type' => TokenType::SEQUENCE_ENTRY,
+                                                            'text' => '-',
+                                                        ],
+                                                    ],
+                                                    'children' => [],
+                                                ],
+                                                [
+                                                    'type' => WhitespaceNode::class,
+                                                    'hash' => 1067539092,
+                                                    'properties' => [
+                                                        'token' => [
+                                                            'type' => TokenType::WHITESPACE,
+                                                            'text' => ' ',
+                                                        ],
+                                                    ],
+                                                    'children' => [],
+                                                ],
+                                                [
+                                                    'type' => ValueNode::class,
+                                                    'hash' => 1439690933,
+                                                    'properties' => [
+                                                        'payload' => [
+                                                            'type' => PlainScalarNode::class,
+                                                            'hash' => 4136715254,
+                                                        ],
+                                                    ],
+                                                    'children' => [
+                                                        [
+                                                            'type' => PlainScalarNode::class,
+                                                            'hash' => 4136715254,
+                                                            'properties' => [
+                                                                'token' => [
+                                                                    'type' => TokenType::PLAIN_SCALAR,
+                                                                    'text' => 'a',
+                                                                ],
+                                                            ],
+                                                            'children' => [],
+                                                        ],
+                                                    ],
+                                                ],
+                                            ],
+                                        ],
+                                        [
+                                            'type' => NewLineNode::class,
+                                            'hash' => 763369711,
+                                            'properties' => [
+                                                'token' => [
+                                                    'type' => TokenType::NEWLINE,
+                                                    'text' => "\n",
+                                                ],
+                                            ],
+                                            'children' => [],
+                                        ],
+                                        [
+                                            'type' => BlockSequenceEntryNode::class,
+                                            'hash' => 2311313798,
+                                            'properties' => [
+                                                'value' => [
+                                                    'type' => ValueNode::class,
+                                                    'hash' => 1154444269,
+                                                ],
+                                            ],
+                                            'children' => [
+                                                [
+                                                    'type' => SequenceEntryNode::class,
+                                                    'hash' => 4074150559,
+                                                    'properties' => [
+                                                        'token' => [
+                                                            'type' => TokenType::SEQUENCE_ENTRY,
+                                                            'text' => '-',
+                                                        ],
+                                                    ],
+                                                    'children' => [],
+                                                ],
+                                                [
+                                                    'type' => WhitespaceNode::class,
+                                                    'hash' => 1067539092,
+                                                    'properties' => [
+                                                        'token' => [
+                                                            'type' => TokenType::WHITESPACE,
+                                                            'text' => ' ',
+                                                        ],
+                                                    ],
+                                                    'children' => [],
+                                                ],
+                                                [
+                                                    'type' => ValueNode::class,
+                                                    'hash' => 1154444269,
+                                                    'properties' => [
+                                                        'payload' => [
+                                                            'type' => PlainScalarNode::class,
+                                                            'hash' => 1439155551,
+                                                        ],
+                                                    ],
+                                                    'children' => [
+                                                        [
+                                                            'type' => PlainScalarNode::class,
+                                                            'hash' => 1439155551,
+                                                            'properties' => [
+                                                                'token' => [
+                                                                    'type' => TokenType::PLAIN_SCALAR,
+                                                                    'text' => 'b',
+                                                                ],
+                                                            ],
+                                                            'children' => [],
+                                                        ],
+                                                    ],
+                                                ],
+                                            ],
+                                        ],
+                                    ],
                                 ],
                             ],
                         ],

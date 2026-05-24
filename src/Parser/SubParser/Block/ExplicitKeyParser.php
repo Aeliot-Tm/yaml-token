@@ -94,12 +94,44 @@ final readonly class ExplicitKeyParser
         $indentLen = $head->indentLen;
         $significantToken = $head->significantToken;
         $scalarPeekOffset = $head->peekOffset;
-        if ($indentLen <= $entryIndentLen) {
+
+        if ($indentLen > $entryIndentLen) {
+            if (TokenType::SEQUENCE_ENTRY === $significantToken->type) {
+                $keyNode->setName($this->registry->getBlockSequenceParser()->parseBlockSequenceValue($parseContext, IndentContext::createForBlock($entryIndentLen)));
+
+                return;
+            }
+
+            if (
+                TokenType::EXPLICIT_KEY_INDICATOR === $significantToken->type
+                || TokenType::MERGE_INDICATOR === $significantToken->type
+            ) {
+                $keyNode->setName($this->registry->getBlockMappingParser()->parseBlockMappingValue($parseContext, IndentContext::createForBlock($entryIndentLen)));
+
+                return;
+            }
+
+            if ($significantToken->type->isScalar()) {
+                if ($this->multilineContinuationHelper->isImplicitYamlKeyOnContinuationLine($parseContext->tokens, $scalarPeekOffset)) {
+                    $keyNode->setName($this->registry->getBlockMappingParser()->parseBlockMappingValue($parseContext, IndentContext::createForBlock($entryIndentLen)));
+                } else {
+                    $this->consumeExplicitKeyMultilinePlainScalar($parseContext->tokens, $keyNode, $entryIndentLen);
+                }
+            }
+
+            return;
+        }
+
+        if ($indentLen !== $entryIndentLen) {
             return;
         }
 
         if (TokenType::SEQUENCE_ENTRY === $significantToken->type) {
-            $keyNode->setName($this->registry->getBlockSequenceParser()->parseBlockSequenceValue($parseContext, IndentContext::createForBlock($entryIndentLen)));
+            $keyNode->setName($this->registry->getBlockSequenceParser()->parseBlockSequenceValue(
+                $parseContext,
+                IndentContext::createForBlock($entryIndentLen - 1, true),
+                true,
+            ));
 
             return;
         }
@@ -109,16 +141,6 @@ final readonly class ExplicitKeyParser
             || TokenType::MERGE_INDICATOR === $significantToken->type
         ) {
             $keyNode->setName($this->registry->getBlockMappingParser()->parseBlockMappingValue($parseContext, IndentContext::createForBlock($entryIndentLen)));
-
-            return;
-        }
-
-        if ($significantToken->type->isScalar()) {
-            if ($this->multilineContinuationHelper->isImplicitYamlKeyOnContinuationLine($parseContext->tokens, $scalarPeekOffset)) {
-                $keyNode->setName($this->registry->getBlockMappingParser()->parseBlockMappingValue($parseContext, IndentContext::createForBlock($entryIndentLen)));
-            } else {
-                $this->consumeExplicitKeyMultilinePlainScalar($parseContext->tokens, $keyNode, $entryIndentLen);
-            }
         }
     }
 

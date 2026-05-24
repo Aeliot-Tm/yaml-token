@@ -15,6 +15,7 @@ namespace Aeliot\YamlToken\Test\Unit\Parser;
 
 use Aeliot\YamlToken\Emitter\YamlEmitter;
 use Aeliot\YamlToken\Node\BlockMappingNode;
+use Aeliot\YamlToken\Node\BlockSequenceNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\FlowMappingNode;
 use Aeliot\YamlToken\Node\FlowSequenceNode;
@@ -28,6 +29,7 @@ use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Parser::class)]
+#[UsesClass(BlockSequenceNode::class)]
 #[UsesClass(PlainScalarNode::class)]
 final class ComplexMappingKeysTest extends TestCase
 {
@@ -101,6 +103,21 @@ final class ComplexMappingKeysTest extends TestCase
         self::assertFalse($couples[0]->getKey()->isEmpty());
 
         self::assertInstanceOf(FlowSequenceNode::class, $couples[0]->getKey()->getName());
+    }
+
+    public function testParsesZeroIndentedBlockSequencesInExplicitMappingKey(): void
+    {
+        $source = "---\n?\n- a\n- b\n:\n- c\n- d\n";
+        $stream = (new ParserBuilder())->createParser()->parse($source);
+        self::assertSame($source, (new YamlEmitter())->emit($stream));
+
+        $couple = $this->getOnlyDocumentCouple($stream);
+        self::assertFalse($couple->getKey()->isEmpty());
+        self::assertInstanceOf(BlockSequenceNode::class, $couple->getKey()->getName());
+
+        $value = $couple->getValue();
+        self::assertNotNull($value);
+        self::assertInstanceOf(BlockSequenceNode::class, $value->getPayload());
     }
 
     private function getOnlyDocumentCouple(StreamNode $stream): KeyValueCoupleNode

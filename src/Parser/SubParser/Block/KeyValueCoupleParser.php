@@ -109,7 +109,10 @@ final readonly class KeyValueCoupleParser
         }
 
         $this->consumer->collectTypes($parseContext->tokens, [TokenType::VALUE_INDICATOR, TokenType::WHITESPACE], $keyValueCouple);
-        $keyValueCouple->addChild($this->registry->getValueParser()->parseValue($parseContext, IndentContext::createForBlock($indentLen)));
+        $keyValueCouple->addChild($this->registry->getValueParser()->parseValue(
+            $parseContext,
+            IndentContext::createForBlock($indentLen, true),
+        ));
         $this->anchorPostProcessor->postProcessKeyValueCouple($parseContext->anchorsRegistry, $keyValueCouple);
     }
 }

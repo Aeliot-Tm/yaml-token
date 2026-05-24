@@ -117,6 +117,12 @@ final readonly class BlockCollectionLoopHelper
             && $isBareDocumentEntry($parseContext)
         ) {
             $indentLen = 0;
+        } elseif (
+            $parentIndent->allowsSameIndentBlockSequence
+            && TokenType::SEQUENCE_ENTRY === $token->type
+            && 0 === $head->indentLen
+        ) {
+            $indentLen = 0;
         } else {
             return null;
         }

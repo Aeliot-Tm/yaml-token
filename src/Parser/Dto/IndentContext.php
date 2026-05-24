@@ -19,13 +19,14 @@ namespace Aeliot\YamlToken\Parser\Dto;
  * (YAML 1.2.2 rule [211], n = -1), or the flow-collection context
  * for values nested inside flow structures.
  *
- * Use the named flags {@see self::$isBareDocumentRoot} and
- * {@see self::$isFlowCollection} for context checks instead of
- * comparing {@see self::$indentLen} against magic numbers.
+ * Use the named flags {@see self::$allowsSameIndentBlockSequence},
+ * {@see self::$isBareDocumentRoot} and {@see self::$isFlowCollection} for
+ * context checks instead of comparing {@see self::$indentLen} against magic numbers.
  */
 final readonly class IndentContext
 {
     private function __construct(
+        public bool $allowsSameIndentBlockSequence,
         public int $indentLen,
         public bool $isBareDocumentRoot,
         public bool $isFlowCollection,
@@ -34,16 +35,16 @@ final readonly class IndentContext
 
     public static function createForBareDocument(): self
     {
-        return new self(-1, true, false);
+        return new self(false, -1, true, false);
     }
 
-    public static function createForBlock(int $indent): self
+    public static function createForBlock(int $indent, bool $allowsSameIndentBlockSequence = false): self
     {
-        return new self($indent, false, false);
+        return new self($allowsSameIndentBlockSequence, $indent, false, false);
     }
 
     public static function createForFlow(): self
     {
-        return new self(-2, false, true);
+        return new self(false, -2, false, true);
     }
 }

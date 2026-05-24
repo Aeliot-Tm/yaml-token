@@ -62,7 +62,14 @@ final readonly class IndentedBlockValueParser
             return;
         }
 
-        if ($head->indentLen > 0) {
+        if (
+            $head->indentLen > 0
+            || (
+                $parentIndent->allowsSameIndentBlockSequence
+                && $head->indentLen === $parentIndent->indentLen
+                && TokenType::SEQUENCE_ENTRY === $head->significantToken->type
+            )
+        ) {
             $this->dispatchIndentedContent($parseContext, $valueNode, $parentIndent, $head, $token);
 
             return;
@@ -306,7 +313,11 @@ final readonly class IndentedBlockValueParser
         // (same-indent sequence entry must be checked before the generic "too shallow" guard)
         if ($head->indentLen === $parentIndent->indentLen && TokenType::SEQUENCE_ENTRY === $head->significantToken->type) {
             $this->consumeBlockValueOpeningLayout($parseContext, $valueNode);
-            $valueNode->addChild($this->registry->getBlockSequenceParser()->parseBlockSequenceValue($parseContext, IndentContext::createForBlock($parentIndent->indentLen - 1), true));
+            $valueNode->addChild($this->registry->getBlockSequenceParser()->parseBlockSequenceValue(
+                $parseContext,
+                IndentContext::createForBlock($parentIndent->indentLen - 1, true),
+                true,
+            ));
 
             return;
         }
