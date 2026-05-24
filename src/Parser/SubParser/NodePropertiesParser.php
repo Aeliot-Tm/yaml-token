@@ -44,7 +44,7 @@ final readonly class NodePropertiesParser
     ): void {
         $properties = $propertiesHolder->getProperties();
         $hadProperties = null !== $properties;
-        $whitespaceBuffer = [];
+        $buffer = [];
 
         while (!$parseContext->tokens->isEnd()) {
             $token = $parseContext->tokens->current();
@@ -52,7 +52,7 @@ final readonly class NodePropertiesParser
                 if (null === $properties) {
                     $propertiesHolder->addChild(new WhitespaceNode($token));
                 } else {
-                    $whitespaceBuffer[] = new WhitespaceNode($token);
+                    $buffer[] = new WhitespaceNode($token);
                 }
                 $parseContext->tokens->advance();
                 continue;
@@ -62,11 +62,7 @@ final readonly class NodePropertiesParser
                 if (null !== $properties?->getAnchor()) {
                     throw new UnexpectedStateException($this->errorHelper->appendTokenLocation('Only one anchor is supported per node', $token));
                 }
-                $properties ??= new NodePropertiesNode();
-                foreach ($whitespaceBuffer as $whitespace) {
-                    $properties->addChild($whitespace);
-                }
-                $whitespaceBuffer = [];
+                $this->whitespaceBuffer($properties, $buffer);
                 $properties->addChild(new AnchorNode($token));
                 $parseContext->tokens->advance();
                 continue;
@@ -76,11 +72,7 @@ final readonly class NodePropertiesParser
                 if (null !== $properties?->getTag()) {
                     throw new UnexpectedStateException($this->errorHelper->appendTokenLocation('Only one tag is supported per node', $token));
                 }
-                $properties ??= new NodePropertiesNode();
-                foreach ($whitespaceBuffer as $whitespace) {
-                    $properties->addChild($whitespace);
-                }
-                $whitespaceBuffer = [];
+                $this->whitespaceBuffer($properties, $buffer);
                 $properties->addChild(new TagNode($token));
                 $parseContext->tokens->advance();
                 continue;
@@ -92,8 +84,17 @@ final readonly class NodePropertiesParser
         if (null !== $properties && !$hadProperties) {
             $propertiesHolder->addChild($properties);
         }
-        foreach ($whitespaceBuffer as $whitespace) {
+        foreach ($buffer as $whitespace) {
             $propertiesHolder->addChild($whitespace);
         }
+    }
+
+    private function whitespaceBuffer(?NodePropertiesNode &$properties, array &$buffer): void
+    {
+        $properties ??= new NodePropertiesNode();
+        foreach ($buffer as $whitespace) {
+            $properties->addChild($whitespace);
+        }
+        $buffer = [];
     }
 }
