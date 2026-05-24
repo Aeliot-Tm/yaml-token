@@ -13,6 +13,6 @@ declare(strict_types=1);
 
 namespace Aeliot\YamlToken\Node;
 
-class LiteralBlockScalarNode extends ScalarNode
+class LiteralBlockScalarNode extends BlockScalarNode
 {
 }

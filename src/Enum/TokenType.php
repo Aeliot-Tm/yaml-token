@@ -56,6 +56,16 @@ enum TokenType: string
         self::LITERAL_BLOCK_SCALAR_INDICATOR,
     ];
 
+    public function isFoldedBlockScalarIndicator(): bool
+    {
+        return $this === self::FOLDED_BLOCK_SCALAR_INDICATOR;
+    }
+
+    public function isLiteralBlockScalarIndicator(): bool
+    {
+        return $this === self::LITERAL_BLOCK_SCALAR_INDICATOR;
+    }
+
     public function isMergeIndicator(): bool
     {
         return self::MERGE_INDICATOR === $this;

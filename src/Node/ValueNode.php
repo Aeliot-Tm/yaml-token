@@ -25,6 +25,7 @@ class ValueNode extends AbstractNode implements NodePropertiesHolderInterface
         if (
             $child instanceof AliasNode
             || $child instanceof BlockMappingNode
+            || $child instanceof BlockScalarEntryNode
             || $child instanceof BlockSequenceNode
             || $child instanceof FlowMappingNode
             || $child instanceof FlowSequenceNode
