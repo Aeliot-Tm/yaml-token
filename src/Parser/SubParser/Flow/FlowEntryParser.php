@@ -14,14 +14,12 @@ declare(strict_types=1);
 namespace Aeliot\YamlToken\Parser\SubParser\Flow;
 
 use Aeliot\YamlToken\Enum\TokenType;
-use Aeliot\YamlToken\Node\AliasNode;
 use Aeliot\YamlToken\Node\FlowMappingNode;
 use Aeliot\YamlToken\Node\FlowSequenceNode;
+use Aeliot\YamlToken\Node\KeyNameAssignableInterface;
 use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
-use Aeliot\YamlToken\Node\MultilinePlainScalarNode;
 use Aeliot\YamlToken\Node\Node;
-use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Parser\Assembler\ParserRegistry;
 use Aeliot\YamlToken\Parser\Dto\IndentContext;
@@ -152,13 +150,7 @@ final readonly class FlowEntryParser
             $keyNode->addChild($properties);
         }
         $payload = $valueNode->getPayload();
-        if (
-            $payload instanceof AliasNode
-            || $payload instanceof FlowMappingNode
-            || $payload instanceof FlowSequenceNode
-            || $payload instanceof MultilinePlainScalarNode
-            || $payload instanceof ScalarNode
-        ) {
+        if ($payload instanceof KeyNameAssignableInterface) {
             $keyNode->setName($payload);
         }
     }

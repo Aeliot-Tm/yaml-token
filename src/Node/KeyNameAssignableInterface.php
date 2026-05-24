@@ -13,9 +13,6 @@ declare(strict_types=1);
 
 namespace Aeliot\YamlToken\Node;
 
-/**
- * Block-context plain scalar split across lines (PLAIN_SCALAR fragments).
- */
-class MultilinePlainScalarNode extends AbstractNode implements KeyNameAssignableInterface
+interface KeyNameAssignableInterface
 {
 }

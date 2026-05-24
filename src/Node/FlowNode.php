@@ -13,6 +13,6 @@ declare(strict_types=1);
 
 namespace Aeliot\YamlToken\Node;
 
-abstract class FlowNode extends AbstractNode
+abstract class FlowNode extends AbstractNode implements KeyNameAssignableInterface
 {
 }

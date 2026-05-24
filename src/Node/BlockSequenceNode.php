@@ -17,7 +17,7 @@ namespace Aeliot\YamlToken\Node;
  * Block sequence node (indented sequence entries).
  * Contains: BlockSequenceEntryNode[] (each holds a "-" indicator and a ValueNode).
  */
-class BlockSequenceNode extends AbstractNode
+class BlockSequenceNode extends AbstractNode implements KeyNameAssignableInterface
 {
     /**
      * @return list<BlockSequenceEntryNode>

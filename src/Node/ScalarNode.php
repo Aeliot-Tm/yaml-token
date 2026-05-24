@@ -15,7 +15,7 @@ namespace Aeliot\YamlToken\Node;
 
 use Aeliot\YamlToken\Token\Token;
 
-abstract class ScalarNode extends AbstractNode implements TokenHolderInterface
+abstract class ScalarNode extends AbstractNode implements KeyNameAssignableInterface, TokenHolderInterface
 {
     public function __construct(
         private Token $token,

@@ -15,7 +15,7 @@ namespace Aeliot\YamlToken\Node;
 
 use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
 
-class BlockScalarEntryNode extends AbstractNode
+class BlockScalarEntryNode extends AbstractNode implements KeyNameAssignableInterface
 {
     private ?BlockScalarOptionsNode $options = null;
     private ?BlockScalarNode $payload = null;

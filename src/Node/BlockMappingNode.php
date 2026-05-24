@@ -20,7 +20,7 @@ namespace Aeliot\YamlToken\Node;
  * A {@see MergeInstructionNode} (the YAML 1.1 merge-key extension `<< : *anchor`)
  * may also appear among the children but is not exposed via {@see self::getEntries()}.
  */
-class BlockMappingNode extends AbstractNode
+class BlockMappingNode extends AbstractNode implements KeyNameAssignableInterface
 {
     /**
      * @return list<KeyValueCoupleNode>
