@@ -448,6 +448,8 @@ final readonly class IndentedBlockValueParser
 
         $this->registerAnchorIfPresent($parseContext, $valueNode);
 
+        $this->consumer->collectSpaceAndComments($parseContext->tokens, $valueNode);
+
         $next = $parseContext->tokens->current();
         if (null === $next || TokenType::NEWLINE !== $next->type) {
             throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Expected NEWLINE after node properties, but %s given', $next?->type->value ?? '_nothing_'), $parseContext->tokens));
