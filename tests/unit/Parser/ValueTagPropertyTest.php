@@ -119,7 +119,7 @@ YAML));
     public function testThrowsWhenTwoTagsAreSpecifiedForSameValue(): void
     {
         $this->expectException(UnexpectedStateException::class);
-        $this->expectExceptionMessageMatches('/^Only one tag is supported per value node/');
+        $this->expectExceptionMessageMatches('/^Only one TAG is supported per node/');
 
         (new ParserBuilder())->createParser()->parse(<<<'YAML'
 key: !!str !local value

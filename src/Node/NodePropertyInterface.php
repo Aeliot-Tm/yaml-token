@@ -13,17 +13,6 @@ declare(strict_types=1);
 
 namespace Aeliot\YamlToken\Node;
 
-use Aeliot\YamlToken\Token\Token;
-
-class TagNode extends AbstractNode implements NodePropertyInterface, TokenHolderInterface
+interface NodePropertyInterface
 {
-    public function __construct(
-        private Token $token,
-    ) {
-    }
-
-    public function getToken(): Token
-    {
-        return $this->token;
-    }
 }

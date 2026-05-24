@@ -26,6 +26,11 @@ use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
 
 final readonly class NodePropertiesParser
 {
+    private const TOKEN_TYPE_NODES = [
+        TokenType::ANCHOR->value => AnchorNode::class,
+        TokenType::TAG->value => TagNode::class,
+    ];
+
     public function __construct(
         private ErrorHelper $errorHelper,
     ) {
@@ -58,22 +63,13 @@ final readonly class NodePropertiesParser
                 continue;
             }
 
-            if (TokenType::ANCHOR === $token->type) {
-                if (null !== $properties?->getAnchor()) {
-                    throw new UnexpectedStateException($this->errorHelper->appendTokenLocation('Only one anchor is supported per node', $token));
+            if (isset(self::TOKEN_TYPE_NODES[$token->type->value])) {
+                $class = self::TOKEN_TYPE_NODES[$token->type->value];
+                if (null !== $properties?->getProperty($class)) {
+                    throw new UnexpectedStateException($this->errorHelper->appendTokenLocation(\sprintf('Only one %s is supported per node', $token->type->value), $token));
                 }
                 $this->whitespaceBuffer($properties, $buffer);
-                $properties->addChild(new AnchorNode($token));
-                $parseContext->tokens->advance();
-                continue;
-            }
-
-            if (TokenType::TAG === $token->type) {
-                if (null !== $properties?->getTag()) {
-                    throw new UnexpectedStateException($this->errorHelper->appendTokenLocation('Only one tag is supported per node', $token));
-                }
-                $this->whitespaceBuffer($properties, $buffer);
-                $properties->addChild(new TagNode($token));
+                $properties->addChild(new $class($token));
                 $parseContext->tokens->advance();
                 continue;
             }

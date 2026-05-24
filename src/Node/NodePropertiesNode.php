@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Aeliot\YamlToken\Node;
 
+use Aeliot\YamlToken\Exception\NotSupportedNodePropertyException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
 
 /**
@@ -45,6 +46,18 @@ class NodePropertiesNode extends AbstractNode
     public function getAnchor(): ?AnchorNode
     {
         return $this->anchor;
+    }
+
+    /**
+     * @param class-string<NodePropertyInterface> $class
+     */
+    public function getProperty(string $class): ?NodePropertyInterface
+    {
+        return match ($class) {
+            AnchorNode::class => $this->anchor,
+            TagNode::class => $this->tag,
+            default => throw new NotSupportedNodePropertyException(\sprintf('Requested not supported property "%s"', $class)),
+        };
     }
 
     public function getTag(): ?TagNode
