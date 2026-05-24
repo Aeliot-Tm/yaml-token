@@ -85,6 +85,11 @@ final readonly class NodePropertiesParser
         }
     }
 
+    /**
+     * @param array<WhitespaceNode> $buffer
+     *
+     * @param-out NodePropertiesNode $properties
+     */
     private function whitespaceBuffer(?NodePropertiesNode &$properties, array &$buffer): void
     {
         $properties ??= new NodePropertiesNode();
