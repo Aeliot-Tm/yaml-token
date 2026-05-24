@@ -24,11 +24,13 @@ use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
 use Aeliot\YamlToken\Parser\Helper\MultilineContinuationHelper;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
 use Aeliot\YamlToken\Parser\Helper\PeekOffsetHelper;
+use Aeliot\YamlToken\Parser\SubParser\Consumer;
 use Aeliot\YamlToken\Token\TokenStreamInterface;
 
 final readonly class MultilinePlainScalarParser
 {
     public function __construct(
+        private Consumer $consumer,
         private ErrorHelper $errorHelper,
         private MultilineContinuationHelper $multilineContinuationHelper,
         private NodeFactory $nodeFactory,
@@ -69,14 +71,9 @@ final readonly class MultilinePlainScalarParser
 
     private function appendWhitespaceThenScalar(TokenStreamInterface $tokens, Node $targetNode): void
     {
-        $contentHead = $tokens->current();
-        while (TokenType::WHITESPACE === $contentHead->type) {
-            $targetNode->addChild(new WhitespaceNode($contentHead));
-            $tokens->advance();
-            $contentHead = $tokens->current();
-        }
+        $this->consumer->collectWhitespace($tokens, $targetNode);
 
-        $targetNode->addChild($this->nodeFactory->createScalarNode($contentHead));
+        $targetNode->addChild($this->nodeFactory->createScalarNode($tokens->current()));
         $tokens->advance();
     }
 

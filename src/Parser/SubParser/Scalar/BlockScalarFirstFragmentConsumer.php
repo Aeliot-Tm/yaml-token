@@ -124,12 +124,7 @@ final readonly class BlockScalarFirstFragmentConsumer
             $target->addChild($this->nodeFactory->createSimpleNode($indentationToken));
             $tokens->advance();
 
-            $emptyLineSpace = $tokens->current();
-            while (TokenType::WHITESPACE === $emptyLineSpace?->type) {
-                $target->addChild($this->nodeFactory->createSimpleNode($emptyLineSpace));
-                $tokens->advance();
-                $emptyLineSpace = $tokens->current();
-            }
+            $this->consumer->collectWhitespace($tokens, $target);
         }
     }
 }

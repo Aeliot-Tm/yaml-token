@@ -159,6 +159,7 @@ final class ParserAssembler
     {
         return new ExplicitKeyParser(
             $this->getAliasResolver(),
+            $this->consumer,
             $this->errorHelper,
             $this->lookAheadHelper,
             $this->multilineContinuationHelper,
@@ -197,7 +198,7 @@ final class ParserAssembler
 
     public function createFlowMultilinePlainScalarConsumer(): FlowMultilinePlainScalarConsumer
     {
-        return new FlowMultilinePlainScalarConsumer($this->nodeFactory, $this->peekOffsetHelper);
+        return new FlowMultilinePlainScalarConsumer($this->consumer, $this->nodeFactory, $this->peekOffsetHelper);
     }
 
     public function createFlowMultilinePlainScalarKeyParser(ParserRegistry $registry): FlowMultilinePlainScalarKeyParser
@@ -277,7 +278,7 @@ final class ParserAssembler
 
     public function createMultilinePlainScalarParser(): MultilinePlainScalarParser
     {
-        return new MultilinePlainScalarParser($this->errorHelper, $this->multilineContinuationHelper, $this->nodeFactory, $this->peekOffsetHelper);
+        return new MultilinePlainScalarParser($this->consumer, $this->errorHelper, $this->multilineContinuationHelper, $this->nodeFactory, $this->peekOffsetHelper);
     }
 
     public function createSimpleScalarParser(ParserRegistry $registry): SimpleScalarParser

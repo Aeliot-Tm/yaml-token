@@ -16,14 +16,15 @@ namespace Aeliot\YamlToken\Parser\SubParser\Flow;
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\MultilinePlainScalarNode;
 use Aeliot\YamlToken\Node\NewLineNode;
-use Aeliot\YamlToken\Node\WhitespaceNode;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
 use Aeliot\YamlToken\Parser\Helper\PeekOffsetHelper;
+use Aeliot\YamlToken\Parser\SubParser\Consumer;
 use Aeliot\YamlToken\Token\TokenStreamInterface;
 
 final readonly class FlowMultilinePlainScalarConsumer
 {
     public function __construct(
+        private Consumer $consumer,
         private NodeFactory $nodeFactory,
         private PeekOffsetHelper $peekOffsetHelper,
     ) {
@@ -60,12 +61,7 @@ final readonly class FlowMultilinePlainScalarConsumer
         $multiline->addChild(new NewLineNode($newLine));
         $tokens->advance();
 
-        $contentHead = $tokens->current();
-        while (TokenType::WHITESPACE === $contentHead->type) {
-            $multiline->addChild(new WhitespaceNode($contentHead));
-            $tokens->advance();
-            $contentHead = $tokens->current();
-        }
+        $this->consumer->collectWhitespace($tokens, $multiline);
 
         $multiline->addChild($this->nodeFactory->createScalarNode($scalarToken));
         $tokens->advance();

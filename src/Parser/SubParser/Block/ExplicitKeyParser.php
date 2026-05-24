@@ -33,6 +33,7 @@ use Aeliot\YamlToken\Parser\Helper\LookAheadHelper;
 use Aeliot\YamlToken\Parser\Helper\MultilineContinuationHelper;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
 use Aeliot\YamlToken\Parser\Helper\PeekOffsetHelper;
+use Aeliot\YamlToken\Parser\SubParser\Consumer;
 use Aeliot\YamlToken\Parser\SubParser\NodePropertiesParser;
 use Aeliot\YamlToken\Token\Token;
 use Aeliot\YamlToken\Token\TokenStreamInterface;
@@ -41,6 +42,7 @@ final readonly class ExplicitKeyParser
 {
     public function __construct(
         private AliasResolver $aliasResolver,
+        private Consumer $consumer,
         private ErrorHelper $errorHelper,
         private LookAheadHelper $lookAheadHelper,
         private MultilineContinuationHelper $multilineContinuationHelper,
@@ -271,14 +273,9 @@ final readonly class ExplicitKeyParser
         $tokens->advance();
         $tokens->advance();
 
-        $contentHead = $tokens->current();
-        while (TokenType::WHITESPACE === $contentHead->type) {
-            $multiline->addChild(new WhitespaceNode($contentHead));
-            $tokens->advance();
-            $contentHead = $tokens->current();
-        }
+        $this->consumer->collectWhitespace($tokens, $multiline);
 
-        $multiline->addChild($this->nodeFactory->createScalarNode($contentHead));
+        $multiline->addChild($this->nodeFactory->createScalarNode($tokens->current()));
         $tokens->advance();
 
         return true;

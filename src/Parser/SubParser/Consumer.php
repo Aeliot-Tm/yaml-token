@@ -65,6 +65,11 @@ final readonly class Consumer
         }
     }
 
+    public function collectWhitespace(TokenStreamInterface $tokens, Node $root): void
+    {
+        $this->collectTypes($tokens, [TokenType::WHITESPACE], $root);
+    }
+
     public function collectUntil(TokenStreamInterface $tokens, TokenType $until, Node $root): void
     {
         while (true) {
