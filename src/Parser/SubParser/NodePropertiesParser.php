@@ -50,10 +50,9 @@ final readonly class NodePropertiesParser
     private function collectPropertiesInto(
         ParseContext $parseContext,
         AbstractNode $parentNode,
-        ?NodePropertiesNode $existingProperties,
+        ?NodePropertiesNode $properties,
         string $nodeTypeLabel,
     ): void {
-        $properties = $existingProperties;
         $hadProperties = null !== $properties;
         $whitespaceBuffer = [];
 
