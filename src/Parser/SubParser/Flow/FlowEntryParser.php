@@ -146,12 +146,15 @@ final readonly class FlowEntryParser
         }
 
         $valueNode = $operand;
-        if (null !== ($properties = $valueNode->getProperties())) {
-            $keyNode->addChild($properties);
-        }
         $payload = $valueNode->getPayload();
-        if ($payload instanceof KeyNameAssignableInterface) {
-            $keyNode->setName($payload);
+
+        foreach ($valueNode->getChildren() as $child) {
+            if ($child === $payload && $payload instanceof KeyNameAssignableInterface) {
+                $keyNode->setName($payload);
+                continue;
+            }
+
+            $keyNode->addChild($child);
         }
     }
 }
