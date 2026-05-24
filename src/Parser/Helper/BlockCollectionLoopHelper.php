@@ -18,12 +18,17 @@ use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Parser\Consumer;
 use Aeliot\YamlToken\Parser\Dto\IndentContext;
 use Aeliot\YamlToken\Parser\Dto\ParseContext;
+use Aeliot\YamlToken\Parser\Dto\ParseState;
+use Aeliot\YamlToken\Parser\Exception\IndentationInvalidException;
+use Aeliot\YamlToken\Parser\Exception\IndentationOverrideException;
+use Aeliot\YamlToken\Parser\Exception\IndentationUndefinedException;
+use Aeliot\YamlToken\Token\TokenStreamInterface;
 
 final readonly class BlockCollectionLoopHelper
 {
     public function __construct(
         private Consumer $consumer,
-        private IndentationHelper $indentationHelper,
+        private ErrorHelper $errorHelper,
         private LookAheadHelper $lookAheadHelper,
     ) {
     }
@@ -117,8 +122,8 @@ final readonly class BlockCollectionLoopHelper
         }
 
         if ($indentLen > 0) {
-            $this->indentationHelper->registerIndentStepIfNeeded($parseContext->state, $parseContext->tokens, $indentLen);
-            $this->indentationHelper->assertIndentLenIsValid($parseContext->state, $parseContext->tokens, $indentLen);
+            $this->registerIndentStepIfNeeded($parseContext->state, $parseContext->tokens, $indentLen);
+            $this->assertIndentLenIsValid($parseContext->state, $parseContext->tokens, $indentLen);
         }
 
         if ($indentLen <= $parentIndent->indentLen) {
@@ -126,5 +131,27 @@ final readonly class BlockCollectionLoopHelper
         }
 
         return $indentLen;
+    }
+
+    private function assertIndentLenIsValid(ParseState $state, TokenStreamInterface $tokens, int $indentLen): void
+    {
+        try {
+            $state->assertIndentLenIsValid($indentLen);
+        } catch (IndentationInvalidException|IndentationUndefinedException $e) {
+            $this->errorHelper->wrapParseStateIndentationException($e, $tokens);
+        }
+    }
+
+    private function registerIndentStepIfNeeded(ParseState $state, TokenStreamInterface $tokens, int $indentLen): void
+    {
+        if ($state->isIndentLenRegistered()) {
+            return;
+        }
+
+        try {
+            $state->registerIndentStepLen($indentLen);
+        } catch (IndentationInvalidException|IndentationOverrideException $e) {
+            $this->errorHelper->wrapParseStateIndentationException($e, $tokens);
+        }
     }
 }

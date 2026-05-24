@@ -26,7 +26,6 @@ use Aeliot\YamlToken\Parser\Helper\Identifier\FlowStructureIdentifier;
 use Aeliot\YamlToken\Parser\Helper\Identifier\KeyIdentifier;
 use Aeliot\YamlToken\Parser\Helper\Identifier\NodePropertyIdentifier;
 use Aeliot\YamlToken\Parser\Helper\Identifier\SequenceIdentifier;
-use Aeliot\YamlToken\Parser\Helper\IndentationHelper;
 use Aeliot\YamlToken\Parser\Helper\LookAheadHelper;
 use Aeliot\YamlToken\Parser\Helper\MultilineContinuationHelper;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
@@ -70,7 +69,6 @@ final class ParserAssembler
         private AnchorPostProcessor $anchorPostProcessor,
         private Consumer $consumer,
         private ErrorHelper $errorHelper,
-        private IndentationHelper $indentationHelper,
         private LookAheadHelper $lookAheadHelper,
         private MultilineContinuationHelper $multilineContinuationHelper,
         private NodeFactory $nodeFactory,
@@ -272,7 +270,7 @@ final class ParserAssembler
     {
         return $this->blockCollectionLoopHelper ??= new BlockCollectionLoopHelper(
             $this->consumer,
-            $this->indentationHelper,
+            $this->errorHelper,
             $this->lookAheadHelper,
         );
     }
