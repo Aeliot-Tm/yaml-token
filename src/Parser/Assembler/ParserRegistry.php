@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Aeliot\YamlToken\Parser\Assembler;
 
-use Aeliot\YamlToken\Parser\Helper\BlockMultilinePlainScalarHelper;
 use Aeliot\YamlToken\Parser\Helper\FlowMultilinePlainScalarHelper;
 use Aeliot\YamlToken\Parser\SubParser\Block\BlockMappingParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\BlockSequenceParser;
@@ -41,7 +40,6 @@ use Aeliot\YamlToken\Parser\SubParser\YamlDirectiveParser;
 final class ParserRegistry
 {
     private ?BlockMappingParser $blockMappingParser = null;
-    private ?BlockMultilinePlainScalarHelper $blockMultilinePlainScalarHelper = null;
     private ?BlockScalarParser $blockScalarParser = null;
     private ?BlockSequenceParser $blockSequenceParser = null;
     private ?CompactBlockMappingParser $compactBlockMappingParser = null;
@@ -73,11 +71,6 @@ final class ParserRegistry
     public function getBlockMappingParser(): BlockMappingParser
     {
         return $this->blockMappingParser ??= $this->assembler->createBlockMappingParser($this);
-    }
-
-    public function getBlockMultilinePlainScalarHelper(): BlockMultilinePlainScalarHelper
-    {
-        return $this->blockMultilinePlainScalarHelper ??= $this->assembler->createBlockMultilinePlainScalarHelper($this);
     }
 
     public function getBlockScalarParser(): BlockScalarParser
