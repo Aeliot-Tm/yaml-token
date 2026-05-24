@@ -59,6 +59,10 @@ final class Lexer
      */
     private const CHARS_WHITESPACE = [...self::CHARS_HORIZONTAL_WHITESPACE, ...self::CHARS_LINE_BREAK];
 
+    private const DOC_MARKER_END = '...';
+
+    private const DOC_MARKER_START = '---';
+
     /**
      * @var array<string, TokenType>
      */
@@ -151,6 +155,14 @@ final class Lexer
         $width = $this->utf8CodePointByteWidth($harvester, $harvester->cursor->position);
         $harvester->cursor->position += $width;
         ++$harvester->cursor->column;
+    }
+
+    private function advanceMarker(Harvester $harvester, string $marker): void
+    {
+        $len = \strlen($marker);
+        for ($i = 0; $i < $len; ++$i) {
+            $this->advance($harvester);
+        }
     }
 
     private function applyBlockPlainContinuationIndentRules(Harvester $harvester, string $indent): void
@@ -290,7 +302,7 @@ final class Lexer
         int $lineIndent,
         ?int $autoParentIndent,
     ): bool {
-        if (!$this->isDocumentEndMarkerAt($harvester)) {
+        if (!$this->isDocumentEndMarkerAt($harvester, self::DOC_MARKER_END)) {
             return false;
         }
         if (null !== $autoParentIndent && $autoParentIndent >= 0) {
@@ -371,13 +383,13 @@ final class Lexer
             && '%' === $harvester->input[$harvester->cursor->position];
     }
 
-    private function isDocumentEndMarkerAt(Harvester $harvester): bool
+    private function isDocumentEndMarkerAt(Harvester $harvester, string $marker): bool
     {
         $position = $harvester->cursor->position;
         if ($position + 3 > $harvester->length) {
             return false;
         }
-        if ('...' !== substr($harvester->input, $position, 3)) {
+        if ($marker !== substr($harvester->input, $position, 3)) {
             return false;
         }
         if ($position + 3 === $harvester->length) {
@@ -1104,21 +1116,23 @@ final class Lexer
         }
 
         // DOCUMENT_START (---)
-        if ($this->match($harvester, '---')) {
+        if ($this->isDocumentEndMarkerAt($harvester, self::DOC_MARKER_START)) {
+            $this->advanceMarker($harvester, self::DOC_MARKER_START);
             $harvester->cursor->inDirectivePrefixZone = false;
             $this->resetBlockMappingPlainState($harvester->cursor);
             $harvester->cursor->flowCollectionStack = [];
             $harvester->cursor->plainScalarContinuationBaseIndent = 0;
-            $harvester->stream->addToken(new Token(TokenType::DOCUMENT_START, '---', $startLine, $startColumn));
+            $harvester->stream->addToken(new Token(TokenType::DOCUMENT_START, self::DOC_MARKER_START, $startLine, $startColumn));
 
             return;
         }
 
         // DOCUMENT_END (...)
-        if ($this->match($harvester, '...')) {
+        if ($this->isDocumentEndMarkerAt($harvester, self::DOC_MARKER_END)) {
+            $this->advanceMarker($harvester, self::DOC_MARKER_END);
             $this->resetBlockMappingPlainState($harvester->cursor);
             $harvester->cursor->flowCollectionStack = [];
-            $harvester->stream->addToken(new Token(TokenType::DOCUMENT_END, '...', $startLine, $startColumn));
+            $harvester->stream->addToken(new Token(TokenType::DOCUMENT_END, self::DOC_MARKER_END, $startLine, $startColumn));
             $harvester->cursor->inDirectivePrefixZone = true;
 
             return;
