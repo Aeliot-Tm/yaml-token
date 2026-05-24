@@ -213,6 +213,10 @@ All extend `SyntaxNode` (constructor: `Token`; no extra methods unless noted).
     for each continuation line (no `INDENTATION` token, since `INDENTATION` is only emitted at column 1
     outside flow). The complete key node (including multiline handling) is built by
     [`KeyParser::getKeyNode()`](../../../src/Parser/SubParser/Block/KeyParser.php).
+    Key name building for block-context scalars (explicit `?` and implicit) is delegated to
+    [`BlockMultilinePlainScalarHelper`](../../../src/Parser/Helper/BlockMultilinePlainScalarHelper.php);
+    flow-context key building is handled by
+    [`FlowMultilinePlainScalarHelper`](../../../src/Parser/Helper/FlowMultilinePlainScalarHelper.php).
     `KeyNode::setName(Node)` assigns the key name — a single `ScalarNode` subclass for simple keys,
     or a `MultilinePlainScalarNode` for multiline plain keys, or a flow collection node.
     Trailing `NEWLINE` + `WHITESPACE` that precede `,`, `}`, or `:` on a separate continuation

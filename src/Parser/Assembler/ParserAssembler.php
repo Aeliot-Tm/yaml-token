@@ -17,6 +17,7 @@ use Aeliot\YamlToken\Parser\Consumer;
 use Aeliot\YamlToken\Parser\Helper\AliasResolver;
 use Aeliot\YamlToken\Parser\Helper\AnchorPostProcessor;
 use Aeliot\YamlToken\Parser\Helper\BlockCollectionLoopHelper;
+use Aeliot\YamlToken\Parser\Helper\BlockMultilinePlainScalarHelper;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
 use Aeliot\YamlToken\Parser\Helper\FlowCollectionHelper;
 use Aeliot\YamlToken\Parser\Helper\FlowMultilinePlainScalarHelper;
@@ -86,6 +87,16 @@ final class ParserAssembler
             $this->getBlockStructureIdentifier(),
             $this->errorHelper,
             $registry,
+        );
+    }
+
+    public function createBlockMultilinePlainScalarHelper(ParserRegistry $registry): BlockMultilinePlainScalarHelper
+    {
+        return new BlockMultilinePlainScalarHelper(
+            $this->errorHelper,
+            $registry->getFlowMultilinePlainScalarHelper(),
+            $this->nodeFactory,
+            $this->peekOffsetHelper,
         );
     }
 
@@ -232,9 +243,9 @@ final class ParserAssembler
         );
     }
 
-    public function createMultilinePlainScalarParser(ParserRegistry $registry): MultilinePlainScalarParser
+    public function createMultilinePlainScalarParser(): MultilinePlainScalarParser
     {
-        return new MultilinePlainScalarParser($this->errorHelper, $this->multilineContinuationHelper, $this->nodeFactory, $this->peekOffsetHelper, $registry);
+        return new MultilinePlainScalarParser($this->errorHelper, $this->multilineContinuationHelper, $this->nodeFactory, $this->peekOffsetHelper);
     }
 
     public function createSimpleScalarParser(ParserRegistry $registry): SimpleScalarParser

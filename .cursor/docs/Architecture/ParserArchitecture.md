@@ -148,7 +148,7 @@ class defines its own `parse()` (or similarly named) signature.
 | Class | Responsibility |
 |-------|----------------|
 | [`SimpleScalarParser`](../../../src/Parser/SubParser/Scalar/SimpleScalarParser.php) | Single plain, single-quoted, or double-quoted scalar token |
-| [`MultilinePlainScalarParser`](../../../src/Parser/SubParser/Scalar/MultilinePlainScalarParser.php) | Multiline plain scalars, continuation lines, explicit-block-key plain scalars |
+| [`MultilinePlainScalarParser`](../../../src/Parser/SubParser/Scalar/MultilinePlainScalarParser.php) | Multiline plain scalar continuation lines (appends chunks to an existing multiline node) |
 | [`BlockScalarParser`](../../../src/Parser/SubParser/Scalar/BlockScalarParser.php) | Block scalars (`\|` / `>`) as mapping keys and values |
 
 ## Helpers
@@ -160,6 +160,8 @@ class defines its own `parse()` (or similarly named) signature.
 | [`ErrorHelper`](../../../src/Parser/Helper/ErrorHelper.php) | Append line/column to error messages |
 | [`IndentationHelper`](../../../src/Parser/Helper/IndentationHelper.php) | Validate and register indent steps |
 | [`LookAheadHelper`](../../../src/Parser/Helper/LookAheadHelper.php) | Peek significant block heads; skip insignificant lines |
+| [`BlockMultilinePlainScalarHelper`](../../../src/Parser/Helper/BlockMultilinePlainScalarHelper.php) | Build plain-scalar key names for block-context keys (explicit `?` and implicit) |
+| [`FlowMultilinePlainScalarHelper`](../../../src/Parser/Helper/FlowMultilinePlainScalarHelper.php) | Build plain-scalar key and value names for flow-context keys |
 | [`MultilineContinuationHelper`](../../../src/Parser/Helper/MultilineContinuationHelper.php) | Predicates for multiline plain scalar continuations |
 | [`AnchorPostProcessor`](../../../src/Parser/Helper/AnchorPostProcessor.php) | Register anchors on key/value couples after they are built |
 
