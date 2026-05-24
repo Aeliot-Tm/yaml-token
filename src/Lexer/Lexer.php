@@ -285,6 +285,21 @@ final class Lexer
         return !\in_array($char, self::CHARS_ANCHOR_OR_TAG_FORBIDDEN, true);
     }
 
+    private function isBlockScalarBodyDocumentEndBreak(
+        Harvester $harvester,
+        int $lineIndent,
+        ?int $autoParentIndent,
+    ): bool {
+        if (!$this->isDocumentEndMarkerAt($harvester)) {
+            return false;
+        }
+        if (null !== $autoParentIndent && $autoParentIndent >= 0) {
+            return $lineIndent <= $autoParentIndent;
+        }
+
+        return 0 === $lineIndent;
+    }
+
     private function isBlockScalarStart(Harvester $harvester): bool
     {
         $nextChar = $this->getNextChar($harvester);
@@ -354,6 +369,22 @@ final class Lexer
             && 1 === $harvester->cursor->column
             && $harvester->cursor->position < $harvester->length
             && '%' === $harvester->input[$harvester->cursor->position];
+    }
+
+    private function isDocumentEndMarkerAt(Harvester $harvester): bool
+    {
+        $position = $harvester->cursor->position;
+        if ($position + 3 > $harvester->length) {
+            return false;
+        }
+        if ('...' !== substr($harvester->input, $position, 3)) {
+            return false;
+        }
+        if ($position + 3 === $harvester->length) {
+            return true;
+        }
+
+        return \in_array($harvester->input[$position + 3], self::CHARS_WHITESPACE, true);
     }
 
     private function isFlowExpectsValueSeparatorColon(Cursor $cursor): bool
@@ -708,6 +739,16 @@ final class Lexer
 
             if ($harvester->cursor->position >= $harvester->length || \in_array($harvester->input[$harvester->cursor->position], self::CHARS_LINE_BREAK, true)) {
                 continue;
+            }
+
+            if ($this->isBlockScalarBodyDocumentEndBreak($harvester, $lineIndent, $autoParentIndent)) {
+                $backtrack = $harvester->cursor->position - $indentStart;
+                if ($backtrack > 0) {
+                    $result = substr($result, 0, -$backtrack);
+                    $harvester->cursor->position = $indentStart;
+                    $harvester->cursor->column = max(1, $harvester->cursor->column - $backtrack);
+                }
+                break;
             }
 
             if (null === $minIndent) {

@@ -77,6 +77,12 @@ The rules below describe the practical behavior relied upon by lexer unit tests.
     first body line ends the block as soon as that indent is read (the body buffer may end with
     spaces, not a newline); the same scan builds the raw body that is split per line when the header
     had a `BLOCK_SCALAR_INDENTATION_INDICATOR` digit.
+  - **Document end** (`...`): a line that starts with the document-end marker (after leading
+    spaces) also ends the block body when the marker is at the outer indent level — at column 0
+    for a bare document / top-level node (`blockScalarAutoContentParentIndent` = -1), or at
+    indent ≤ the block value parent indent when that parent is set. Indented `...` inside the
+    scalar content (e.g. under a deeper content indent) stays part of the body. The marker line
+    is not consumed and is emitted next as `DOCUMENT_END`.
   - **Explicit digit body** (same scan as the single-token path, then split per line): the YAML
     explicit floor is **key parent indent** (spaces before the mapping key on the header line,
     taken from the last `PLAIN_SCALAR` before `VALUE_INDICATOR` on that line) plus the digit.
