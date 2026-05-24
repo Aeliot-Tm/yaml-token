@@ -17,19 +17,18 @@ use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\FlowSequenceNode;
 use Aeliot\YamlToken\Parser\Assembler\ParserRegistry;
 use Aeliot\YamlToken\Parser\Dto\ParseContext;
-use Aeliot\YamlToken\Parser\Helper\FlowCollectionHelper;
 
 final readonly class FlowSequenceParser
 {
     public function __construct(
-        private FlowCollectionHelper $flowCollectionHelper,
+        private FlowCollectionParser $flowCollectionParser,
         private ParserRegistry $registry,
     ) {
     }
 
     public function parse(ParseContext $parseContext): FlowSequenceNode
     {
-        return $this->flowCollectionHelper->parseFlowCollection(
+        return $this->flowCollectionParser->parse(
             $parseContext,
             new FlowSequenceNode(),
             TokenType::FLOW_SEQUENCE_START,

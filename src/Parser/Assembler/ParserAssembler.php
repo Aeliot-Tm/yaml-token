@@ -17,7 +17,6 @@ use Aeliot\YamlToken\Parser\Helper\AliasResolver;
 use Aeliot\YamlToken\Parser\Helper\AnchorPostProcessor;
 use Aeliot\YamlToken\Parser\Helper\BlockCollectionLoopHelper;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
-use Aeliot\YamlToken\Parser\Helper\FlowCollectionHelper;
 use Aeliot\YamlToken\Parser\Helper\FlowMultilinePlainScalarHelper;
 use Aeliot\YamlToken\Parser\Helper\Identifier\BlockStructureIdentifier;
 use Aeliot\YamlToken\Parser\Helper\Identifier\FlowStructureIdentifier;
@@ -38,6 +37,7 @@ use Aeliot\YamlToken\Parser\SubParser\Block\KeyValueCoupleParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\SequenceEntryParser;
 use Aeliot\YamlToken\Parser\SubParser\Consumer;
 use Aeliot\YamlToken\Parser\SubParser\DocumentParser;
+use Aeliot\YamlToken\Parser\SubParser\Flow\FlowCollectionParser;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowEntryParser;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowMappingPairParser;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowMappingParser;
@@ -58,7 +58,7 @@ final class ParserAssembler
     private ?AliasResolver $aliasResolver = null;
     private ?BlockCollectionLoopHelper $blockCollectionLoopHelper = null;
     private ?BlockStructureIdentifier $blockStructureIdentifier = null;
-    private ?FlowCollectionHelper $flowCollectionHelper = null;
+    private ?FlowCollectionParser $flowCollectionParser = null;
     private ?FlowStructureIdentifier $flowStructureIdentifier = null;
     private ?FlowValueIndicatorConsumer $flowValueIndicatorConsumer = null;
     private ?KeyIdentifier $keyIdentifier = null;
@@ -158,7 +158,7 @@ final class ParserAssembler
 
     public function createFlowMappingParser(ParserRegistry $registry): FlowMappingParser
     {
-        return new FlowMappingParser($this->getFlowCollectionHelper(), $registry);
+        return new FlowMappingParser($this->getFlowCollectionParser(), $registry);
     }
 
     public function createFlowMultilinePlainScalarHelper(): FlowMultilinePlainScalarHelper
@@ -168,7 +168,7 @@ final class ParserAssembler
 
     public function createFlowSequenceParser(ParserRegistry $registry): FlowSequenceParser
     {
-        return new FlowSequenceParser($this->getFlowCollectionHelper(), $registry);
+        return new FlowSequenceParser($this->getFlowCollectionParser(), $registry);
     }
 
     public function createIndentedBlockValueParser(ParserRegistry $registry): IndentedBlockValueParser
@@ -285,9 +285,9 @@ final class ParserAssembler
         );
     }
 
-    public function getFlowCollectionHelper(): FlowCollectionHelper
+    public function getFlowCollectionParser(): FlowCollectionParser
     {
-        return $this->flowCollectionHelper ??= new FlowCollectionHelper($this->consumer, $this->errorHelper, $this->nodeFactory);
+        return $this->flowCollectionParser ??= new FlowCollectionParser($this->consumer, $this->errorHelper, $this->nodeFactory);
     }
 
     public function getFlowStructureIdentifier(): FlowStructureIdentifier

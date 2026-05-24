@@ -11,16 +11,18 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace Aeliot\YamlToken\Parser\Helper;
+namespace Aeliot\YamlToken\Parser\SubParser\Flow;
 
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\FlowNode;
 use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Parser\Dto\ParseContext;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
+use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
+use Aeliot\YamlToken\Parser\Helper\NodeFactory;
 use Aeliot\YamlToken\Parser\SubParser\Consumer;
 
-final readonly class FlowCollectionHelper
+final readonly class FlowCollectionParser
 {
     public function __construct(
         private Consumer $consumer,
@@ -37,7 +39,7 @@ final readonly class FlowCollectionHelper
      *
      * @return T
      */
-    public function parseFlowCollection(
+    public function parse(
         ParseContext $parseContext,
         FlowNode $node,
         TokenType $openTokenType,
