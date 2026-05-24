@@ -2,275 +2,217 @@
 
 ## Goal
 
-The parser builds a tree of `Node` objects from the lexer `TokenStream`: stream, documents,
-block and flow collections, scalars, and layout (comments, indentation, newlines, structural tokens).
+The parser converts a `TokenStreamInterface` produced by the lexer into a tree of `Node` objects:
+stream, documents, block/flow collections, scalars, anchors, aliases, directives, and layout tokens.
 
-## Architecture
+See [Parser Nodes](ParserNodes.md) for the complete node hierarchy reference.
 
-Parsing is split into **sub-parsers** (one class per YAML construct), **helpers**
-(token consumption, indentation, look-ahead, node creation, structure identification),
-and a thin [`Parser`](../../../src/Parser/Parser.php) façade. Each `parseStream()`
-call builds a [`ParseContext`](../../../src/Parser/ParseContext.php) and delegates
-to [`StreamParser`](../../../src/Parser/SubParser/StreamParser.php) through
-[`ParserRegistry`](../../../src/Parser/ParserRegistry.php). Production wiring uses
-[`ParserBuilder`](../../../src/Parser/ParserBuilder.php).
+## Entry Points
 
-See [Parser Architecture](../Architecture/ParserArchitecture.md) for the full
-component layout, sub-parser catalog, and control-flow description.
+`ParserBuilder::createParser()` is the production factory. It creates shared helpers once,
+wires them through `ParserAssembler`, and returns `new Parser(new ParserRegistry($assembler))`.
 
-## Flow collections
+```php
+$parser = (new ParserBuilder())->createParser();
+$stream = $parser->parse($yamlString);         // tokenizes internally
+$stream = $parser->parseStream($tokenStream);  // uses a pre-tokenized stream
+```
 
-Flow collections (`[ ... ]`, `{ ... }`) are parsed by dedicated sub-parsers under
-[`src/Parser/SubParser/Flow/`](../../../src/Parser/SubParser/Flow):
+## Internal Architecture
 
-- [`FlowSequenceParser`](../../../src/Parser/SubParser/Flow/FlowSequenceParser.php) — `[ … ]`
-- [`FlowMappingParser`](../../../src/Parser/SubParser/Flow/FlowMappingParser.php) — `{ … }`
-- [`FlowEntryParser`](../../../src/Parser/SubParser/Flow/FlowEntryParser.php) — one sequence element
-- [`FlowMappingPairParser`](../../../src/Parser/SubParser/Flow/FlowMappingPairParser.php) — one mapping pair
+Parsing is split into:
 
-Nested flow values and RHS of flow pairs are parsed by
-[`ValueParser::parseValue()`](../../../src/Parser/SubParser/ValueParser.php) with parent indent
-`\Aeliot\YamlToken\Parser\Enum\EspecialIndent::FLOW_COLLECTION_VALUE_PARENT`.
+- **Sub-parsers** — one class per YAML construct under `src/Parser/SubParser/`
+- **Helpers** — token consumption, indentation, look-ahead, node creation, structure identification
+- **Registry** — `ParserRegistry` lazy-initializes sub-parsers; resolves circular references
+- **Assembler** — `ParserAssembler` owns shared helpers and provides `create*()` factories
 
-JSON-style flow-pair keys in sequences (YAML 1.2.2 production [153], e.g.
-`["key":value]` or `[{a: b}:c]`) are tokenized by the lexer as a separate
-`VALUE_INDICATOR` even when `:` is adjacent to the value;
-[`FlowMappingPairParser::tryConsumeFlowMappingValueIndicator()`](../../../src/Parser/SubParser/Flow/FlowMappingPairParser.php)
-handles the same path as for `{a:1}`.
+Sub-parsers hold a `ParserRegistry` reference; they never hold direct references to peers.
+This avoids circular constructor dependencies (e.g. `ValueParser ↔ BlockMappingParser`).
 
-## Anchor declaration in complex keys
+## Runtime Context
 
-[`AnchorPostProcessor::postProcessKeyValueCouple()`](../../../src/Parser/Helper/AnchorPostProcessor.php)
-records each `KeyValueCoupleNode` as the **declaring couple** of every anchor that
-belongs to it (invoked from block and flow key/value couple parsers):
+Each `parseStream()` call creates a `ParseContext` that is passed to every sub-parser:
 
-- The value's direct anchor, via `ValueNode::getAnchor()`.
-- All anchors inside the **key subtree**, via the recursive helper
-  `AnchorPostProcessor::collectAnchorsRecursive()`. The recursion stops at any nested
-  `KeyValueCoupleNode` so anchors declared inside an inner couple keep their
-  inner-couple declaration. This makes aliases resolve back to the surrounding
-  couple even when the anchor is buried inside a flow sequence or flow mapping
-  that serves as the key (`[ &a foo, bar ]: value`, `? [ &a foo, bar ]\n: value`,
-  `{ &a foo: bar }: outer`).
+| Field | Type | Role |
+|-------|------|------|
+| `tokens` | `TokenStreamInterface` | Cursor over the lexer token stream |
+| `anchorsRegistry` | `AnchorsRegistry` | Named anchors registered during parsing |
+| `state` | `ParseState` | Global indent-step tracking |
 
-## Source round-trip and empty nodes
+`IndentContext` is passed per-call to `ValueParser::parseValue()` to carry indentation scope:
 
-This project preserves the original source text by keeping all lexed tokens (including layout tokens
-like whitespace, newlines and comments) in the node tree. The YAML emitter then reconstructs
-the source by concatenating `TokenHolderInterface::getToken()->text` for all nodes.
+| Factory | Meaning |
+|---------|---------|
+| `IndentContext::createForBlock(int $indent)` | Real block indent (≥ 0) |
+| `IndentContext::createForBareDocument()` | Bare document root (YAML 1.2.2 rule [211]) |
+| `IndentContext::createForFlow()` | Value inside a flow collection |
 
-Because of this, the parser must not invent tokens that did not exist in the original input.
+## Parse Flow
 
-- **Round-trip invariant**: emitting a parsed stream must reproduce the original input byte-for-byte.
-- **Empty node invariant**: YAML “empty nodes” are represented structurally, not by synthetic tokens.
-  - If a key or value is empty in YAML grammar, the corresponding node reference is `null` (absence).
-  - If a value is syntactically present (e.g. `:` is present) but its content is empty (`e-node`),
-    the parser keeps a `ValueNode` instance whose content is empty (`ValueNode::isEmpty()`).
+```
+Parser::parse(string $input)
+  → Lexer::tokenize($input)
+  → Parser::parseStream(TokenStream)
+       → new ParseContext(tokens, AnchorsRegistry, ParseState)
+       → StreamParser::parseStream(ctx)
+            → optional ByteOrderNode
+            → DocumentParser::parseDocuments(ctx, stream)
+                 → directives (%YAML, %TAG)
+                 → document markers (---, ...)
+                 → root content: scalars, aliases, mappings, sequences, flow
+            → StreamNode
+```
 
-## Node class hierarchy
+Inside each document, all content paths converge on `ValueParser::parseValue()`:
 
-The parser builds an AST from the following node types. Every node extends
-[`AbstractNode`](../../../src/Node/AbstractNode.php) (which implements
-[`Node`](../../../src/Node/Node.php) — `addChild`, `getChildren`, `getParent`)
-unless stated otherwise.
+1. `NodePropertiesParser` collects `&anchor` / `!tag`.
+2. Anchor is registered in `AnchorsRegistry`.
+3. Whitespace/comments are consumed onto the `ValueNode`.
+4. Dispatch by the next token type:
 
-### Base classes
+| Token | Sub-parser |
+|-------|-----------|
+| `FOLDED_BLOCK_SCALAR_INDICATOR` / `LITERAL_BLOCK_SCALAR_INDICATOR` | `BlockScalarValueConsumer` |
+| `NEWLINE` in flow context | collect whitespace/comments, recurse |
+| `NEWLINE` in block context | `IndentedBlockValueParser` |
+| scalar tokens | `SimpleScalarParser` or `MultilinePlainScalarParser` |
+| `ALIAS` | `AliasResolver` |
+| `SEQUENCE_ENTRY` | `CompactBlockSequenceParser` |
+| `FLOW_SEQUENCE_START` | `FlowSequenceParser` |
+| `FLOW_MAPPING_START` | `FlowMappingParser` |
 
-| Class | Role |
-|-------|------|
-| `AbstractNode` | Mutable children list (`addChild`, `removeChild`, `getChildren`, `setParent`). |
-| `SyntaxNode` *(abstract)* | Wraps a single structural `Token` (`getToken()`). Extends `AbstractNode`, implements `TokenHolderInterface`. |
-| `ScalarNode` *(abstract)* | Wraps a single scalar `Token` (`getToken()`). Extends `AbstractNode`, implements `TokenHolderInterface`. |
+## Sub-parsers
 
-### Scalar nodes
+### Structural
 
-All extend `ScalarNode` (constructor: `Token`; no extra methods).
+| Class | Responsibility |
+|-------|----------------|
+| `StreamParser` | BOM handling; drives document iteration |
+| `DocumentParser` | One document: directives, markers (`---`, `...`), root content dispatch |
+| `ValueParser` | Universal value entry: properties, newline/scalar/alias/collection dispatch |
+| `NodePropertiesParser` | `&anchor` and `!tag` before a key or value |
+| `MergeInstructionParser` | `<< : *alias` merge key |
+| `TagDirectiveParser` | `%TAG` directive |
+| `YamlDirectiveParser` | `%YAML` directive |
 
-| Class | Token type |
-|-------|------------|
-| `DoubleQuotedScalarNode` | `DOUBLE_QUOTED_SCALAR` |
-| `FoldedBlockScalarNode` | `FOLDED_BLOCK_SCALAR` |
-| `LiteralBlockScalarNode` | `LITERAL_BLOCK_SCALAR` |
-| `PlainScalarNode` | `PLAIN_SCALAR` |
-| `SingleQuotedScalarNode` | `SINGLE_QUOTED_SCALAR` |
+### Block
 
-### Structural (syntax) nodes
+| Class | Responsibility |
+|-------|----------------|
+| `BlockMappingParser` | Key-value couples at one indent level |
+| `BlockSequenceParser` | `- entry` items at one indent level |
+| `CompactBlockMappingParser` | Compact mapping nested after `- ` |
+| `CompactBlockSequenceParser` | Compact nested sequence after `- ` |
+| `KeyParser` | One key: dispatches to explicit or implicit key parser |
+| `ExplicitKeyParser` | Explicit key with `?` indicator |
+| `ImplicitKeyParser` | Implicit key (scalar, alias, or flow collection as key) |
+| `KeyValueCoupleParser` | One `key: value` pair |
+| `SequenceEntryParser` | One `- value` sequence entry |
+| `IndentedBlockValueParser` | Value after `:` when content follows on a new line |
 
-All extend `SyntaxNode` (constructor: `Token`; no extra methods unless noted).
+### Flow
 
-| Class | Token / purpose |
-|-------|-----------------|
-| `IndentationNode` | `INDENTATION` |
-| `NewLineNode` | `NEWLINE` |
-| `WhitespaceNode` | `WHITESPACE` |
-| `CommentNode` | `COMMENT` |
-| `DocumentStartNode` | `DOCUMENT_START` (`---`) |
-| `DocumentEndNode` | `DOCUMENT_END` (`...`) |
-| `ValueIndicatorNode` | `VALUE_INDICATOR` (`:`) |
-| `ExplicitKeyIndicatorNode` | `EXPLICIT_KEY_INDICATOR` (`?`) |
-| `SequenceEntryNode` | `SEQUENCE_ENTRY` (`-`) |
-| `FlowEntryNode` | `FLOW_ENTRY` (`,`) |
-| `FlowSequenceBoundNode` *(abstract)* | Base for flow-sequence brackets. |
-| `FlowSequenceStartNode` | `FLOW_SEQUENCE_START` (`[`). Extends `FlowSequenceBoundNode`. |
-| `FlowSequenceEndNode` | `FLOW_SEQUENCE_END` (`]`). Extends `FlowSequenceBoundNode`. |
-| `FlowMappingBoundNode` *(abstract)* | Base for flow-mapping brackets. |
-| `FlowMappingStartNode` | `FLOW_MAPPING_START` (`{`). Extends `FlowMappingBoundNode`. |
-| `FlowMappingEndNode` | `FLOW_MAPPING_END` (`}`). Extends `FlowMappingBoundNode`. |
-| `BlockScalarIndicatorNode` | `BLOCK_SCALAR_INDICATOR` (`\|` / `>`) |
-| `BlockScalarChompingIndicatorNode` | `BLOCK_SCALAR_CHOMPING_INDICATOR` (`+` / `-`) |
-| `BlockScalarIndentationIndicatorNode` | `BLOCK_SCALAR_INDENTATION_INDICATOR` |
-| `MergeIndicatorNode` | `MERGE_INDICATOR` (`<<`) |
-| `ByteOrderNode` | `BYTE_ORDER` (BOM). Extends `AbstractNode`, implements `TokenHolderInterface`. |
+| Class | Responsibility |
+|-------|----------------|
+| `FlowMappingParser` | `{ … }` mapping |
+| `FlowSequenceParser` | `[ … ]` sequence |
+| `FlowCollectionParser` | Shared flow collection loop (brackets, entries, separators) |
+| `FlowEntryParser` | One sequence element (value or flow pair) |
+| `FlowMappingPairParser` | One `key: value` pair inside `{ … }` |
+| `FlowPairValueConsumer` | Value side of a flow pair |
+| `FlowValueIndicatorConsumer` | `:` inside flow context |
+| `FlowMultilinePlainScalarConsumer` | Plain scalar continuation lines in flow context |
+| `FlowMultilinePlainScalarKeyParser` | Flow multiline plain scalar as a mapping key |
 
-### Composite nodes
+### Scalar
 
-| Class | Key methods |
-|-------|-------------|
-| `StreamNode` | Root of the tree (YAML rule l‑yaml‑stream :211). |
-| `DocumentNode` | One document (l‑any‑document :210). |
-| `BlockMappingNode` | `getEntries(): list<KeyValueCoupleNode>` — filters structural children. |
-| `BlockSequenceNode` | `getEntries(): list<BlockSequenceEntryNode>`. |
-| `BlockSequenceEntryNode` | `getValue(): ?ValueNode`. Typed `addChild()` / `removeChild()`. |
-| `FlowSequenceNode` | `getEntries(): list<ValueNode>`. |
-| `FlowMappingNode` | `getEntries(): list<KeyValueCoupleNode>`. |
-| `MultilinePlainScalarNode` | Groups `PLAIN_SCALAR` fragments across lines. |
-| `KeyValueCoupleNode` | `getKey()`, `getValue()`, `getValueIndicator()`, `getMergeInstruction()`, `getIndentation()` / `setIndentation()`. Typed `addChild()` / `removeChild()` with duplication guards. |
-| `KeyNode` | `getName(): ?Node`, `setName(Node)` *(throws on double set)*, `getExplicitKeyIndicatorNode()` / `setExplicitKeyIndicator()`, `getProperties()` / `setProperties()`, `getAnchor()`, `getTag()`, `isEmpty()`. |
-| `ValueNode` | `getScalar()`, `getMultilinePlainScalar()`, `getAlias()`, `getBlockMapping()`, `getBlockSequence()`, `getFlowMapping()`, `getFlowSequence()`, `getKeyValueCouple()`, `getProperties()` / `setProperties()`, `getAnchor()`, `getTag()`, `isEmpty()`. Typed `addChild()`. |
-| `NodePropertiesNode` | Groups `&anchor` and `!tag` metadata. `getAnchor()`, `getTag()`. Typed `addChild()` / `removeChild()`. |
-| `AnchorNode` | `getName()` (strips `&`), `getToken()`, `getDeclarationCouple()` / `setDeclarationCouple()`. |
-| `AliasNode` | `getName()` (strips `*`), `getToken()`, `getAnchor()` / `setAnchor()`. |
-| `TagNode` | `getToken()`. |
-| `MergeInstructionNode` | `addAlias(AliasNode)`, `getAliases(): list<AliasNode>`. |
-| `DirectiveNode` | Generic reserved directive. `getToken()`. |
-| `YamlDirectiveNode` | `getIndicatorNode()`, `getVersionNode()`. Typed `addChild()` / `removeChild()`. |
-| `YamlDirectiveIndicatorNode` | `getToken()` (`%YAML`). |
-| `YamlDirectiveVersionNode` | `getToken()`. |
-| `TagDirectiveNode` | `getIndicatorNode()`, `getHandleNode()`, `getPrefixNode()`, `getHandle(): ?string`, `getPrefix(): string`. Typed `addChild()` / `removeChild()`. |
-| `TagDirectiveIndicatorNode` | `getToken()` (`%TAG`). |
-| `TagDirectiveHandleNode` | `getHandle(): string`, `getToken()`. |
-| `TagDirectivePrefixNode` | `getPrefix(): string`, `getToken()`. |
+| Class | Responsibility |
+|-------|----------------|
+| `SimpleScalarParser` | Single-token scalar (plain, single-quoted, double-quoted) |
+| `MultilinePlainScalarParser` | Plain scalar spanning multiple lines in block context |
+| `BlockScalarFirstFragmentConsumer` | Block scalar header line + first scalar fragment |
+| `BlockScalarKeyNameConsumer` | Block scalar as a mapping key name |
+| `BlockScalarValueConsumer` | Block scalar as a value (after `\|` or `>`) |
 
-## Technical details
+## Helpers
 
-- Fixture regression: [`FixtureParserMappingTest`](../../../tests/unit/Parser/FixtureParserMappingTest.php)
-  asserts the parse tree shape (via [`NodeTreeRepresenter`](../../../tests/helper/NodeTreeRepresenter.php))
-  against files under `tests/parser_expectations/`. Regenerate snapshots with `composer parser-expectations`
-  after intentional parser or YAML fixture changes (run inside the `php-cli` container when using Docker).
-  Snapshot PHP writes token `text` fields that contain control characters (including newlines)
-  as double-quoted strings with escapes (for example `"\n"`) for stable expectations
-  across OS and Git line-ending settings.
-- Entry points: [`Parser::parse`](../../../src/Parser/Parser.php) (lexes input),
-  [`Parser::parseStream`](../../../src/Parser/Parser.php) for an existing `TokenStream`
-  (builds `ParseContext`, delegates to `StreamParser`).
-  Prefer [`ParserBuilder::createParser()`](../../../src/Parser/ParserBuilder.php) for production wiring.
-- `%YAML` directive: built as [`YamlDirectiveNode`](../../../src/Node/YamlDirectiveNode.php)
-  with [`YamlDirectiveIndicatorNode`](../../../src/Node/YamlDirectiveIndicatorNode.php) for the
-  `DIRECTIVE_YAML_INDICATOR` (`%YAML`) token and child nodes for optional horizontal whitespace,
-  optional `VALUE_INDICATOR` (`:`), and required `DIRECTIVE_YAML_VERSION`
-  (as [`YamlDirectiveVersionNode`](../../../src/Node/YamlDirectiveVersionNode.php)).
-  Horizontal whitespace and comments after the version token stay at document level
-  (same loop as other layout). If a newline or comment appears before a version token, or the token stream
-  ends before a version token, the parser throws [`LogicException`](../../../src/Parser/SubParser/DirectiveParser.php).
-- `%TAG` directive: built as [`TagDirectiveNode`](../../../src/Node/TagDirectiveNode.php)
-  with [`TagDirectiveIndicatorNode`](../../../src/Node/TagDirectiveIndicatorNode.php) for the
-  `DIRECTIVE_TAG_INDICATOR` (`%TAG`) token and child nodes for optional horizontal whitespace,
-  required `DIRECTIVE_TAG_HANDLE` (as [`TagDirectiveHandleNode`](../../../src/Node/TagDirectiveHandleNode.php))
-  and required `DIRECTIVE_TAG_PREFIX` (as [`TagDirectivePrefixNode`](../../../src/Node/TagDirectivePrefixNode.php)).
-  If a newline or comment appears before handle/prefix, or the token stream ends before
-  the prefix token, the parser throws [`LogicException`](../../../src/Parser/Parser.php).
-- Value node properties:
-  - `ValueNode` may start with node properties (metadata) before its content.
-  - Anchor is stored as [`AnchorNode`](../../../src/Node/AnchorNode.php).
-  - Explicit tag is stored as [`TagNode`](../../../src/Node/TagNode.php) for the `TAG` token (full tag lexeme),
-    exposed via `ValueNode::getTag()` and `KeyNode::getTag()` when a tag appears in node properties.
-  - Block-context plain scalars may span multiple lines. In that case the value contains
-    multiple `ScalarNode` fragments (one per `PLAIN_SCALAR` token). `ValueNode` groups these fragments
-    into a single [`MultilinePlainScalarNode`](../../../src/Node/MultilinePlainScalarNode.php) 
-    exposed via `ValueNode::getMultilinePlainScalar()`. When `multilinePlainScalar` is present,
-    `ValueNode::getScalar()` is `null`. Single-line plain (and other scalar styles) still use
-    `ValueNode::getScalar()` with a [`ScalarNode`](../../../src/Node/ScalarNode.php).
-    Continuation lines may include `WHITESPACE` (for example a tab) between the line’s `INDENTATION`
-    token and the next `PLAIN_SCALAR`; the parser consumes those tokens as part of the same scalar
-    line so block collections do not treat the line as a new entry.
-    At bare document root (no enclosing block indent; `Parser` passes
-    `\Aeliot\YamlToken\Parser\Enum\EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT` as the parent length),
-    a continuation may begin with a scalar at column one with no leading `INDENTATION` on that line;
-    the same helper accepts it when the line is not an implicit YAML key (`:` on that line).
-    Horizontal `WHITESPACE` that ends a physical line immediately before `NEWLINE` (for example trailing
-    spaces after `b` on the same line) is folded into the scalar before the next continuation is probed.
-    A completely empty line between continuation lines is lexed as two consecutive `NEWLINE` tokens;
-    when the following line is still a valid continuation (indented probe as before, or bare-root flush probe,
-    including not stealing an implicit block key),
-    [`MultilinePlainScalarParser::appendMultilinePlainScalarContinuations()`](../../../src/Parser/SubParser/Scalar/MultilinePlainScalarParser.php)
-    keeps the first `NEWLINE` inside the value (YAML 1.2.2 §6.5 / §7.3.3, e.g. Example 7.12 Plain Lines).
-    A line that has only block `INDENTATION` plus horizontal `WHITESPACE` (for example a tab) before
-    the line break is another empty-continuation pattern: the parser consumes `NEWLINE` + indent +
-    those spaces/tabs and leaves the closing `NEWLINE` so the next fragment still receives a leading
-    `NewLineNode` like other continuations.
-  - Plain-scalar **keys** in flow mappings (e.g. `{ multi\n  line, a: b}`) may also span
-    multiple physical lines. Inside `{...}` the lexer emits `NEWLINE` + `WHITESPACE` + `PLAIN_SCALAR`
-    for each continuation line (no `INDENTATION` token, since `INDENTATION` is only emitted at column 1
-    outside flow). The complete key node (including multiline handling) is built by
-    [`KeyParser::getKeyNode()`](../../../src/Parser/SubParser/Block/KeyParser.php).
-    Key name building for block-context scalars (explicit `?` and implicit) is delegated to
-    [`BlockMultilinePlainScalarHelper`](../../../src/Parser/Helper/BlockMultilinePlainScalarHelper.php);
-    flow-context key building is handled by
-    [`FlowMultilinePlainScalarHelper`](../../../src/Parser/Helper/FlowMultilinePlainScalarHelper.php).
-    `KeyNode::setName(Node)` assigns the key name — a single `ScalarNode` subclass for simple keys,
-    or a `MultilinePlainScalarNode` for multiline plain keys, or a flow collection node.
-    Trailing `NEWLINE` + `WHITESPACE` that precede `,`, `}`, or `:` on a separate continuation
-    line stay as layout children of the `KeyValueCoupleNode` (collected by
-    [`FlowMappingPairParser::tryConsumeFlowMappingValueIndicator()`](../../../src/Parser/SubParser/Flow/FlowMappingPairParser.php)), so the source round-trips byte-for-byte.
-- Collections:
-  - When a block collection (mapping or sequence) appears as a value after `:` on a new line,
-    the opening layout tokens (the `NEWLINE` after `:`, any comment/empty lines, and whitespace
-    before the first significant content line) belong to the enclosing `ValueNode`, not to the
-    `BlockMappingNode` / `BlockSequenceNode` itself.
-    [`IndentedBlockValueParser::consumeBlockValueOpeningLayout()`](../../../src/Parser/SubParser/Block/IndentedBlockValueParser.php)
-    consumes these tokens onto the `ValueNode` before dispatching to the collection parser.
-    The same helper is used for flow and scalar value branches in
-    `IndentedBlockValueParser::parseIndentedBlockValue()`,
-    ensuring uniform ownership of the opening layout across all value types.
-  - Block mapping: `key:` followed by an indented block of key/value couples (`BlockMappingNode`).
-  - A line that looks like `key: value` only counts as a new mapping entry when the scalar key is
-    followed by `:` on the **same** line (implicit YAML key). Indented text on the next line without
-    that pattern is a **block scalar value** (plain or quoted), represented as `ValueNode` with
-    `ScalarNode` / layout children, not as `KeyValueCoupleNode`.
-  - A flow sequence or flow mapping may be the whole implicit block key when it is immediately
-    followed by `:` on the same line (before a newline), e.g. `[flow]: block` or `{k: v}: block`.
-    The same applies when the flow collection is prefixed by node properties (anchor and/or tag) on
-    that line, e.g. `&k [a]: b`. The parser detects these patterns in
-    [`BlockStructureIdentifier::isKeyValueCoupleStart()`](../../../src/Parser/Helper/Identifier/BlockStructureIdentifier.php)
-    (via `FlowStructureIdentifier::isFlowCollectionFollowedByBlockValueIndicatorOnSameLine()` and
-    `NodePropertyIdentifier::isNodePropertiesFollowedByFlowCollectionImplicitBlockKeyOnSameLine()`),
-    and for compact sequence entries in
-    [`SequenceEntryParser`](../../../src/Parser/SubParser/Block/SequenceEntryParser.php), so the flow collection is parsed as the key’s `name`
-    node, not as a separate top-level flow value before an erroneous empty-key couple.
-  - Literal and folded block scalars (`|` / `>`): after the header line, non-empty continuation lines
-    use the same newline + indentation + scalar consumption as multiline plain scalars; the value may
-    become `MultilinePlainScalarNode` when several `PLAIN_SCALAR` fragments are present.
-    After an explicit-indent header (`|N` / `>N`, …), any further `NEWLINE` tokens that represent empty
-    lines before the first indented content line are consumed as part of the value before the first
-    `INDENTATION` / scalar fragment.
-  - Block sequence: `key:` followed by an indented list of `-` entries (`BlockSequenceNode`
-    with `SequenceEntryNode` children).
-  - Flow mapping / sequence: `{...}` / `[...]`.
-  - Inside flow collections, a mapping value may start after a line break; the lexer then uses
-    `WHITESPACE` (not `INDENTATION`) before the node. Those values are parsed via
-    [`ValueParser::parseValue()`](../../../src/Parser/SubParser/ValueParser.php) with sentinel
-    `\Aeliot\YamlToken\Parser\Enum\EspecialIndent::FLOW_COLLECTION_VALUE_PARENT`
-    so newline-prefixed content is not mistaken for
-    [`IndentedBlockValueParser::parseIndentedBlockValue()`](../../../src/Parser/SubParser/Block/IndentedBlockValueParser.php)
-    at indent `0`
-    (which would not consume the value and could split one `KeyValueCoupleNode` into two).
-  - In flow context, separation spaces and comments after a value (before `,`, `]`, or `}`) are
-    children of the enclosing `FlowSequenceNode` or `FlowMappingNode`, not of the `ValueNode` that
-    carries the scalar or nested flow node. Spaces after `:` in a flow pair stay on `KeyValueCoupleNode`
-    (see Example 7.19).
-- Bare document content that is only a scalar (no mapping key) is parsed as a top-level `ValueNode`
-  when the first token is a scalar and it is not an implicit key line.
-- The bare-document block context follows YAML 1.2.2 rule [211]. The parser passes a sentinel
-  `\Aeliot\YamlToken\Parser\Enum\EspecialIndent::BARE_DOCUMENT_BLOCK_PARENT` (-1) into
-  `ValueParser::parseValue()` so the same `$lineIndent <= $parentIndent` checks work at column 0;
-  it is not a physical space count.
+| Class | Purpose |
+|-------|---------|
+| `Consumer` | Collect layout tokens (whitespace, comments, newlines) into a parent node |
+| `NodeFactory` | Create typed nodes from tokens |
+| `ErrorHelper` | Append `line:column` to error messages |
+| `LookAheadHelper` | Peek at the first significant block head; collect insignificant lines |
+| `MultilineContinuationHelper` | Detect plain scalar continuation lines |
+| `AnchorPostProcessor` | Walk the key subtree and register anchors on `KeyValueCoupleNode` |
+| `AliasResolver` | Resolve `*alias` tokens to their `AnchorNode` |
+| `BlockCollectionLoopHelper` | Advance past blank/comment lines to the next block entry |
+| `PeekOffsetHelper` | Skip whitespace tokens in peek operations |
+
+### Structure Identifiers
+
+| Class | Purpose |
+|-------|---------|
+| `BlockStructureIdentifier` | Detect block mapping/sequence starts and key-value couple starts |
+| `FlowStructureIdentifier` | Detect flow collection starts; flow-collection-as-implicit-key |
+| `NodePropertyIdentifier` | Detect anchor/tag token positions |
+| `KeyIdentifier` | Detect scalar followed by `:` (implicit key) |
+| `SequenceIdentifier` | Detect `- ` sequence entry |
+
+## Key Behaviors
+
+### Round-trip Preservation
+
+All layout tokens (whitespace, newlines, comments, indentation) are kept in the node tree.
+Emitting a parsed stream reproduces the original input byte-for-byte.
+The parser never synthesizes tokens that did not appear in the input.
+
+### Empty Values
+
+An empty YAML value is represented as a `ValueNode` with no payload.
+`ValueNode::isEmpty()` returns `true`. The node itself is never `null` when `:` was present.
+
+### Anchors and Aliases
+
+- Anchors on values are registered in `AnchorsRegistry` immediately when `ValueNode` is built.
+- After each `KeyValueCoupleNode` is assembled, `AnchorPostProcessor` recursively walks the key
+  subtree and registers all anchors found there (stopping at nested couples).
+- Each `AnchorNode` stores a reference to its declaring `KeyValueCoupleNode` via `getDeclarationCouple()`.
+- `AliasNode` holds a direct reference to the resolved `AnchorNode` via `getAnchor()`.
+
+### Block Scalars
+
+A block scalar (`|` / `>`) is assembled as `BlockScalarEntryNode`:
+- `BlockScalarOptionsNode` child: type indicator (`BlockScalarIndicatorNode`), optional
+  chomping indicator (`+`/`-`), optional indentation indicator (digit).
+- Layout tokens: newlines and optional indentation after the header.
+- Payload: `LiteralBlockScalarNode` or `FoldedBlockScalarNode`.
+
+When the stream ends before the newline that follows the header, the entry is returned
+with only the options child and no scalar payload.
+
+### Multiline Plain Scalars
+
+Multiple consecutive `PLAIN_SCALAR` tokens spanning lines are grouped into a `MultilinePlainScalarNode`.
+In block context the continuation line must be more indented than the parent indent.
+At bare document root a continuation may start at column 1 if the line is not an implicit key.
+
+### Merge Keys
+
+`<< : *alias` is represented as a `MergeInstructionNode` child of `BlockMappingNode`
+or `FlowMappingNode`. `MergeInstructionNode` contains `AliasNode` instances.
+
+## Exceptions
+
+All parser exceptions are in `src/Parser/Exception/` and implement `ParserExceptionInterface`:
+
+| Class | Condition |
+|-------|-----------|
+| `AnchorUndefinedException` | Alias references an undeclared anchor |
+| `IndentationInvalidException` | Indentation value is invalid (e.g. non-positive) |
+| `IndentationOverrideException` | Indent step already registered |
+| `IndentationUndefinedException` | Indent step not yet defined |
+| `UnexpectedEndException` | Token stream ended prematurely |
+| `UnexpectedNodeException` | Unexpected node type encountered |
+| `UnexpectedStateException` | Internal parser state error |
+| `UnexpectedTokenException` | Unexpected token type |
