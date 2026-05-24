@@ -22,16 +22,8 @@ return [
         'text' => "\n",
     ],
     [
-        'type' => TokenType::DIRECTIVE_YAML_INDICATOR,
-        'text' => '%YAML',
-    ],
-    [
-        'type' => TokenType::WHITESPACE,
-        'text' => ' ',
-    ],
-    [
-        'type' => TokenType::DIRECTIVE_YAML_VERSION,
-        'text' => '1.2',
+        'type' => TokenType::PLAIN_SCALAR,
+        'text' => '%YAML 1.2',
     ],
     [
         'type' => TokenType::NEWLINE,

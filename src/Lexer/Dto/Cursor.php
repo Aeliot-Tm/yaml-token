@@ -111,6 +111,16 @@ final class Cursor
     public bool $inBlockScalarHeaderLine = false;
 
     /**
+     * When true, non-indented {@code %} lines (YAML 1.2.2 §6.8 rule {@code [82]}) are lexed as directives.
+     * Set at stream start and after {@see TokenType::DOCUMENT_END}; cleared on the first significant
+     * character that is not part of a directive line (including {@see TokenType::DOCUMENT_START}).
+     * Bare documents have no directive prefix (§9.1.3); explicit-document content after {@code ---} is never
+     * in this zone (§9.1.2). Re-entry is only via {@see TokenType::DOCUMENT_END}, not when {@code %} appears
+     * before {@code ---} without an intervening {@code ...} (§9.2 sloppy-stream simplification).
+     */
+    public bool $inDirectivePrefixZone = true;
+
+    /**
      * When set, the next iteration emits the block body as a single
      * {@see TokenType::LITERAL_BLOCK_SCALAR} or {@see TokenType::FOLDED_BLOCK_SCALAR} token
      * using the explicit indentation indicator to determine content boundaries.

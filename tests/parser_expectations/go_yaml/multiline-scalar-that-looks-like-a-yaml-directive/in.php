@@ -5,23 +5,20 @@ declare(strict_types=1);
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\DocumentStartNode;
+use Aeliot\YamlToken\Node\MultilinePlainScalarNode;
 use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\PlainScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\ValueNode;
-use Aeliot\YamlToken\Node\WhitespaceNode;
-use Aeliot\YamlToken\Node\YamlDirectiveIndicatorNode;
-use Aeliot\YamlToken\Node\YamlDirectiveNode;
-use Aeliot\YamlToken\Node\YamlDirectiveVersionNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 2615693917,
+    'hash' => 2984399056,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 4075423172,
+            'hash' => 2970379067,
             'properties' => [],
             'children' => [
                 [
@@ -48,75 +45,53 @@ return [
                 ],
                 [
                     'type' => ValueNode::class,
-                    'hash' => 3089238441,
+                    'hash' => 3688942937,
                     'properties' => [
                         'payload' => [
-                            'type' => PlainScalarNode::class,
-                            'hash' => 3315189552,
+                            'type' => MultilinePlainScalarNode::class,
+                            'hash' => 1152745304,
                         ],
                     ],
                     'children' => [
                         [
-                            'type' => PlainScalarNode::class,
-                            'hash' => 3315189552,
-                            'properties' => [
-                                'token' => [
-                                    'type' => TokenType::PLAIN_SCALAR,
-                                    'text' => 'scalar',
+                            'type' => MultilinePlainScalarNode::class,
+                            'hash' => 1152745304,
+                            'properties' => [],
+                            'children' => [
+                                [
+                                    'type' => PlainScalarNode::class,
+                                    'hash' => 3315189552,
+                                    'properties' => [
+                                        'token' => [
+                                            'type' => TokenType::PLAIN_SCALAR,
+                                            'text' => 'scalar',
+                                        ],
+                                    ],
+                                    'children' => [],
+                                ],
+                                [
+                                    'type' => NewLineNode::class,
+                                    'hash' => 763369711,
+                                    'properties' => [
+                                        'token' => [
+                                            'type' => TokenType::NEWLINE,
+                                            'text' => "\n",
+                                        ],
+                                    ],
+                                    'children' => [],
+                                ],
+                                [
+                                    'type' => PlainScalarNode::class,
+                                    'hash' => 2669535877,
+                                    'properties' => [
+                                        'token' => [
+                                            'type' => TokenType::PLAIN_SCALAR,
+                                            'text' => '%YAML 1.2',
+                                        ],
+                                    ],
+                                    'children' => [],
                                 ],
                             ],
-                            'children' => [],
-                        ],
-                    ],
-                ],
-                [
-                    'type' => NewLineNode::class,
-                    'hash' => 763369711,
-                    'properties' => [
-                        'token' => [
-                            'type' => TokenType::NEWLINE,
-                            'text' => "\n",
-                        ],
-                    ],
-                    'children' => [],
-                ],
-                [
-                    'type' => YamlDirectiveNode::class,
-                    'hash' => 3149179964,
-                    'properties' => [],
-                    'children' => [
-                        [
-                            'type' => YamlDirectiveIndicatorNode::class,
-                            'hash' => 3872005402,
-                            'properties' => [
-                                'token' => [
-                                    'type' => TokenType::DIRECTIVE_YAML_INDICATOR,
-                                    'text' => '%YAML',
-                                ],
-                            ],
-                            'children' => [],
-                        ],
-                        [
-                            'type' => WhitespaceNode::class,
-                            'hash' => 1067539092,
-                            'properties' => [
-                                'token' => [
-                                    'type' => TokenType::WHITESPACE,
-                                    'text' => ' ',
-                                ],
-                            ],
-                            'children' => [],
-                        ],
-                        [
-                            'type' => YamlDirectiveVersionNode::class,
-                            'hash' => 2369398325,
-                            'properties' => [
-                                'token' => [
-                                    'type' => TokenType::DIRECTIVE_YAML_VERSION,
-                                    'text' => '1.2',
-                                ],
-                            ],
-                            'children' => [],
                         ],
                     ],
                 ],

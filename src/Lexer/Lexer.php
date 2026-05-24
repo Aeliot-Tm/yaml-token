@@ -107,13 +107,13 @@ final class Lexer
                 break;
             }
 
-            if ($this->shouldTokenizeYamlDirectiveAsParts($harvester)) {
+            if ($this->isDirectiveLineStart($harvester) && $this->shouldTokenizeYamlDirectiveAsParts($harvester)) {
                 $this->tokenizeYamlDirectiveLine($harvester);
 
                 continue;
             }
 
-            if ($this->shouldTokenizeTagDirectiveAsParts($harvester)) {
+            if ($this->isDirectiveLineStart($harvester) && $this->shouldTokenizeTagDirectiveAsParts($harvester)) {
                 $this->tokenizeTagDirectiveLine($harvester);
 
                 continue;
@@ -346,6 +346,14 @@ final class Lexer
         }
 
         return \in_array($harvester->input[$harvester->cursor->position - 1], self::CHARS_WHITESPACE, true);
+    }
+
+    private function isDirectiveLineStart(Harvester $harvester): bool
+    {
+        return $harvester->cursor->inDirectivePrefixZone
+            && 1 === $harvester->cursor->column
+            && $harvester->cursor->position < $harvester->length
+            && '%' === $harvester->input[$harvester->cursor->position];
     }
 
     private function isFlowExpectsValueSeparatorColon(Cursor $cursor): bool
@@ -1056,6 +1064,7 @@ final class Lexer
 
         // DOCUMENT_START (---)
         if ($this->match($harvester, '---')) {
+            $harvester->cursor->inDirectivePrefixZone = false;
             $this->resetBlockMappingPlainState($harvester->cursor);
             $harvester->cursor->flowCollectionStack = [];
             $harvester->cursor->plainScalarContinuationBaseIndent = 0;
@@ -1069,6 +1078,7 @@ final class Lexer
             $this->resetBlockMappingPlainState($harvester->cursor);
             $harvester->cursor->flowCollectionStack = [];
             $harvester->stream->addToken(new Token(TokenType::DOCUMENT_END, '...', $startLine, $startColumn));
+            $harvester->cursor->inDirectivePrefixZone = true;
 
             return;
         }
@@ -1082,13 +1092,15 @@ final class Lexer
             return;
         }
 
-        // DIRECTIVE (%... directive line) — only at line start.
-        if ('%' === $char && 1 === $harvester->cursor->column) {
+        // DIRECTIVE (%... directive line) — non-indented, only in directive prefix zone (YAML 1.2.2 §6.8).
+        if ($this->isDirectiveLineStart($harvester)) {
             $directive = $this->readGenericDirectiveLineLexeme($harvester);
             $harvester->stream->addToken(new Token(TokenType::DIRECTIVE, $directive, $startLine, $startColumn));
 
             return;
         }
+
+        $harvester->cursor->inDirectivePrefixZone = false;
 
         // FLOW indicators. "{" and "[" always open a flow context. "}", "]" and "," act as
         // structural tokens only inside an open flow context; in block context they are valid

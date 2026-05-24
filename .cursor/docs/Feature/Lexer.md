@@ -21,7 +21,17 @@ The rules below describe the practical behavior relied upon by lexer unit tests.
   - Elsewhere within a line, a run of spaces/tabs is emitted as `WHITESPACE`.
 - **Document markers**: `---` → `DOCUMENT_START`, `...` → `DOCUMENT_END`.
 - **Comments**: `#...` until line break is `COMMENT` (newline is a separate `NEWLINE` token).
-- **Directives**:
+- **Directives** (YAML 1.2.2 §6.8, §9.1.2, §9.1.3):
+  - Directives are recognized only while `inDirectivePrefixZone` is active: at stream start and
+    again after each `DOCUMENT_END` (`...`). The zone closes on the first significant character
+    that is not part of a directive line (including `DOCUMENT_START` / `---`). `%` lines inside
+    document content are plain scalars (spec Example 9.4).
+  - A directive line requires a non-indented `%` at column 1 while the zone is active (§6.8).
+    Indented `%` is never a directive. Bare documents have no directive prefix; the first
+    non-comment line of a bare document must not start with `%` (§9.1.3 — validity rule, not a
+    lexer error).
+  - **Known simplification:** the zone re-opens only via `...`, not when `%` appears before `---`
+    without an intervening document end (§9.2 sloppy-stream edge case).
   - `%YAML` lines: the name must be exact — the character after `L` must be horizontal whitespace,
     `:`, a digit, a line break, or end of input. Otherwise (e.g. `%YAMLL`), the whole `%...` line
     through the line break is a generic `DIRECTIVE` token. When the boundary matches, the line
