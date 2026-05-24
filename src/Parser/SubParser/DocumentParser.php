@@ -32,6 +32,7 @@ use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
 use Aeliot\YamlToken\Parser\Helper\Identifier\BlockStructureIdentifier;
 use Aeliot\YamlToken\Parser\Helper\Identifier\FlowStructureIdentifier;
 use Aeliot\YamlToken\Parser\Helper\Identifier\NodePropertyIdentifier;
+use Aeliot\YamlToken\Parser\Helper\LookAheadHelper;
 use Aeliot\YamlToken\Token\Token;
 
 final readonly class DocumentParser
@@ -40,6 +41,7 @@ final readonly class DocumentParser
         private BlockStructureIdentifier $blockStructureIdentifier,
         private ErrorHelper $errorHelper,
         private FlowStructureIdentifier $flowStructureIdentifier,
+        private LookAheadHelper $lookAheadHelper,
         private NodePropertyIdentifier $nodePropertyIdentifier,
         private ParserRegistry $registry,
     ) {
@@ -179,6 +181,12 @@ final readonly class DocumentParser
         if (TokenType::COMMENT === $token->type) {
             $document->addChild(new CommentNode($token));
             $parseContext->tokens->advance();
+
+            return true;
+        }
+
+        if ($this->lookAheadHelper->isInsignificantIndentationLine($parseContext->tokens)) {
+            $this->lookAheadHelper->collectInsignificantIndentationLines($parseContext->tokens, $document);
 
             return true;
         }

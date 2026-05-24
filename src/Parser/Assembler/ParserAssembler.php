@@ -151,6 +151,7 @@ final class ParserAssembler
             $this->getBlockStructureIdentifier(),
             $this->errorHelper,
             $this->getFlowStructureIdentifier(),
+            $this->lookAheadHelper,
             $this->getNodePropertyIdentifier(),
             $registry,
         );
