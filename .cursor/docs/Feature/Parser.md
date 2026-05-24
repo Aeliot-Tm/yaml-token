@@ -109,7 +109,7 @@ Inside each document, all content paths converge on `ValueParser::parseValue()`:
 | `ImplicitKeyParser` | Implicit key (scalar, alias, or flow collection as key) |
 | `KeyValueCoupleParser` | One `key: value` pair |
 | `SequenceEntryParser` | One `- value` sequence entry |
-| `IndentedBlockValueParser` | Value after `:` when content follows on a new line |
+| `IndentedBlockValueParser` | Value after `:` when content follows on a new line; bare-document node-property continuation lines (YAML 1.2.2 rules `[96]`, `[200]`, `[211]`) |
 
 ### Flow
 
@@ -179,6 +179,17 @@ An empty YAML value is represented as a `ValueNode` with no payload.
   subtree and registers all anchors found there (stopping at nested couples).
 - Each `AnchorNode` stores a reference to its declaring `KeyValueCoupleNode` via `getDeclarationCouple()`.
 - `AliasNode` holds a direct reference to the resolved `AnchorNode` via `getAnchor()`.
+
+### Bare-document node properties
+
+At bare document root (YAML 1.2.2 rule `[211]`), when a value carries `&anchor` / `!tag` on one line
+and the payload continues on the next, `IndentedBlockValueParser` keeps a single `ValueNode`:
+
+- A continuation line with only node properties (rule `[96]`) merges into the same `NodePropertiesNode`.
+- A continuation line with node properties followed by a scalar on the same line attaches the scalar as payload.
+- Implicit mapping keys and flow-collection keys on the next line are not merged; `DocumentParser` parses them separately.
+
+Indented block values use the same continuation rules with a required `INDENTATION` token on each continuation line.
 
 ### Block Scalars
 

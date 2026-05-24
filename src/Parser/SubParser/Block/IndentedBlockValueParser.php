@@ -35,6 +35,10 @@ use Aeliot\YamlToken\Token\Token;
 
 final readonly class IndentedBlockValueParser
 {
+    private const NODE_PROPERTIES_LINE_ANCHOR_OR_TAG_ONLY = 'anchor_or_tag_only';
+    private const NODE_PROPERTIES_LINE_OTHER = 'other';
+    private const NODE_PROPERTIES_LINE_SCALAR = 'scalar';
+
     public function __construct(
         private Consumer $consumer,
         private ErrorHelper $errorHelper,
@@ -65,17 +69,64 @@ final readonly class IndentedBlockValueParser
         }
 
         if ($parentIndent->isBareDocumentRoot) {
+            if ($this->tryDispatchNodePropertyContinuation($parseContext, $valueNode, $parentIndent, $head, $token, false)) {
+                return;
+            }
+
             $this->dispatchBareDocumentContent($parseContext, $valueNode, $head->significantToken);
         }
     }
 
-    private function consumeBlockValueOpeningLayout(ParseContext $parseContext, ValueNode $valueNode): void
+    private function classifyNodePropertiesLine(ParseContext $parseContext, int $offset): string
     {
-        $valueNode->addChild(new NewLineNode($parseContext->tokens->current()));
+        $i = $offset;
+        $seenTag = false;
+
+        while (true) {
+            $token = $parseContext->tokens->peek($i);
+            if (null === $token || TokenType::NEWLINE === $token->type) {
+                return self::NODE_PROPERTIES_LINE_ANCHOR_OR_TAG_ONLY;
+            }
+            if (TokenType::WHITESPACE === $token->type || TokenType::COMMENT === $token->type) {
+                ++$i;
+
+                continue;
+            }
+
+            if (TokenType::ANCHOR === $token->type) {
+                ++$i;
+
+                continue;
+            }
+
+            if ($this->nodePropertyIdentifier->isNodePropertyToken($token)) {
+                if ($seenTag) {
+                    return self::NODE_PROPERTIES_LINE_OTHER;
+                }
+                $seenTag = true;
+                ++$i;
+
+                continue;
+            }
+
+            return $token->type->isScalar()
+                ? self::NODE_PROPERTIES_LINE_SCALAR
+                : self::NODE_PROPERTIES_LINE_OTHER;
+        }
+    }
+
+    private function consumeContinuationLineLayout(ParseContext $parseContext, Node $layoutContainer, Token $newlineToken): void
+    {
+        $layoutContainer->addChild(new NewLineNode($newlineToken));
         $parseContext->tokens->advance();
 
-        $this->consumer->collectSpaceCommentEnds($parseContext->tokens, $valueNode);
-        $this->lookAheadHelper->collectInsignificantIndentationLines($parseContext->tokens, $valueNode);
+        $this->consumer->collectSpaceCommentEnds($parseContext->tokens, $layoutContainer);
+        $this->lookAheadHelper->collectInsignificantIndentationLines($parseContext->tokens, $layoutContainer);
+    }
+
+    private function consumeBlockValueOpeningLayout(ParseContext $parseContext, ValueNode $valueNode): void
+    {
+        $this->consumeContinuationLineLayout($parseContext, $valueNode, $parseContext->tokens->current());
     }
 
     /**
@@ -139,11 +190,14 @@ final readonly class IndentedBlockValueParser
         $valueNode->addChild(new IndentationNode($indentationToken));
         $parseContext->tokens->advance();
 
+        $this->consumeTaggedScalarPayload($parseContext, $valueNode, $parentIndent);
+    }
+
+    private function consumeTaggedScalarPayload(ParseContext $parseContext, ValueNode $valueNode, IndentContext $parentIndent): void
+    {
         $this->registry->getNodePropertiesParser()->collectProperties($parseContext, $valueNode);
 
-        if ($anchor = $valueNode->getAnchor()) {
-            $parseContext->anchorsRegistry->anchors[$anchor->getName()] = $anchor;
-        }
+        $this->registerAnchorIfPresent($parseContext, $valueNode);
 
         $this->consumer->collectSpaceAndComments($parseContext->tokens, $valueNode);
 
@@ -153,7 +207,7 @@ final readonly class IndentedBlockValueParser
             TokenType::SINGLE_QUOTED_SCALAR,
             TokenType::PLAIN_SCALAR,
         ], true)) {
-            throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Scalar expected for indented block tagged scalar value, but %s given', $scalarToken?->type->value ?? '_nothing_'), $parseContext->tokens));
+            throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Scalar expected for tagged scalar value, but %s given', $scalarToken?->type->value ?? '_nothing_'), $parseContext->tokens));
         }
 
         $this->finishScalarWithPossibleMultiline($parseContext, $valueNode, $scalarToken, $parentIndent);
@@ -242,10 +296,7 @@ final readonly class IndentedBlockValueParser
             return;
         }
 
-        // Node-properties-only line: a separator line carrying only tag/anchor before the actual value
-        if ($this->nodePropertyIdentifier->isNodePropertyToken($head->significantToken) && $this->isNodePropertiesOnlyLine($parseContext, $head->peekOffset)) {
-            $this->parseNodePropertiesOnlyLine($parseContext, $valueNode, $parentIndent, $newlineToken);
-
+        if ($this->tryDispatchNodePropertyContinuation($parseContext, $valueNode, $parentIndent, $head, $newlineToken, true)) {
             return;
         }
 
@@ -262,17 +313,6 @@ final readonly class IndentedBlockValueParser
         ) {
             $this->consumeBlockValueOpeningLayout($parseContext, $valueNode);
             $this->parseIndentedFlowCollection($parseContext, $valueNode, $head->significantToken);
-
-            return;
-        }
-
-        // Node-properties followed by an indented scalar (not an implicit key)
-        if (
-            $this->nodePropertyIdentifier->isNodePropertyToken($head->significantToken)
-            && !$this->nodePropertyIdentifier->isNodePropertiesFollowedByImplicitKeyFromOffset($parseContext, $head->peekOffset)
-        ) {
-            $this->consumeBlockValueOpeningLayout($parseContext, $valueNode);
-            $this->consumeTaggedScalar($parseContext, $valueNode, $parentIndent);
 
             return;
         }
@@ -347,45 +387,6 @@ final readonly class IndentedBlockValueParser
         $parseContext->tokens->advance();
     }
 
-    private function isNodePropertiesOnlyLine(ParseContext $parseContext, int $offset): bool
-    {
-        $i = $offset;
-        $seenTag = false;
-
-        while (true) {
-            $token = $parseContext->tokens->peek($i);
-            if (null === $token) {
-                return true;
-            }
-            if (TokenType::NEWLINE === $token->type) {
-                return true;
-            }
-            if (TokenType::WHITESPACE === $token->type || TokenType::COMMENT === $token->type) {
-                ++$i;
-
-                continue;
-            }
-
-            if (TokenType::ANCHOR === $token->type) {
-                ++$i;
-
-                continue;
-            }
-
-            if ($this->nodePropertyIdentifier->isNodePropertyToken($token)) {
-                if ($seenTag) {
-                    return false;
-                }
-                $seenTag = true;
-                ++$i;
-
-                continue;
-            }
-
-            return false;
-        }
-    }
-
     private function parseIndentedFlowCollection(
         ParseContext $parseContext,
         ValueNode $valueNode,
@@ -405,26 +406,28 @@ final readonly class IndentedBlockValueParser
         );
     }
 
-    private function parseNodePropertiesOnlyLine(
+    private function parseNodePropertiesContinuationLine(
         ParseContext $parseContext,
         ValueNode $valueNode,
         IndentContext $parentIndent,
         Token $newlineToken,
+        bool $requiresIndentation,
     ): void {
         $separatorContainer = $valueNode->getProperties() ?? $valueNode;
-        $separatorContainer->addChild(new NewLineNode($newlineToken));
-        $parseContext->tokens->advance();
-        $this->consumer->collectSpaceCommentEnds($parseContext->tokens, $separatorContainer);
-        $this->lookAheadHelper->collectInsignificantIndentationLines($parseContext->tokens, $separatorContainer);
+        $this->consumeContinuationLineLayout($parseContext, $separatorContainer, $newlineToken);
 
-        $indentationToken = $parseContext->tokens->current();
-        if (null === $indentationToken || TokenType::INDENTATION !== $indentationToken->type) {
-            throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Expected INDENTATION before node properties, but %s given', $indentationToken?->type->value ?? '_nothing_'), $parseContext->tokens));
+        if ($requiresIndentation) {
+            $indentationToken = $parseContext->tokens->current();
+            if (null === $indentationToken || TokenType::INDENTATION !== $indentationToken->type) {
+                throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Expected INDENTATION before node properties, but %s given', $indentationToken?->type->value ?? '_nothing_'), $parseContext->tokens));
+            }
+            $separatorContainer->addChild(new IndentationNode($indentationToken));
+            $parseContext->tokens->advance();
         }
-        $separatorContainer->addChild(new IndentationNode($indentationToken));
-        $parseContext->tokens->advance();
 
         $this->registry->getNodePropertiesParser()->collectProperties($parseContext, $valueNode);
+
+        $this->registerAnchorIfPresent($parseContext, $valueNode);
 
         $next = $parseContext->tokens->current();
         if (null === $next || TokenType::NEWLINE !== $next->type) {
@@ -432,5 +435,56 @@ final readonly class IndentedBlockValueParser
         }
 
         $this->parseIndentedBlockValue($parseContext, $valueNode, $parentIndent);
+    }
+
+    private function registerAnchorIfPresent(ParseContext $parseContext, ValueNode $valueNode): void
+    {
+        if ($anchor = $valueNode->getAnchor()) {
+            $parseContext->anchorsRegistry->anchors[$anchor->getName()] = $anchor;
+        }
+    }
+
+    private function shouldContinueWithTaggedScalar(ParseContext $parseContext, int $offset): bool
+    {
+        if (self::NODE_PROPERTIES_LINE_SCALAR !== $this->classifyNodePropertiesLine($parseContext, $offset)) {
+            return false;
+        }
+
+        return !$this->nodePropertyIdentifier->isNodePropertiesFollowedByImplicitKeyFromOffset($parseContext, $offset);
+    }
+
+    private function tryDispatchNodePropertyContinuation(
+        ParseContext $parseContext,
+        ValueNode $valueNode,
+        IndentContext $parentIndent,
+        LookAheadResult $head,
+        Token $newlineToken,
+        bool $requiresIndentation,
+    ): bool {
+        if (!$this->nodePropertyIdentifier->isNodePropertyToken($head->significantToken)) {
+            return false;
+        }
+
+        if (self::NODE_PROPERTIES_LINE_ANCHOR_OR_TAG_ONLY === $this->classifyNodePropertiesLine($parseContext, $head->peekOffset)) {
+            $this->parseNodePropertiesContinuationLine($parseContext, $valueNode, $parentIndent, $newlineToken, $requiresIndentation);
+
+            return true;
+        }
+
+        if (!$this->shouldContinueWithTaggedScalar($parseContext, $head->peekOffset)) {
+            return false;
+        }
+
+        if ($requiresIndentation) {
+            $this->consumeBlockValueOpeningLayout($parseContext, $valueNode);
+            $this->consumeTaggedScalar($parseContext, $valueNode, $parentIndent);
+
+            return true;
+        }
+
+        $this->consumeContinuationLineLayout($parseContext, $valueNode->getProperties() ?? $valueNode, $newlineToken);
+        $this->consumeTaggedScalarPayload($parseContext, $valueNode, IndentContext::createForBareDocument());
+
+        return true;
     }
 }
