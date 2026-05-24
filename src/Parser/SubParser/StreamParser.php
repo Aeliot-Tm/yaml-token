@@ -16,8 +16,8 @@ namespace Aeliot\YamlToken\Parser\SubParser;
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\ByteOrderNode;
 use Aeliot\YamlToken\Node\StreamNode;
+use Aeliot\YamlToken\Parser\Assembler\ParserRegistry;
 use Aeliot\YamlToken\Parser\Dto\ParseContext;
-use Aeliot\YamlToken\Parser\ParserRegistry;
 
 final readonly class StreamParser
 {

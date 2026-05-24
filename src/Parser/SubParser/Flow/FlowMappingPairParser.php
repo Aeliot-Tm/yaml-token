@@ -16,12 +16,12 @@ namespace Aeliot\YamlToken\Parser\SubParser\Flow;
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\ValueNode;
+use Aeliot\YamlToken\Parser\Assembler\ParserRegistry;
 use Aeliot\YamlToken\Parser\Dto\IndentContext;
 use Aeliot\YamlToken\Parser\Dto\ParseContext;
 use Aeliot\YamlToken\Parser\Helper\AnchorPostProcessor;
 use Aeliot\YamlToken\Parser\Helper\FlowValueIndicatorConsumer;
 use Aeliot\YamlToken\Parser\Helper\Identifier\FlowStructureIdentifier;
-use Aeliot\YamlToken\Parser\ParserRegistry;
 
 final readonly class FlowMappingPairParser
 {

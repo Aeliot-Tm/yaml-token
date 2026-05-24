@@ -32,7 +32,6 @@ use Aeliot\YamlToken\Parser\Helper\LookAheadHelper;
 use Aeliot\YamlToken\Parser\Helper\MultilineContinuationHelper;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
 use Aeliot\YamlToken\Parser\Helper\PeekOffsetHelper;
-use Aeliot\YamlToken\Parser\ParserRegistry;
 use Aeliot\YamlToken\Parser\SubParser\Block\BlockMappingParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\BlockSequenceParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\CompactBlockMappingParser;

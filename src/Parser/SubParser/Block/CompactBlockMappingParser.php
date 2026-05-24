@@ -14,10 +14,10 @@ declare(strict_types=1);
 namespace Aeliot\YamlToken\Parser\SubParser\Block;
 
 use Aeliot\YamlToken\Node\BlockMappingNode;
+use Aeliot\YamlToken\Parser\Assembler\ParserRegistry;
 use Aeliot\YamlToken\Parser\Dto\ParseContext;
 use Aeliot\YamlToken\Parser\Helper\BlockCollectionLoopHelper;
 use Aeliot\YamlToken\Parser\Helper\Identifier\BlockStructureIdentifier;
-use Aeliot\YamlToken\Parser\ParserRegistry;
 
 final readonly class CompactBlockMappingParser
 {

@@ -11,9 +11,8 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace Aeliot\YamlToken\Parser;
+namespace Aeliot\YamlToken\Parser\Assembler;
 
-use Aeliot\YamlToken\Parser\Assembler\ParserAssembler;
 use Aeliot\YamlToken\Parser\Helper\BlockMultilinePlainScalarHelper;
 use Aeliot\YamlToken\Parser\Helper\FlowMultilinePlainScalarHelper;
 use Aeliot\YamlToken\Parser\SubParser\Block\BlockMappingParser;
