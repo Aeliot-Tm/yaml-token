@@ -73,7 +73,7 @@ final readonly class IndentedBlockValueParser
                 return;
             }
 
-            $this->dispatchBareDocumentContent($parseContext, $valueNode, $head->significantToken);
+            $this->dispatchBareDocumentContent($parseContext, $valueNode, $head);
         }
     }
 
@@ -216,8 +216,10 @@ final readonly class IndentedBlockValueParser
     private function dispatchBareDocumentContent(
         ParseContext $parseContext,
         ValueNode $valueNode,
-        Token $afterIndent,
+        LookAheadResult $head,
     ): void {
+        $afterIndent = $head->significantToken;
+        $linePeekOffset = $head->peekOffset;
         if (TokenType::SEQUENCE_ENTRY === $afterIndent->type) {
             $this->consumeBlockValueOpeningLayout($parseContext, $valueNode);
             $valueNode->addChild(
@@ -232,6 +234,23 @@ final readonly class IndentedBlockValueParser
         if (
             TokenType::EXPLICIT_KEY_INDICATOR === $afterIndent->type
             || TokenType::MERGE_INDICATOR === $afterIndent->type
+        ) {
+            $this->consumeBlockValueOpeningLayout($parseContext, $valueNode);
+            $valueNode->addChild(
+                $this->registry
+                    ->getBlockMappingParser()
+                    ->parseBlockMappingValue($parseContext, IndentContext::createForBareDocument()),
+            );
+
+            return;
+        }
+
+        if (
+            $this->nodePropertyIdentifier->isNodePropertyToken($afterIndent)
+            && (
+                $this->nodePropertyIdentifier->isNodePropertiesFollowedByImplicitKeyFromOffset($parseContext, $linePeekOffset)
+                || $this->nodePropertyIdentifier->isNodePropertiesFollowedByFlowCollectionImplicitBlockKeyFromOffset($parseContext, $linePeekOffset)
+            )
         ) {
             $this->consumeBlockValueOpeningLayout($parseContext, $valueNode);
             $valueNode->addChild(

@@ -63,18 +63,13 @@ final readonly class NodePropertyIdentifier
     }
 
     /**
-     * True when the line begins with c-ns-properties (anchor/tag), then — still before
-     * NEWLINE — a flow mapping or flow sequence whose closing bracket is followed on the
-     * same line by {@code VALUE_INDICATOR} (block implicit key whose key is a tagged or
-     * anchored flow collection, e.g. {@code &k [a]: b}).
+     * True when c-ns-properties at {@code $offset} are followed on the same line by a flow
+     * mapping or flow sequence whose closing bracket is followed by {@code VALUE_INDICATOR}.
+     *
+     * @param int $offset Peek offset to the first TAG or ANCHOR on the line
      */
-    public function isNodePropertiesFollowedByFlowCollectionImplicitBlockKeyOnSameLine(ParseContext $parseContext): bool
+    public function isNodePropertiesFollowedByFlowCollectionImplicitBlockKeyFromOffset(ParseContext $parseContext, int $offset): bool
     {
-        $offset = 0;
-        if (TokenType::INDENTATION === $parseContext->tokens->current()?->type) {
-            $offset = 1;
-        }
-
         if (!$this->isNodePropertyToken($parseContext->tokens->peek($offset))) {
             return false;
         }
@@ -110,6 +105,22 @@ final readonly class NodePropertyIdentifier
         }
 
         return $this->flowStructureIdentifier->isFlowCollectionFollowedByBlockValueIndicatorOnSameLine($parseContext, $offset);
+    }
+
+    /**
+     * True when the line begins with c-ns-properties (anchor/tag), then — still before
+     * NEWLINE — a flow mapping or flow sequence whose closing bracket is followed on the
+     * same line by {@code VALUE_INDICATOR} (block implicit key whose key is a tagged or
+     * anchored flow collection, e.g. {@code &k [a]: b}).
+     */
+    public function isNodePropertiesFollowedByFlowCollectionImplicitBlockKeyOnSameLine(ParseContext $parseContext): bool
+    {
+        $offset = 0;
+        if (TokenType::INDENTATION === $parseContext->tokens->current()?->type) {
+            $offset = 1;
+        }
+
+        return $this->isNodePropertiesFollowedByFlowCollectionImplicitBlockKeyFromOffset($parseContext, $offset);
     }
 
     /**

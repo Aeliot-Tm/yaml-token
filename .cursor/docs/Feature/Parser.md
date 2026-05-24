@@ -187,7 +187,8 @@ and the payload continues on the next, `IndentedBlockValueParser` keeps a single
 
 - A continuation line with only node properties (rule `[96]`) merges into the same `NodePropertiesNode`.
 - A continuation line with node properties followed by a scalar on the same line attaches the scalar as payload.
-- Implicit mapping keys and flow-collection keys on the next line are not merged; `DocumentParser` parses them separately.
+- A continuation line with node properties followed by an implicit block mapping key on the same line (scalar or flow collection, then `:`) becomes a `BlockMappingNode` payload of the same `ValueNode`, matching the scalar-only implicit-key branch and `dispatchIndentedContent` for indented block values.
+- A bare-document continuation line that is only a plain scalar without `:` on the same line may attach as multiline plain scalar payload when applicable.
 
 Indented block values use the same continuation rules with a required `INDENTATION` token on each continuation line.
 
