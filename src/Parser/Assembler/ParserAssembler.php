@@ -30,6 +30,8 @@ use Aeliot\YamlToken\Parser\SubParser\Block\BlockMappingParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\BlockSequenceParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\CompactBlockMappingParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\CompactBlockSequenceParser;
+use Aeliot\YamlToken\Parser\SubParser\Block\ExplicitKeyParser;
+use Aeliot\YamlToken\Parser\SubParser\Block\ImplicitKeyParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\IndentedBlockValueParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\KeyParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\KeyValueCoupleParser;
@@ -153,6 +155,20 @@ final class ParserAssembler
         );
     }
 
+    public function createExplicitKeyParser(ParserRegistry $registry): ExplicitKeyParser
+    {
+        return new ExplicitKeyParser(
+            $this->getAliasResolver(),
+            $this->errorHelper,
+            $this->lookAheadHelper,
+            $this->multilineContinuationHelper,
+            $this->nodeFactory,
+            $registry->getNodePropertiesParser(),
+            $this->peekOffsetHelper,
+            $registry,
+        );
+    }
+
     public function createFlowEntryParser(ParserRegistry $registry): FlowEntryParser
     {
         return new FlowEntryParser(
@@ -194,6 +210,16 @@ final class ParserAssembler
         return new FlowSequenceParser($this->getFlowCollectionParser(), $registry);
     }
 
+    public function createImplicitKeyParser(ParserRegistry $registry): ImplicitKeyParser
+    {
+        return new ImplicitKeyParser(
+            $this->getAliasResolver(),
+            $this->errorHelper,
+            $this->nodeFactory,
+            $registry,
+        );
+    }
+
     public function createIndentedBlockValueParser(ParserRegistry $registry): IndentedBlockValueParser
     {
         return new IndentedBlockValueParser(
@@ -210,14 +236,9 @@ final class ParserAssembler
     public function createKeyParser(ParserRegistry $registry): KeyParser
     {
         return new KeyParser(
-            $this->getAliasResolver(),
-            $this->errorHelper,
-            $this->lookAheadHelper,
-            $this->multilineContinuationHelper,
-            $this->nodeFactory,
+            $registry->getExplicitKeyParser(),
+            $registry->getImplicitKeyParser(),
             $registry->getNodePropertiesParser(),
-            $this->peekOffsetHelper,
-            $registry,
         );
     }
 

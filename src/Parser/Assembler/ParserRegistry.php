@@ -17,6 +17,8 @@ use Aeliot\YamlToken\Parser\SubParser\Block\BlockMappingParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\BlockSequenceParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\CompactBlockMappingParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\CompactBlockSequenceParser;
+use Aeliot\YamlToken\Parser\SubParser\Block\ExplicitKeyParser;
+use Aeliot\YamlToken\Parser\SubParser\Block\ImplicitKeyParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\IndentedBlockValueParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\KeyParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\KeyValueCoupleParser;
@@ -50,12 +52,14 @@ final class ParserRegistry
     private ?CompactBlockMappingParser $compactBlockMappingParser = null;
     private ?CompactBlockSequenceParser $compactBlockSequenceParser = null;
     private ?DocumentParser $documentParser = null;
+    private ?ExplicitKeyParser $explicitKeyParser = null;
     private ?FlowEntryParser $flowEntryParser = null;
     private ?FlowMappingPairParser $flowMappingPairParser = null;
     private ?FlowMappingParser $flowMappingParser = null;
     private ?FlowMultilinePlainScalarConsumer $flowMultilinePlainScalarConsumer = null;
     private ?FlowMultilinePlainScalarKeyParser $flowMultilinePlainScalarKeyParser = null;
     private ?FlowSequenceParser $flowSequenceParser = null;
+    private ?ImplicitKeyParser $implicitKeyParser = null;
     private ?IndentedBlockValueParser $indentedBlockValueParser = null;
     private ?KeyParser $keyParser = null;
     private ?KeyValueCoupleParser $keyValueCoupleParser = null;
@@ -114,6 +118,11 @@ final class ParserRegistry
         return $this->documentParser ??= $this->assembler->createDocumentParser($this);
     }
 
+    public function getExplicitKeyParser(): ExplicitKeyParser
+    {
+        return $this->explicitKeyParser ??= $this->assembler->createExplicitKeyParser($this);
+    }
+
     public function getFlowEntryParser(): FlowEntryParser
     {
         return $this->flowEntryParser ??= $this->assembler->createFlowEntryParser($this);
@@ -142,6 +151,11 @@ final class ParserRegistry
     public function getFlowSequenceParser(): FlowSequenceParser
     {
         return $this->flowSequenceParser ??= $this->assembler->createFlowSequenceParser($this);
+    }
+
+    public function getImplicitKeyParser(): ImplicitKeyParser
+    {
+        return $this->implicitKeyParser ??= $this->assembler->createImplicitKeyParser($this);
     }
 
     public function getIndentedBlockValueParser(): IndentedBlockValueParser
