@@ -273,11 +273,6 @@ final readonly class ExplicitKeyParser
             return false;
         }
 
-        $keyProbe = $this->peekOffsetHelper->skipWhitespaceOffset($tokens, $scalarOffset + 1);
-        if (TokenType::VALUE_INDICATOR === $tokens->peek($keyProbe)?->type) {
-            return false;
-        }
-
         $multiline->addChild(new NewLineNode($newLine));
         $multiline->addChild(new IndentationNode($indentation));
         $tokens->advance();
