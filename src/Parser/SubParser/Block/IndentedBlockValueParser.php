@@ -264,6 +264,20 @@ final readonly class IndentedBlockValueParser
             return;
         }
 
+        // Block scalar on a continuation line (e.g. after a node-properties-only line)
+        if (\in_array($head->significantToken->type, TokenType::BLOCK_SCALAR_INDICATORS, true)) {
+            $this->consumeBlockValueOpeningLayout($parseContext, $valueNode);
+            $indentationToken = $parseContext->tokens->current();
+            if (null === $indentationToken || TokenType::INDENTATION !== $indentationToken->type) {
+                throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Expected INDENTATION before block scalar, but %s given', $indentationToken?->type->value ?? '_nothing_'), $parseContext->tokens));
+            }
+            $valueNode->addChild(new IndentationNode($indentationToken));
+            $parseContext->tokens->advance();
+            $this->registry->getBlockScalarValueConsumer()->consume($parseContext->tokens, $valueNode, $parentIndent);
+
+            return;
+        }
+
         $this->consumeBlockValueOpeningLayout($parseContext, $valueNode);
         $valueNode->addChild($this->registry->getBlockMappingParser()->parseBlockMappingValue($parseContext, $parentIndent));
     }
