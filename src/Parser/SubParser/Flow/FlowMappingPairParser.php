@@ -15,18 +15,15 @@ namespace Aeliot\YamlToken\Parser\SubParser\Flow;
 
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
-use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Parser\Assembler\ParserRegistry;
-use Aeliot\YamlToken\Parser\Dto\IndentContext;
 use Aeliot\YamlToken\Parser\Dto\ParseContext;
 use Aeliot\YamlToken\Parser\Helper\AnchorPostProcessor;
-use Aeliot\YamlToken\Parser\Helper\Identifier\FlowStructureIdentifier;
 
 final readonly class FlowMappingPairParser
 {
     public function __construct(
         private AnchorPostProcessor $anchorPostProcessor,
-        private FlowStructureIdentifier $flowStructureIdentifier,
+        private FlowPairValueConsumer $flowPairValueConsumer,
         private FlowValueIndicatorConsumer $flowValueIndicatorConsumer,
         private ParserRegistry $registry,
     ) {
@@ -38,16 +35,7 @@ final readonly class FlowMappingPairParser
         $couple->addChild($this->registry->getKeyParser()->getKeyNode($parseContext));
 
         if ($this->flowValueIndicatorConsumer->tryConsume($parseContext, $couple)) {
-            if ($this->flowStructureIdentifier->isNextSignificantTokenOneOf(
-                $parseContext,
-                true,
-                TokenType::FLOW_ENTRY,
-                TokenType::FLOW_MAPPING_END,
-            )) {
-                $couple->addChild(new ValueNode());
-            } else {
-                $couple->addChild($this->registry->getValueParser()->parseValue($parseContext, IndentContext::createForFlow()));
-            }
+            $this->flowPairValueConsumer->parseValueOrEmpty($parseContext, $couple, TokenType::FLOW_ENTRY, TokenType::FLOW_MAPPING_END);
         }
 
         $this->anchorPostProcessor->postProcessKeyValueCouple($parseContext->anchorsRegistry, $couple);

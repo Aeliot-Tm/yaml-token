@@ -29,6 +29,7 @@ use Aeliot\YamlToken\Parser\SubParser\Flow\FlowMappingPairParser;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowMappingParser;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowMultilinePlainScalarConsumer;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowMultilinePlainScalarKeyParser;
+use Aeliot\YamlToken\Parser\SubParser\Flow\FlowPairValueConsumer;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowSequenceParser;
 use Aeliot\YamlToken\Parser\SubParser\MergeInstructionParser;
 use Aeliot\YamlToken\Parser\SubParser\NodePropertiesParser;
@@ -55,6 +56,7 @@ final class ParserRegistry
     private ?ExplicitKeyParser $explicitKeyParser = null;
     private ?FlowEntryParser $flowEntryParser = null;
     private ?FlowMappingPairParser $flowMappingPairParser = null;
+    private ?FlowPairValueConsumer $flowPairValueConsumer = null;
     private ?FlowMappingParser $flowMappingParser = null;
     private ?FlowMultilinePlainScalarConsumer $flowMultilinePlainScalarConsumer = null;
     private ?FlowMultilinePlainScalarKeyParser $flowMultilinePlainScalarKeyParser = null;
@@ -146,6 +148,11 @@ final class ParserRegistry
     public function getFlowMultilinePlainScalarKeyParser(): FlowMultilinePlainScalarKeyParser
     {
         return $this->flowMultilinePlainScalarKeyParser ??= $this->assembler->createFlowMultilinePlainScalarKeyParser($this);
+    }
+
+    public function getFlowPairValueConsumer(): FlowPairValueConsumer
+    {
+        return $this->flowPairValueConsumer ??= $this->assembler->createFlowPairValueConsumer($this);
     }
 
     public function getFlowSequenceParser(): FlowSequenceParser

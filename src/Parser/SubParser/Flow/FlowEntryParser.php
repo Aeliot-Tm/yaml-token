@@ -35,6 +35,7 @@ final readonly class FlowEntryParser
 {
     public function __construct(
         private AnchorPostProcessor $anchorPostProcessor,
+        private FlowPairValueConsumer $flowPairValueConsumer,
         private FlowStructureIdentifier $flowStructureIdentifier,
         private FlowValueIndicatorConsumer $flowValueIndicatorConsumer,
         private KeyIdentifier $keyIdentifier,
@@ -101,17 +102,7 @@ final readonly class FlowEntryParser
             throw new UnexpectedStateException('Expected VALUE_INDICATOR after flow complex key');
         }
 
-        if ($this->flowStructureIdentifier->isNextSignificantTokenOneOf(
-            $parseContext,
-            true,
-            TokenType::FLOW_ENTRY,
-            TokenType::FLOW_SEQUENCE_END,
-        )) {
-            $couple->addChild(new ValueNode());
-        } else {
-            $couple->addChild($this->registry->getValueParser()->parseValue($parseContext, IndentContext::createForFlow()));
-        }
-
+        $this->flowPairValueConsumer->parseValueOrEmpty($parseContext, $couple, TokenType::FLOW_ENTRY, TokenType::FLOW_SEQUENCE_END);
         $this->anchorPostProcessor->postProcessKeyValueCouple($parseContext->anchorsRegistry, $couple);
 
         return $this->completeOperandAsValue($couple);
@@ -138,17 +129,7 @@ final readonly class FlowEntryParser
 
         $this->flowValueIndicatorConsumer->tryConsume($parseContext, $couple);
 
-        if ($this->flowStructureIdentifier->isNextSignificantTokenOneOf(
-            $parseContext,
-            true,
-            TokenType::FLOW_ENTRY,
-            TokenType::FLOW_SEQUENCE_END,
-        )) {
-            $couple->addChild(new ValueNode());
-        } else {
-            $couple->addChild($this->registry->getValueParser()->parseValue($parseContext, IndentContext::createForFlow()));
-        }
-
+        $this->flowPairValueConsumer->parseValueOrEmpty($parseContext, $couple, TokenType::FLOW_ENTRY, TokenType::FLOW_SEQUENCE_END);
         $this->anchorPostProcessor->postProcessKeyValueCouple($parseContext->anchorsRegistry, $couple);
 
         return $this->completeOperandAsValue($couple);

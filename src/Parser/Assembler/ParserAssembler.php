@@ -44,6 +44,7 @@ use Aeliot\YamlToken\Parser\SubParser\Flow\FlowMappingPairParser;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowMappingParser;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowMultilinePlainScalarConsumer;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowMultilinePlainScalarKeyParser;
+use Aeliot\YamlToken\Parser\SubParser\Flow\FlowPairValueConsumer;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowSequenceParser;
 use Aeliot\YamlToken\Parser\SubParser\Flow\FlowValueIndicatorConsumer;
 use Aeliot\YamlToken\Parser\SubParser\MergeInstructionParser;
@@ -174,6 +175,7 @@ final class ParserAssembler
     {
         return new FlowEntryParser(
             $this->anchorPostProcessor,
+            $registry->getFlowPairValueConsumer(),
             $this->getFlowStructureIdentifier(),
             $this->getFlowValueIndicatorConsumer(),
             $this->getKeyIdentifier(),
@@ -185,8 +187,16 @@ final class ParserAssembler
     {
         return new FlowMappingPairParser(
             $this->anchorPostProcessor,
-            $this->getFlowStructureIdentifier(),
+            $registry->getFlowPairValueConsumer(),
             $this->getFlowValueIndicatorConsumer(),
+            $registry,
+        );
+    }
+
+    public function createFlowPairValueConsumer(ParserRegistry $registry): FlowPairValueConsumer
+    {
+        return new FlowPairValueConsumer(
+            $this->getFlowStructureIdentifier(),
             $registry,
         );
     }
