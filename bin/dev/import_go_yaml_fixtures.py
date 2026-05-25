@@ -99,6 +99,18 @@ def _ensure_parent(path: Path, dry_run: bool) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
 
 
+def _remove_empty_fixture_dirs(leaf_file: Path, bucket_root: Path) -> None:
+    """Remove empty directories from leaf_file's parent up to (not including) bucket_root."""
+    bucket_root = bucket_root.resolve()
+    current = leaf_file.parent.resolve()
+    while current != bucket_root and bucket_root in current.parents:
+        try:
+            current.rmdir()
+        except OSError:
+            break
+        current = current.parent.resolve()
+
+
 def _yamllint(path: Path) -> subprocess.CompletedProcess[str]:
     return _exec_php_cli(["yamllint", "-c", str(YAMLLINT_CONFIG), str(path)])
 
@@ -189,6 +201,7 @@ def import_one(
     _ensure_parent(dest_extra, dry_run=dry_run)
     if dest_extra.exists():
         dest_go.unlink()
+        _remove_empty_fixture_dirs(dest_go, GO_YAML_DIR)
         content_by_hash.pop(source_hash, None)
         return ImportResult(
             source=source,
@@ -200,6 +213,7 @@ def import_one(
         )
 
     dest_go.rename(dest_extra)
+    _remove_empty_fixture_dirs(dest_go, GO_YAML_DIR)
     content_by_hash[source_hash] = dest_extra
     return ImportResult(source=source, dest=dest_extra, bucket="go_yaml_extra", yamllint_ok=False, created=True)
 
