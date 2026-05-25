@@ -51,7 +51,7 @@ final readonly class BlockScalarFirstFragmentConsumer
         $options->addChild(new BlockScalarIndicatorNode($token));
         $tokens->advance();
 
-        $this->consumer->collectUntil($tokens, TokenType::NEWLINE, $options);
+        $this->consumer->collectUntil($tokens, $options, TokenType::NEWLINE);
 
         $token = $tokens->current();
         if (null === $token) {

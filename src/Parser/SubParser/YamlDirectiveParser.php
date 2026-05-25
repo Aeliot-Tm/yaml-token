@@ -31,8 +31,9 @@ final readonly class YamlDirectiveParser
         $this->consumer->grab($parseContext->tokens, $yamlDirectiveNode, TokenType::DIRECTIVE_YAML_INDICATOR);
         $this->consumer->collectTypes(
             $parseContext->tokens,
-            [TokenType::WHITESPACE, TokenType::VALUE_INDICATOR],
             $yamlDirectiveNode,
+            TokenType::VALUE_INDICATOR,
+            TokenType::WHITESPACE,
         );
         $this->consumer->grab($parseContext->tokens, $yamlDirectiveNode, TokenType::DIRECTIVE_YAML_VERSION);
         $this->consumer->collectSpaceAndComments($parseContext->tokens, $yamlDirectiveNode);

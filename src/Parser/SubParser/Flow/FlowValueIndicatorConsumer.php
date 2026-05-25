@@ -38,7 +38,7 @@ final readonly class FlowValueIndicatorConsumer
         $couple->addChild(new ValueIndicatorNode($token));
         $parseContext->tokens->advance();
 
-        $this->consumer->collectTypes($parseContext->tokens, [TokenType::WHITESPACE], $couple);
+        $this->consumer->collectWhitespace($parseContext->tokens, $couple);
 
         return true;
     }

@@ -15,6 +15,7 @@ namespace Aeliot\YamlToken\Parser\SubParser;
 
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\Node;
+use Aeliot\YamlToken\Parser\Exception\InvalidArgumentException;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
 use Aeliot\YamlToken\Parser\Helper\TokenGrabber;
 use Aeliot\YamlToken\Token\TokenStreamInterface;
@@ -40,19 +41,20 @@ final readonly class Consumer
 
     public function collectSpaceAndComments(TokenStreamInterface $tokens, Node $root): void
     {
-        $this->collectTypes($tokens, self::TOKEN_TYPES_SPACE_AND_COMMENT, $root);
+        $this->collectTypes($tokens, $root, ...self::TOKEN_TYPES_SPACE_AND_COMMENT);
     }
 
     public function collectSpaceCommentEnds(TokenStreamInterface $tokens, Node $root): void
     {
-        $this->collectTypes($tokens, self::TOKEN_TYPES_SPACE_COMMENT_END, $root);
+        $this->collectTypes($tokens, $root, ...self::TOKEN_TYPES_SPACE_COMMENT_END);
     }
 
-    /**
-     * @param TokenType[] $types
-     */
-    public function collectTypes(TokenStreamInterface $tokens, array $types, Node $root): void
+    public function collectTypes(TokenStreamInterface $tokens, Node $root, TokenType ...$types): void
     {
+        if (!$types) {
+            throw new InvalidArgumentException('Types for the collecting are required');
+        }
+
         while (true) {
             $token = $tokens->current();
             if (null === $token) {
@@ -69,10 +71,10 @@ final readonly class Consumer
 
     public function collectWhitespace(TokenStreamInterface $tokens, Node $root): void
     {
-        $this->collectTypes($tokens, [TokenType::WHITESPACE], $root);
+        $this->collectTypes($tokens, $root, TokenType::WHITESPACE);
     }
 
-    public function collectUntil(TokenStreamInterface $tokens, TokenType $until, Node $root): void
+    public function collectUntil(TokenStreamInterface $tokens, Node $root, TokenType $until): void
     {
         while (true) {
             $token = $tokens->current();

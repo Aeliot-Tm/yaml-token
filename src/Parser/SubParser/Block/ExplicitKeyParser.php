@@ -230,7 +230,7 @@ final readonly class ExplicitKeyParser
     private function consumeSameLineTrailingCommentForBlockExplicitKey(ParseContext $parseContext, KeyNode $keyNode): void
     {
         if (TokenType::COMMENT === $parseContext->tokens->current()?->type) {
-            $this->consumer->collectTypes($parseContext->tokens, [TokenType::COMMENT], $keyNode);
+            $this->consumer->collectTypes($parseContext->tokens, $keyNode, TokenType::COMMENT);
         }
     }
 

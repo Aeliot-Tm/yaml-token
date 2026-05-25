@@ -61,7 +61,7 @@ final readonly class KeyValueCoupleParser
             null !== $afterKey
             && null !== $keyValueCouple->getKey()->getExplicitKeyIndicatorNode()
         ) {
-            $this->consumer->collectTypes($parseContext->tokens, [TokenType::WHITESPACE], $keyValueCouple);
+            $this->consumer->collectWhitespace($parseContext->tokens, $keyValueCouple);
             $afterKey = $parseContext->tokens->current();
 
             if (null === $afterKey || TokenType::NEWLINE !== $afterKey->type) {
@@ -75,12 +75,14 @@ final readonly class KeyValueCoupleParser
                 $headIndentLen = $head->indentLen;
                 $significantToken = $head->significantToken;
                 if (TokenType::VALUE_INDICATOR === $significantToken->type && $headIndentLen === $indentLen) {
-                    $this->consumer->collectTypes($parseContext->tokens, [
+                    $this->consumer->collectTypes(
+                        $parseContext->tokens,
+                        $keyValueCouple,
                         TokenType::COMMENT,
                         TokenType::INDENTATION,
                         TokenType::NEWLINE,
                         TokenType::WHITESPACE,
-                    ], $keyValueCouple);
+                    );
                 }
             }
         }
@@ -93,7 +95,7 @@ final readonly class KeyValueCoupleParser
             && \strlen($afterKey->text) === $indentLen
             && TokenType::VALUE_INDICATOR === $parseContext->tokens->peek(1)?->type
         ) {
-            $this->consumer->collectTypes($parseContext->tokens, [TokenType::INDENTATION], $keyValueCouple);
+            $this->consumer->collectTypes($parseContext->tokens, $keyValueCouple, TokenType::INDENTATION);
         }
 
         if (
@@ -108,7 +110,7 @@ final readonly class KeyValueCoupleParser
             );
         }
 
-        $this->consumer->collectTypes($parseContext->tokens, [TokenType::VALUE_INDICATOR, TokenType::WHITESPACE], $keyValueCouple);
+        $this->consumer->collectTypes($parseContext->tokens, $keyValueCouple, TokenType::VALUE_INDICATOR, TokenType::WHITESPACE);
         $keyValueCouple->addChild($this->registry->getValueParser()->parseValue(
             $parseContext,
             IndentContext::createForBlock($indentLen, true),
