@@ -16,6 +16,7 @@ namespace Aeliot\YamlToken\Parser\Helper;
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\BlockScalarChompingIndicatorNode;
 use Aeliot\YamlToken\Node\BlockScalarIndentationIndicatorNode;
+use Aeliot\YamlToken\Node\BlockScalarIndicatorNode;
 use Aeliot\YamlToken\Node\CommentNode;
 use Aeliot\YamlToken\Node\DoubleQuotedScalarNode;
 use Aeliot\YamlToken\Node\FlowEntryNode;
@@ -84,6 +85,8 @@ final readonly class NodeFactory
             TokenType::FLOW_MAPPING_START => new FlowMappingStartNode($token),
             TokenType::FLOW_SEQUENCE_END => new FlowSequenceEndNode($token),
             TokenType::FLOW_SEQUENCE_START => new FlowSequenceStartNode($token),
+            TokenType::FOLDED_BLOCK_SCALAR_INDICATOR,
+            TokenType::LITERAL_BLOCK_SCALAR_INDICATOR => new BlockScalarIndicatorNode($token),
             TokenType::INDENTATION => new IndentationNode($token),
             TokenType::MERGE_INDICATOR => new MergeIndicatorNode($token),
             TokenType::NEWLINE => new NewLineNode($token),

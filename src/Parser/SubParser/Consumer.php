@@ -91,4 +91,12 @@ final readonly class Consumer
 
         return \strlen($token->text);
     }
+
+    public function grabOneOf(TokenStreamInterface $tokens, Node $root, TokenType ...$types): int
+    {
+        $token = $this->tokenGrabber->grabOneOf($tokens, ...$types);
+        $root->addChild($this->nodeFactory->createSimpleNode($token));
+
+        return \strlen($token->text);
+    }
 }

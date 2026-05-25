@@ -32,7 +32,7 @@ final readonly class BlockScalarKeyNameConsumer
      */
     public function consume(TokenStreamInterface $tokens, KeyNode $keyNode): void
     {
-        $entry = $this->blockScalarFirstFragmentConsumer->consume($tokens, true);
+        $entry = $this->blockScalarFirstFragmentConsumer->consume($tokens);
         $keyNode->setName($entry);
     }
 }

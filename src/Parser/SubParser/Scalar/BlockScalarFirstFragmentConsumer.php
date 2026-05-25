@@ -15,10 +15,7 @@ namespace Aeliot\YamlToken\Parser\SubParser\Scalar;
 
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\BlockScalarEntryNode;
-use Aeliot\YamlToken\Node\BlockScalarIndicatorNode;
 use Aeliot\YamlToken\Node\BlockScalarOptionsNode;
-use Aeliot\YamlToken\Node\IndentationNode;
-use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
@@ -44,48 +41,28 @@ final readonly class BlockScalarFirstFragmentConsumer
      * Returns the assembled entry node. When the stream is truncated and $failOnTruncatedStream is false,
      * returns a partial entry containing only the options (no scalar payload).
      */
-    public function consume(TokenStreamInterface $tokens, bool $failOnTruncatedStream): BlockScalarEntryNode
+    public function consume(TokenStreamInterface $tokens): BlockScalarEntryNode
     {
-        $token = $tokens->current();
         $options = new BlockScalarOptionsNode();
-        $options->addChild(new BlockScalarIndicatorNode($token));
-        $tokens->advance();
 
+        $this->consumer->grabOneOf($tokens, $options, ...TokenType::BLOCK_SCALAR_INDICATORS);
         $this->consumer->collectUntil($tokens, $options, TokenType::NEWLINE);
-
-        $token = $tokens->current();
-        if (null === $token) {
-            if ($failOnTruncatedStream) {
-                throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation('Expected NEWLINE after block scalar indicator, got _nothing_', $tokens));
-            }
-
-            $entry = new BlockScalarEntryNode();
-            $entry->addChild($options);
-
-            return $entry;
-        }
-
-        if (TokenType::NEWLINE !== $token->type) {
-            throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Expected NEWLINE after block scalar indicator, got %s', $token->type->value), $token));
-        }
 
         $entry = new BlockScalarEntryNode();
         $entry->addChild($options);
-        $entry->addChild(new NewLineNode($token));
-        $tokens->advance();
 
-        while (TokenType::NEWLINE === $tokens->current()?->type) {
-            $entry->addChild(new NewLineNode($tokens->current()));
-            $tokens->advance();
+        $token = $tokens->current();
+        if (null === $token) {
+            return $entry;
         }
+
+        $this->consumer->grab($tokens, $entry, TokenType::NEWLINE);
+        $this->consumer->collectTypes($tokens, $entry, TokenType::NEWLINE);
 
         // YAML 1.2.2 §8.1.1.1: with an explicit indentation indicator (|N, >N, |N-, >N+, ...),
         // the body may start with leading spaces that are part of the content but surface
         // to the parser as a separate INDENTATION token before the scalar payload.
-        if (TokenType::INDENTATION === $tokens->current()?->type) {
-            $entry->addChild(new IndentationNode($tokens->current()));
-            $tokens->advance();
-        }
+        $this->consumer->collectTypes($tokens, $entry, TokenType::INDENTATION);
 
         $token = $tokens->current();
         if (null === $token || !$token->type->isScalar()) {

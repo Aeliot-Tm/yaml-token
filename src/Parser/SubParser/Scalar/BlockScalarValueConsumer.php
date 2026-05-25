@@ -33,7 +33,7 @@ final readonly class BlockScalarValueConsumer
      */
     public function consume(TokenStreamInterface $tokens, ValueNode $valueNode, IndentContext $parentIndent): void
     {
-        $entry = $this->blockScalarFirstFragmentConsumer->consume($tokens, false);
+        $entry = $this->blockScalarFirstFragmentConsumer->consume($tokens);
         $valueNode->addChild($entry);
         $this->multilinePlainScalarParser->appendMultilinePlainScalarContinuations($tokens, $valueNode, $parentIndent);
     }

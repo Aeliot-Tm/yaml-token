@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Aeliot\YamlToken\Parser\Helper;
 
 use Aeliot\YamlToken\Enum\TokenType;
+use Aeliot\YamlToken\Parser\Exception\InvalidArgumentException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Token\Token;
 use Aeliot\YamlToken\Token\TokenStreamInterface;
@@ -30,6 +31,26 @@ final readonly class TokenGrabber
         $token = $tokens->current();
         if ($token?->type !== $tokenType) {
             throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Expected %s token, but %s given', $tokenType->value, $token?->type->value ?? '_nothing_'), $tokens));
+        }
+        $tokens->advance();
+
+        return $token;
+    }
+
+    public function grabOneOf(TokenStreamInterface $tokens, TokenType ...$types): Token
+    {
+        if (!$types) {
+            throw new InvalidArgumentException('Types for the grabbing are required');
+        }
+
+        $token = $tokens->current();
+        if (!\in_array($token?->type, $types, true)) {
+            $exceptionMessage = \sprintf(
+                'Expected %s token, but %s given',
+                implode(' or ', array_map(static fn (TokenType $x): string => $x->value, $types)),
+                $token?->type->value ?? '_nothing_'
+            );
+            throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation($exceptionMessage, $tokens));
         }
         $tokens->advance();
 
