@@ -16,6 +16,8 @@ namespace Aeliot\YamlToken\Parser\Helper\Identifier;
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Parser\Dto\ParseContext;
 use Aeliot\YamlToken\Parser\Helper\MultilineContinuationHelper;
+use Aeliot\YamlToken\Parser\Helper\PeekOffsetHelper;
+use Aeliot\YamlToken\Token\TokenStreamInterface;
 
 final readonly class BlockStructureIdentifier
 {
@@ -23,6 +25,7 @@ final readonly class BlockStructureIdentifier
         private FlowStructureIdentifier $flowStructureIdentifier,
         private MultilineContinuationHelper $multilineContinuationHelper,
         private NodePropertyIdentifier $nodePropertyIdentifier,
+        private PeekOffsetHelper $peekOffsetHelper,
         private SequenceIdentifier $sequenceIdentifier,
     ) {
     }
@@ -36,11 +39,10 @@ final readonly class BlockStructureIdentifier
      */
     public function isKeyValueCoupleStart(ParseContext $parseContext): bool
     {
-        $contentPeekOffset = 0;
-        $token = $parseContext->tokens->current();
-        if (TokenType::INDENTATION === $token->type) {
-            $contentPeekOffset = 1;
-            $token = $parseContext->tokens->peek(1);
+        $contentPeekOffset = $this->resolveEntryContentPeekOffset($parseContext->tokens);
+        $token = $parseContext->tokens->peek($contentPeekOffset);
+        if (null === $token) {
+            return false;
         }
 
         if (
@@ -52,7 +54,7 @@ final readonly class BlockStructureIdentifier
             return true;
         }
 
-        if (\in_array($token?->type, [TokenType::FLOW_SEQUENCE_START, TokenType::FLOW_MAPPING_START], true)) {
+        if (\in_array($token->type, [TokenType::FLOW_SEQUENCE_START, TokenType::FLOW_MAPPING_START], true)) {
             return $this->flowStructureIdentifier->isFlowCollectionFollowedByBlockValueIndicatorOnSameLine($parseContext, $contentPeekOffset);
         }
 
@@ -61,10 +63,8 @@ final readonly class BlockStructureIdentifier
             TokenType::SINGLE_QUOTED_SCALAR,
             TokenType::PLAIN_SCALAR,
         ], true)) {
-            $scalarLineOffset = TokenType::INDENTATION === $parseContext->tokens->current()?->type ? 1 : 0;
-
             return $this->multilineContinuationHelper
-                ->isImplicitYamlKeyOnContinuationLine($parseContext->tokens, $scalarLineOffset);
+                ->isImplicitYamlKeyOnContinuationLine($parseContext->tokens, $contentPeekOffset);
         }
 
         return $this->nodePropertyIdentifier->isNodePropertyToken($token)
@@ -76,12 +76,8 @@ final readonly class BlockStructureIdentifier
 
     public function isKeyValueCoupleStartAllowingNodeProperties(ParseContext $parseContext): bool
     {
-        $token = $parseContext->tokens->current();
-        if (TokenType::INDENTATION === $token->type) {
-            $token = $parseContext->tokens->peek(1);
-        }
-
-        if ($this->nodePropertyIdentifier->isNodePropertyToken($token)) {
+        $contentPeekOffset = $this->resolveEntryContentPeekOffset($parseContext->tokens);
+        if ($this->nodePropertyIdentifier->isNodePropertyToken($parseContext->tokens->peek($contentPeekOffset))) {
             return true;
         }
 
@@ -91,5 +87,15 @@ final readonly class BlockStructureIdentifier
     public function isSequenceStart(ParseContext $parseContext): bool
     {
         return $this->sequenceIdentifier->isSequenceStart($parseContext);
+    }
+
+    private function resolveEntryContentPeekOffset(TokenStreamInterface $tokens): int
+    {
+        $offset = 0;
+        if (TokenType::INDENTATION === $tokens->current()?->type) {
+            $offset = 1;
+        }
+
+        return $this->peekOffsetHelper->skipWhitespaceOffset($tokens, $offset);
     }
 }

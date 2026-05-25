@@ -16,11 +16,13 @@ namespace Aeliot\YamlToken\Parser\SubParser\Block;
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Parser\Dto\ParseContext;
+use Aeliot\YamlToken\Parser\SubParser\Consumer;
 use Aeliot\YamlToken\Parser\SubParser\NodePropertiesParser;
 
 final readonly class KeyParser
 {
     public function __construct(
+        private Consumer $consumer,
         private ExplicitKeyParser $explicitKeyParser,
         private ImplicitKeyParser $implicitKeyParser,
         private NodePropertiesParser $nodePropertiesParser,
@@ -30,6 +32,7 @@ final readonly class KeyParser
     public function getKeyNode(ParseContext $parseContext, ?int $entryIndentLen = null): KeyNode
     {
         $keyNode = new KeyNode();
+        $this->consumer->collectWhitespace($parseContext->tokens, $keyNode);
         $this->nodePropertiesParser->collectProperties($parseContext, $keyNode);
         $token = $parseContext->tokens->current();
 

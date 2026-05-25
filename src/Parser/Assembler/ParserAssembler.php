@@ -249,6 +249,7 @@ final class ParserAssembler
     public function createKeyParser(ParserRegistry $registry): KeyParser
     {
         return new KeyParser(
+            $this->consumer,
             $registry->getExplicitKeyParser(),
             $registry->getImplicitKeyParser(),
             $registry->getNodePropertiesParser(),
@@ -337,6 +338,7 @@ final class ParserAssembler
             $this->getFlowStructureIdentifier(),
             $this->multilineContinuationHelper,
             $this->getNodePropertyIdentifier(),
+            $this->peekOffsetHelper,
             $this->getSequenceIdentifier(),
         );
     }
@@ -365,6 +367,7 @@ final class ParserAssembler
     {
         return $this->nodePropertyIdentifier ??= new NodePropertyIdentifier(
             $this->getFlowStructureIdentifier(),
+            $this->peekOffsetHelper,
         );
     }
 

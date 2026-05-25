@@ -15,12 +15,15 @@ namespace Aeliot\YamlToken\Parser\Helper\Identifier;
 
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Parser\Dto\ParseContext;
+use Aeliot\YamlToken\Parser\Helper\PeekOffsetHelper;
 use Aeliot\YamlToken\Token\Token;
+use Aeliot\YamlToken\Token\TokenStreamInterface;
 
 final readonly class NodePropertyIdentifier
 {
     public function __construct(
         private FlowStructureIdentifier $flowStructureIdentifier,
+        private PeekOffsetHelper $peekOffsetHelper,
     ) {
     }
 
@@ -36,13 +39,7 @@ final readonly class NodePropertyIdentifier
      */
     public function isNodePropertyAtDocumentRoot(ParseContext $parseContext): bool
     {
-        $token = $parseContext->tokens->current();
-        if (null === $token) {
-            return false;
-        }
-        if (TokenType::INDENTATION === $token->type) {
-            $token = $parseContext->tokens->peek(1);
-        }
+        $token = $parseContext->tokens->peek($this->resolveLineContentPeekOffset($parseContext->tokens));
 
         return null !== $token && \in_array($token->type, [
             TokenType::ANCHOR,
@@ -115,12 +112,10 @@ final readonly class NodePropertyIdentifier
      */
     public function isNodePropertiesFollowedByFlowCollectionImplicitBlockKeyOnSameLine(ParseContext $parseContext): bool
     {
-        $offset = 0;
-        if (TokenType::INDENTATION === $parseContext->tokens->current()?->type) {
-            $offset = 1;
-        }
-
-        return $this->isNodePropertiesFollowedByFlowCollectionImplicitBlockKeyFromOffset($parseContext, $offset);
+        return $this->isNodePropertiesFollowedByFlowCollectionImplicitBlockKeyFromOffset(
+            $parseContext,
+            $this->resolveLineContentPeekOffset($parseContext->tokens),
+        );
     }
 
     /**
@@ -180,15 +175,21 @@ final readonly class NodePropertyIdentifier
      */
     public function isNodePropertiesFollowedByImplicitYamlKeyOnSameLine(ParseContext $parseContext): bool
     {
-        $offset = 0;
-        if (TokenType::INDENTATION === $parseContext->tokens->current()?->type) {
-            $offset = 1;
-        }
-
+        $offset = $this->resolveLineContentPeekOffset($parseContext->tokens);
         if (!$this->isNodePropertyToken($parseContext->tokens->peek($offset))) {
             return false;
         }
 
         return $this->isNodePropertiesFollowedByImplicitKeyFromOffset($parseContext, $offset);
+    }
+
+    private function resolveLineContentPeekOffset(TokenStreamInterface $tokens): int
+    {
+        $offset = 0;
+        if (TokenType::INDENTATION === $tokens->current()?->type) {
+            $offset = 1;
+        }
+
+        return $this->peekOffsetHelper->skipWhitespaceOffset($tokens, $offset);
     }
 }
