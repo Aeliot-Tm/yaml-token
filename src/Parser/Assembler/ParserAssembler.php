@@ -279,10 +279,9 @@ final class ParserAssembler
     public function createSequenceEntryParser(ParserRegistry $registry): SequenceEntryParser
     {
         return new SequenceEntryParser(
-            $this->errorHelper,
+            $this->consumer,
             $this->getFlowStructureIdentifier(),
             $this->getKeyIdentifier(),
-            $this->nodeFactory,
             $this->getNodePropertyIdentifier(),
             $registry,
         );

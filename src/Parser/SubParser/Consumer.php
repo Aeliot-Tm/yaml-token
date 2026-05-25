@@ -43,29 +43,33 @@ final readonly class Consumer
         $this->collectTypes($tokens, $root, TokenType::VALUE_INDICATOR, TokenType::WHITESPACE);
     }
 
-    public function collectTypes(TokenStreamInterface $tokens, Node $root, TokenType ...$types): void
+    public function collectTypes(TokenStreamInterface $tokens, Node $root, TokenType ...$types): int
     {
         if (!$types) {
             throw new InvalidArgumentException('Types for the collecting are required');
         }
 
+        $length = 0;
         while (true) {
             $token = $tokens->current();
             if (null === $token) {
                 break;
             }
             if (\in_array($token->type, $types, true)) {
+                $length += \strlen($token->text);
                 $root->addChild($this->nodeFactory->createSimpleNode($token));
                 $tokens->advance();
                 continue;
             }
             break;
         }
+
+        return $length;
     }
 
-    public function collectWhitespace(TokenStreamInterface $tokens, Node $root): void
+    public function collectWhitespace(TokenStreamInterface $tokens, Node $root): int
     {
-        $this->collectTypes($tokens, $root, TokenType::WHITESPACE);
+        return $this->collectTypes($tokens, $root, TokenType::WHITESPACE);
     }
 
     public function collectUntil(TokenStreamInterface $tokens, Node $root, TokenType $until): void
@@ -80,8 +84,11 @@ final readonly class Consumer
         }
     }
 
-    public function grab(TokenStreamInterface $tokens, Node $root, TokenType $tokenType): void
+    public function grab(TokenStreamInterface $tokens, Node $root, TokenType $tokenType): int
     {
-        $root->addChild($this->nodeFactory->createSimpleNode($this->tokenGrabber->current($tokens, $tokenType)));
+        $token = $this->tokenGrabber->current($tokens, $tokenType);
+        $root->addChild($this->nodeFactory->createSimpleNode($token));
+
+        return \strlen($token->text);
     }
 }

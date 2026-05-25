@@ -16,24 +16,20 @@ namespace Aeliot\YamlToken\Parser\SubParser\Block;
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Node\ValueNode;
-use Aeliot\YamlToken\Node\WhitespaceNode;
 use Aeliot\YamlToken\Parser\Assembler\ParserRegistry;
 use Aeliot\YamlToken\Parser\Dto\IndentContext;
 use Aeliot\YamlToken\Parser\Dto\ParseContext;
-use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
-use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
 use Aeliot\YamlToken\Parser\Helper\Identifier\FlowStructureIdentifier;
 use Aeliot\YamlToken\Parser\Helper\Identifier\KeyIdentifier;
 use Aeliot\YamlToken\Parser\Helper\Identifier\NodePropertyIdentifier;
-use Aeliot\YamlToken\Parser\Helper\NodeFactory;
+use Aeliot\YamlToken\Parser\SubParser\Consumer;
 
 final readonly class SequenceEntryParser
 {
     public function __construct(
-        private ErrorHelper $errorHelper,
+        private Consumer $consumer,
         private FlowStructureIdentifier $flowStructureIdentifier,
         private KeyIdentifier $keyIdentifier,
-        private NodeFactory $nodeFactory,
         private NodePropertyIdentifier $nodePropertyIdentifier,
         private ParserRegistry $registry,
     ) {
@@ -62,26 +58,8 @@ final readonly class SequenceEntryParser
      */
     private function consumeSequenceEntryIndicatorAndSpaces(ParseContext $parseContext, Node $target): int
     {
-        $token = $parseContext->tokens->current();
-        if (TokenType::SEQUENCE_ENTRY !== $token?->type) {
-            throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('SEQUENCE_ENTRY expected, but %s given', $token?->type->value ?? '_nothing_'), $parseContext->tokens));
-        }
-
-        $target->addChild($this->nodeFactory->createSimpleNode($token));
-        $parseContext->tokens->advance();
-        $consumed = \strlen($token->text);
-
-        while (true) {
-            $next = $parseContext->tokens->current();
-            if (TokenType::WHITESPACE !== $next?->type) {
-                break;
-            }
-            $target->addChild(new WhitespaceNode($next));
-            $consumed += \strlen($next->text);
-            $parseContext->tokens->advance();
-        }
-
-        return $consumed;
+        return $this->consumer->grab($parseContext->tokens, $target, TokenType::SEQUENCE_ENTRY)
+            + $this->consumer->collectWhitespace($parseContext->tokens, $target);
     }
 
     /**
