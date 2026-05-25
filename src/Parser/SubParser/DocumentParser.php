@@ -272,7 +272,7 @@ final readonly class DocumentParser
             return false;
         }
 
-        if ($this->blockStructureIdentifier->isBlockScalarStartAtDocumentRoot($parseContext)) {
+        if (\in_array($token->type, TokenType::BLOCK_SCALAR_INDICATORS, true)) {
             $document->addChild($this->registry->getValueParser()->parseValue($parseContext, IndentContext::createForBareDocument()));
 
             return true;

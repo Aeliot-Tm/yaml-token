@@ -27,23 +27,6 @@ final readonly class BlockStructureIdentifier
     ) {
     }
 
-    public function isBlockScalarStartAtDocumentRoot(ParseContext $parseContext): bool
-    {
-        $offset = 0;
-        while (true) {
-            $token = $parseContext->tokens->peek($offset);
-            if (null === $token) {
-                return false;
-            }
-            if (TokenType::INDENTATION === $token->type || TokenType::WHITESPACE === $token->type) {
-                ++$offset;
-                continue;
-            }
-
-            return \in_array($token->type, TokenType::BLOCK_SCALAR_INDICATORS, true);
-        }
-    }
-
     /**
      * YAML 1.2.2 §6.4 / §6.6: detects a line that is either entirely empty
      * (l-empty) or contains only a comment (l-comment), possibly with
