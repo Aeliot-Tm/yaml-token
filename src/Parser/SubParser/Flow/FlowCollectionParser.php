@@ -35,7 +35,7 @@ final readonly class FlowCollectionParser
      * @template T of FlowNode
      *
      * @param T $node
-     * @param \Closure(ParseContext): Node $parseEntry
+     * @param \Closure(ParseContext): Node $parseEntryParser
      *
      * @return T
      */
@@ -44,7 +44,7 @@ final readonly class FlowCollectionParser
         FlowNode $node,
         TokenType $openTokenType,
         TokenType $closeTokenType,
-        \Closure $parseEntry,
+        \Closure $parseEntryParser,
     ): FlowNode {
         $this->consumer->grab($parseContext->tokens, $node, $openTokenType);
 
@@ -71,7 +71,7 @@ final readonly class FlowCollectionParser
                 continue;
             }
 
-            $node->addChild($parseEntry($parseContext));
+            $node->addChild($parseEntryParser($parseContext));
         }
     }
 }
