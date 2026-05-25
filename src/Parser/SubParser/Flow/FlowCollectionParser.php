@@ -60,7 +60,7 @@ final readonly class FlowCollectionParser
             $token = $parseContext->tokens->current();
             if (null === $token || $closeTokenType === $token->type) {
                 if ($closeTokenType !== $token?->type) {
-                    throw new UnexpectedTokenException(\sprintf('There is no expected %s token, but %s given', $closeTokenType->value, $token?->type->value ?? '_nothing_'));
+                    throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('There is no expected %s token, but %s given', $closeTokenType->value, $token?->type->value ?? '_nothing_'), $parseContext->tokens));
                 }
 
                 $node->addChild($this->nodeFactory->createSimpleNode($token));

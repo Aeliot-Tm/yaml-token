@@ -26,6 +26,7 @@ use Aeliot\YamlToken\Parser\Dto\IndentContext;
 use Aeliot\YamlToken\Parser\Dto\ParseContext;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
 use Aeliot\YamlToken\Parser\Helper\AnchorPostProcessor;
+use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
 use Aeliot\YamlToken\Parser\Helper\Identifier\FlowStructureIdentifier;
 use Aeliot\YamlToken\Parser\Helper\Identifier\KeyIdentifier;
 
@@ -33,6 +34,7 @@ final readonly class FlowEntryParser
 {
     public function __construct(
         private AnchorPostProcessor $anchorPostProcessor,
+        private ErrorHelper $errorHelper,
         private FlowPairValueConsumer $flowPairValueConsumer,
         private FlowStructureIdentifier $flowStructureIdentifier,
         private FlowValueIndicatorConsumer $flowValueIndicatorConsumer,
@@ -97,7 +99,7 @@ final readonly class FlowEntryParser
         $couple->addChild($keyNode);
 
         if (!$this->flowValueIndicatorConsumer->tryConsume($parseContext, $couple)) {
-            throw new UnexpectedStateException('Expected VALUE_INDICATOR after flow complex key');
+            throw new UnexpectedStateException($this->errorHelper->appendTokenLocation('Expected VALUE_INDICATOR after flow complex key', $parseContext->tokens));
         }
 
         $this->flowPairValueConsumer->parseValueOrEmpty($parseContext, $couple, TokenType::FLOW_ENTRY, TokenType::FLOW_SEQUENCE_END);

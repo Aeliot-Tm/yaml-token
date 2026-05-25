@@ -38,7 +38,7 @@ final class ParserBuilder
         $errorHelper = new ErrorHelper();
         $peekOffsetHelper = new PeekOffsetHelper();
         $multilineContinuationHelper = new MultilineContinuationHelper($peekOffsetHelper);
-        $nodeFactory = new NodeFactory();
+        $nodeFactory = new NodeFactory($errorHelper);
         $consumer = new Consumer($nodeFactory);
         $lookAheadHelper = new LookAheadHelper($consumer);
 

@@ -176,6 +176,7 @@ final class ParserAssembler
     {
         return new FlowEntryParser(
             $this->anchorPostProcessor,
+            $this->errorHelper,
             $registry->getFlowPairValueConsumer(),
             $this->getFlowStructureIdentifier(),
             $this->getFlowValueIndicatorConsumer(),

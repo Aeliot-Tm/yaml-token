@@ -69,7 +69,7 @@ final readonly class TagDirectiveParser
 
             if (TokenType::DIRECTIVE_TAG_PREFIX === $token->type) {
                 if (!$seenHandle) {
-                    throw new UnexpectedStateException('Expected TAG directive handle before prefix');
+                    throw new UnexpectedStateException($this->errorHelper->appendTokenLocation('Expected TAG directive handle before prefix', $token));
                 }
                 $tagDirectiveNode->addChild(new TagDirectivePrefixNode($token));
                 $parseContext->tokens->advance();

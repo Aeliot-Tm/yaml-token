@@ -41,6 +41,10 @@ use Aeliot\YamlToken\Token\Token;
 
 final readonly class NodeFactory
 {
+    public function __construct(private ErrorHelper $errorHelper)
+    {
+    }
+
     public function createScalarNode(Token $token): ScalarNode
     {
         return match ($token->type) {
@@ -49,7 +53,7 @@ final readonly class NodeFactory
             TokenType::LITERAL_BLOCK_SCALAR => new LiteralBlockScalarNode($token),
             TokenType::PLAIN_SCALAR => new PlainScalarNode($token),
             TokenType::SINGLE_QUOTED_SCALAR => new SingleQuotedScalarNode($token),
-            default => throw new UnexpectedTokenException(self::appendTokenLocation(\sprintf('Expected scalar token, got %s', $token->type->value), $token)),
+            default => throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Expected scalar token, got %s', $token->type->value), $token)),
         };
     }
 
@@ -78,12 +82,7 @@ final readonly class NodeFactory
             TokenType::SEQUENCE_ENTRY => new SequenceEntryNode($token),
             TokenType::VALUE_INDICATOR => new ValueIndicatorNode($token),
             TokenType::WHITESPACE => new WhitespaceNode($token),
-            default => throw new UnexpectedTokenException(self::appendTokenLocation(\sprintf('Not configured node for token type: %s', $token->type->value), $token)),
+            default => throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Not configured node for token type: %s', $token->type->value), $token)),
         };
-    }
-
-    private static function appendTokenLocation(string $message, Token $token): string
-    {
-        return $message.\sprintf(' in line %d column %d', $token->line, $token->column);
     }
 }
