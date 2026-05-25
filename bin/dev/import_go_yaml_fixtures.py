@@ -139,55 +139,77 @@ def _first_case_dir_name(source: Path) -> str:
     return source.relative_to(SOURCE_ROOT).parts[0]
 
 
+def _purge_content_hash_entries_for_paths(
+    content_by_hash: dict[str, Path],
+    *paths: Path,
+) -> None:
+    targets = {p.resolve() for p in paths}
+    for digest, path in list(content_by_hash.items()):
+        if path.resolve() in targets:
+            content_by_hash.pop(digest, None)
+
+
 def import_one(
     source: Path,
     *,
     dry_run: bool,
     content_by_hash: dict[str, Path],
+    force: bool,
 ) -> ImportResult:
     dest_go, dest_extra = _dest_paths_for_source(source)
     source_bytes = source.read_bytes()
     source_hash = _sha256_hex(source_bytes)
+    had_destination = dest_go.exists() or dest_extra.exists()
 
-    if dest_go.exists():
-        return ImportResult(
-            source=source,
-            dest=dest_go,
-            bucket="go_yaml",
-            yamllint_ok=True,
-            created=False,
-            skipped_reason="destination_already_exists_go_yaml",
-        )
-    if dest_extra.exists():
-        return ImportResult(
-            source=source,
-            dest=dest_extra,
-            bucket="go_yaml_extra",
-            yamllint_ok=False,
-            created=False,
-            skipped_reason="destination_already_exists_go_yaml_extra",
-        )
+    if not force:
+        if dest_go.exists():
+            return ImportResult(
+                source=source,
+                dest=dest_go,
+                bucket="go_yaml",
+                yamllint_ok=True,
+                created=False,
+                skipped_reason="destination_already_exists_go_yaml",
+            )
+        if dest_extra.exists():
+            return ImportResult(
+                source=source,
+                dest=dest_extra,
+                bucket="go_yaml_extra",
+                yamllint_ok=False,
+                created=False,
+                skipped_reason="destination_already_exists_go_yaml_extra",
+            )
 
-    existing = content_by_hash.get(source_hash)
-    if existing is not None:
-        return ImportResult(
-            source=source,
-            dest=dest_go,
-            bucket="go_yaml",
-            yamllint_ok=True,
-            created=False,
-            skipped_reason=f"content_already_in_project:{existing.relative_to(ROOT)}",
-        )
+        existing = content_by_hash.get(source_hash)
+        if existing is not None:
+            return ImportResult(
+                source=source,
+                dest=dest_go,
+                bucket="go_yaml",
+                yamllint_ok=True,
+                created=False,
+                skipped_reason=f"content_already_in_project:{existing.relative_to(ROOT)}",
+            )
+
+    if force and not dry_run:
+        if dest_extra.exists():
+            dest_extra.unlink()
+            _remove_empty_fixture_dirs(dest_extra, GO_YAML_EXTRA_DIR)
+        _purge_content_hash_entries_for_paths(content_by_hash, dest_go, dest_extra)
 
     _ensure_parent(dest_go, dry_run=dry_run)
     if dry_run:
+        skipped_reason = "dry_run_no_copy_no_lint"
+        if force and had_destination:
+            skipped_reason = "dry_run_force_reload"
         return ImportResult(
             source=source,
             dest=dest_go,
             bucket="go_yaml",
             yamllint_ok=True,
             created=True,
-            skipped_reason="dry_run_no_copy_no_lint",
+            skipped_reason=skipped_reason,
         )
 
     shutil.copyfile(source, dest_go)
@@ -225,6 +247,11 @@ def main() -> int:
         ),
     )
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument(
+        "--force",
+        action="store_true",
+        help="Reload fixtures that already exist in go_yaml/ or go_yaml_extra/ and regenerate expectations.",
+    )
     ap.add_argument("--limit", type=int, default=0, metavar="N", help="Import at most N files.")
     ap.add_argument("--offset", type=int, default=0, metavar="N", help="Skip the first N sources.")
     ap.add_argument(
@@ -268,7 +295,7 @@ def main() -> int:
 
     for src in sources:
         upstream_rel = _rel_under_yaml_test_suite(src)
-        result = import_one(src, dry_run=args.dry_run, content_by_hash=content_by_hash)
+        result = import_one(src, dry_run=args.dry_run, content_by_hash=content_by_hash, force=args.force)
         print(f"[import] {upstream_rel} -> {result.dest.relative_to(ROOT)} (bucket={result.bucket}, created={result.created}, yamllint_ok={result.yamllint_ok})")
         if result.skipped_reason:
             print(f"[info] {upstream_rel}: {result.skipped_reason}")
