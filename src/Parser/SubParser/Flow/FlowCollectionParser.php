@@ -46,13 +46,7 @@ final readonly class FlowCollectionParser
         TokenType $closeTokenType,
         \Closure $parseEntry,
     ): FlowNode {
-        $token = $parseContext->tokens->current();
-        if ($openTokenType !== $token?->type) {
-            throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('There is no expected %s token, but %s given', $openTokenType->value, $token?->type->value ?? '_nothing_'), $parseContext->tokens));
-        }
-
-        $node->addChild($this->nodeFactory->createSimpleNode($token));
-        $parseContext->tokens->advance();
+        $this->consumer->grab($parseContext->tokens, $node, $openTokenType);
 
         while (true) {
             $this->consumer->collectSpaceCommentEnds($parseContext->tokens, $node);
