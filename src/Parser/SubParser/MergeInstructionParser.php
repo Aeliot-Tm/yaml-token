@@ -55,7 +55,7 @@ final readonly class MergeInstructionParser
         $mergeInstruction->addChild($this->nodeFactory->createSimpleNode($token));
         $parseContext->tokens->advance();
 
-        $this->consumer->collectTypes($parseContext->tokens, $mergeInstruction, TokenType::VALUE_INDICATOR, TokenType::WHITESPACE);
+        $this->consumer->collectSpaceValueIndicator($parseContext->tokens, $mergeInstruction);
 
         $value = $this->registry->getValueParser()->parseValue($parseContext, IndentContext::createForFlow());
         $mergeInstruction->addChild($value);

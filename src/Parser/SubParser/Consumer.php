@@ -49,6 +49,11 @@ final readonly class Consumer
         $this->collectTypes($tokens, $root, ...self::TOKEN_TYPES_SPACE_COMMENT_END);
     }
 
+    public function collectSpaceValueIndicator(TokenStreamInterface $tokens, Node $root): void
+    {
+        $this->collectTypes($tokens, $root, TokenType::VALUE_INDICATOR, TokenType::WHITESPACE);
+    }
+
     public function collectTypes(TokenStreamInterface $tokens, Node $root, TokenType ...$types): void
     {
         if (!$types) {
