@@ -16,6 +16,7 @@ namespace Aeliot\YamlToken\Parser\SubParser;
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
+use Aeliot\YamlToken\Parser\Helper\TokenGrabber;
 use Aeliot\YamlToken\Token\TokenStreamInterface;
 
 final readonly class Consumer
@@ -33,6 +34,7 @@ final readonly class Consumer
 
     public function __construct(
         private NodeFactory $nodeFactory,
+        private TokenGrabber $tokenGrabber,
     ) {
     }
 
@@ -80,5 +82,10 @@ final readonly class Consumer
             $root->addChild($this->nodeFactory->createSimpleNode($token));
             $tokens->advance();
         }
+    }
+
+    public function grab(TokenStreamInterface $tokens, Node $root, TokenType $tokenType): void
+    {
+        $root->addChild($this->nodeFactory->createSimpleNode($this->tokenGrabber->current($tokens, $tokenType)));
     }
 }

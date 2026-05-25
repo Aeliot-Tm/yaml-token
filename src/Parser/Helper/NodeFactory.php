@@ -35,6 +35,7 @@ use Aeliot\YamlToken\Node\SequenceEntryNode;
 use Aeliot\YamlToken\Node\SingleQuotedScalarNode;
 use Aeliot\YamlToken\Node\ValueIndicatorNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
+use Aeliot\YamlToken\Node\YamlDirectiveIndicatorNode;
 use Aeliot\YamlToken\Node\YamlDirectiveVersionNode;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Token\Token;
@@ -70,6 +71,7 @@ final readonly class NodeFactory
             TokenType::BLOCK_SCALAR_CHOMPING_INDICATOR => new BlockScalarChompingIndicatorNode($token),
             TokenType::BLOCK_SCALAR_INDENTATION_INDICATOR => new BlockScalarIndentationIndicatorNode($token),
             TokenType::COMMENT => new CommentNode($token),
+            TokenType::DIRECTIVE_YAML_INDICATOR => new YamlDirectiveIndicatorNode($token),
             TokenType::DIRECTIVE_YAML_VERSION => new YamlDirectiveVersionNode($token),
             TokenType::FLOW_ENTRY => new FlowEntryNode($token),
             TokenType::FLOW_MAPPING_END => new FlowMappingEndNode($token),
