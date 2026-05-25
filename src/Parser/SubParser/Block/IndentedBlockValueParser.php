@@ -186,7 +186,7 @@ final readonly class IndentedBlockValueParser
      */
     private function consumeTaggedScalar(ParseContext $parseContext, ValueNode $valueNode, IndentContext $parentIndent): void
     {
-        $indentLength = $this->consumer->grab($parseContext->tokens, $valueNode, TokenType::INDENTATION);
+        $indentLength = $this->consumer->require($parseContext->tokens, $valueNode, TokenType::INDENTATION);
         if ($indentLength <= $parentIndent->indentLen) {
             throw new IndentationInvalidException($this->errorHelper->appendTokenLocation(\sprintf('Indented block tagged scalar must be deeper than parent key line indent (%d spaces)', $parentIndent->indentLen), $parseContext->tokens));
         }
@@ -360,7 +360,7 @@ final readonly class IndentedBlockValueParser
         // Block scalar on a continuation line (e.g. after a node-properties-only line)
         if (\in_array($head->significantToken->type, TokenType::BLOCK_SCALAR_INDICATORS, true)) {
             $this->consumeBlockValueOpeningLayout($parseContext, $valueNode);
-            $this->consumer->grab($parseContext->tokens, $valueNode, TokenType::INDENTATION);
+            $this->consumer->require($parseContext->tokens, $valueNode, TokenType::INDENTATION);
             $this->registry->getBlockScalarValueConsumer()->consume($parseContext->tokens, $valueNode, $parentIndent);
 
             return;
@@ -411,7 +411,7 @@ final readonly class IndentedBlockValueParser
         ValueNode $valueNode,
         Token $afterIndent,
     ): void {
-        $this->consumer->grab($parseContext->tokens, $valueNode, TokenType::INDENTATION);
+        $this->consumer->require($parseContext->tokens, $valueNode, TokenType::INDENTATION);
 
         $valueNode->addChild(
             TokenType::FLOW_SEQUENCE_START === $afterIndent->type
@@ -431,7 +431,7 @@ final readonly class IndentedBlockValueParser
         $this->consumeContinuationLineLayout($parseContext, $separatorContainer, $newlineToken);
 
         if ($requiresIndentation) {
-            $this->consumer->grab($parseContext->tokens, $separatorContainer, TokenType::INDENTATION);
+            $this->consumer->require($parseContext->tokens, $separatorContainer, TokenType::INDENTATION);
         }
 
         $this->registry->getNodePropertiesParser()->collectProperties($parseContext, $valueNode);

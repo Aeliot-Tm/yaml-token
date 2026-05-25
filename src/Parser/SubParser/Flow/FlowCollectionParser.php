@@ -46,7 +46,7 @@ final readonly class FlowCollectionParser
         TokenType $closeTokenType,
         \Closure $parseEntryParser,
     ): FlowNode {
-        $this->consumer->grab($parseContext->tokens, $node, $openTokenType);
+        $this->consumer->require($parseContext->tokens, $node, $openTokenType);
 
         while (true) {
             $this->consumer->collectSpaceCommentEnds($parseContext->tokens, $node);

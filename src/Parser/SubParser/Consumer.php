@@ -84,17 +84,9 @@ final readonly class Consumer
         }
     }
 
-    public function grab(TokenStreamInterface $tokens, Node $root, TokenType $tokenType): int
+    public function require(TokenStreamInterface $tokens, Node $root, TokenType ...$types): int
     {
-        $token = $this->tokenGrabber->current($tokens, $tokenType);
-        $root->addChild($this->nodeFactory->createSimpleNode($token));
-
-        return \strlen($token->text);
-    }
-
-    public function grabOneOf(TokenStreamInterface $tokens, Node $root, TokenType ...$types): int
-    {
-        $token = $this->tokenGrabber->grabOneOf($tokens, ...$types);
+        $token = $this->tokenGrabber->require($tokens, ...$types);
         $root->addChild($this->nodeFactory->createSimpleNode($token));
 
         return \strlen($token->text);

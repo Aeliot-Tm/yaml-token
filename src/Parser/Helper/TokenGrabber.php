@@ -26,18 +26,7 @@ final readonly class TokenGrabber
     ) {
     }
 
-    public function current(TokenStreamInterface $tokens, TokenType $tokenType): Token
-    {
-        $token = $tokens->current();
-        if ($token?->type !== $tokenType) {
-            throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Expected %s token, but %s given', $tokenType->value, $token?->type->value ?? '_nothing_'), $tokens));
-        }
-        $tokens->advance();
-
-        return $token;
-    }
-
-    public function grabOneOf(TokenStreamInterface $tokens, TokenType ...$types): Token
+    public function require(TokenStreamInterface $tokens, TokenType ...$types): Token
     {
         if (!$types) {
             throw new InvalidArgumentException('Types for the grabbing are required');

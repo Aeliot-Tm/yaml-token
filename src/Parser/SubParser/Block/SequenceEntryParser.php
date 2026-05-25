@@ -58,7 +58,7 @@ final readonly class SequenceEntryParser
      */
     private function consumeSequenceEntryIndicatorAndSpaces(ParseContext $parseContext, Node $target): int
     {
-        return $this->consumer->grab($parseContext->tokens, $target, TokenType::SEQUENCE_ENTRY)
+        return $this->consumer->require($parseContext->tokens, $target, TokenType::SEQUENCE_ENTRY)
             + $this->consumer->collectWhitespace($parseContext->tokens, $target);
     }
 

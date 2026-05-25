@@ -45,7 +45,7 @@ final readonly class BlockScalarFirstFragmentConsumer
     {
         $options = new BlockScalarOptionsNode();
 
-        $this->consumer->grabOneOf($tokens, $options, ...TokenType::BLOCK_SCALAR_INDICATORS);
+        $this->consumer->require($tokens, $options, ...TokenType::BLOCK_SCALAR_INDICATORS);
         $this->consumer->collectUntil($tokens, $options, TokenType::NEWLINE);
 
         $entry = new BlockScalarEntryNode();
@@ -56,7 +56,7 @@ final readonly class BlockScalarFirstFragmentConsumer
             return $entry;
         }
 
-        $this->consumer->grab($tokens, $entry, TokenType::NEWLINE);
+        $this->consumer->require($tokens, $entry, TokenType::NEWLINE);
         $this->consumer->collectTypes($tokens, $entry, TokenType::NEWLINE);
 
         // YAML 1.2.2 §8.1.1.1: with an explicit indentation indicator (|N, >N, |N-, >N+, ...),

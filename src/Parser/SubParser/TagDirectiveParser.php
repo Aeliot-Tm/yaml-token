@@ -28,11 +28,11 @@ final readonly class TagDirectiveParser
     {
         $tagDirectiveNode = new TagDirectiveNode();
 
-        $this->consumer->grab($parseContext->tokens, $tagDirectiveNode, TokenType::DIRECTIVE_TAG_INDICATOR);
+        $this->consumer->require($parseContext->tokens, $tagDirectiveNode, TokenType::DIRECTIVE_TAG_INDICATOR);
         $this->consumer->collectWhitespace($parseContext->tokens, $tagDirectiveNode);
-        $this->consumer->grab($parseContext->tokens, $tagDirectiveNode, TokenType::DIRECTIVE_TAG_HANDLE);
+        $this->consumer->require($parseContext->tokens, $tagDirectiveNode, TokenType::DIRECTIVE_TAG_HANDLE);
         $this->consumer->collectWhitespace($parseContext->tokens, $tagDirectiveNode);
-        $this->consumer->grab($parseContext->tokens, $tagDirectiveNode, TokenType::DIRECTIVE_TAG_PREFIX);
+        $this->consumer->require($parseContext->tokens, $tagDirectiveNode, TokenType::DIRECTIVE_TAG_PREFIX);
         $this->consumer->collectSpaceAndComments($parseContext->tokens, $tagDirectiveNode);
 
         return $tagDirectiveNode;
