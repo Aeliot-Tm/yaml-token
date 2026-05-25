@@ -305,7 +305,7 @@ final class ParserAssembler
 
     public function createTagDirectiveParser(): TagDirectiveParser
     {
-        return new TagDirectiveParser($this->consumer, $this->errorHelper, $this->nodeFactory);
+        return new TagDirectiveParser($this->consumer);
     }
 
     public function createValueParser(ParserRegistry $registry): ValueParser
