@@ -26,6 +26,7 @@ use Aeliot\YamlToken\Parser\Helper\LookAheadHelper;
 use Aeliot\YamlToken\Parser\Helper\MultilineContinuationHelper;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
 use Aeliot\YamlToken\Parser\Helper\PeekOffsetHelper;
+use Aeliot\YamlToken\Parser\Helper\TokenGrabber;
 use Aeliot\YamlToken\Parser\SubParser\Block\BlockMappingParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\BlockSequenceParser;
 use Aeliot\YamlToken\Parser\SubParser\Block\CompactBlockMappingParser;
@@ -79,6 +80,7 @@ final class ParserAssembler
         private MultilineContinuationHelper $multilineContinuationHelper,
         private NodeFactory $nodeFactory,
         private PeekOffsetHelper $peekOffsetHelper,
+        private TokenGrabber $tokenGrabber,
     ) {
     }
 
@@ -315,7 +317,7 @@ final class ParserAssembler
 
     public function createYamlDirectiveParser(): YamlDirectiveParser
     {
-        return new YamlDirectiveParser($this->consumer, $this->errorHelper, $this->nodeFactory);
+        return new YamlDirectiveParser($this->consumer, $this->nodeFactory, $this->tokenGrabber);
     }
 
     public function getAliasResolver(): AliasResolver

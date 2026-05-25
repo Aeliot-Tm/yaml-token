@@ -21,7 +21,6 @@ use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\YamlDirectiveIndicatorNode;
 use Aeliot\YamlToken\Node\YamlDirectiveNode;
 use Aeliot\YamlToken\Node\YamlDirectiveVersionNode;
-use Aeliot\YamlToken\Parser\Exception\UnexpectedEndException;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Parser;
 use Aeliot\YamlToken\Parser\ParserBuilder;
@@ -41,17 +40,9 @@ final class YamlDirectiveTest extends TestCase
     /**
      * @return array<array<string>>
      */
-    public static function getDataForTestThrowsAtEndOfFile(): array
-    {
-        return [['%YAML'], ['%YAML:'], ['%YAML '], ['%YAML : ']];
-    }
-
-    /**
-     * @return array<array<string>>
-     */
     public static function getDataForTestWhenNoVersion(): array
     {
-        return [["%YAML\n"], ["%YAML # no version\n"]];
+        return [['%YAML'], ['%YAML:'], ['%YAML '], ['%YAML : '], ["%YAML\n"], ["%YAML # no version\n"]];
     }
 
     public function testParsesMultipleYamlDirectivesWithTrailingComment(): void
@@ -135,20 +126,11 @@ YAML);
         self::assertSame('key', $name->getToken()->text);
     }
 
-    #[DataProvider('getDataForTestThrowsAtEndOfFile')]
-    public function testThrowsAtEndOfFile(string $yaml): void
-    {
-        $this->expectException(UnexpectedEndException::class);
-        $this->expectExceptionMessageMatches('/^Unexpected end of token stream: YAML directive version is required/');
-
-        (new ParserBuilder())->createParser()->parse($yaml);
-    }
-
     #[DataProvider('getDataForTestWhenNoVersion')]
     public function testThrowsWhenNoVersion(string $yaml): void
     {
         $this->expectException(UnexpectedTokenException::class);
-        $this->expectExceptionMessageMatches('/^Expected YAML directive version before newline or comment/');
+        $this->expectExceptionMessageMatches('/^Expected DIRECTIVE_YAML_VERSION token, but/');
 
         (new ParserBuilder())->createParser()->parse($yaml);
     }

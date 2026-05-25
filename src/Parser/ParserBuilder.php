@@ -21,6 +21,7 @@ use Aeliot\YamlToken\Parser\Helper\LookAheadHelper;
 use Aeliot\YamlToken\Parser\Helper\MultilineContinuationHelper;
 use Aeliot\YamlToken\Parser\Helper\NodeFactory;
 use Aeliot\YamlToken\Parser\Helper\PeekOffsetHelper;
+use Aeliot\YamlToken\Parser\Helper\TokenGrabber;
 use Aeliot\YamlToken\Parser\SubParser\Consumer;
 
 final class ParserBuilder
@@ -50,6 +51,7 @@ final class ParserBuilder
             $multilineContinuationHelper,
             $nodeFactory,
             $peekOffsetHelper,
+            new TokenGrabber($errorHelper),
         );
     }
 }
