@@ -286,19 +286,31 @@ def main() -> int:
     elif args.suite_filter == "spec":
         sources = [p for p in sources if _first_case_dir_name(p).startswith("spec-example-")]
 
+    total_after_filters = len(sources)
     if args.offset > 0:
         sources = sources[args.offset :]
     if args.limit > 0:
         sources = sources[: args.limit]
 
+    if sources:
+        last_index = args.offset + len(sources) - 1
+        print(
+            f"[batch] fixtures #{args.offset}..#{last_index} "
+            f"({len(sources)} of {total_after_filters} after filters; use --offset for resume)",
+        )
+
     content_by_hash = _scan_project_fixture_content()
 
-    for src in sources:
+    for batch_pos, src in enumerate(sources):
+        fixture_index = args.offset + batch_pos
         upstream_rel = _rel_under_yaml_test_suite(src)
         result = import_one(src, dry_run=args.dry_run, content_by_hash=content_by_hash, force=args.force)
-        print(f"[import] {upstream_rel} -> {result.dest.relative_to(ROOT)} (bucket={result.bucket}, created={result.created}, yamllint_ok={result.yamllint_ok})")
+        print(
+            f"[import] #{fixture_index} {upstream_rel} -> {result.dest.relative_to(ROOT)} "
+            f"(bucket={result.bucket}, created={result.created}, yamllint_ok={result.yamllint_ok})",
+        )
         if result.skipped_reason:
-            print(f"[info] {upstream_rel}: {result.skipped_reason}")
+            print(f"[info] #{fixture_index} {upstream_rel}: {result.skipped_reason}")
 
         if args.dry_run:
             continue
@@ -319,6 +331,9 @@ def main() -> int:
                 print(proc.stderr)
                 print(f"[stop] composer test-all failed after importing: {result.dest.relative_to(ROOT)}")
                 return proc.returncode
+
+    if sources and args.offset + len(sources) < total_after_filters:
+        print(f"[hint] next run: --offset {args.offset + len(sources)}")
 
     return 0
 
