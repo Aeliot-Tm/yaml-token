@@ -22,17 +22,6 @@ use Aeliot\YamlToken\Token\TokenStreamInterface;
 
 final readonly class Consumer
 {
-    private const TOKEN_TYPES_SPACE_AND_COMMENT = [
-        TokenType::COMMENT,
-        TokenType::WHITESPACE,
-    ];
-
-    private const TOKEN_TYPES_SPACE_COMMENT_END = [
-        TokenType::COMMENT,
-        TokenType::NEWLINE,
-        TokenType::WHITESPACE,
-    ];
-
     public function __construct(
         private NodeFactory $nodeFactory,
         private TokenGrabber $tokenGrabber,
@@ -41,12 +30,12 @@ final readonly class Consumer
 
     public function collectSpaceAndComments(TokenStreamInterface $tokens, Node $root): void
     {
-        $this->collectTypes($tokens, $root, ...self::TOKEN_TYPES_SPACE_AND_COMMENT);
+        $this->collectTypes($tokens, $root, TokenType::COMMENT, TokenType::WHITESPACE);
     }
 
     public function collectSpaceCommentEnds(TokenStreamInterface $tokens, Node $root): void
     {
-        $this->collectTypes($tokens, $root, ...self::TOKEN_TYPES_SPACE_COMMENT_END);
+        $this->collectTypes($tokens, $root, TokenType::COMMENT, TokenType::NEWLINE, TokenType::WHITESPACE);
     }
 
     public function collectSpaceValueIndicator(TokenStreamInterface $tokens, Node $root): void
