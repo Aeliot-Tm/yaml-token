@@ -66,6 +66,10 @@ final readonly class DocumentParser
             }
 
             $token = $parseContext->tokens->current();
+            if (!$token) {
+                break;
+            }
+
             throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Unexpected type: %s', $token->type->value), $token));
         }
 
@@ -151,6 +155,9 @@ final readonly class DocumentParser
     private function tryConsumeDirectiveToken(ParseContext $parseContext, DocumentNode $document): bool
     {
         $token = $parseContext->tokens->current();
+        if (!$token) {
+            return false;
+        }
 
         if (TokenType::DIRECTIVE === $token->type) {
             $document->addChild(new DirectiveNode($token));
@@ -177,6 +184,9 @@ final readonly class DocumentParser
     private function tryConsumeDocumentLayoutToken(ParseContext $parseContext, DocumentNode $document): bool
     {
         $token = $parseContext->tokens->current();
+        if (!$token) {
+            return false;
+        }
 
         if (TokenType::COMMENT === $token->type) {
             $document->addChild(new CommentNode($token));
@@ -225,6 +235,9 @@ final readonly class DocumentParser
         array &$addedDocs,
     ): bool {
         $token = $parseContext->tokens->current();
+        if (!$token) {
+            return false;
+        }
 
         if (TokenType::DOCUMENT_START === $token->type) {
             if ($document->getChildren()) {
@@ -255,6 +268,9 @@ final readonly class DocumentParser
     private function tryParseDocumentRootContent(ParseContext $parseContext, DocumentNode $document): bool
     {
         $token = $parseContext->tokens->current();
+        if (!$token) {
+            return false;
+        }
 
         if ($this->blockStructureIdentifier->isBlockScalarStartAtDocumentRoot($parseContext)) {
             $document->addChild($this->registry->getValueParser()->parseValue($parseContext, IndentContext::createForBareDocument()));
