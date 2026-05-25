@@ -257,21 +257,6 @@ final readonly class DocumentParser
         $token = $parseContext->tokens->current();
 
         if ($this->blockStructureIdentifier->isBlockScalarStartAtDocumentRoot($parseContext)) {
-            while (true) {
-                $separation = $parseContext->tokens->current();
-                if (TokenType::INDENTATION === $separation?->type) {
-                    $document->addChild(new IndentationNode($separation));
-                    $parseContext->tokens->advance();
-                    continue;
-                }
-                if (TokenType::WHITESPACE === $separation?->type) {
-                    $document->addChild(new WhitespaceNode($separation));
-                    $parseContext->tokens->advance();
-                    continue;
-                }
-                break;
-            }
-
             $document->addChild($this->registry->getValueParser()->parseValue($parseContext, IndentContext::createForBareDocument()));
 
             return true;
