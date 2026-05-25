@@ -185,12 +185,6 @@ final readonly class DocumentParser
             return true;
         }
 
-        if ($this->lookAheadHelper->isInsignificantIndentationLine($parseContext->tokens)) {
-            $this->lookAheadHelper->collectInsignificantIndentationLines($parseContext->tokens, $document);
-
-            return true;
-        }
-
         if (TokenType::NEWLINE === $token->type) {
             $document->addChild(new NewLineNode($token));
             $parseContext->tokens->advance();
@@ -198,8 +192,7 @@ final readonly class DocumentParser
             return true;
         }
 
-        // Preserve trailing spaces on otherwise blank lines: whitespace before NEWLINE is not structural.
-        if (TokenType::WHITESPACE === $token->type && TokenType::NEWLINE === $parseContext->tokens->peek(1)?->type) {
+        if (TokenType::WHITESPACE === $token->type) {
             $document->addChild(new WhitespaceNode($token));
             $parseContext->tokens->advance();
 
@@ -213,18 +206,8 @@ final readonly class DocumentParser
             return true;
         }
 
-        // YAML 1.2.2 §6.6 Comments: "Comments must be separated from other tokens by white space characters."
-        // Handles `s-separate-in-line` between a preceding token on the same line (e.g. DOCUMENT_START/END) and a trailing comment.
-        if (TokenType::WHITESPACE === $token->type && TokenType::COMMENT === $parseContext->tokens->peek(1)?->type) {
-            $document->addChild(new WhitespaceNode($token));
-            $parseContext->tokens->advance();
-
-            return true;
-        }
-
-        if (TokenType::WHITESPACE === $token->type) {
-            $document->addChild(new WhitespaceNode($token));
-            $parseContext->tokens->advance();
+        if ($this->lookAheadHelper->isInsignificantIndentationLine($parseContext->tokens)) {
+            $this->lookAheadHelper->collectInsignificantIndentationLines($parseContext->tokens, $document);
 
             return true;
         }
