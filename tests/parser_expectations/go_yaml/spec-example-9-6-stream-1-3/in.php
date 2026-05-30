@@ -16,12 +16,12 @@ use Aeliot\YamlToken\Node\ValueIndicatorNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 use Aeliot\YamlToken\Node\YamlDirectiveIndicatorNode;
-use Aeliot\YamlToken\Node\YamlDirectiveNode;
+use Aeliot\YamlToken\Node\YamlVersionDirectiveNode;
 use Aeliot\YamlToken\Node\YamlVersionNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 999856253,
+    'hash' => 3259223257,
     'properties' => [],
     'children' => [
         [
@@ -205,12 +205,12 @@ return [
         ],
         [
             'type' => DocumentNode::class,
-            'hash' => 3311311004,
+            'hash' => 3039714280,
             'properties' => [],
             'children' => [
                 [
-                    'type' => YamlDirectiveNode::class,
-                    'hash' => 3704166648,
+                    'type' => YamlVersionDirectiveNode::class,
+                    'hash' => 1831138458,
                     'properties' => [],
                     'children' => [
                         [

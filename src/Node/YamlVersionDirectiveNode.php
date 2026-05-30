@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Aeliot\YamlToken\Node;
 
-class YamlDirectiveNode extends AbstractNode
+class YamlVersionDirectiveNode extends AbstractNode
 {
     private ?YamlDirectiveIndicatorNode $indicatorNode = null;
     private ?YamlVersionNode $versionNode = null;
