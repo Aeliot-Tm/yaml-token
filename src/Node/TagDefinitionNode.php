@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Aeliot\YamlToken\Node;
 
-class TagDirectiveNode extends AbstractNode
+class TagDefinitionNode extends AbstractNode
 {
     private ?TagDirectiveHandleNode $handleNode = null;
     private ?TagDirectiveIndicatorNode $indicatorNode = null;

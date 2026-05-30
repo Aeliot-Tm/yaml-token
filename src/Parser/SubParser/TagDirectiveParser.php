@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Aeliot\YamlToken\Parser\SubParser;
 
 use Aeliot\YamlToken\Enum\TokenType;
-use Aeliot\YamlToken\Node\TagDirectiveNode;
+use Aeliot\YamlToken\Node\TagDefinitionNode;
 use Aeliot\YamlToken\Parser\Dto\ParseContext;
 
 final readonly class TagDirectiveParser
@@ -24,17 +24,17 @@ final readonly class TagDirectiveParser
     ) {
     }
 
-    public function parse(ParseContext $parseContext): TagDirectiveNode
+    public function parse(ParseContext $parseContext): TagDefinitionNode
     {
-        $tagDirectiveNode = new TagDirectiveNode();
+        $TagDefinitionNode = new TagDefinitionNode();
 
-        $this->consumer->require($parseContext->tokens, $tagDirectiveNode, TokenType::DIRECTIVE_TAG_INDICATOR);
-        $this->consumer->collectWhitespace($parseContext->tokens, $tagDirectiveNode);
-        $this->consumer->require($parseContext->tokens, $tagDirectiveNode, TokenType::DIRECTIVE_TAG_HANDLE);
-        $this->consumer->collectWhitespace($parseContext->tokens, $tagDirectiveNode);
-        $this->consumer->require($parseContext->tokens, $tagDirectiveNode, TokenType::DIRECTIVE_TAG_PREFIX);
-        $this->consumer->collectSpaceAndComments($parseContext->tokens, $tagDirectiveNode);
+        $this->consumer->require($parseContext->tokens, $TagDefinitionNode, TokenType::DIRECTIVE_TAG_INDICATOR);
+        $this->consumer->collectWhitespace($parseContext->tokens, $TagDefinitionNode);
+        $this->consumer->require($parseContext->tokens, $TagDefinitionNode, TokenType::DIRECTIVE_TAG_HANDLE);
+        $this->consumer->collectWhitespace($parseContext->tokens, $TagDefinitionNode);
+        $this->consumer->require($parseContext->tokens, $TagDefinitionNode, TokenType::DIRECTIVE_TAG_PREFIX);
+        $this->consumer->collectSpaceAndComments($parseContext->tokens, $TagDefinitionNode);
 
-        return $tagDirectiveNode;
+        return $TagDefinitionNode;
     }
 }

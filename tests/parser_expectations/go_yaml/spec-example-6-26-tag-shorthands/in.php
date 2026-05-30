@@ -11,9 +11,9 @@ use Aeliot\YamlToken\Node\NodePropertiesNode;
 use Aeliot\YamlToken\Node\PlainScalarNode;
 use Aeliot\YamlToken\Node\SequenceEntryNode;
 use Aeliot\YamlToken\Node\StreamNode;
+use Aeliot\YamlToken\Node\TagDefinitionNode;
 use Aeliot\YamlToken\Node\TagDirectiveHandleNode;
 use Aeliot\YamlToken\Node\TagDirectiveIndicatorNode;
-use Aeliot\YamlToken\Node\TagDirectiveNode;
 use Aeliot\YamlToken\Node\TagDirectivePrefixNode;
 use Aeliot\YamlToken\Node\TagNode;
 use Aeliot\YamlToken\Node\ValueNode;
@@ -21,17 +21,17 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 2185590105,
+    'hash' => 2357657030,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 3173126717,
+            'hash' => 2365950738,
             'properties' => [],
             'children' => [
                 [
-                    'type' => TagDirectiveNode::class,
-                    'hash' => 3916933786,
+                    'type' => TagDefinitionNode::class,
+                    'hash' => 237810491,
                     'properties' => [],
                     'children' => [
                         [

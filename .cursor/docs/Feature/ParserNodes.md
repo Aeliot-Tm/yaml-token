@@ -254,7 +254,7 @@ Represents a `<< : *alias` merge key entry.
 | `getIndicatorNode()` | `?YamlDirectiveNode` |
 | `getVersionNode()` | `?YamlVersionNode` |
 
-### TagDirectiveNode
+### TagDefinitionNode
 
 `%TAG handle prefix` directive.
 
