@@ -1,5 +1,9 @@
 # YAML Token
 
+[![Testing](https://github.com/Aeliot-Tm/yaml-token/actions/workflows/automated-testing.yaml/badge.svg?branch=main)](https://github.com/Aeliot-Tm/yaml-token/actions/workflows/automated-testing.yaml?query=branch%3Amain)
+[![Security Audit](https://github.com/Aeliot-Tm/yaml-token/actions/workflows/security-audit.yaml/badge.svg?branch=main)](https://github.com/Aeliot-Tm/yaml-token/actions/workflows/security-audit.yaml?query=branch%3Amain)
+[![GitHub License](https://img.shields.io/github/license/Aeliot-Tm/yaml-token?label=License&labelColor=black)](LICENSE)
+
 A YAML parser that represents YAML as a hierarchical structure of nodes and tokens.
 
 ## Purpose
