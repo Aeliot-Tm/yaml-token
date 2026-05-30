@@ -12,7 +12,7 @@ use Aeliot\YamlToken\Node\PlainScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\TagDefinitionNode;
 use Aeliot\YamlToken\Node\TagDirectiveHandleNode;
-use Aeliot\YamlToken\Node\TagDirectiveIndicatorNode;
+use Aeliot\YamlToken\Node\TagDirectiveNode;
 use Aeliot\YamlToken\Node\TagDirectivePrefixNode;
 use Aeliot\YamlToken\Node\TagNode;
 use Aeliot\YamlToken\Node\ValueNode;
@@ -20,25 +20,25 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 3412457143,
+    'hash' => 2237021761,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 2629758316,
+            'hash' => 1305770326,
             'properties' => [],
             'children' => [
                 [
                     'type' => TagDefinitionNode::class,
-                    'hash' => 2078517593,
+                    'hash' => 2845022553,
                     'properties' => [],
                     'children' => [
                         [
-                            'type' => TagDirectiveIndicatorNode::class,
-                            'hash' => 4058827745,
+                            'type' => TagDirectiveNode::class,
+                            'hash' => 414177067,
                             'properties' => [
                                 'token' => [
-                                    'type' => TokenType::DIRECTIVE_TAG_INDICATOR,
+                                    'type' => TokenType::TAG_DIRECTIVE,
                                     'text' => '%TAG',
                                 ],
                             ],

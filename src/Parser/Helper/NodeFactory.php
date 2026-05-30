@@ -35,7 +35,7 @@ use Aeliot\YamlToken\Node\ScalarNode;
 use Aeliot\YamlToken\Node\SequenceEntryNode;
 use Aeliot\YamlToken\Node\SingleQuotedScalarNode;
 use Aeliot\YamlToken\Node\TagDirectiveHandleNode;
-use Aeliot\YamlToken\Node\TagDirectiveIndicatorNode;
+use Aeliot\YamlToken\Node\TagDirectiveNode;
 use Aeliot\YamlToken\Node\TagDirectivePrefixNode;
 use Aeliot\YamlToken\Node\ValueIndicatorNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
@@ -78,7 +78,7 @@ final readonly class NodeFactory
             TokenType::YAML_DIRECTIVE => new YamlDirectiveNode($token),
             TokenType::YAML_VERSION => new YamlVersionNode($token),
             TokenType::DIRECTIVE_TAG_HANDLE => new TagDirectiveHandleNode($token),
-            TokenType::DIRECTIVE_TAG_INDICATOR => new TagDirectiveIndicatorNode($token),
+            TokenType::TAG_DIRECTIVE => new TagDirectiveNode($token),
             TokenType::DIRECTIVE_TAG_PREFIX => new TagDirectivePrefixNode($token),
             TokenType::FLOW_ENTRY => new FlowEntryNode($token),
             TokenType::FLOW_MAPPING_END => new FlowMappingEndNode($token),

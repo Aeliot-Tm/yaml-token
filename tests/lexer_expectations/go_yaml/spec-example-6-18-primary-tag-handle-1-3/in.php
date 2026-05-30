@@ -54,7 +54,7 @@ return [
         'text' => "\n",
     ],
     [
-        'type' => TokenType::DIRECTIVE_TAG_INDICATOR,
+        'type' => TokenType::TAG_DIRECTIVE,
         'text' => '%TAG',
     ],
     [

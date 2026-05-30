@@ -16,7 +16,7 @@ namespace Aeliot\YamlToken\Node;
 class TagDefinitionNode extends AbstractNode
 {
     private ?TagDirectiveHandleNode $handleNode = null;
-    private ?TagDirectiveIndicatorNode $indicatorNode = null;
+    private ?TagDirectiveNode $indicatorNode = null;
     private ?TagDirectivePrefixNode $prefixNode = null;
 
     public function addChild(Node $child): void
@@ -24,7 +24,7 @@ class TagDefinitionNode extends AbstractNode
         if ($child instanceof TagDirectiveHandleNode) {
             $this->handleNode = $child;
         }
-        if ($child instanceof TagDirectiveIndicatorNode) {
+        if ($child instanceof TagDirectiveNode) {
             $this->indicatorNode = $child;
         }
         if ($child instanceof TagDirectivePrefixNode) {
@@ -44,7 +44,7 @@ class TagDefinitionNode extends AbstractNode
         return $this->handleNode;
     }
 
-    public function getIndicatorNode(): ?TagDirectiveIndicatorNode
+    public function getIndicatorNode(): ?TagDirectiveNode
     {
         return $this->indicatorNode;
     }

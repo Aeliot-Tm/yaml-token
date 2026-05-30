@@ -13,7 +13,7 @@ use Aeliot\YamlToken\Node\PlainScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\TagDefinitionNode;
 use Aeliot\YamlToken\Node\TagDirectiveHandleNode;
-use Aeliot\YamlToken\Node\TagDirectiveIndicatorNode;
+use Aeliot\YamlToken\Node\TagDirectiveNode;
 use Aeliot\YamlToken\Node\TagDirectivePrefixNode;
 use Aeliot\YamlToken\Node\TagNode;
 use Aeliot\YamlToken\Node\ValueNode;
@@ -21,25 +21,25 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 3499275564,
+    'hash' => 1897201285,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 1994302802,
+            'hash' => 4206394972,
             'properties' => [],
             'children' => [
                 [
                     'type' => TagDefinitionNode::class,
-                    'hash' => 183828463,
+                    'hash' => 2115362233,
                     'properties' => [],
                     'children' => [
                         [
-                            'type' => TagDirectiveIndicatorNode::class,
-                            'hash' => 4058827745,
+                            'type' => TagDirectiveNode::class,
+                            'hash' => 414177067,
                             'properties' => [
                                 'token' => [
-                                    'type' => TokenType::DIRECTIVE_TAG_INDICATOR,
+                                    'type' => TokenType::TAG_DIRECTIVE,
                                     'text' => '%TAG',
                                 ],
                             ],
@@ -251,20 +251,20 @@ return [
         ],
         [
             'type' => DocumentNode::class,
-            'hash' => 1994302802,
+            'hash' => 4206394972,
             'properties' => [],
             'children' => [
                 [
                     'type' => TagDefinitionNode::class,
-                    'hash' => 183828463,
+                    'hash' => 2115362233,
                     'properties' => [],
                     'children' => [
                         [
-                            'type' => TagDirectiveIndicatorNode::class,
-                            'hash' => 4058827745,
+                            'type' => TagDirectiveNode::class,
+                            'hash' => 414177067,
                             'properties' => [
                                 'token' => [
-                                    'type' => TokenType::DIRECTIVE_TAG_INDICATOR,
+                                    'type' => TokenType::TAG_DIRECTIVE,
                                     'text' => '%TAG',
                                 ],
                             ],

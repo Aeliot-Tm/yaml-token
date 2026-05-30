@@ -172,7 +172,7 @@ final readonly class DocumentParser
             return true;
         }
 
-        if (TokenType::DIRECTIVE_TAG_INDICATOR === $token->type) {
+        if (TokenType::TAG_DIRECTIVE === $token->type) {
             $document->addChild($this->registry->getTagDirectiveParser()->parse($parseContext));
 
             return true;

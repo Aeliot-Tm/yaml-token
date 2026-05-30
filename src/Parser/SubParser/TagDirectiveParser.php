@@ -28,7 +28,7 @@ final readonly class TagDirectiveParser
     {
         $TagDefinitionNode = new TagDefinitionNode();
 
-        $this->consumer->require($parseContext->tokens, $TagDefinitionNode, TokenType::DIRECTIVE_TAG_INDICATOR);
+        $this->consumer->require($parseContext->tokens, $TagDefinitionNode, TokenType::TAG_DIRECTIVE);
         $this->consumer->collectWhitespace($parseContext->tokens, $TagDefinitionNode);
         $this->consumer->require($parseContext->tokens, $TagDefinitionNode, TokenType::DIRECTIVE_TAG_HANDLE);
         $this->consumer->collectWhitespace($parseContext->tokens, $TagDefinitionNode);
