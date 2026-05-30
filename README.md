@@ -1,11 +1,16 @@
 # YAML Token
 
-A YAML parser that represents YAML as a hierarchical structure of tokens and containers.
+A YAML parser that represents YAML as a hierarchical structure of nodes and tokens.
 
 ## Purpose
 
-The library enables working with YAML not only as data but as a full structure of the source text.
-Every element (key, value, indentation, comment) has its position and can be modified or recreated.
+The library enables working with YAML not only as data but as a full structure of the source text
+represented by nodes and tokens. It provides base layer for the analysis and modification of YAML
+with isolated impact and without side effects.
+
+Unlike [`symfony/yaml`](https://github.com/symfony/YAML), which is designed for `YAML → array`
+and `array → YAML` conversion, this library provides a mechanism for analyzing and precisely
+manipulating the source YAML.
 
 > ## Project status:
 > 
