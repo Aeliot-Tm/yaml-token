@@ -14,3 +14,4 @@ runs:
       with:
         php-version: ${{ inputs.php-version }}
         coverage: none
+        tools: composer
