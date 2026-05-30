@@ -61,7 +61,7 @@ All extend `SyntaxNode` (constructor accepts `Token`; no additional methods unle
 | `FlowMappingEndNode` | `FLOW_MAPPING_END` (`}`). Extends `FlowMappingBoundNode`. |
 | `BlockScalarIndicatorNode` | `FOLDED_BLOCK_SCALAR_INDICATOR` or `LITERAL_BLOCK_SCALAR_INDICATOR` (`>` / `\|`) |
 | `BlockScalarChompingIndicatorNode` | `BLOCK_SCALAR_CHOMPING_INDICATOR` (`+` / `-`) |
-| `BlockScalarIndentationIndicatorNode` | `BLOCK_SCALAR_INDENTATION_INDICATOR` (digit) |
+| `BlockScalarIndentationIndicatorNode` | `INDENTATION_INDICATOR` (digit) |
 | `MergeIndicatorNode` | `MERGE_INDICATOR` (`<<`) |
 | `YamlDirectiveNode` | `YAML_DIRECTIVE` (`%YAML`) |
 | `YamlVersionNode` | `YAML_VERSION` (version string) |

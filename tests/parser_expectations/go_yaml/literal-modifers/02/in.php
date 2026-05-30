@@ -5,23 +5,23 @@ declare(strict_types=1);
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\BlockScalarChompingIndicatorNode;
 use Aeliot\YamlToken\Node\BlockScalarEntryNode;
-use Aeliot\YamlToken\Node\BlockScalarIndentationIndicatorNode;
 use Aeliot\YamlToken\Node\BlockScalarIndicatorNode;
 use Aeliot\YamlToken\Node\BlockScalarOptionsNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\DocumentStartNode;
+use Aeliot\YamlToken\Node\IndentationIndicatorNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 2679686725,
+    'hash' => 4094658852,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 2799926116,
+            'hash' => 3111694754,
             'properties' => [],
             'children' => [
                 [
@@ -48,22 +48,22 @@ return [
                 ],
                 [
                     'type' => ValueNode::class,
-                    'hash' => 2832640303,
+                    'hash' => 3728052899,
                     'properties' => [
                         'payload' => [
                             'type' => BlockScalarEntryNode::class,
-                            'hash' => 3786804679,
+                            'hash' => 1313897014,
                         ],
                     ],
                     'children' => [
                         [
                             'type' => BlockScalarEntryNode::class,
-                            'hash' => 3786804679,
+                            'hash' => 1313897014,
                             'properties' => [],
                             'children' => [
                                 [
                                     'type' => BlockScalarOptionsNode::class,
-                                    'hash' => 2967190261,
+                                    'hash' => 577509866,
                                     'properties' => [
                                         'typeIndicator' => [
                                             'type' => BlockScalarIndicatorNode::class,
@@ -74,8 +74,8 @@ return [
                                             'hash' => 2238875574,
                                         ],
                                         'indentationIndicator' => [
-                                            'type' => BlockScalarIndentationIndicatorNode::class,
-                                            'hash' => 964000784,
+                                            'type' => IndentationIndicatorNode::class,
+                                            'hash' => 3127960550,
                                         ],
                                     ],
                                     'children' => [
@@ -91,11 +91,11 @@ return [
                                             'children' => [],
                                         ],
                                         [
-                                            'type' => BlockScalarIndentationIndicatorNode::class,
-                                            'hash' => 964000784,
+                                            'type' => IndentationIndicatorNode::class,
+                                            'hash' => 3127960550,
                                             'properties' => [
                                                 'token' => [
-                                                    'type' => TokenType::BLOCK_SCALAR_INDENTATION_INDICATOR,
+                                                    'type' => TokenType::INDENTATION_INDICATOR,
                                                     'text' => '1',
                                                 ],
                                             ],

@@ -18,7 +18,7 @@ return [
         'text' => '|',
     ],
     [
-        'type' => TokenType::BLOCK_SCALAR_INDENTATION_INDICATOR,
+        'type' => TokenType::INDENTATION_INDICATOR,
         'text' => '2',
     ],
     [
@@ -54,7 +54,7 @@ return [
         'text' => '-',
     ],
     [
-        'type' => TokenType::BLOCK_SCALAR_INDENTATION_INDICATOR,
+        'type' => TokenType::INDENTATION_INDICATOR,
         'text' => '2',
     ],
     [

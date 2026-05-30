@@ -37,7 +37,7 @@ final class Cursor
     public ?int $blockMappingKeyIndent = null;
 
     /**
-     * Digit (1–9) from {@see TokenType::BLOCK_SCALAR_INDENTATION_INDICATOR} on the current header line; cleared when the header ends.
+     * Digit (1–9) from {@see TokenType::INDENTATION_INDICATOR} on the current header line; cleared when the header ends.
      */
     public ?int $blockScalarAdditionalIndentFromIndicator = null;
 
@@ -72,7 +72,7 @@ final class Cursor
     public ?int $blockScalarExplicitContentMinIndent = null;
 
     /**
-     * True after {@see TokenType::BLOCK_SCALAR_INDENTATION_INDICATOR} on the current block header line.
+     * True after {@see TokenType::INDENTATION_INDICATOR} on the current block header line.
      */
     public bool $blockScalarExplicitIndentIndicator = false;
 

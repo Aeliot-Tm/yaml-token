@@ -18,7 +18,7 @@ use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
 class BlockScalarOptionsNode extends AbstractNode
 {
     private ?BlockScalarChompingIndicatorNode $chompingIndicator = null;
-    private ?BlockScalarIndentationIndicatorNode $indentationIndicator = null;
+    private ?IndentationIndicatorNode $indentationIndicator = null;
     private ?BlockScalarIndicatorNode $typeIndicator = null;
 
     public function addChild(Node $child): void
@@ -28,7 +28,7 @@ class BlockScalarOptionsNode extends AbstractNode
                 throw new UnexpectedStateException('Attempt to set block scalar chomping indicator twice');
             }
             $this->chompingIndicator = $child;
-        } elseif ($child instanceof BlockScalarIndentationIndicatorNode) {
+        } elseif ($child instanceof IndentationIndicatorNode) {
             if (null !== $this->indentationIndicator) {
                 throw new UnexpectedStateException('Attempt to set block scalar indentation indicator twice');
             }
@@ -48,7 +48,7 @@ class BlockScalarOptionsNode extends AbstractNode
         return $this->chompingIndicator;
     }
 
-    public function getIndentationIndicator(): ?BlockScalarIndentationIndicatorNode
+    public function getIndentationIndicator(): ?IndentationIndicatorNode
     {
         return $this->indentationIndicator;
     }

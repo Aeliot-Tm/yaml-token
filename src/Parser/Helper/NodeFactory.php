@@ -15,7 +15,6 @@ namespace Aeliot\YamlToken\Parser\Helper;
 
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\BlockScalarChompingIndicatorNode;
-use Aeliot\YamlToken\Node\BlockScalarIndentationIndicatorNode;
 use Aeliot\YamlToken\Node\BlockScalarIndicatorNode;
 use Aeliot\YamlToken\Node\CommentNode;
 use Aeliot\YamlToken\Node\DoubleQuotedScalarNode;
@@ -25,6 +24,7 @@ use Aeliot\YamlToken\Node\FlowMappingStartNode;
 use Aeliot\YamlToken\Node\FlowSequenceEndNode;
 use Aeliot\YamlToken\Node\FlowSequenceStartNode;
 use Aeliot\YamlToken\Node\FoldedBlockScalarNode;
+use Aeliot\YamlToken\Node\IndentationIndicatorNode;
 use Aeliot\YamlToken\Node\IndentNode;
 use Aeliot\YamlToken\Node\LiteralBlockScalarNode;
 use Aeliot\YamlToken\Node\MergeIndicatorNode;
@@ -73,7 +73,7 @@ final readonly class NodeFactory
     {
         return match ($token->type) {
             TokenType::BLOCK_SCALAR_CHOMPING_INDICATOR => new BlockScalarChompingIndicatorNode($token),
-            TokenType::BLOCK_SCALAR_INDENTATION_INDICATOR => new BlockScalarIndentationIndicatorNode($token),
+            TokenType::INDENTATION_INDICATOR => new IndentationIndicatorNode($token),
             TokenType::COMMENT => new CommentNode($token),
             TokenType::YAML_DIRECTIVE => new YamlDirectiveNode($token),
             TokenType::YAML_VERSION => new YamlVersionNode($token),

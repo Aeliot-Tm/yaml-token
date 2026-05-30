@@ -1239,7 +1239,7 @@ final class Lexer
                 $this->advance($harvester);
                 $harvester->cursor->blockScalarAdditionalIndentFromIndicator = (int) $char;
                 $harvester->cursor->blockScalarExplicitIndentIndicator = true;
-                $harvester->stream->addToken(new Token(TokenType::BLOCK_SCALAR_INDENTATION_INDICATOR, $char, $startLine, $startColumn));
+                $harvester->stream->addToken(new Token(TokenType::INDENTATION_INDICATOR, $char, $startLine, $startColumn));
 
                 return;
             }

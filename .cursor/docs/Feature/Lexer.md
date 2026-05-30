@@ -62,10 +62,10 @@ The rules below describe the practical behavior relied upon by lexer unit tests.
   - `LITERAL_BLOCK_SCALAR_INDICATOR` / `FOLDED_BLOCK_SCALAR_INDICATOR` for the `|` / `>` character
   - the rest of the block scalar header line uses the same rules as elsewhere on the line:
     `WHITESPACE`, `COMMENT`, `BLOCK_SCALAR_CHOMPING_INDICATOR` (`+` or `-`),
-    `BLOCK_SCALAR_INDENTATION_INDICATOR` (one digit), then `NEWLINE` ending the header line;
+    `INDENTATION_INDICATOR` (one digit), then `NEWLINE` ending the header line;
     the cursor holds the expected body token type (`LITERAL_BLOCK_SCALAR` / `FOLDED_BLOCK_SCALAR`)
     while the header line is open
-  - **Body tokenization**: if the header included a digit `BLOCK_SCALAR_INDENTATION_INDICATOR`,
+  - **Body tokenization**: if the header included a digit `INDENTATION_INDICATOR`,
     the block body is not a single `LITERAL_BLOCK_SCALAR` / `FOLDED_BLOCK_SCALAR` token;
     it is split per physical line into leading horizontal whitespace as `INDENT`,
     non-whitespace line suffix as `PLAIN_SCALAR`, and line breaks as `NEWLINE` (same raw bytes
@@ -76,7 +76,7 @@ The rules below describe the practical behavior relied upon by lexer unit tests.
     (YAML structural indent is space-only). A line whose space-only indent is shallower than the
     first body line ends the block as soon as that indent is read (the body buffer may end with
     spaces, not a newline); the same scan builds the raw body that is split per line when the header
-    had a `BLOCK_SCALAR_INDENTATION_INDICATOR` digit.
+    had a `INDENTATION_INDICATOR` digit.
   - **Document end** (`...`): a line that starts with the document-end marker (after leading
     spaces) also ends the block body when the marker is at the outer indent level — at column 0
     for a bare document / top-level node (`blockScalarAutoContentParentIndent` = -1), or at
