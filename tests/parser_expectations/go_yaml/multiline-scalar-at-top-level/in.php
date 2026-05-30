@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\DocumentNode;
-use Aeliot\YamlToken\Node\IndentationNode;
+use Aeliot\YamlToken\Node\IndentNode;
 use Aeliot\YamlToken\Node\MultilinePlainScalarNode;
 use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\PlainScalarNode;
@@ -14,27 +14,27 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 1691744630,
+    'hash' => 613010434,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 682024272,
+            'hash' => 4286980458,
             'properties' => [],
             'children' => [
                 [
                     'type' => ValueNode::class,
-                    'hash' => 3097528486,
+                    'hash' => 1769526083,
                     'properties' => [
                         'payload' => [
                             'type' => MultilinePlainScalarNode::class,
-                            'hash' => 1465094480,
+                            'hash' => 3608675552,
                         ],
                     ],
                     'children' => [
                         [
                             'type' => MultilinePlainScalarNode::class,
-                            'hash' => 1465094480,
+                            'hash' => 3608675552,
                             'properties' => [],
                             'children' => [
                                 [
@@ -93,11 +93,11 @@ return [
                                     'children' => [],
                                 ],
                                 [
-                                    'type' => IndentationNode::class,
-                                    'hash' => 412793561,
+                                    'type' => IndentNode::class,
+                                    'hash' => 2852255048,
                                     'properties' => [
                                         'token' => [
-                                            'type' => TokenType::INDENTATION,
+                                            'type' => TokenType::INDENT,
                                             'text' => '  ',
                                         ],
                                     ],

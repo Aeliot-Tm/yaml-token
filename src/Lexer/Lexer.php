@@ -203,7 +203,7 @@ final class Lexer
     /**
      * Strip chomping (YAML 1.0 / 1.2): exclude the final line break after the last non-empty line and any
      * trailing empty lines. Bytes from the first such line break onward are detached and re-tokenized
-     * (e.g. {@see TokenType::NEWLINE}, {@see TokenType::INDENTATION}).
+     * (e.g. {@see TokenType::NEWLINE}, {@see TokenType::INDENT}).
      */
     private function computeBlockScalarStripSuffixLength(string $result): int
     {
@@ -1092,11 +1092,11 @@ final class Lexer
             return;
         }
 
-        // INDENTATION (spaces at line start, after newline; tab starts WHITESPACE — not valid YAML indent)
+        // INDENT (spaces at line start, after newline; tab starts WHITESPACE — not valid YAML indent)
         if (1 === $harvester->cursor->column && ' ' === $char) {
             $indent = $this->readIndentation($harvester);
             if ('' !== $indent) {
-                // Blank lines may contain spaces; they must not create structural INDENTATION tokens.
+                // Blank lines may contain spaces; they must not create structural INDENT tokens.
                 if ($harvester->cursor->position >= $harvester->length
                     || \in_array($harvester->input[$harvester->cursor->position], self::CHARS_LINE_BREAK, true)) {
                     $harvester->stream->addToken(new Token(TokenType::WHITESPACE, $indent, $startLine, $startColumn));
@@ -1110,7 +1110,7 @@ final class Lexer
                     return;
                 }
                 $this->applyBlockPlainContinuationIndentRules($harvester, $indent);
-                $harvester->stream->addToken(new Token(TokenType::INDENTATION, $indent, $startLine, $startColumn));
+                $harvester->stream->addToken(new Token(TokenType::INDENT, $indent, $startLine, $startColumn));
 
                 return;
             }

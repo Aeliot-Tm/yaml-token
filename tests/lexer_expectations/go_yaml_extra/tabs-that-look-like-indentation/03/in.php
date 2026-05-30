@@ -6,7 +6,7 @@ use Aeliot\YamlToken\Enum\TokenType;
 
 return [
     [
-        'type' => TokenType::INDENTATION,
+        'type' => TokenType::INDENT,
         'text' => ' ',
     ],
     [

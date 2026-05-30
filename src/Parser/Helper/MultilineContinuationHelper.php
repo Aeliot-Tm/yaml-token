@@ -70,7 +70,7 @@ final readonly class MultilineContinuationHelper
     public function isIndentedMultilinePlainContinuationAt(TokenStreamInterface $tokens, int $indentPeekOffset, IndentContext $parentIndent): bool
     {
         $indentation = $tokens->peek($indentPeekOffset);
-        if (TokenType::INDENTATION !== $indentation?->type) {
+        if (TokenType::INDENT !== $indentation?->type) {
             return false;
         }
         if (\strlen($indentation->text) <= $parentIndent->indentLen) {
@@ -113,7 +113,7 @@ final readonly class MultilineContinuationHelper
         }
 
         $maybeIndent = $tokens->peek($offset + 1);
-        if (TokenType::INDENTATION === $maybeIndent?->type && \strlen($maybeIndent->text) > $parentIndent->indentLen) {
+        if (TokenType::INDENT === $maybeIndent?->type && \strlen($maybeIndent->text) > $parentIndent->indentLen) {
             $afterIndentOffset = $this->peekOffsetHelper->skipWhitespaceOffset($tokens, $offset + 2);
             if (TokenType::NEWLINE === $tokens->peek($afterIndentOffset)?->type) {
                 return $this->isAnyContinuationAt($tokens, $afterIndentOffset + 1, $parentIndent);

@@ -126,7 +126,7 @@ final class NodeTreeRepresenter
                 'indentationIndicator' => $node->getIndentationIndicator(),
             ],
             $node instanceof KeyValueCoupleNode => [
-                'indentation' => $node->getIndentation(),
+                'indent' => $node->getIndent(),
                 'key' => $node->getKey(),
                 'mergeInstruction' => $node->getMergeInstruction(),
                 'valueIndicator' => $node->getValueIndicator(),

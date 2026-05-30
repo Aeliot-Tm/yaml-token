@@ -42,7 +42,7 @@ return [
         'text' => "    xxx\n",
     ],
     [
-        'type' => TokenType::INDENTATION,
+        'type' => TokenType::INDENT,
         'text' => '  ',
     ],
     [

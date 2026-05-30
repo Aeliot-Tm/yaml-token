@@ -41,7 +41,7 @@ final class IndentLessSequenceWithScalarTest extends LexerMappingTestCase
                 'text' => "\n",
             ],
             [
-                'type' => TokenType::INDENTATION,
+                'type' => TokenType::INDENT,
                 'text' => '  ',
             ],
             [
@@ -57,7 +57,7 @@ final class IndentLessSequenceWithScalarTest extends LexerMappingTestCase
                 'text' => "\n",
             ],
             [
-                'type' => TokenType::INDENTATION,
+                'type' => TokenType::INDENT,
                 'text' => '  ',
             ],
             [

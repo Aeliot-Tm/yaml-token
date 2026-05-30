@@ -5,27 +5,27 @@ declare(strict_types=1);
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\CommentNode;
 use Aeliot\YamlToken\Node\DocumentNode;
-use Aeliot\YamlToken\Node\IndentationNode;
+use Aeliot\YamlToken\Node\IndentNode;
 use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 3030688490,
+    'hash' => 1787917444,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 2808845543,
+            'hash' => 804013562,
             'properties' => [],
             'children' => [
                 [
-                    'type' => IndentationNode::class,
-                    'hash' => 412793561,
+                    'type' => IndentNode::class,
+                    'hash' => 2852255048,
                     'properties' => [
                         'token' => [
-                            'type' => TokenType::INDENTATION,
+                            'type' => TokenType::INDENT,
                             'text' => '  ',
                         ],
                     ],

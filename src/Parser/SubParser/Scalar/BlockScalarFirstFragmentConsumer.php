@@ -37,7 +37,7 @@ final readonly class BlockScalarFirstFragmentConsumer
     /**
      * Consumes a block scalar (literal | or folded >) indicator line and the first scalar fragment.
      * Tokens consumed: BLOCK_SCALAR_INDICATOR, optional sub-indicators (chomping/indentation), NEWLINE,
-     * optional leading empty lines, optional INDENTATION, and the scalar payload.
+     * optional leading empty lines, optional INDENT, and the scalar payload.
      * Returns the assembled entry node. When the stream is truncated and $failOnTruncatedStream is false,
      * returns a partial entry containing only the options (no scalar payload).
      */
@@ -61,8 +61,8 @@ final readonly class BlockScalarFirstFragmentConsumer
 
         // YAML 1.2.2 §8.1.1.1: with an explicit indentation indicator (|N, >N, |N-, >N+, ...),
         // the body may start with leading spaces that are part of the content but surface
-        // to the parser as a separate INDENTATION token before the scalar payload.
-        $this->consumer->collectTypes($tokens, $entry, TokenType::INDENTATION);
+        // to the parser as a separate INDENT token before the scalar payload.
+        $this->consumer->collectTypes($tokens, $entry, TokenType::INDENT);
 
         $token = $tokens->current();
         if (null === $token || !$token->type->isScalar()) {
@@ -96,7 +96,7 @@ final readonly class BlockScalarFirstFragmentConsumer
             }
 
             $indentationToken = $tokens->peek(1);
-            if (TokenType::INDENTATION !== $indentationToken?->type) {
+            if (TokenType::INDENT !== $indentationToken?->type) {
                 break;
             }
 

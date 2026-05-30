@@ -33,9 +33,9 @@ final readonly class CompactBlockMappingParser
      *   ns-l-block-map-entry(n) ( s-indent(n) ns-l-block-map-entry(n) )*
      *
      * The first entry is parsed at the current stream position (no leading
-     * INDENTATION token — the caller has already consumed '-' and its
+     * INDENT token — the caller has already consumed '-' and its
      * trailing spaces so we sit directly on the key). Subsequent entries
-     * require an INDENTATION token whose length equals $indentLen.
+     * require an INDENT token whose length equals $indentLen.
      */
     public function parseCompactBlockMapping(ParseContext $parseContext, int $indentLen): BlockMappingNode
     {

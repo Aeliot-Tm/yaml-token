@@ -8,7 +8,7 @@ use Aeliot\YamlToken\Node\DoubleQuotedScalarNode;
 use Aeliot\YamlToken\Node\FlowSequenceEndNode;
 use Aeliot\YamlToken\Node\FlowSequenceNode;
 use Aeliot\YamlToken\Node\FlowSequenceStartNode;
-use Aeliot\YamlToken\Node\IndentationNode;
+use Aeliot\YamlToken\Node\IndentNode;
 use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\NewLineNode;
@@ -20,17 +20,17 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 3990030910,
+    'hash' => 3785885593,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 3539800823,
+            'hash' => 892863794,
             'properties' => [],
             'children' => [
                 [
                     'type' => KeyValueCoupleNode::class,
-                    'hash' => 3989921106,
+                    'hash' => 637503334,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
@@ -42,7 +42,7 @@ return [
                         ],
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 806999992,
+                            'hash' => 1179681239,
                         ],
                     ],
                     'children' => [
@@ -82,7 +82,7 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 806999992,
+                            'hash' => 1179681239,
                             'properties' => [
                                 'payload' => [
                                     'type' => FlowSequenceNode::class,
@@ -102,11 +102,11 @@ return [
                                     'children' => [],
                                 ],
                                 [
-                                    'type' => IndentationNode::class,
-                                    'hash' => 412793561,
+                                    'type' => IndentNode::class,
+                                    'hash' => 2852255048,
                                     'properties' => [
                                         'token' => [
-                                            'type' => TokenType::INDENTATION,
+                                            'type' => TokenType::INDENT,
                                             'text' => '  ',
                                         ],
                                     ],

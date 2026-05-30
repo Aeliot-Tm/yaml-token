@@ -8,7 +8,7 @@ use Aeliot\YamlToken\Node\FlowEntryNode;
 use Aeliot\YamlToken\Node\FlowSequenceEndNode;
 use Aeliot\YamlToken\Node\FlowSequenceNode;
 use Aeliot\YamlToken\Node\FlowSequenceStartNode;
-use Aeliot\YamlToken\Node\IndentationNode;
+use Aeliot\YamlToken\Node\IndentNode;
 use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\PlainScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
@@ -17,20 +17,20 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 2593301733,
+    'hash' => 232581680,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 1520087142,
+            'hash' => 627843858,
             'properties' => [],
             'children' => [
                 [
-                    'type' => IndentationNode::class,
-                    'hash' => 412793561,
+                    'type' => IndentNode::class,
+                    'hash' => 2852255048,
                     'properties' => [
                         'token' => [
-                            'type' => TokenType::INDENTATION,
+                            'type' => TokenType::INDENT,
                             'text' => '  ',
                         ],
                     ],

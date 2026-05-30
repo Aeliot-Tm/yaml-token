@@ -33,7 +33,7 @@ final readonly class BlockStructureIdentifier
     /**
      * YAML 1.2.2 §6.4 / §6.6: detects a line that is either entirely empty
      * (l-empty) or contains only a comment (l-comment), possibly with
-     * leading whitespace. Such a line's leading INDENTATION token is part
+     * leading whitespace. Such a line's leading INDENT token is part
      * of s-separate-in-line, not of block s-indent(n), and must not be
      * registered as the document's indent step nor validated against it.
      */
@@ -92,7 +92,7 @@ final readonly class BlockStructureIdentifier
     private function resolveEntryContentPeekOffset(TokenStreamInterface $tokens): int
     {
         $offset = 0;
-        if (TokenType::INDENTATION === $tokens->current()?->type) {
+        if (TokenType::INDENT === $tokens->current()?->type) {
             $offset = 1;
         }
 

@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Aeliot\YamlToken\Parser\SubParser\Block;
 
 use Aeliot\YamlToken\Enum\TokenType;
-use Aeliot\YamlToken\Node\IndentationNode;
+use Aeliot\YamlToken\Node\IndentNode;
 use Aeliot\YamlToken\Node\MultilinePlainScalarNode;
 use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\Node;
@@ -138,22 +138,22 @@ final readonly class IndentedBlockValueParser
 
     /**
      * Consumes an indented plain scalar (no node properties prefix).
-     * The stream must be positioned at the INDENTATION token (opening layout already consumed).
-     * INDENTATION and any trailing WHITESPACE/COMMENT tokens are deferred into $layoutPrefix
+     * The stream must be positioned at the INDENT token (opening layout already consumed).
+     * INDENT and any trailing WHITESPACE/COMMENT tokens are deferred into $layoutPrefix
      * and flushed into either a MultilinePlainScalarNode or directly into $valueNode by
      * finishScalarWithPossibleMultiline — they must not be separated from that call.
      */
     private function consumePlainScalar(ParseContext $parseContext, ValueNode $valueNode, IndentContext $parentIndent): void
     {
         $indentationToken = $parseContext->tokens->current();
-        if (TokenType::INDENTATION !== $indentationToken?->type) {
-            throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Expected INDENTATION for indented block scalar, but %s given', $indentationToken?->type->value ?? '_nothing_'), $parseContext->tokens));
+        if (TokenType::INDENT !== $indentationToken?->type) {
+            throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Expected INDENT for indented block scalar, but %s given', $indentationToken?->type->value ?? '_nothing_'), $parseContext->tokens));
         }
         if (\strlen($indentationToken->text) <= $parentIndent->indentLen) {
             throw new IndentationInvalidException($this->errorHelper->appendTokenLocation(\sprintf('Indented block scalar must be deeper than parent key line indent (%d spaces)', $parentIndent->indentLen), $indentationToken));
         }
 
-        $layoutPrefix = [new IndentationNode($indentationToken)];
+        $layoutPrefix = [new IndentNode($indentationToken)];
         $parseContext->tokens->advance();
 
         while (true) {
@@ -182,11 +182,11 @@ final readonly class IndentedBlockValueParser
 
     /**
      * Consumes an indented scalar that is preceded by node properties (tag/anchor) on the same line.
-     * The stream must be positioned at the INDENTATION token (opening layout already consumed).
+     * The stream must be positioned at the INDENT token (opening layout already consumed).
      */
     private function consumeTaggedScalar(ParseContext $parseContext, ValueNode $valueNode, IndentContext $parentIndent): void
     {
-        $indentLength = $this->consumer->require($parseContext->tokens, $valueNode, TokenType::INDENTATION);
+        $indentLength = $this->consumer->require($parseContext->tokens, $valueNode, TokenType::INDENT);
         if ($indentLength <= $parentIndent->indentLen) {
             throw new IndentationInvalidException($this->errorHelper->appendTokenLocation(\sprintf('Indented block tagged scalar must be deeper than parent key line indent (%d spaces)', $parentIndent->indentLen), $parseContext->tokens));
         }
@@ -360,7 +360,7 @@ final readonly class IndentedBlockValueParser
         // Block scalar on a continuation line (e.g. after a node-properties-only line)
         if (\in_array($head->significantToken->type, TokenType::BLOCK_SCALAR_INDICATORS, true)) {
             $this->consumeBlockValueOpeningLayout($parseContext, $valueNode);
-            $this->consumer->require($parseContext->tokens, $valueNode, TokenType::INDENTATION);
+            $this->consumer->require($parseContext->tokens, $valueNode, TokenType::INDENT);
             $this->registry->getBlockScalarValueConsumer()->consume($parseContext->tokens, $valueNode, $parentIndent);
 
             return;
@@ -411,7 +411,7 @@ final readonly class IndentedBlockValueParser
         ValueNode $valueNode,
         Token $afterIndent,
     ): void {
-        $this->consumer->require($parseContext->tokens, $valueNode, TokenType::INDENTATION);
+        $this->consumer->require($parseContext->tokens, $valueNode, TokenType::INDENT);
 
         $valueNode->addChild(
             TokenType::FLOW_SEQUENCE_START === $afterIndent->type
@@ -431,7 +431,7 @@ final readonly class IndentedBlockValueParser
         $this->consumeContinuationLineLayout($parseContext, $separatorContainer, $newlineToken);
 
         if ($requiresIndentation) {
-            $this->consumer->require($parseContext->tokens, $separatorContainer, TokenType::INDENTATION);
+            $this->consumer->require($parseContext->tokens, $separatorContainer, TokenType::INDENT);
         }
 
         $this->registry->getNodePropertiesParser()->collectProperties($parseContext, $valueNode);

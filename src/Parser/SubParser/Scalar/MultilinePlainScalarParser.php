@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Aeliot\YamlToken\Parser\SubParser\Scalar;
 
 use Aeliot\YamlToken\Enum\TokenType;
-use Aeliot\YamlToken\Node\IndentationNode;
+use Aeliot\YamlToken\Node\IndentNode;
 use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Node\WhitespaceNode;
@@ -39,7 +39,7 @@ final readonly class MultilinePlainScalarParser
     }
 
     /**
-     * Appends NEWLINE / INDENTATION / scalar chunks for multiline plain scalars and for | / > block bodies.
+     * Appends NEWLINE / INDENT / scalar chunks for multiline plain scalars and for | / > block bodies.
      *
      * @see Parser::parseValue() YAML 1.2.2 §7.3.3 / §8.1.1
      */
@@ -129,7 +129,7 @@ final readonly class MultilinePlainScalarParser
         $indentation = $tokens->peek(1);
 
         $targetNode->addChild(new NewLineNode($tokens->current()));
-        $targetNode->addChild(new IndentationNode($indentation));
+        $targetNode->addChild(new IndentNode($indentation));
         $tokens->advance();
         $tokens->advance();
         $this->appendWhitespaceThenScalar($tokens, $targetNode);
@@ -141,7 +141,7 @@ final readonly class MultilinePlainScalarParser
     {
         $newLine = $tokens->current();
         $maybeIndent = $tokens->peek(1);
-        if (TokenType::INDENTATION !== $maybeIndent?->type || \strlen($maybeIndent->text) <= $parentIndent->indentLen) {
+        if (TokenType::INDENT !== $maybeIndent?->type || \strlen($maybeIndent->text) <= $parentIndent->indentLen) {
             return false;
         }
 
@@ -156,10 +156,10 @@ final readonly class MultilinePlainScalarParser
         $targetNode->addChild(new NewLineNode($newLine));
         $tokens->advance();
         $indentationToken = $tokens->current();
-        if (TokenType::INDENTATION !== $indentationToken->type) {
-            throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Expected INDENTATION after newline in multiline plain empty line, got %s', $indentationToken->type->value), $tokens));
+        if (TokenType::INDENT !== $indentationToken->type) {
+            throw new UnexpectedTokenException($this->errorHelper->appendTokenLocation(\sprintf('Expected INDENT after newline in multiline plain empty line, got %s', $indentationToken->type->value), $tokens));
         }
-        $targetNode->addChild(new IndentationNode($indentationToken));
+        $targetNode->addChild(new IndentNode($indentationToken));
         $tokens->advance();
         for ($w = 2; $w < $afterIndentOffset; ++$w) {
             $wsToken = $tokens->current();

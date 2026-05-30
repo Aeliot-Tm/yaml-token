@@ -37,7 +37,7 @@ final class BrokenIndentTabTest extends LexerMappingTestCase
                 'text' => "\n",
             ],
             [
-                'type' => TokenType::INDENTATION,
+                'type' => TokenType::INDENT,
                 'text' => '  ',
             ],
             [
@@ -64,7 +64,7 @@ final class BrokenIndentTabTest extends LexerMappingTestCase
 
         yield 'spaces tab trailing spaces' => [[
             [
-                'type' => TokenType::INDENTATION,
+                'type' => TokenType::INDENT,
                 'text' => '  ',
             ],
             [
@@ -91,7 +91,7 @@ final class BrokenIndentTabTest extends LexerMappingTestCase
 
         yield 'spaces then tab' => [[
             [
-                'type' => TokenType::INDENTATION,
+                'type' => TokenType::INDENT,
                 'text' => '  ',
             ],
             [

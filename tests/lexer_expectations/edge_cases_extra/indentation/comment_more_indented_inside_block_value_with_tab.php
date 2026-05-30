@@ -26,7 +26,7 @@ return [
         'text' => "\n",
     ],
     [
-        'type' => TokenType::INDENTATION,
+        'type' => TokenType::INDENT,
         'text' => '  ',
     ],
     [
@@ -42,7 +42,7 @@ return [
         'text' => "\n",
     ],
     [
-        'type' => TokenType::INDENTATION,
+        'type' => TokenType::INDENT,
         'text' => '     ',
     ],
     [
@@ -58,7 +58,7 @@ return [
         'text' => "\n",
     ],
     [
-        'type' => TokenType::INDENTATION,
+        'type' => TokenType::INDENT,
         'text' => '    ',
     ],
     [

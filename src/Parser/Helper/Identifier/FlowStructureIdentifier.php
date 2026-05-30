@@ -80,7 +80,7 @@ final readonly class FlowStructureIdentifier
     public function isFlowMappingStart(ParseContext $parseContext): bool
     {
         $token = $parseContext->tokens->current();
-        if (TokenType::INDENTATION === $token->type) {
+        if (TokenType::INDENT === $token->type) {
             $token = $parseContext->tokens->peek(1);
         }
 
@@ -155,7 +155,7 @@ final readonly class FlowStructureIdentifier
     public function isFlowSequenceStart(ParseContext $parseContext): bool
     {
         $token = $parseContext->tokens->current();
-        if (TokenType::INDENTATION === $token->type) {
+        if (TokenType::INDENT === $token->type) {
             $token = $parseContext->tokens->peek(1);
         }
 

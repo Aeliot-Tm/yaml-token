@@ -44,7 +44,7 @@ final class SequenceEntryMultilinePlainContinuationTest extends LexerMappingTest
                 'text' => "\n",
             ],
             [
-                'type' => TokenType::INDENTATION,
+                'type' => TokenType::INDENT,
                 'text' => ' ',
             ],
             [
@@ -75,7 +75,7 @@ final class SequenceEntryMultilinePlainContinuationTest extends LexerMappingTest
                 'text' => "\n",
             ],
             [
-                'type' => TokenType::INDENTATION,
+                'type' => TokenType::INDENT,
                 'text' => '  ',
             ],
             [

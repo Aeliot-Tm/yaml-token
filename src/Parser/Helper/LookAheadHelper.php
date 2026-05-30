@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Aeliot\YamlToken\Parser\Helper;
 
 use Aeliot\YamlToken\Enum\TokenType;
-use Aeliot\YamlToken\Node\IndentationNode;
+use Aeliot\YamlToken\Node\IndentNode;
 use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Parser\Dto\LookAheadResult;
 use Aeliot\YamlToken\Parser\SubParser\Consumer;
@@ -29,7 +29,7 @@ final readonly class LookAheadHelper
 
     /**
      * Consume one or more consecutive l-empty / l-comment lines whose
-     * leading INDENTATION must not contribute to the surrounding block's
+     * leading INDENT must not contribute to the surrounding block's
      * s-indent(n). Tokens are still attached to $root verbatim so the
      * emitter can reproduce the original text.
      */
@@ -37,7 +37,7 @@ final readonly class LookAheadHelper
     {
         while ($this->isInsignificantIndentationLine($tokens)) {
             $token = $tokens->current();
-            $root->addChild(new IndentationNode($token));
+            $root->addChild(new IndentNode($token));
             $tokens->advance();
             $this->consumer->collectSpaceCommentEnds($tokens, $root);
         }
@@ -45,7 +45,7 @@ final readonly class LookAheadHelper
 
     public function isInsignificantIndentationLine(TokenStreamInterface $tokens): bool
     {
-        if (TokenType::INDENTATION !== $tokens->current()?->type) {
+        if (TokenType::INDENT !== $tokens->current()?->type) {
             return false;
         }
 
@@ -68,10 +68,10 @@ final readonly class LookAheadHelper
      * block / column-0 collection — without prematurely consuming any tokens.
      *
      * A line is considered insignificant when it consists exclusively of
-     * WHITESPACE / COMMENT tokens (optionally prefixed by an INDENTATION
+     * WHITESPACE / COMMENT tokens (optionally prefixed by an INDENT
      * token) and is terminated by NEWLINE or end-of-stream. Both indented
      * comment lines (`    # ...`) and column-0 comment lines (`# ...`) are
-     * skipped, since the lexer omits the leading INDENTATION token only
+     * skipped, since the lexer omits the leading INDENT token only
      * for the latter.
      *
      * @param int $offset TokenStreamInterface peek offset of the first token to consider:
@@ -80,7 +80,7 @@ final readonly class LookAheadHelper
      *
      * @return LookAheadResult|null Result pointing at the first significant line:
      *                              - indentLen is the byte-length of that line's
-     *                              leading INDENTATION token (0 for column-0 lines);
+     *                              leading INDENT token (0 for column-0 lines);
      *                              - significantToken is the first non-WHITESPACE/COMMENT
      *                              token of that line.
      *                              - peekOffset is the TokenStreamInterface peek offset of significantToken.
@@ -99,7 +99,7 @@ final readonly class LookAheadHelper
                 continue;
             }
 
-            $hasIndentation = TokenType::INDENTATION === $token->type;
+            $hasIndentation = TokenType::INDENT === $token->type;
             $indentLen = $hasIndentation ? \strlen($token->text) : 0;
             $probe = $hasIndentation ? $offset + 1 : $offset;
 

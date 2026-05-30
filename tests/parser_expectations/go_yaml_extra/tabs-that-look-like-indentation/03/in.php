@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\DocumentNode;
-use Aeliot\YamlToken\Node\IndentationNode;
+use Aeliot\YamlToken\Node\IndentNode;
 use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\NewLineNode;
@@ -16,20 +16,20 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 3792778721,
+    'hash' => 19695354,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 16243093,
+            'hash' => 1253428376,
             'properties' => [],
             'children' => [
                 [
-                    'type' => IndentationNode::class,
-                    'hash' => 2218577147,
+                    'type' => IndentNode::class,
+                    'hash' => 2725803330,
                     'properties' => [
                         'token' => [
-                            'type' => TokenType::INDENTATION,
+                            'type' => TokenType::INDENT,
                             'text' => ' ',
                         ],
                     ],

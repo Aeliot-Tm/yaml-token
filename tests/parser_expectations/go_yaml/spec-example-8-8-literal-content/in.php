@@ -8,7 +8,7 @@ use Aeliot\YamlToken\Node\BlockScalarIndicatorNode;
 use Aeliot\YamlToken\Node\BlockScalarOptionsNode;
 use Aeliot\YamlToken\Node\CommentNode;
 use Aeliot\YamlToken\Node\DocumentNode;
-use Aeliot\YamlToken\Node\IndentationNode;
+use Aeliot\YamlToken\Node\IndentNode;
 use Aeliot\YamlToken\Node\LiteralBlockScalarNode;
 use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\StreamNode;
@@ -16,12 +16,12 @@ use Aeliot\YamlToken\Node\ValueNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 3222613924,
+    'hash' => 1522177735,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 2065447845,
+            'hash' => 1080034979,
             'properties' => [],
             'children' => [
                 [
@@ -89,11 +89,11 @@ return [
                     ],
                 ],
                 [
-                    'type' => IndentationNode::class,
-                    'hash' => 2218577147,
+                    'type' => IndentNode::class,
+                    'hash' => 2725803330,
                     'properties' => [
                         'token' => [
-                            'type' => TokenType::INDENTATION,
+                            'type' => TokenType::INDENT,
                             'text' => ' ',
                         ],
                     ],

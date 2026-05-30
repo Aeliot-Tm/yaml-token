@@ -20,7 +20,7 @@ use Aeliot\YamlToken\Node\DirectiveNode;
 use Aeliot\YamlToken\Node\DocumentEndNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\DocumentStartNode;
-use Aeliot\YamlToken\Node\IndentationNode;
+use Aeliot\YamlToken\Node\IndentNode;
 use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
@@ -113,11 +113,11 @@ final readonly class DocumentParser
     private function consumeOptionalLeadingIndent(ParseContext $parseContext, DocumentNode $document): void
     {
         $token = $parseContext->tokens->current();
-        if (TokenType::INDENTATION !== $token->type) {
+        if (TokenType::INDENT !== $token->type) {
             return;
         }
 
-        $document->addChild(new IndentationNode($token));
+        $document->addChild(new IndentNode($token));
         $parseContext->tokens->advance();
     }
 
@@ -127,8 +127,8 @@ final readonly class DocumentParser
         $document->addChild($sequenceEntry);
 
         $leadingIndent = 0;
-        if (TokenType::INDENTATION === $token->type) {
-            $sequenceEntry->addChild(new IndentationNode($token));
+        if (TokenType::INDENT === $token->type) {
+            $sequenceEntry->addChild(new IndentNode($token));
             $leadingIndent = \strlen($token->text);
             $parseContext->tokens->advance();
         }
@@ -209,8 +209,8 @@ final readonly class DocumentParser
             return true;
         }
 
-        if (TokenType::INDENTATION === $token->type && TokenType::COMMENT === $parseContext->tokens->peek(1)?->type) {
-            $document->addChild(new IndentationNode($token));
+        if (TokenType::INDENT === $token->type && TokenType::COMMENT === $parseContext->tokens->peek(1)?->type) {
+            $document->addChild(new IndentNode($token));
             $parseContext->tokens->advance();
 
             return true;
@@ -292,7 +292,7 @@ final readonly class DocumentParser
 
         if ($this->blockStructureIdentifier->isKeyValueCoupleStart($parseContext)) {
             $indentLen = 0;
-            if (TokenType::INDENTATION === $token->type) {
+            if (TokenType::INDENT === $token->type) {
                 $indentLen = \strlen($token->text);
             }
 

@@ -21,7 +21,7 @@ final readonly class SequenceIdentifier
     public function isSequenceStart(ParseContext $parseContext): bool
     {
         $token = $parseContext->tokens->current();
-        if (TokenType::INDENTATION === $token->type) {
+        if (TokenType::INDENT === $token->type) {
             $token = $parseContext->tokens->peek(1);
         }
 

@@ -35,7 +35,7 @@ final readonly class NodePropertyIdentifier
      * s-l+block-node(-1, block-in) (§9.1.3) → [196] → [198] → [200].
      *
      * Detects such a node-property prefix at the document root by peeking past
-     * a possible leading INDENTATION token.
+     * a possible leading INDENT token.
      */
     public function isNodePropertyAtDocumentRoot(ParseContext $parseContext): bool
     {
@@ -186,7 +186,7 @@ final readonly class NodePropertyIdentifier
     private function resolveLineContentPeekOffset(TokenStreamInterface $tokens): int
     {
         $offset = 0;
-        if (TokenType::INDENTATION === $tokens->current()?->type) {
+        if (TokenType::INDENT === $tokens->current()?->type) {
             $offset = 1;
         }
 

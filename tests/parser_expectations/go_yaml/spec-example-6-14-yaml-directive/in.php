@@ -7,7 +7,7 @@ use Aeliot\YamlToken\Node\CommentNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\DocumentStartNode;
 use Aeliot\YamlToken\Node\DoubleQuotedScalarNode;
-use Aeliot\YamlToken\Node\IndentationNode;
+use Aeliot\YamlToken\Node\IndentNode;
 use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\ValueNode;
@@ -18,12 +18,12 @@ use Aeliot\YamlToken\Node\YamlVersionNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 1693908487,
+    'hash' => 3005642268,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 1638151659,
+            'hash' => 721771192,
             'properties' => [],
             'children' => [
                 [
@@ -100,11 +100,11 @@ return [
                     'children' => [],
                 ],
                 [
-                    'type' => IndentationNode::class,
-                    'hash' => 3260233032,
+                    'type' => IndentNode::class,
+                    'hash' => 2392602947,
                     'properties' => [
                         'token' => [
-                            'type' => TokenType::INDENTATION,
+                            'type' => TokenType::INDENT,
                             'text' => '          ',
                         ],
                     ],

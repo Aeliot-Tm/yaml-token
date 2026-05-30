@@ -15,7 +15,7 @@ namespace Aeliot\YamlToken\Parser\SubParser\Block;
 
 use Aeliot\YamlToken\Node\BlockSequenceEntryNode;
 use Aeliot\YamlToken\Node\BlockSequenceNode;
-use Aeliot\YamlToken\Node\IndentationNode;
+use Aeliot\YamlToken\Node\IndentNode;
 use Aeliot\YamlToken\Parser\Assembler\ParserRegistry;
 use Aeliot\YamlToken\Parser\Dto\ParseContext;
 use Aeliot\YamlToken\Parser\Helper\BlockCollectionLoopHelper;
@@ -35,10 +35,10 @@ final readonly class CompactBlockSequenceParser
      *   c-l-block-seq-entry(n) ( s-indent(n) c-l-block-seq-entry(n) )*
      *
      * The first entry is parsed at the current stream position (no leading
-     * INDENTATION token — the caller has already consumed the enclosing
+     * INDENT token — the caller has already consumed the enclosing
      * indicator, e.g. '-', '?' or ':' together with its trailing spaces,
      * so we sit directly on the nested '-'). Subsequent entries require
-     * an INDENTATION token whose length equals $indentLen — the column
+     * an INDENT token whose length equals $indentLen — the column
      * (0-based) of the first '-', i.e. the value of n in rule [186].
      */
     public function parseCompactBlockSequence(ParseContext $parseContext, int $indentLen): BlockSequenceNode
@@ -61,7 +61,7 @@ final readonly class CompactBlockSequenceParser
             $token = $parseContext->tokens->current();
             $sequenceEntry = new BlockSequenceEntryNode();
             $blockSequence->addChild($sequenceEntry);
-            $sequenceEntry->addChild(new IndentationNode($token));
+            $sequenceEntry->addChild(new IndentNode($token));
             $parseContext->tokens->advance();
 
             $this->registry->getSequenceEntryParser()->parseSequenceEntry($parseContext, $sequenceEntry, $indentLen);

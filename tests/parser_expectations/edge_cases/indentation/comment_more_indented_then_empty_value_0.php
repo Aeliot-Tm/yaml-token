@@ -6,7 +6,7 @@ use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\CommentNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\DocumentStartNode;
-use Aeliot\YamlToken\Node\IndentationNode;
+use Aeliot\YamlToken\Node\IndentNode;
 use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\NewLineNode;
@@ -17,12 +17,12 @@ use Aeliot\YamlToken\Node\ValueNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 2771878353,
+    'hash' => 465013524,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 225723501,
+            'hash' => 2546603764,
             'properties' => [],
             'children' => [
                 [
@@ -119,11 +119,11 @@ return [
                     'children' => [],
                 ],
                 [
-                    'type' => IndentationNode::class,
-                    'hash' => 412793561,
+                    'type' => IndentNode::class,
+                    'hash' => 2852255048,
                     'properties' => [
                         'token' => [
-                            'type' => TokenType::INDENTATION,
+                            'type' => TokenType::INDENT,
                             'text' => '  ',
                         ],
                     ],

@@ -9,7 +9,7 @@ use Aeliot\YamlToken\Node\BlockScalarOptionsNode;
 use Aeliot\YamlToken\Node\CommentNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\DocumentStartNode;
-use Aeliot\YamlToken\Node\IndentationNode;
+use Aeliot\YamlToken\Node\IndentNode;
 use Aeliot\YamlToken\Node\LiteralBlockScalarNode;
 use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\StreamNode;
@@ -18,12 +18,12 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 3607953712,
+    'hash' => 3640706455,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 3248205831,
+            'hash' => 938828708,
             'properties' => [],
             'children' => [
                 [
@@ -113,11 +113,11 @@ return [
                     ],
                 ],
                 [
-                    'type' => IndentationNode::class,
-                    'hash' => 2218577147,
+                    'type' => IndentNode::class,
+                    'hash' => 2725803330,
                     'properties' => [
                         'token' => [
-                            'type' => TokenType::INDENTATION,
+                            'type' => TokenType::INDENT,
                             'text' => ' ',
                         ],
                     ],

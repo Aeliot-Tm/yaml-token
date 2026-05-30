@@ -16,7 +16,7 @@ namespace Aeliot\YamlToken\Parser\SubParser\Block;
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\BlockSequenceEntryNode;
 use Aeliot\YamlToken\Node\BlockSequenceNode;
-use Aeliot\YamlToken\Node\IndentationNode;
+use Aeliot\YamlToken\Node\IndentNode;
 use Aeliot\YamlToken\Parser\Assembler\ParserRegistry;
 use Aeliot\YamlToken\Parser\Dto\IndentContext;
 use Aeliot\YamlToken\Parser\Dto\ParseContext;
@@ -71,8 +71,8 @@ final readonly class BlockSequenceParser
 
             $sequenceEntry = new BlockSequenceEntryNode();
             $blockSequence->addChild($sequenceEntry);
-            if (TokenType::INDENTATION === $token->type) {
-                $sequenceEntry->addChild(new IndentationNode($token));
+            if (TokenType::INDENT === $token->type) {
+                $sequenceEntry->addChild(new IndentNode($token));
                 $parseContext->tokens->advance();
             }
 

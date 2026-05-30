@@ -190,7 +190,7 @@ and the payload continues on the next, `IndentedBlockValueParser` keeps a single
 - A continuation line with node properties followed by an implicit block mapping key on the same line (scalar or flow collection, then `:`) becomes a `BlockMappingNode` payload of the same `ValueNode`, matching the scalar-only implicit-key branch and `dispatchIndentedContent` for indented block values.
 - A bare-document continuation line that is only a plain scalar without `:` on the same line may attach as multiline plain scalar payload when applicable.
 
-Indented block values use the same continuation rules with a required `INDENTATION` token on each continuation line.
+Indented block values use the same continuation rules with a required `INDENT` token on each continuation line.
 
 ### Block Scalars
 

@@ -44,7 +44,7 @@ All extend `SyntaxNode` (constructor accepts `Token`; no additional methods unle
 
 | Class | Token type / purpose |
 |-------|----------------------|
-| `IndentationNode` | `INDENTATION` |
+| `IndentNode` | `INDENT` |
 | `NewLineNode` | `NEWLINE` |
 | `WhitespaceNode` | `WHITESPACE` |
 | `CommentNode` | `COMMENT` |
@@ -108,7 +108,7 @@ Block sequence (indented `- entry` items).
 
 ### BlockSequenceEntryNode
 
-One block sequence entry. Children: optional `IndentationNode`, `SequenceEntryNode`, `ValueNode`, layout.
+One block sequence entry. Children: optional `IndentNode`, `SequenceEntryNode`, `ValueNode`, layout.
 
 | Method | Returns |
 |--------|---------|
@@ -136,14 +136,14 @@ One key-value pair in block or flow context.
 
 | Method | Returns |
 |--------|---------|
-| `getIndentation()` | `?IndentationNode` — leading indentation (set via `setIndentation()`). |
+| `getIndentation()` | `?IndentNode` — leading indentation (set via `setIndentation()`). |
 | `getKey()` | `?KeyNode` |
 | `getValueIndicator()` | `?ValueIndicatorNode` — the `:` token node. |
 | `getValue()` | `?ValueNode` |
 | `getMergeInstruction()` | `?MergeInstructionNode` — present for `<<` entries. |
 
 `addChild()` enforces single assignment of each typed field; calling `setIndentation()` is the only
-way to attach an `IndentationNode` (leading indentation belongs to the couple, not its children).
+way to attach an `IndentNode` (leading indentation belongs to the couple, not its children).
 
 ### KeyNode
 
@@ -216,7 +216,7 @@ Wrapper for a block scalar (`|` / `>`).
 | `getOptions()` | `?BlockScalarOptionsNode` — header line. |
 | `getPayload()` | `?BlockScalarNode` — `LiteralBlockScalarNode` or `FoldedBlockScalarNode`. |
 
-Children in parse order: `BlockScalarOptionsNode`, `NewLineNode`(s), optional `IndentationNode`, scalar node.
+Children in parse order: `BlockScalarOptionsNode`, `NewLineNode`(s), optional `IndentNode`, scalar node.
 Payload is `null` when the stream was truncated before the header newline.
 
 ### BlockScalarOptionsNode
@@ -234,7 +234,7 @@ The block scalar header indicators.
 ### MultilinePlainScalarNode
 
 Groups multiple `PLAIN_SCALAR` token fragments from consecutive lines.
-Children: alternating `PlainScalarNode` and layout nodes (`NewLineNode`, `IndentationNode`, `WhitespaceNode`).
+Children: alternating `PlainScalarNode` and layout nodes (`NewLineNode`, `IndentNode`, `WhitespaceNode`).
 
 ### MergeInstructionNode
 

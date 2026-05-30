@@ -68,7 +68,7 @@ final readonly class BlockMappingParser
             }
 
             $previousCoupleIndentLen = $indentLen;
-            $mergeCandidate = TokenType::INDENTATION === $token->type
+            $mergeCandidate = TokenType::INDENT === $token->type
                 ? $parseContext->tokens->peek(1)
                 : $token;
             if (TokenType::MERGE_INDICATOR === $mergeCandidate?->type) {

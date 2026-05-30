@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Aeliot\YamlToken\Parser\SubParser\Block;
 
 use Aeliot\YamlToken\Enum\TokenType;
-use Aeliot\YamlToken\Node\IndentationNode;
+use Aeliot\YamlToken\Node\IndentNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Parser\Assembler\ParserRegistry;
@@ -48,9 +48,9 @@ final readonly class KeyValueCoupleParser
         $root->addChild($keyValueCouple);
 
         $entryIndentLen = 0;
-        if (TokenType::INDENTATION === $token->type) {
+        if (TokenType::INDENT === $token->type) {
             $entryIndentLen = \strlen($token->text);
-            $keyValueCouple->setIndentation(new IndentationNode($token));
+            $keyValueCouple->setIndent(new IndentNode($token));
             $parseContext->tokens->advance();
         }
 
@@ -79,7 +79,7 @@ final readonly class KeyValueCoupleParser
                         $parseContext->tokens,
                         $keyValueCouple,
                         TokenType::COMMENT,
-                        TokenType::INDENTATION,
+                        TokenType::INDENT,
                         TokenType::NEWLINE,
                         TokenType::WHITESPACE,
                     );
@@ -91,11 +91,11 @@ final readonly class KeyValueCoupleParser
         if (
             null !== $afterKey
             && null !== $keyValueCouple->getKey()->getExplicitKeyIndicatorNode()
-            && TokenType::INDENTATION === $afterKey->type
+            && TokenType::INDENT === $afterKey->type
             && \strlen($afterKey->text) === $indentLen
             && TokenType::VALUE_INDICATOR === $parseContext->tokens->peek(1)?->type
         ) {
-            $this->consumer->collectTypes($parseContext->tokens, $keyValueCouple, TokenType::INDENTATION);
+            $this->consumer->collectTypes($parseContext->tokens, $keyValueCouple, TokenType::INDENT);
         }
 
         if (

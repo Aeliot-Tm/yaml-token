@@ -17,7 +17,7 @@ use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
 
 class KeyValueCoupleNode extends AbstractNode
 {
-    private ?IndentationNode $indentation = null;
+    private ?IndentNode $indent = null;
     private ?KeyNode $key = null;
     private ?MergeInstructionNode $mergeInstruction = null;
     private ?ValueNode $value = null;
@@ -50,20 +50,20 @@ class KeyValueCoupleNode extends AbstractNode
         parent::addChild($child);
     }
 
-    public function getIndentation(): ?IndentationNode
+    public function getIndent(): ?IndentNode
     {
-        return $this->indentation;
+        return $this->indent;
     }
 
     /**
-     * NOTE: used separate method case Lexer produces INDENTATION token
+     * NOTE: used separate method case Lexer produces INDENT token
      *       for spaces before value putted to the next line. And it has to be
      *       a part of couple. Only indentation before couple have to be
      *       identified as real indentation.
      */
-    public function setIndentation(IndentationNode $node): void
+    public function setIndent(IndentNode $node): void
     {
-        $this->indentation = $node;
+        $this->indent = $node;
         $this->addChild($node);
     }
 
@@ -89,8 +89,8 @@ class KeyValueCoupleNode extends AbstractNode
 
     public function removeChild(Node $child): void
     {
-        if ($this->indentation === $child) {
-            $this->indentation = null;
+        if ($this->indent === $child) {
+            $this->indent = null;
         } elseif ($this->key === $child) {
             $this->key = null;
         } elseif ($this->mergeInstruction === $child) {

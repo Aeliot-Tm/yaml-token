@@ -18,7 +18,7 @@ return [
         'text' => " \n  \n  literal\n   \n  \n  text\n\n",
     ],
     [
-        'type' => TokenType::INDENTATION,
+        'type' => TokenType::INDENT,
         'text' => ' ',
     ],
     [

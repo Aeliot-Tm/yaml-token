@@ -16,7 +16,7 @@ namespace Aeliot\YamlToken\Parser\SubParser\Block;
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\BlockIndentationNode;
 use Aeliot\YamlToken\Node\ExplicitKeyIndicatorNode;
-use Aeliot\YamlToken\Node\IndentationNode;
+use Aeliot\YamlToken\Node\IndentNode;
 use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\MultilinePlainScalarNode;
 use Aeliot\YamlToken\Node\NewLineNode;
@@ -185,9 +185,9 @@ final readonly class ExplicitKeyParser
 
     /**
      * Builds the {@see KeyNode} name for the explicit-block-key path where the key starts on a new line
-     * after the `?` indicator (YAML 1.2.2 §8.2.2). Consumes the first NEWLINE + INDENTATION + PLAIN_SCALAR
+     * after the `?` indicator (YAML 1.2.2 §8.2.2). Consumes the first NEWLINE + INDENT + PLAIN_SCALAR
      * line and any subsequent continuation lines. When only a single scalar fragment is present, the
-     * leading layout (NEWLINE / INDENTATION / WHITESPACE) is attached directly to the {@see KeyNode}
+     * leading layout (NEWLINE / INDENT / WHITESPACE) is attached directly to the {@see KeyNode}
      * and the name becomes a plain {@see ScalarNode}; otherwise the whole sequence is wrapped in a
      * {@see MultilinePlainScalarNode}.
      */
@@ -316,7 +316,7 @@ final readonly class ExplicitKeyParser
         }
 
         $indentation = $tokens->peek(1);
-        if (TokenType::INDENTATION !== $indentation?->type) {
+        if (TokenType::INDENT !== $indentation?->type) {
             return false;
         }
 
@@ -331,7 +331,7 @@ final readonly class ExplicitKeyParser
         }
 
         $multiline->addChild(new NewLineNode($newLine));
-        $multiline->addChild(new IndentationNode($indentation));
+        $multiline->addChild(new IndentNode($indentation));
         $tokens->advance();
         $tokens->advance();
 

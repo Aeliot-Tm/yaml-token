@@ -12,12 +12,12 @@ The rules below describe the practical behavior relied upon by lexer unit tests.
 
 - **Newlines**: `\r\n`, `\r`, `\n` are emitted as `NEWLINE`. Newline resets tracked indentation state.
 - **Indentation vs whitespace**:
-  - At column 1, a run of **spaces only** (U+0020) is emitted as `INDENTATION`.
-  - A **tab** at column 1 is not part of `INDENTATION` (YAML forbids tabs in structural indent):
+  - At column 1, a run of **spaces only** (U+0020) is emitted as `INDENT`.
+  - A **tab** at column 1 is not part of `INDENT` (YAML forbids tabs in structural indent):
     it is emitted as `WHITESPACE` together with any following horizontal whitespace on the same run,
     like elsewhere on the line.
-  - After a space-only `INDENTATION`, a tab on the same line is the start of the next `WHITESPACE`
-    token (e.g. `  \t` → `INDENTATION` `"  "` then `WHITESPACE` `"\t"`).
+  - After a space-only `INDENT`, a tab on the same line is the start of the next `WHITESPACE`
+    token (e.g. `  \t` → `INDENT` `"  "` then `WHITESPACE` `"\t"`).
   - Elsewhere within a line, a run of spaces/tabs is emitted as `WHITESPACE`.
 - **Document markers**: `---` → `DOCUMENT_START`, `...` → `DOCUMENT_END`.
 - **Comments**: `#...` until line break is `COMMENT` (newline is a separate `NEWLINE` token).
@@ -67,7 +67,7 @@ The rules below describe the practical behavior relied upon by lexer unit tests.
     while the header line is open
   - **Body tokenization**: if the header included a digit `BLOCK_SCALAR_INDENTATION_INDICATOR`,
     the block body is not a single `LITERAL_BLOCK_SCALAR` / `FOLDED_BLOCK_SCALAR` token;
-    it is split per physical line into leading horizontal whitespace as `INDENTATION`,
+    it is split per physical line into leading horizontal whitespace as `INDENT`,
     non-whitespace line suffix as `PLAIN_SCALAR`, and line breaks as `NEWLINE` (same raw bytes
     as in the source). Otherwise the next token is one `pendingBlockScalarBody` body token as before
   - **Single body token** (`|` / `>` without splitting per line): when scanning where the block body ends,
@@ -96,7 +96,7 @@ The rules below describe the practical behavior relied upon by lexer unit tests.
     with non-horizontal-whitespace content is excluded from the block body token, together
     with any following trailing empty lines (lines with only horizontal whitespace in the body);
     the lexer rewinds the byte offset and line/column so those bytes are emitted next as normal tokens
-    (`NEWLINE`, and leading `INDENTATION` when empty lines were indented in the source)
+    (`NEWLINE`, and leading `INDENT` when empty lines were indented in the source)
   - `LITERAL_BLOCK_SCALAR` / `FOLDED_BLOCK_SCALAR` carry only the indented block body (raw text),
     without the indicator or header line
 - **Structural indicators with lookahead**:

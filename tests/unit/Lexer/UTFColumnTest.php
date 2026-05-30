@@ -77,7 +77,7 @@ final class UTFColumnTest extends TestCase
                 'column' => 5,
             ],
             [
-                'type' => TokenType::INDENTATION,
+                'type' => TokenType::INDENT,
                 'text' => '  ',
                 'line' => 2,
                 'column' => 1,

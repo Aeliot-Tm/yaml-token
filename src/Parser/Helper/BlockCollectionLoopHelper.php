@@ -40,7 +40,7 @@ final readonly class BlockCollectionLoopHelper
      * the indentation check and skips registerIndentStepIfNeeded/assertIndentLenIsValid
      * because the step was already registered when the first entry was parsed.
      *
-     * After a true return, $parseContext->tokens->current() points at the INDENTATION
+     * After a true return, $parseContext->tokens->current() points at the INDENT
      * token whose length equals $indentLen.
      *
      * @return bool true when the loop should continue, false when it should break
@@ -59,7 +59,7 @@ final readonly class BlockCollectionLoopHelper
         $this->lookAheadHelper->collectInsignificantIndentationLines($parseContext->tokens, $collection);
 
         $token = $parseContext->tokens->current();
-        if (null === $token || TokenType::INDENTATION !== $token->type) {
+        if (null === $token || TokenType::INDENT !== $token->type) {
             return false;
         }
 
@@ -77,16 +77,16 @@ final readonly class BlockCollectionLoopHelper
      * Encapsulates the shared scaffolding of block-collection main loops:
      *   1. peek → break if out-of-scope (no significant head or indent ≤ $parentIndent->indentLen)
      *   2. collectSpaceCommentEnds + collectInsignificantIndentationLines
-     *   3. determine $indentLen from INDENTATION token or bare-document zero-indent
+     *   3. determine $indentLen from INDENT token or bare-document zero-indent
      *   4. registerIndentStepIfNeeded + assertIndentLenIsValid for $indentLen > 0
      *   5. break if $indentLen ≤ $parentIndent->indentLen
      *
      * After a non-null return, $parseContext->tokens->current() still points at the same
-     * token that was used to determine $indentLen (INDENTATION or the entry token itself).
+     * token that was used to determine $indentLen (INDENT or the entry token itself).
      *
      * @param callable(ParseContext): bool $isBareDocumentEntry
      *                                                          Called only when $parentIndent->isBareDocumentRoot is true
-     *                                                          and the current token is not INDENTATION. Should return true when the token at the
+     *                                                          and the current token is not INDENT. Should return true when the token at the
      *                                                          current stream position is a valid zero-indent entry for this collection type.
      *
      * @return int|null indent length of the next entry, or null to signal "break the loop"
@@ -110,7 +110,7 @@ final readonly class BlockCollectionLoopHelper
             return null;
         }
 
-        if (TokenType::INDENTATION === $token->type) {
+        if (TokenType::INDENT === $token->type) {
             $indentLen = \strlen($token->text);
         } elseif (
             $parentIndent->isBareDocumentRoot

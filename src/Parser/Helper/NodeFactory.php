@@ -25,7 +25,7 @@ use Aeliot\YamlToken\Node\FlowMappingStartNode;
 use Aeliot\YamlToken\Node\FlowSequenceEndNode;
 use Aeliot\YamlToken\Node\FlowSequenceStartNode;
 use Aeliot\YamlToken\Node\FoldedBlockScalarNode;
-use Aeliot\YamlToken\Node\IndentationNode;
+use Aeliot\YamlToken\Node\IndentNode;
 use Aeliot\YamlToken\Node\LiteralBlockScalarNode;
 use Aeliot\YamlToken\Node\MergeIndicatorNode;
 use Aeliot\YamlToken\Node\NewLineNode;
@@ -87,7 +87,7 @@ final readonly class NodeFactory
             TokenType::FLOW_SEQUENCE_START => new FlowSequenceStartNode($token),
             TokenType::FOLDED_BLOCK_SCALAR_INDICATOR,
             TokenType::LITERAL_BLOCK_SCALAR_INDICATOR => new BlockScalarIndicatorNode($token),
-            TokenType::INDENTATION => new IndentationNode($token),
+            TokenType::INDENT => new IndentNode($token),
             TokenType::MERGE_INDICATOR => new MergeIndicatorNode($token),
             TokenType::NEWLINE => new NewLineNode($token),
             TokenType::SEQUENCE_ENTRY => new SequenceEntryNode($token),

@@ -16,7 +16,7 @@ namespace Aeliot\YamlToken\Parser\SubParser;
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\AliasNode;
 use Aeliot\YamlToken\Node\FlowSequenceNode;
-use Aeliot\YamlToken\Node\IndentationNode;
+use Aeliot\YamlToken\Node\IndentNode;
 use Aeliot\YamlToken\Node\MergeInstructionNode;
 use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Node\ValueNode;
@@ -43,8 +43,8 @@ final readonly class MergeInstructionParser
         $mergeInstruction = new MergeInstructionNode();
 
         $token = $parseContext->tokens->current();
-        if (TokenType::INDENTATION === $token?->type) {
-            $mergeInstruction->addChild(new IndentationNode($token));
+        if (TokenType::INDENT === $token?->type) {
+            $mergeInstruction->addChild(new IndentNode($token));
             $parseContext->tokens->advance();
             $token = $parseContext->tokens->current();
         }

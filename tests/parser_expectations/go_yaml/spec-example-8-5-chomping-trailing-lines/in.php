@@ -9,7 +9,7 @@ use Aeliot\YamlToken\Node\BlockScalarIndicatorNode;
 use Aeliot\YamlToken\Node\BlockScalarOptionsNode;
 use Aeliot\YamlToken\Node\CommentNode;
 use Aeliot\YamlToken\Node\DocumentNode;
-use Aeliot\YamlToken\Node\IndentationNode;
+use Aeliot\YamlToken\Node\IndentNode;
 use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\LiteralBlockScalarNode;
@@ -22,20 +22,20 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 125332153,
+    'hash' => 2336042020,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 2130137672,
+            'hash' => 3771103013,
             'properties' => [],
             'children' => [
                 [
-                    'type' => IndentationNode::class,
-                    'hash' => 2218577147,
+                    'type' => IndentNode::class,
+                    'hash' => 2725803330,
                     'properties' => [
                         'token' => [
-                            'type' => TokenType::INDENTATION,
+                            'type' => TokenType::INDENT,
                             'text' => ' ',
                         ],
                     ],
@@ -64,11 +64,11 @@ return [
                     'children' => [],
                 ],
                 [
-                    'type' => IndentationNode::class,
-                    'hash' => 412793561,
+                    'type' => IndentNode::class,
+                    'hash' => 2852255048,
                     'properties' => [
                         'token' => [
-                            'type' => TokenType::INDENTATION,
+                            'type' => TokenType::INDENT,
                             'text' => '  ',
                         ],
                     ],
@@ -274,11 +274,11 @@ return [
                     'children' => [],
                 ],
                 [
-                    'type' => IndentationNode::class,
-                    'hash' => 2218577147,
+                    'type' => IndentNode::class,
+                    'hash' => 2725803330,
                     'properties' => [
                         'token' => [
-                            'type' => TokenType::INDENTATION,
+                            'type' => TokenType::INDENT,
                             'text' => ' ',
                         ],
                     ],
@@ -307,11 +307,11 @@ return [
                     'children' => [],
                 ],
                 [
-                    'type' => IndentationNode::class,
-                    'hash' => 412793561,
+                    'type' => IndentNode::class,
+                    'hash' => 2852255048,
                     'properties' => [
                         'token' => [
-                            'type' => TokenType::INDENTATION,
+                            'type' => TokenType::INDENT,
                             'text' => '  ',
                         ],
                     ],
@@ -480,11 +480,11 @@ return [
                     ],
                 ],
                 [
-                    'type' => IndentationNode::class,
-                    'hash' => 2218577147,
+                    'type' => IndentNode::class,
+                    'hash' => 2725803330,
                     'properties' => [
                         'token' => [
-                            'type' => TokenType::INDENTATION,
+                            'type' => TokenType::INDENT,
                             'text' => ' ',
                         ],
                     ],
@@ -513,11 +513,11 @@ return [
                     'children' => [],
                 ],
                 [
-                    'type' => IndentationNode::class,
-                    'hash' => 412793561,
+                    'type' => IndentNode::class,
+                    'hash' => 2852255048,
                     'properties' => [
                         'token' => [
-                            'type' => TokenType::INDENTATION,
+                            'type' => TokenType::INDENT,
                             'text' => '  ',
                         ],
                     ],
@@ -701,11 +701,11 @@ return [
                     ],
                 ],
                 [
-                    'type' => IndentationNode::class,
-                    'hash' => 2218577147,
+                    'type' => IndentNode::class,
+                    'hash' => 2725803330,
                     'properties' => [
                         'token' => [
-                            'type' => TokenType::INDENTATION,
+                            'type' => TokenType::INDENT,
                             'text' => ' ',
                         ],
                     ],
@@ -734,11 +734,11 @@ return [
                     'children' => [],
                 ],
                 [
-                    'type' => IndentationNode::class,
-                    'hash' => 412793561,
+                    'type' => IndentNode::class,
+                    'hash' => 2852255048,
                     'properties' => [
                         'token' => [
-                            'type' => TokenType::INDENTATION,
+                            'type' => TokenType::INDENT,
                             'text' => '  ',
                         ],
                     ],

@@ -7,7 +7,7 @@ use Aeliot\YamlToken\Node\BlockIndentationNode;
 use Aeliot\YamlToken\Node\BlockMappingNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\ExplicitKeyIndicatorNode;
-use Aeliot\YamlToken\Node\IndentationNode;
+use Aeliot\YamlToken\Node\IndentNode;
 use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\MultilinePlainScalarNode;
@@ -20,31 +20,31 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 322252296,
+    'hash' => 1658187915,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 2640309537,
+            'hash' => 102111035,
             'properties' => [],
             'children' => [
                 [
                     'type' => KeyValueCoupleNode::class,
-                    'hash' => 3038860303,
+                    'hash' => 1755786737,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
-                            'hash' => 3163261483,
+                            'hash' => 176688900,
                         ],
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 3752632406,
+                            'hash' => 3554873167,
                         ],
                     ],
                     'children' => [
                         [
                             'type' => KeyNode::class,
-                            'hash' => 3163261483,
+                            'hash' => 176688900,
                             'properties' => [
                                 'explicitKeyIndicatorNode' => [
                                     'type' => ExplicitKeyIndicatorNode::class,
@@ -52,7 +52,7 @@ return [
                                 ],
                                 'name' => [
                                     'type' => MultilinePlainScalarNode::class,
-                                    'hash' => 1651379915,
+                                    'hash' => 409907815,
                                 ],
                             ],
                             'children' => [
@@ -80,7 +80,7 @@ return [
                                 ],
                                 [
                                     'type' => MultilinePlainScalarNode::class,
-                                    'hash' => 1651379915,
+                                    'hash' => 409907815,
                                     'properties' => [],
                                     'children' => [
                                         [
@@ -106,11 +106,11 @@ return [
                                             'children' => [],
                                         ],
                                         [
-                                            'type' => IndentationNode::class,
-                                            'hash' => 412793561,
+                                            'type' => IndentNode::class,
+                                            'hash' => 2852255048,
                                             'properties' => [
                                                 'token' => [
-                                                    'type' => TokenType::INDENTATION,
+                                                    'type' => TokenType::INDENT,
                                                     'text' => '  ',
                                                 ],
                                             ],
@@ -133,11 +133,11 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 3752632406,
+                            'hash' => 3554873167,
                             'properties' => [
                                 'payload' => [
                                     'type' => BlockMappingNode::class,
-                                    'hash' => 3354399918,
+                                    'hash' => 1839818504,
                                 ],
                             ],
                             'children' => [
@@ -154,23 +154,23 @@ return [
                                 ],
                                 [
                                     'type' => BlockMappingNode::class,
-                                    'hash' => 3354399918,
+                                    'hash' => 1839818504,
                                     'properties' => [
                                         'entries' => [
                                             [
                                                 'type' => KeyValueCoupleNode::class,
-                                                'hash' => 2382776347,
+                                                'hash' => 1359579883,
                                             ],
                                         ],
                                     ],
                                     'children' => [
                                         [
                                             'type' => KeyValueCoupleNode::class,
-                                            'hash' => 2382776347,
+                                            'hash' => 1359579883,
                                             'properties' => [
-                                                'indentation' => [
-                                                    'type' => IndentationNode::class,
-                                                    'hash' => 412793561,
+                                                'indent' => [
+                                                    'type' => IndentNode::class,
+                                                    'hash' => 2852255048,
                                                 ],
                                                 'key' => [
                                                     'type' => KeyNode::class,
@@ -187,11 +187,11 @@ return [
                                             ],
                                             'children' => [
                                                 [
-                                                    'type' => IndentationNode::class,
-                                                    'hash' => 412793561,
+                                                    'type' => IndentNode::class,
+                                                    'hash' => 2852255048,
                                                     'properties' => [
                                                         'token' => [
-                                                            'type' => TokenType::INDENTATION,
+                                                            'type' => TokenType::INDENT,
                                                             'text' => '  ',
                                                         ],
                                                     ],
