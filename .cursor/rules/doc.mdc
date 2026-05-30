@@ -10,6 +10,7 @@ Download descriptions from files IF you need to understand the work:
 
 2. Features:
    - [Lexer](../docs/Feature/Lexer.md)
+   - [Node Traversal](../docs/Feature/NodeTraversal.md)
    - [Parser](../docs/Feature/Parser.md)
    - [Parser Nodes](../docs/Feature/ParserNodes.md)
    - [Showing of problematic position](../docs/Feature/ShowingProblematicPosition.md)

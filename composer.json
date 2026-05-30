@@ -25,6 +25,7 @@
     "autoload-dev": {
         "psr-4": {
             "Aeliot\\YamlToken\\TestHelper\\": "tests/helper/",
+            "Aeliot\\YamlToken\\TestStub\\": "tests/stub/",
             "Aeliot\\YamlToken\\Test\\Unit\\": "tests/unit/"
         }
     },
