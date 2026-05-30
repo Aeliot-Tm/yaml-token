@@ -55,6 +55,7 @@ Their sources, scope, and license terms are listed in [THIRD_PARTY_NOTICES.md](T
 
 ## Contributing
 
-Early feedback and contributions are welcome. Open an issue to discuss larger changes
+Feedback and contributions are welcome. Open an issue to discuss larger changes
 before investing significant time. Pull requests for fixes and tests are appreciated.
-Expect APIs to keep moving until the project stabilizes.
+
+Read [contributing instructions](CONTRIBUTING.md).
