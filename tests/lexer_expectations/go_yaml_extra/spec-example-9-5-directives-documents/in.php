@@ -14,7 +14,7 @@ return [
         'text' => ' ',
     ],
     [
-        'type' => TokenType::DIRECTIVE_YAML_VERSION,
+        'type' => TokenType::YAML_VERSION,
         'text' => '1.2',
     ],
     [
@@ -58,7 +58,7 @@ return [
         'text' => ' ',
     ],
     [
-        'type' => TokenType::DIRECTIVE_YAML_VERSION,
+        'type' => TokenType::YAML_VERSION,
         'text' => '1.2',
     ],
     [

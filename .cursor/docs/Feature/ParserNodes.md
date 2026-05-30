@@ -64,7 +64,7 @@ All extend `SyntaxNode` (constructor accepts `Token`; no additional methods unle
 | `BlockScalarIndentationIndicatorNode` | `BLOCK_SCALAR_INDENTATION_INDICATOR` (digit) |
 | `MergeIndicatorNode` | `MERGE_INDICATOR` (`<<`) |
 | `YamlDirectiveIndicatorNode` | `DIRECTIVE_YAML_INDICATOR` (`%YAML`) |
-| `YamlDirectiveVersionNode` | `DIRECTIVE_YAML_VERSION` (version string) |
+| `YamlVersionNode` | `YAML_VERSION` (version string) |
 | `TagDirectiveIndicatorNode` | `DIRECTIVE_TAG_INDICATOR` (`%TAG`) |
 | `TagDirectiveHandleNode` | `DIRECTIVE_TAG_HANDLE`. `getHandle(): string` returns the handle text. |
 | `TagDirectivePrefixNode` | `DIRECTIVE_TAG_PREFIX`. `getPrefix(): string` returns the prefix text. |
@@ -252,7 +252,7 @@ Represents a `<< : *alias` merge key entry.
 | Method | Returns |
 |--------|---------|
 | `getIndicatorNode()` | `?YamlDirectiveIndicatorNode` |
-| `getVersionNode()` | `?YamlDirectiveVersionNode` |
+| `getVersionNode()` | `?YamlVersionNode` |
 
 ### TagDirectiveNode
 

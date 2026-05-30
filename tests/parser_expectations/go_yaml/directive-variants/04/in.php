@@ -11,21 +11,21 @@ use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 use Aeliot\YamlToken\Node\YamlDirectiveIndicatorNode;
 use Aeliot\YamlToken\Node\YamlDirectiveNode;
-use Aeliot\YamlToken\Node\YamlDirectiveVersionNode;
+use Aeliot\YamlToken\Node\YamlVersionNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 2949865273,
+    'hash' => 296436804,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 2918394137,
+            'hash' => 2752652400,
             'properties' => [],
             'children' => [
                 [
                     'type' => YamlDirectiveNode::class,
-                    'hash' => 1002567859,
+                    'hash' => 1522108364,
                     'properties' => [],
                     'children' => [
                         [
@@ -51,11 +51,11 @@ return [
                             'children' => [],
                         ],
                         [
-                            'type' => YamlDirectiveVersionNode::class,
-                            'hash' => 778870940,
+                            'type' => YamlVersionNode::class,
+                            'hash' => 4032462578,
                             'properties' => [
                                 'token' => [
-                                    'type' => TokenType::DIRECTIVE_YAML_VERSION,
+                                    'type' => TokenType::YAML_VERSION,
                                     'text' => '1.1',
                                 ],
                             ],

@@ -1647,7 +1647,7 @@ final class Lexer
         $versionColumn = $harvester->cursor->column;
         $version = $this->readYamlDirectiveVersion($harvester);
         if ('' !== $version) {
-            $harvester->stream->addToken(new Token(TokenType::DIRECTIVE_YAML_VERSION, $version, $versionLine, $versionColumn));
+            $harvester->stream->addToken(new Token(TokenType::YAML_VERSION, $version, $versionLine, $versionColumn));
         }
     }
 

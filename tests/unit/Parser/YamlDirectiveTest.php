@@ -20,7 +20,7 @@ use Aeliot\YamlToken\Node\PlainScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\YamlDirectiveIndicatorNode;
 use Aeliot\YamlToken\Node\YamlDirectiveNode;
-use Aeliot\YamlToken\Node\YamlDirectiveVersionNode;
+use Aeliot\YamlToken\Node\YamlVersionNode;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Parser;
 use Aeliot\YamlToken\Parser\ParserBuilder;
@@ -34,7 +34,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(StreamNode::class)]
 #[UsesClass(YamlDirectiveIndicatorNode::class)]
 #[UsesClass(YamlDirectiveNode::class)]
-#[UsesClass(YamlDirectiveVersionNode::class)]
+#[UsesClass(YamlVersionNode::class)]
 final class YamlDirectiveTest extends TestCase
 {
     /**
@@ -76,10 +76,10 @@ YAML);
         self::assertInstanceOf(YamlDirectiveNode::class, $directive);
         self::assertSame('%YAML', $directive->getIndicatorNode()->getToken()->text);
 
-        /** @var YamlDirectiveVersionNode[] $versionNodes */
+        /** @var YamlVersionNode[] $versionNodes */
         $versionNodes = array_values(array_filter(
             $directive->getChildren(),
-            static fn ($n): bool => $n instanceof YamlDirectiveVersionNode,
+            static fn ($n): bool => $n instanceof YamlVersionNode,
         ));
         self::assertCount(1, $versionNodes);
         self::assertSame('1.0', $versionNodes[0]->getToken()->text);
@@ -101,10 +101,10 @@ YAML);
         $directive = $children[0];
         self::assertSame('%YAML', $directive->getIndicatorNode()->getToken()->text);
 
-        /** @var YamlDirectiveVersionNode[] $versionNodes */
+        /** @var YamlVersionNode[] $versionNodes */
         $versionNodes = array_values(array_filter(
             $directive->getChildren(),
-            static fn ($n): bool => $n instanceof YamlDirectiveVersionNode,
+            static fn ($n): bool => $n instanceof YamlVersionNode,
         ));
         self::assertCount(1, $versionNodes);
         self::assertSame('1.2', $versionNodes[0]->getToken()->text);
@@ -130,7 +130,7 @@ YAML);
     public function testThrowsWhenNoVersion(string $yaml): void
     {
         $this->expectException(UnexpectedTokenException::class);
-        $this->expectExceptionMessageMatches('/^Expected DIRECTIVE_YAML_VERSION token, but/');
+        $this->expectExceptionMessageMatches('/^Expected YAML_VERSION token, but/');
 
         (new ParserBuilder())->createParser()->parse($yaml);
     }

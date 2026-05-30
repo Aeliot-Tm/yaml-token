@@ -36,7 +36,7 @@ The rules below describe the practical behavior relied upon by lexer unit tests.
     `:`, a digit, a line break, or end of input. Otherwise (e.g. `%YAMLL`), the whole `%...` line
     through the line break is a generic `DIRECTIVE` token. When the boundary matches, the line
     is split into `DIRECTIVE_YAML_INDICATOR` (`%YAML`), optional `WHITESPACE`, optional `VALUE_INDICATOR` (`:`),
-    optional `WHITESPACE`, `DIRECTIVE_YAML_VERSION` (text until horizontal whitespace, line break,
+    optional `WHITESPACE`, `YAML_VERSION` (text until horizontal whitespace, line break,
     or `#` that starts a comment), optional `WHITESPACE`, optional `COMMENT`, then the line break
     is a separate `NEWLINE`.
   - `%TAG` lines: when the keyword is followed by horizontal whitespace, `!` (start of a tag handle),
