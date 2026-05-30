@@ -166,7 +166,7 @@ final readonly class DocumentParser
             return true;
         }
 
-        if (TokenType::DIRECTIVE_YAML_INDICATOR === $token->type) {
+        if (TokenType::YAML_DIRECTIVE === $token->type) {
             $document->addChild($this->registry->getYamlDirectiveParser()->parse($parseContext));
 
             return true;

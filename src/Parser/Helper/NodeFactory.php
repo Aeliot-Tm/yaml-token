@@ -39,7 +39,7 @@ use Aeliot\YamlToken\Node\TagDirectiveIndicatorNode;
 use Aeliot\YamlToken\Node\TagDirectivePrefixNode;
 use Aeliot\YamlToken\Node\ValueIndicatorNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
-use Aeliot\YamlToken\Node\YamlDirectiveIndicatorNode;
+use Aeliot\YamlToken\Node\YamlDirectiveNode;
 use Aeliot\YamlToken\Node\YamlVersionNode;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Token\Token;
@@ -75,7 +75,7 @@ final readonly class NodeFactory
             TokenType::BLOCK_SCALAR_CHOMPING_INDICATOR => new BlockScalarChompingIndicatorNode($token),
             TokenType::BLOCK_SCALAR_INDENTATION_INDICATOR => new BlockScalarIndentationIndicatorNode($token),
             TokenType::COMMENT => new CommentNode($token),
-            TokenType::DIRECTIVE_YAML_INDICATOR => new YamlDirectiveIndicatorNode($token),
+            TokenType::YAML_DIRECTIVE => new YamlDirectiveNode($token),
             TokenType::YAML_VERSION => new YamlVersionNode($token),
             TokenType::DIRECTIVE_TAG_HANDLE => new TagDirectiveHandleNode($token),
             TokenType::DIRECTIVE_TAG_INDICATOR => new TagDirectiveIndicatorNode($token),

@@ -28,7 +28,7 @@ final readonly class YamlDirectiveParser
     {
         $YamlVersionDirectiveNode = new YamlVersionDirectiveNode();
 
-        $this->consumer->require($parseContext->tokens, $YamlVersionDirectiveNode, TokenType::DIRECTIVE_YAML_INDICATOR);
+        $this->consumer->require($parseContext->tokens, $YamlVersionDirectiveNode, TokenType::YAML_DIRECTIVE);
         $this->consumer->collectSpaceValueIndicator($parseContext->tokens, $YamlVersionDirectiveNode);
         $this->consumer->require($parseContext->tokens, $YamlVersionDirectiveNode, TokenType::YAML_VERSION);
         $this->consumer->collectSpaceAndComments($parseContext->tokens, $YamlVersionDirectiveNode);

@@ -38,7 +38,7 @@ return [
         'text' => "\n",
     ],
     [
-        'type' => TokenType::DIRECTIVE_YAML_INDICATOR,
+        'type' => TokenType::YAML_DIRECTIVE,
         'text' => '%YAML',
     ],
     [

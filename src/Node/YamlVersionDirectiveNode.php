@@ -15,12 +15,12 @@ namespace Aeliot\YamlToken\Node;
 
 class YamlVersionDirectiveNode extends AbstractNode
 {
-    private ?YamlDirectiveIndicatorNode $indicatorNode = null;
+    private ?YamlDirectiveNode $indicatorNode = null;
     private ?YamlVersionNode $versionNode = null;
 
     public function addChild(Node $child): void
     {
-        if ($child instanceof YamlDirectiveIndicatorNode) {
+        if ($child instanceof YamlDirectiveNode) {
             $this->indicatorNode = $child;
         }
         if ($child instanceof YamlVersionNode) {
@@ -30,7 +30,7 @@ class YamlVersionDirectiveNode extends AbstractNode
         parent::addChild($child);
     }
 
-    public function getIndicatorNode(): ?YamlDirectiveIndicatorNode
+    public function getIndicatorNode(): ?YamlDirectiveNode
     {
         return $this->indicatorNode;
     }

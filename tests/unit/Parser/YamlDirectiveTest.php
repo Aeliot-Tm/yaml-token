@@ -18,7 +18,7 @@ use Aeliot\YamlToken\Node\DocumentStartNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\PlainScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
-use Aeliot\YamlToken\Node\YamlDirectiveIndicatorNode;
+use Aeliot\YamlToken\Node\YamlDirectiveNode;
 use Aeliot\YamlToken\Node\YamlVersionDirectiveNode;
 use Aeliot\YamlToken\Node\YamlVersionNode;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
@@ -32,7 +32,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(Parser::class)]
 #[UsesClass(DocumentNode::class)]
 #[UsesClass(StreamNode::class)]
-#[UsesClass(YamlDirectiveIndicatorNode::class)]
+#[UsesClass(YamlDirectiveNode::class)]
 #[UsesClass(YamlVersionDirectiveNode::class)]
 #[UsesClass(YamlVersionNode::class)]
 final class YamlDirectiveTest extends TestCase
