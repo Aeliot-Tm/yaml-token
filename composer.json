@@ -35,6 +35,7 @@
         "sort-packages": true
     },
     "require": {
+        "ext-ctype": "*",
         "php": "^8.2"
     },
     "require-dev": {
