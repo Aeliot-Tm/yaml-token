@@ -11,25 +11,25 @@ use Aeliot\YamlToken\Node\NodePropertiesNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\TagDefinitionNode;
 use Aeliot\YamlToken\Node\TagDirectiveNode;
-use Aeliot\YamlToken\Node\TagDirectivePrefixNode;
 use Aeliot\YamlToken\Node\TagHandleNode;
 use Aeliot\YamlToken\Node\TagNode;
+use Aeliot\YamlToken\Node\TagPrefixNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 3360125927,
+    'hash' => 1736740235,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 1190043970,
+            'hash' => 2790539813,
             'properties' => [],
             'children' => [
                 [
                     'type' => TagDefinitionNode::class,
-                    'hash' => 4126949142,
+                    'hash' => 3685433027,
                     'properties' => [],
                     'children' => [
                         [
@@ -77,11 +77,11 @@ return [
                             'children' => [],
                         ],
                         [
-                            'type' => TagDirectivePrefixNode::class,
-                            'hash' => 493262035,
+                            'type' => TagPrefixNode::class,
+                            'hash' => 767311283,
                             'properties' => [
                                 'token' => [
-                                    'type' => TokenType::DIRECTIVE_TAG_PREFIX,
+                                    'type' => TokenType::TAG_PREFIX,
                                     'text' => 'tag:yaml.org,2002:',
                                 ],
                             ],

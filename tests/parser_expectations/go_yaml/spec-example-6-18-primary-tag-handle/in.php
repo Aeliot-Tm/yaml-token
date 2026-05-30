@@ -13,15 +13,15 @@ use Aeliot\YamlToken\Node\NodePropertiesNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\TagDefinitionNode;
 use Aeliot\YamlToken\Node\TagDirectiveNode;
-use Aeliot\YamlToken\Node\TagDirectivePrefixNode;
 use Aeliot\YamlToken\Node\TagHandleNode;
 use Aeliot\YamlToken\Node\TagNode;
+use Aeliot\YamlToken\Node\TagPrefixNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 3706192266,
+    'hash' => 2212963446,
     'properties' => [],
     'children' => [
         [
@@ -149,7 +149,7 @@ return [
         ],
         [
             'type' => DocumentNode::class,
-            'hash' => 2816769556,
+            'hash' => 888721437,
             'properties' => [],
             'children' => [
                 [
@@ -176,7 +176,7 @@ return [
                 ],
                 [
                     'type' => TagDefinitionNode::class,
-                    'hash' => 2306599751,
+                    'hash' => 1800427772,
                     'properties' => [],
                     'children' => [
                         [
@@ -224,11 +224,11 @@ return [
                             'children' => [],
                         ],
                         [
-                            'type' => TagDirectivePrefixNode::class,
-                            'hash' => 1785704209,
+                            'type' => TagPrefixNode::class,
+                            'hash' => 2050170584,
                             'properties' => [
                                 'token' => [
-                                    'type' => TokenType::DIRECTIVE_TAG_PREFIX,
+                                    'type' => TokenType::TAG_PREFIX,
                                     'text' => 'tag:example.com,2000:app/',
                                 ],
                             ],

@@ -67,7 +67,7 @@ All extend `SyntaxNode` (constructor accepts `Token`; no additional methods unle
 | `YamlVersionNode` | `YAML_VERSION` (version string) |
 | `TagDirectiveNode` | `TAG_DIRECTIVE` (`%TAG`) |
 | `TagHandleNode` | `TAG_HANDLE`. `getHandle(): string` returns the handle text. |
-| `TagDirectivePrefixNode` | `DIRECTIVE_TAG_PREFIX`. `getPrefix(): string` returns the prefix text. |
+| `TagPrefixNode` | `TAG_PREFIX`. `getPrefix(): string` returns the prefix text. |
 | `DirectiveNode` | Generic unrecognized directive line (`DIRECTIVE` token). |
 
 ## Property Nodes
@@ -262,6 +262,6 @@ Represents a `<< : *alias` merge key entry.
 |--------|---------|
 | `getIndicatorNode()` | `?TagDirectiveNode` |
 | `getHandleNode()` | `?TagHandleNode` |
-| `getPrefixNode()` | `?TagDirectivePrefixNode` |
+| `getPrefixNode()` | `?TagPrefixNode` |
 | `getHandle()` | `?string` — shortcut via `getHandleNode()`. |
 | `getPrefix()` | `string` — shortcut via `getPrefixNode()`. |

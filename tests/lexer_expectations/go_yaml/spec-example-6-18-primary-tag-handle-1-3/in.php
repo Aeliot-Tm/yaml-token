@@ -70,7 +70,7 @@ return [
         'text' => ' ',
     ],
     [
-        'type' => TokenType::DIRECTIVE_TAG_PREFIX,
+        'type' => TokenType::TAG_PREFIX,
         'text' => 'tag:example.com,2000:app/',
     ],
     [

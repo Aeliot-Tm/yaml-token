@@ -1439,7 +1439,7 @@ final class Lexer
     }
 
     /**
-     * Split `%TAG` lines into `TAG_DIRECTIVE`, `TAG_HANDLE`, `DIRECTIVE_TAG_PREFIX` only when the keyword
+     * Split `%TAG` lines into `TAG_DIRECTIVE`, `TAG_HANDLE`, `TAG_PREFIX` only when the keyword
      * is followed by a handle (starts with `!`) or horizontal whitespace / EOF — not when followed immediately by a
      * line break (whole-line token as before).
      */
@@ -1610,7 +1610,7 @@ final class Lexer
         $prefixLine = $harvester->cursor->line;
         $prefixColumn = $harvester->cursor->column;
         $prefix = $this->readTagDirectivePrefix($harvester);
-        $harvester->stream->addToken(new Token(TokenType::DIRECTIVE_TAG_PREFIX, $prefix, $prefixLine, $prefixColumn));
+        $harvester->stream->addToken(new Token(TokenType::TAG_PREFIX, $prefix, $prefixLine, $prefixColumn));
     }
 
     private function tokenizeYamlDirectiveLine(Harvester $harvester): void

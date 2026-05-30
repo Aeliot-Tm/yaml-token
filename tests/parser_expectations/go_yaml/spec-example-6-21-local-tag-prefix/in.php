@@ -13,25 +13,25 @@ use Aeliot\YamlToken\Node\PlainScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\TagDefinitionNode;
 use Aeliot\YamlToken\Node\TagDirectiveNode;
-use Aeliot\YamlToken\Node\TagDirectivePrefixNode;
 use Aeliot\YamlToken\Node\TagHandleNode;
 use Aeliot\YamlToken\Node\TagNode;
+use Aeliot\YamlToken\Node\TagPrefixNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 798300005,
+    'hash' => 4124385679,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 697911694,
+            'hash' => 1254065462,
             'properties' => [],
             'children' => [
                 [
                     'type' => TagDefinitionNode::class,
-                    'hash' => 3847645287,
+                    'hash' => 2247174432,
                     'properties' => [],
                     'children' => [
                         [
@@ -79,11 +79,11 @@ return [
                             'children' => [],
                         ],
                         [
-                            'type' => TagDirectivePrefixNode::class,
-                            'hash' => 740646174,
+                            'type' => TagPrefixNode::class,
+                            'hash' => 2152501011,
                             'properties' => [
                                 'token' => [
-                                    'type' => TokenType::DIRECTIVE_TAG_PREFIX,
+                                    'type' => TokenType::TAG_PREFIX,
                                     'text' => '!my-',
                                 ],
                             ],
@@ -251,12 +251,12 @@ return [
         ],
         [
             'type' => DocumentNode::class,
-            'hash' => 697911694,
+            'hash' => 1254065462,
             'properties' => [],
             'children' => [
                 [
                     'type' => TagDefinitionNode::class,
-                    'hash' => 3847645287,
+                    'hash' => 2247174432,
                     'properties' => [],
                     'children' => [
                         [
@@ -304,11 +304,11 @@ return [
                             'children' => [],
                         ],
                         [
-                            'type' => TagDirectivePrefixNode::class,
-                            'hash' => 740646174,
+                            'type' => TagPrefixNode::class,
+                            'hash' => 2152501011,
                             'properties' => [
                                 'token' => [
-                                    'type' => TokenType::DIRECTIVE_TAG_PREFIX,
+                                    'type' => TokenType::TAG_PREFIX,
                                     'text' => '!my-',
                                 ],
                             ],

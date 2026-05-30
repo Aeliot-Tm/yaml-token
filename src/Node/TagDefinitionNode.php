@@ -17,7 +17,7 @@ class TagDefinitionNode extends AbstractNode
 {
     private ?TagHandleNode $handleNode = null;
     private ?TagDirectiveNode $indicatorNode = null;
-    private ?TagDirectivePrefixNode $prefixNode = null;
+    private ?TagPrefixNode $prefixNode = null;
 
     public function addChild(Node $child): void
     {
@@ -27,7 +27,7 @@ class TagDefinitionNode extends AbstractNode
         if ($child instanceof TagDirectiveNode) {
             $this->indicatorNode = $child;
         }
-        if ($child instanceof TagDirectivePrefixNode) {
+        if ($child instanceof TagPrefixNode) {
             $this->prefixNode = $child;
         }
 
@@ -54,7 +54,7 @@ class TagDefinitionNode extends AbstractNode
         return $this->prefixNode->getPrefix();
     }
 
-    public function getPrefixNode(): ?TagDirectivePrefixNode
+    public function getPrefixNode(): ?TagPrefixNode
     {
         return $this->prefixNode;
     }

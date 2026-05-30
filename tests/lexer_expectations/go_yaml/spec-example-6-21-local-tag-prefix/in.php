@@ -22,7 +22,7 @@ return [
         'text' => ' ',
     ],
     [
-        'type' => TokenType::DIRECTIVE_TAG_PREFIX,
+        'type' => TokenType::TAG_PREFIX,
         'text' => '!my-',
     ],
     [
@@ -86,7 +86,7 @@ return [
         'text' => ' ',
     ],
     [
-        'type' => TokenType::DIRECTIVE_TAG_PREFIX,
+        'type' => TokenType::TAG_PREFIX,
         'text' => '!my-',
     ],
     [
