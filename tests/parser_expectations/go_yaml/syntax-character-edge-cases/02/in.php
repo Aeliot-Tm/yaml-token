@@ -7,45 +7,45 @@ use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\NodePropertiesNode;
 use Aeliot\YamlToken\Node\StreamNode;
-use Aeliot\YamlToken\Node\TagNode;
+use Aeliot\YamlToken\Node\TagPropertyNode;
 use Aeliot\YamlToken\Node\ValueNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 3243268870,
+    'hash' => 2185621834,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 3385382678,
+            'hash' => 877237620,
             'properties' => [],
             'children' => [
                 [
                     'type' => ValueNode::class,
-                    'hash' => 3021418534,
+                    'hash' => 3884296074,
                     'properties' => [
                         'nodeProperties' => [
                             'type' => NodePropertiesNode::class,
-                            'hash' => 1490154007,
+                            'hash' => 1910144566,
                         ],
                     ],
                     'children' => [
                         [
                             'type' => NodePropertiesNode::class,
-                            'hash' => 1490154007,
+                            'hash' => 1910144566,
                             'properties' => [
                                 'tag' => [
-                                    'type' => TagNode::class,
-                                    'hash' => 4203679380,
+                                    'type' => TagPropertyNode::class,
+                                    'hash' => 2656926909,
                                 ],
                             ],
                             'children' => [
                                 [
-                                    'type' => TagNode::class,
-                                    'hash' => 4203679380,
+                                    'type' => TagPropertyNode::class,
+                                    'hash' => 2656926909,
                                     'properties' => [
                                         'token' => [
-                                            'type' => TokenType::TAG,
+                                            'type' => TokenType::TAG_PROPERTY,
                                             'text' => '!',
                                         ],
                                     ],

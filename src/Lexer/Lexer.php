@@ -123,7 +123,7 @@ final class Lexer
                 continue;
             }
 
-            // TAG (!...) — see {@see tokenizeExplicitTag} in {@see tokenize}
+            // TAG_PROPERTY (!...) — see {@see tokenizeExplicitTag} in {@see tokenize}
             if ($harvester->cursor->position < $harvester->length && '!' === $harvester->input[$harvester->cursor->position]) {
                 if ($harvester->cursor->suppressExplicitTagForBang) {
                     $this->readToken($harvester);
@@ -1513,7 +1513,7 @@ final class Lexer
         $this->advance($harvester);
 
         if ($harvester->cursor->position >= $harvester->length) {
-            $harvester->stream->addToken(new Token(TokenType::TAG, '!', $bangLine, $bangColumn));
+            $harvester->stream->addToken(new Token(TokenType::TAG_PROPERTY, '!', $bangLine, $bangColumn));
 
             return;
         }
@@ -1534,7 +1534,7 @@ final class Lexer
             }
 
             $verbatimText = '!<'.$body.$closeText;
-            $harvester->stream->addToken(new Token(TokenType::TAG, $verbatimText, $bangLine, $bangColumn));
+            $harvester->stream->addToken(new Token(TokenType::TAG_PROPERTY, $verbatimText, $bangLine, $bangColumn));
 
             return;
         }
@@ -1542,7 +1542,7 @@ final class Lexer
         if ('!' === $next) {
             $this->advance($harvester);
             $suffix = $this->readTagShorthandSuffix($harvester);
-            $harvester->stream->addToken(new Token(TokenType::TAG, '!!'.$suffix, $bangLine, $bangColumn));
+            $harvester->stream->addToken(new Token(TokenType::TAG_PROPERTY, '!!'.$suffix, $bangLine, $bangColumn));
 
             return;
         }
@@ -1561,19 +1561,19 @@ final class Lexer
             $handleText = substr($harvester->input, $firstBangPos, $handleEnd - $firstBangPos + 1);
             $suffix = $this->readTagShorthandSuffix($harvester);
 
-            $harvester->stream->addToken(new Token(TokenType::TAG, $handleText.$suffix, $bangLine, $bangColumn));
+            $harvester->stream->addToken(new Token(TokenType::TAG_PROPERTY, $handleText.$suffix, $bangLine, $bangColumn));
 
             return;
         }
 
         $suffix = $this->readTagShorthandSuffix($harvester);
         if ('' === $suffix) {
-            $harvester->stream->addToken(new Token(TokenType::TAG, '!', $bangLine, $bangColumn));
+            $harvester->stream->addToken(new Token(TokenType::TAG_PROPERTY, '!', $bangLine, $bangColumn));
 
             return;
         }
 
-        $harvester->stream->addToken(new Token(TokenType::TAG, '!'.$suffix, $bangLine, $bangColumn));
+        $harvester->stream->addToken(new Token(TokenType::TAG_PROPERTY, '!'.$suffix, $bangLine, $bangColumn));
     }
 
     private function tokenizeTagDirectiveLine(Harvester $harvester): void

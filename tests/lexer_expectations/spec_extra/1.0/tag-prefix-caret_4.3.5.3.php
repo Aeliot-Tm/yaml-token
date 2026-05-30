@@ -18,7 +18,7 @@ return [
         'text' => ' ',
     ],
     [
-        'type' => TokenType::TAG,
+        'type' => TokenType::TAG_PROPERTY,
         'text' => '!example.com,2000/^base',
     ],
     [
@@ -46,7 +46,7 @@ return [
         'text' => ' ',
     ],
     [
-        'type' => TokenType::TAG,
+        'type' => TokenType::TAG_PROPERTY,
         'text' => '!^derived',
     ],
     [

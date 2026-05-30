@@ -6,7 +6,7 @@ use Aeliot\YamlToken\Enum\TokenType;
 
 return [
     [
-        'type' => TokenType::TAG,
+        'type' => TokenType::TAG_PROPERTY,
         'text' => '!!map',
     ],
     [
@@ -38,7 +38,7 @@ return [
         'text' => ' ',
     ],
     [
-        'type' => TokenType::TAG,
+        'type' => TokenType::TAG_PROPERTY,
         'text' => '!!seq',
     ],
     [
@@ -70,7 +70,7 @@ return [
         'text' => ' ',
     ],
     [
-        'type' => TokenType::TAG,
+        'type' => TokenType::TAG_PROPERTY,
         'text' => '!!str',
     ],
     [

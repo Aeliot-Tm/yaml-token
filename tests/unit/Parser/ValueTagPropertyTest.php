@@ -21,7 +21,7 @@ use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Node\PlainScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
-use Aeliot\YamlToken\Node\TagNode;
+use Aeliot\YamlToken\Node\TagPropertyNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
 use Aeliot\YamlToken\Parser\Parser;
@@ -36,7 +36,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(Lexer::class)]
 #[UsesClass(PlainScalarNode::class)]
 #[UsesClass(StreamNode::class)]
-#[UsesClass(TagNode::class)]
+#[UsesClass(TagPropertyNode::class)]
 #[UsesClass(ValueNode::class)]
 final class ValueTagPropertyTest extends TestCase
 {
@@ -49,7 +49,7 @@ YAML));
         $value = $couple->getValue();
         self::assertNotNull($value);
         $tag = $value->getTag();
-        self::assertInstanceOf(TagNode::class, $tag);
+        self::assertInstanceOf(TagPropertyNode::class, $tag);
         self::assertSame('!', $tag->getToken()->text);
     }
 
@@ -62,8 +62,8 @@ YAML));
         $value = $couple->getValue();
         self::assertNotNull($value);
         $tag = $value->getTag();
-        self::assertInstanceOf(TagNode::class, $tag);
-        self::assertSame(TokenType::TAG, $tag->getToken()->type);
+        self::assertInstanceOf(TagPropertyNode::class, $tag);
+        self::assertSame(TokenType::TAG_PROPERTY, $tag->getToken()->type);
         self::assertSame('!local', $tag->getToken()->text);
     }
 
@@ -76,8 +76,8 @@ YAML));
         $value = $couple->getValue();
         self::assertNotNull($value);
         $tag = $value->getTag();
-        self::assertInstanceOf(TagNode::class, $tag);
-        self::assertSame(TokenType::TAG, $tag->getToken()->type);
+        self::assertInstanceOf(TagPropertyNode::class, $tag);
+        self::assertSame(TokenType::TAG_PROPERTY, $tag->getToken()->type);
         self::assertSame('!!str', $tag->getToken()->text);
 
         $scalar = $value->getPayload();
@@ -111,15 +111,15 @@ YAML));
         $value = $couple->getValue();
         self::assertNotNull($value);
         $tag = $value->getTag();
-        self::assertInstanceOf(TagNode::class, $tag);
-        self::assertSame(TokenType::TAG, $tag->getToken()->type);
+        self::assertInstanceOf(TagPropertyNode::class, $tag);
+        self::assertSame(TokenType::TAG_PROPERTY, $tag->getToken()->type);
         self::assertSame('!<tag:yaml.org,2002:str>', $tag->getToken()->text);
     }
 
     public function testThrowsWhenTwoTagsAreSpecifiedForSameValue(): void
     {
         $this->expectException(UnexpectedStateException::class);
-        $this->expectExceptionMessageMatches('/^Only one TAG is supported per node/');
+        $this->expectExceptionMessageMatches('/^Only one TAG_PROPERTY is supported per node/');
 
         (new ParserBuilder())->createParser()->parse(<<<'YAML'
 key: !!str !local value

@@ -13,27 +13,27 @@ use Aeliot\YamlToken\Node\NodePropertiesNode;
 use Aeliot\YamlToken\Node\SequenceEntryNode;
 use Aeliot\YamlToken\Node\SingleQuotedScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
-use Aeliot\YamlToken\Node\TagNode;
+use Aeliot\YamlToken\Node\TagPropertyNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 972221106,
+    'hash' => 1901616062,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 3715038616,
+            'hash' => 1096247587,
             'properties' => [],
             'children' => [
                 [
                     'type' => BlockSequenceEntryNode::class,
-                    'hash' => 2567549887,
+                    'hash' => 2827893622,
                     'properties' => [
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 1211342540,
+                            'hash' => 1593382607,
                         ],
                     ],
                     'children' => [
@@ -61,11 +61,11 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 1211342540,
+                            'hash' => 1593382607,
                             'properties' => [
                                 'nodeProperties' => [
                                     'type' => NodePropertiesNode::class,
-                                    'hash' => 2805732162,
+                                    'hash' => 3273011123,
                                 ],
                                 'payload' => [
                                     'type' => DoubleQuotedScalarNode::class,
@@ -75,20 +75,20 @@ return [
                             'children' => [
                                 [
                                     'type' => NodePropertiesNode::class,
-                                    'hash' => 2805732162,
+                                    'hash' => 3273011123,
                                     'properties' => [
                                         'tag' => [
-                                            'type' => TagNode::class,
-                                            'hash' => 1166972359,
+                                            'type' => TagPropertyNode::class,
+                                            'hash' => 907070353,
                                         ],
                                     ],
                                     'children' => [
                                         [
-                                            'type' => TagNode::class,
-                                            'hash' => 1166972359,
+                                            'type' => TagPropertyNode::class,
+                                            'hash' => 907070353,
                                             'properties' => [
                                                 'token' => [
-                                                    'type' => TokenType::TAG,
+                                                    'type' => TokenType::TAG_PROPERTY,
                                                     'text' => '!!str',
                                                 ],
                                             ],
@@ -380,11 +380,11 @@ return [
                 ],
                 [
                     'type' => BlockSequenceEntryNode::class,
-                    'hash' => 1722954092,
+                    'hash' => 3383637218,
                     'properties' => [
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 3379870314,
+                            'hash' => 2753806428,
                         ],
                     ],
                     'children' => [
@@ -412,30 +412,30 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 3379870314,
+                            'hash' => 2753806428,
                             'properties' => [
                                 'nodeProperties' => [
                                     'type' => NodePropertiesNode::class,
-                                    'hash' => 2805732162,
+                                    'hash' => 3273011123,
                                 ],
                             ],
                             'children' => [
                                 [
                                     'type' => NodePropertiesNode::class,
-                                    'hash' => 2805732162,
+                                    'hash' => 3273011123,
                                     'properties' => [
                                         'tag' => [
-                                            'type' => TagNode::class,
-                                            'hash' => 1166972359,
+                                            'type' => TagPropertyNode::class,
+                                            'hash' => 907070353,
                                         ],
                                     ],
                                     'children' => [
                                         [
-                                            'type' => TagNode::class,
-                                            'hash' => 1166972359,
+                                            'type' => TagPropertyNode::class,
+                                            'hash' => 907070353,
                                             'properties' => [
                                                 'token' => [
-                                                    'type' => TokenType::TAG,
+                                                    'type' => TokenType::TAG_PROPERTY,
                                                     'text' => '!!str',
                                                 ],
                                             ],

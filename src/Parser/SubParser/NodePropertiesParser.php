@@ -18,7 +18,7 @@ use Aeliot\YamlToken\Node\AnchorPropertyNode;
 use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Node\NodePropertiesHolderInterface;
 use Aeliot\YamlToken\Node\NodePropertiesNode;
-use Aeliot\YamlToken\Node\TagNode;
+use Aeliot\YamlToken\Node\TagPropertyNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 use Aeliot\YamlToken\Parser\Dto\ParseContext;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
@@ -28,7 +28,7 @@ final readonly class NodePropertiesParser
 {
     private const TOKEN_TYPE_NODES = [
         TokenType::ANCHOR_PROPERTY->value => AnchorPropertyNode::class,
-        TokenType::TAG->value => TagNode::class,
+        TokenType::TAG_PROPERTY->value => TagPropertyNode::class,
     ];
 
     public function __construct(

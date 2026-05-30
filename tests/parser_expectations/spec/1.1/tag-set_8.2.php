@@ -13,26 +13,26 @@ use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\NodePropertiesNode;
 use Aeliot\YamlToken\Node\PlainScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
-use Aeliot\YamlToken\Node\TagNode;
+use Aeliot\YamlToken\Node\TagPropertyNode;
 use Aeliot\YamlToken\Node\ValueNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 4132591525,
+    'hash' => 1372930895,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 1260894467,
+            'hash' => 2657886744,
             'properties' => [],
             'children' => [
                 [
                     'type' => ValueNode::class,
-                    'hash' => 4098823303,
+                    'hash' => 1680452118,
                     'properties' => [
                         'nodeProperties' => [
                             'type' => NodePropertiesNode::class,
-                            'hash' => 3067572638,
+                            'hash' => 1464818344,
                         ],
                         'payload' => [
                             'type' => BlockMappingNode::class,
@@ -42,20 +42,20 @@ return [
                     'children' => [
                         [
                             'type' => NodePropertiesNode::class,
-                            'hash' => 3067572638,
+                            'hash' => 1464818344,
                             'properties' => [
                                 'tag' => [
-                                    'type' => TagNode::class,
-                                    'hash' => 1576210103,
+                                    'type' => TagPropertyNode::class,
+                                    'hash' => 778916065,
                                 ],
                             ],
                             'children' => [
                                 [
-                                    'type' => TagNode::class,
-                                    'hash' => 1576210103,
+                                    'type' => TagPropertyNode::class,
+                                    'hash' => 778916065,
                                     'properties' => [
                                         'token' => [
-                                            'type' => TokenType::TAG,
+                                            'type' => TokenType::TAG_PROPERTY,
                                             'text' => '!!set',
                                         ],
                                     ],

@@ -43,7 +43,7 @@ final readonly class NodePropertyIdentifier
 
         return null !== $token && \in_array($token->type, [
             TokenType::ANCHOR_PROPERTY,
-            TokenType::TAG,
+            TokenType::TAG_PROPERTY,
         ], true);
     }
 
@@ -55,7 +55,7 @@ final readonly class NodePropertyIdentifier
 
         return \in_array($token->type, [
             TokenType::ANCHOR_PROPERTY,
-            TokenType::TAG,
+            TokenType::TAG_PROPERTY,
         ], true);
     }
 
@@ -63,7 +63,7 @@ final readonly class NodePropertyIdentifier
      * True when c-ns-properties at {@code $offset} are followed on the same line by a flow
      * mapping or flow sequence whose closing bracket is followed by {@code VALUE_INDICATOR}.
      *
-     * @param int $offset Peek offset to the first TAG or ANCHOR_PROPERTY on the line
+     * @param int $offset Peek offset to the first TAG_PROPERTY or ANCHOR_PROPERTY on the line
      */
     public function isNodePropertiesFollowedByFlowCollectionImplicitBlockKeyFromOffset(ParseContext $parseContext, int $offset): bool
     {
@@ -84,7 +84,7 @@ final readonly class NodePropertyIdentifier
                 ++$offset;
                 continue;
             }
-            if (TokenType::ANCHOR_PROPERTY === $peeked->type || TokenType::TAG === $peeked->type) {
+            if (TokenType::ANCHOR_PROPERTY === $peeked->type || TokenType::TAG_PROPERTY === $peeked->type) {
                 $sawProperty = true;
                 ++$offset;
                 continue;
@@ -122,7 +122,7 @@ final readonly class NodePropertyIdentifier
      * Whether c-ns-properties at {@code $offset} are followed on the same line by an implicit YAML key
      * (scalar then VALUE_INDICATOR before NEWLINE).
      *
-     * @param int $offset Peek offset to the first TAG or ANCHOR_PROPERTY on the line
+     * @param int $offset Peek offset to the first TAG_PROPERTY or ANCHOR_PROPERTY on the line
      */
     public function isNodePropertiesFollowedByImplicitKeyFromOffset(ParseContext $parseContext, int $offset): bool
     {
@@ -138,7 +138,7 @@ final readonly class NodePropertyIdentifier
                 ++$offset;
                 continue;
             }
-            if (TokenType::ANCHOR_PROPERTY === $token->type || TokenType::TAG === $token->type) {
+            if (TokenType::ANCHOR_PROPERTY === $token->type || TokenType::TAG_PROPERTY === $token->type) {
                 ++$offset;
                 continue;
             }

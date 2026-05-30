@@ -6,7 +6,7 @@ use Aeliot\YamlToken\Enum\TokenType;
 
 return [
     [
-        'type' => TokenType::TAG,
+        'type' => TokenType::TAG_PROPERTY,
         'text' => '!!pairs',
     ],
     [

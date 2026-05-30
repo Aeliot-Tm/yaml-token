@@ -6,7 +6,7 @@ use Aeliot\YamlToken\Enum\TokenType;
 
 return [
     [
-        'type' => TokenType::TAG,
+        'type' => TokenType::TAG_PROPERTY,
         'text' => '!<tag:yaml.org,2002:str>',
     ],
     [
@@ -34,7 +34,7 @@ return [
         'text' => '  ',
     ],
     [
-        'type' => TokenType::TAG,
+        'type' => TokenType::TAG_PROPERTY,
         'text' => '!<!bar>',
     ],
     [

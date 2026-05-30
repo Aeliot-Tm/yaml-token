@@ -11,28 +11,28 @@ use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\NodePropertiesNode;
 use Aeliot\YamlToken\Node\PlainScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
-use Aeliot\YamlToken\Node\TagNode;
+use Aeliot\YamlToken\Node\TagPropertyNode;
 use Aeliot\YamlToken\Node\ValueIndicatorNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 3586083816,
+    'hash' => 4195043046,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 199097252,
+            'hash' => 1920683212,
             'properties' => [],
             'children' => [
                 [
                     'type' => KeyValueCoupleNode::class,
-                    'hash' => 517515034,
+                    'hash' => 3741505936,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
-                            'hash' => 22056251,
+                            'hash' => 2703490587,
                         ],
                         'valueIndicator' => [
                             'type' => ValueIndicatorNode::class,
@@ -40,17 +40,17 @@ return [
                         ],
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 1613716701,
+                            'hash' => 43512232,
                         ],
                     ],
                     'children' => [
                         [
                             'type' => KeyNode::class,
-                            'hash' => 22056251,
+                            'hash' => 2703490587,
                             'properties' => [
                                 'nodeProperties' => [
                                     'type' => NodePropertiesNode::class,
-                                    'hash' => 375762788,
+                                    'hash' => 2951466189,
                                 ],
                                 'name' => [
                                     'type' => PlainScalarNode::class,
@@ -60,20 +60,20 @@ return [
                             'children' => [
                                 [
                                     'type' => NodePropertiesNode::class,
-                                    'hash' => 375762788,
+                                    'hash' => 2951466189,
                                     'properties' => [
                                         'tag' => [
-                                            'type' => TagNode::class,
-                                            'hash' => 1974495568,
+                                            'type' => TagPropertyNode::class,
+                                            'hash' => 561129080,
                                         ],
                                     ],
                                     'children' => [
                                         [
-                                            'type' => TagNode::class,
-                                            'hash' => 1974495568,
+                                            'type' => TagPropertyNode::class,
+                                            'hash' => 561129080,
                                             'properties' => [
                                                 'token' => [
-                                                    'type' => TokenType::TAG,
+                                                    'type' => TokenType::TAG_PROPERTY,
                                                     'text' => '!<tag:yaml.org,2002:str>',
                                                 ],
                                             ],
@@ -129,11 +129,11 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 1613716701,
+                            'hash' => 43512232,
                             'properties' => [
                                 'nodeProperties' => [
                                     'type' => NodePropertiesNode::class,
-                                    'hash' => 2970576146,
+                                    'hash' => 3664580064,
                                 ],
                                 'payload' => [
                                     'type' => PlainScalarNode::class,
@@ -165,20 +165,20 @@ return [
                                 ],
                                 [
                                     'type' => NodePropertiesNode::class,
-                                    'hash' => 2970576146,
+                                    'hash' => 3664580064,
                                     'properties' => [
                                         'tag' => [
-                                            'type' => TagNode::class,
-                                            'hash' => 1937385685,
+                                            'type' => TagPropertyNode::class,
+                                            'hash' => 323542378,
                                         ],
                                     ],
                                     'children' => [
                                         [
-                                            'type' => TagNode::class,
-                                            'hash' => 1937385685,
+                                            'type' => TagPropertyNode::class,
+                                            'hash' => 323542378,
                                             'properties' => [
                                                 'token' => [
-                                                    'type' => TokenType::TAG,
+                                                    'type' => TokenType::TAG_PROPERTY,
                                                     'text' => '!<!bar>',
                                                 ],
                                             ],

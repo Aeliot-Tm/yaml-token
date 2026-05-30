@@ -23,8 +23,8 @@ See [Parser](Parser.md) for the overall parse flow and sub-parser catalog.
 | Interface | Purpose |
 |-----------|---------|
 | `TokenHolderInterface` | `getToken(): Token` — node wraps exactly one token. |
-| `NodePropertiesHolderInterface` | `getProperties(): ?NodePropertiesNode`, `getAnchor(): ?AnchorPropertyNode`, `getTag(): ?TagNode`. Implemented by `KeyNode` and `ValueNode`. |
-| `NodePropertyInterface` | Marker for nodes that are node properties (`AnchorPropertyNode`, `TagNode`). |
+| `NodePropertiesHolderInterface` | `getProperties(): ?NodePropertiesNode`, `getAnchor(): ?AnchorPropertyNode`, `getTag(): ?TagPropertyNode`. Implemented by `KeyNode` and `ValueNode`. |
+| `NodePropertyInterface` | Marker for nodes that are node properties (`AnchorPropertyNode`, `TagPropertyNode`). |
 
 ## Scalar Nodes
 
@@ -76,7 +76,7 @@ All extend `SyntaxNode` (constructor accepts `Token`; no additional methods unle
 |-------|-------------|
 | `AnchorPropertyNode` | `getName(): string` (strips leading `&`), `getToken()`, `getDeclarationCouple(): ?KeyValueCoupleNode`, `setDeclarationCouple(KeyValueCoupleNode)`. Implements `NodePropertyInterface`, `TokenHolderInterface`. |
 | `AliasNode` | `getName(): string` (strips leading `*`), `getToken()`, `getAnchor(): ?AnchorPropertyNode`, `setAnchor(AnchorPropertyNode)`. Implements `TokenHolderInterface`. |
-| `TagNode` | `getToken()`. Implements `NodePropertyInterface`, `TokenHolderInterface`. |
+| `TagPropertyNode` | `getToken()`. Implements `NodePropertyInterface`, `TokenHolderInterface`. |
 
 ## Composite Nodes
 
@@ -156,7 +156,7 @@ The key side of a key-value pair. Implements `NodePropertiesHolderInterface`.
 | `setName(Node)` | Assigns the key name; throws on second call. |
 | `getProperties()` | `?NodePropertiesNode` |
 | `getAnchor()` | `?AnchorPropertyNode` (shortcut via `getProperties()`). |
-| `getTag()` | `?TagNode` (shortcut via `getProperties()`). |
+| `getTag()` | `?TagPropertyNode` (shortcut via `getProperties()`). |
 | `isEmpty()` | `bool` — `true` when no name was set. |
 
 ### ValueNode
@@ -168,7 +168,7 @@ The value side of a key-value pair, or a standalone document value. Implements `
 | `getPayload()` | `?Node` — the actual content (see payload types below). |
 | `getProperties()` | `?NodePropertiesNode` |
 | `getAnchor()` | `?AnchorPropertyNode` (shortcut via `getProperties()`). |
-| `getTag()` | `?TagNode` (shortcut via `getProperties()`). |
+| `getTag()` | `?TagPropertyNode` (shortcut via `getProperties()`). |
 | `isEmpty()` | `bool` — `true` when payload is `null`. |
 | `isAlias()` | `bool` |
 | `isBlockMapping()` | `bool` |
@@ -202,8 +202,8 @@ Groups `&anchor` and `!tag` before a key or value.
 | Method | Returns |
 |--------|---------|
 | `getAnchor()` | `?AnchorPropertyNode` |
-| `getTag()` | `?TagNode` |
-| `getProperty(string $class)` | `?NodePropertyInterface` — accepts `AnchorPropertyNode::class` or `TagNode::class`. |
+| `getTag()` | `?TagPropertyNode` |
+| `getProperty(string $class)` | `?NodePropertyInterface` — accepts `AnchorPropertyNode::class` or `TagPropertyNode::class`. |
 
 `addChild()` enforces at most one anchor and one tag.
 

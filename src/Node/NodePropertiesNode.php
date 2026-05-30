@@ -24,7 +24,7 @@ use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
 class NodePropertiesNode extends AbstractNode
 {
     private ?AnchorPropertyNode $anchor = null;
-    private ?TagNode $tag = null;
+    private ?TagPropertyNode $tag = null;
 
     public function addChild(Node $child): void
     {
@@ -33,7 +33,7 @@ class NodePropertiesNode extends AbstractNode
                 throw new UnexpectedStateException('Attempt to set anchor twice');
             }
             $this->anchor = $child;
-        } elseif ($child instanceof TagNode) {
+        } elseif ($child instanceof TagPropertyNode) {
             if (null !== $this->tag) {
                 throw new UnexpectedStateException('Attempt to set tag twice');
             }
@@ -55,12 +55,12 @@ class NodePropertiesNode extends AbstractNode
     {
         return match ($class) {
             AnchorPropertyNode::class => $this->anchor,
-            TagNode::class => $this->tag,
+            TagPropertyNode::class => $this->tag,
             default => throw new NotSupportedNodePropertyException(\sprintf('Requested not supported property "%s"', $class)),
         };
     }
 
-    public function getTag(): ?TagNode
+    public function getTag(): ?TagPropertyNode
     {
         return $this->tag;
     }

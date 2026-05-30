@@ -38,7 +38,7 @@ return [
         'text' => ' ',
     ],
     [
-        'type' => TokenType::TAG,
+        'type' => TokenType::TAG_PROPERTY,
         'text' => '!shape',
     ],
     [
@@ -78,7 +78,7 @@ return [
         'text' => ' ',
     ],
     [
-        'type' => TokenType::TAG,
+        'type' => TokenType::TAG_PROPERTY,
         'text' => '!circle',
     ],
     [
@@ -194,7 +194,7 @@ return [
         'text' => ' ',
     ],
     [
-        'type' => TokenType::TAG,
+        'type' => TokenType::TAG_PROPERTY,
         'text' => '!line',
     ],
     [
@@ -310,7 +310,7 @@ return [
         'text' => ' ',
     ],
     [
-        'type' => TokenType::TAG,
+        'type' => TokenType::TAG_PROPERTY,
         'text' => '!label',
     ],
     [

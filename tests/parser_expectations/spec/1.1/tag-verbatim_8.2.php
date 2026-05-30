@@ -12,24 +12,24 @@ use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\NodePropertiesNode;
 use Aeliot\YamlToken\Node\PlainScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
-use Aeliot\YamlToken\Node\TagNode;
+use Aeliot\YamlToken\Node\TagPropertyNode;
 use Aeliot\YamlToken\Node\ValueIndicatorNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 487687972,
+    'hash' => 4250741670,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 424336572,
+            'hash' => 3886266428,
             'properties' => [],
             'children' => [
                 [
                     'type' => KeyValueCoupleNode::class,
-                    'hash' => 2766053141,
+                    'hash' => 1661767524,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
@@ -41,7 +41,7 @@ return [
                         ],
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 1966536766,
+                            'hash' => 2408600823,
                         ],
                     ],
                     'children' => [
@@ -92,11 +92,11 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 1966536766,
+                            'hash' => 2408600823,
                             'properties' => [
                                 'nodeProperties' => [
                                     'type' => NodePropertiesNode::class,
-                                    'hash' => 3675476179,
+                                    'hash' => 510223153,
                                 ],
                                 'payload' => [
                                     'type' => BlockMappingNode::class,
@@ -106,20 +106,20 @@ return [
                             'children' => [
                                 [
                                     'type' => NodePropertiesNode::class,
-                                    'hash' => 3675476179,
+                                    'hash' => 510223153,
                                     'properties' => [
                                         'tag' => [
-                                            'type' => TagNode::class,
-                                            'hash' => 3477114139,
+                                            'type' => TagPropertyNode::class,
+                                            'hash' => 2113441543,
                                         ],
                                     ],
                                     'children' => [
                                         [
-                                            'type' => TagNode::class,
-                                            'hash' => 3477114139,
+                                            'type' => TagPropertyNode::class,
+                                            'hash' => 2113441543,
                                             'properties' => [
                                                 'token' => [
-                                                    'type' => TokenType::TAG,
+                                                    'type' => TokenType::TAG_PROPERTY,
                                                     'text' => '!<tag:clarkevans.com,2002:invoice>',
                                                 ],
                                             ],

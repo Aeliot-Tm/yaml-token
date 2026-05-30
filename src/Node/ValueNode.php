@@ -59,7 +59,7 @@ class ValueNode extends AbstractNode implements NodePropertiesHolderInterface
         return $this->properties;
     }
 
-    public function getTag(): ?TagNode
+    public function getTag(): ?TagPropertyNode
     {
         return $this->properties?->getTag();
     }

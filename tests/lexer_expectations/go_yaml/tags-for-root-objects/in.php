@@ -14,7 +14,7 @@ return [
         'text' => ' ',
     ],
     [
-        'type' => TokenType::TAG,
+        'type' => TokenType::TAG_PROPERTY,
         'text' => '!!map',
     ],
     [
@@ -62,7 +62,7 @@ return [
         'text' => ' ',
     ],
     [
-        'type' => TokenType::TAG,
+        'type' => TokenType::TAG_PROPERTY,
         'text' => '!!seq',
     ],
     [
@@ -78,7 +78,7 @@ return [
         'text' => ' ',
     ],
     [
-        'type' => TokenType::TAG,
+        'type' => TokenType::TAG_PROPERTY,
         'text' => '!!str',
     ],
     [
@@ -102,7 +102,7 @@ return [
         'text' => ' ',
     ],
     [
-        'type' => TokenType::TAG,
+        'type' => TokenType::TAG_PROPERTY,
         'text' => '!!str',
     ],
     [

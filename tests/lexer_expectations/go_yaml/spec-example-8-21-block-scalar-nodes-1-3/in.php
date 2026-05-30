@@ -46,7 +46,7 @@ return [
         'text' => ' ',
     ],
     [
-        'type' => TokenType::TAG,
+        'type' => TokenType::TAG_PROPERTY,
         'text' => '!foo',
     ],
     [

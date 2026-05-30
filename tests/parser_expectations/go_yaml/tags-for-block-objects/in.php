@@ -15,24 +15,24 @@ use Aeliot\YamlToken\Node\NodePropertiesNode;
 use Aeliot\YamlToken\Node\PlainScalarNode;
 use Aeliot\YamlToken\Node\SequenceEntryNode;
 use Aeliot\YamlToken\Node\StreamNode;
-use Aeliot\YamlToken\Node\TagNode;
+use Aeliot\YamlToken\Node\TagPropertyNode;
 use Aeliot\YamlToken\Node\ValueIndicatorNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 2439818677,
+    'hash' => 2132834955,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 3543760264,
+            'hash' => 1275404264,
             'properties' => [],
             'children' => [
                 [
                     'type' => KeyValueCoupleNode::class,
-                    'hash' => 2679191102,
+                    'hash' => 2378482560,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
@@ -44,7 +44,7 @@ return [
                         ],
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 2649172053,
+                            'hash' => 1022380569,
                         ],
                     ],
                     'children' => [
@@ -95,34 +95,34 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 2649172053,
+                            'hash' => 1022380569,
                             'properties' => [
                                 'nodeProperties' => [
                                     'type' => NodePropertiesNode::class,
-                                    'hash' => 3490416409,
+                                    'hash' => 2569658227,
                                 ],
                                 'payload' => [
                                     'type' => BlockSequenceNode::class,
-                                    'hash' => 1038910846,
+                                    'hash' => 3810363637,
                                 ],
                             ],
                             'children' => [
                                 [
                                     'type' => NodePropertiesNode::class,
-                                    'hash' => 3490416409,
+                                    'hash' => 2569658227,
                                     'properties' => [
                                         'tag' => [
-                                            'type' => TagNode::class,
-                                            'hash' => 1668907789,
+                                            'type' => TagPropertyNode::class,
+                                            'hash' => 283630939,
                                         ],
                                     ],
                                     'children' => [
                                         [
-                                            'type' => TagNode::class,
-                                            'hash' => 1668907789,
+                                            'type' => TagPropertyNode::class,
+                                            'hash' => 283630939,
                                             'properties' => [
                                                 'token' => [
-                                                    'type' => TokenType::TAG,
+                                                    'type' => TokenType::TAG_PROPERTY,
                                                     'text' => '!!seq',
                                                 ],
                                             ],
@@ -143,27 +143,27 @@ return [
                                 ],
                                 [
                                     'type' => BlockSequenceNode::class,
-                                    'hash' => 1038910846,
+                                    'hash' => 3810363637,
                                     'properties' => [
                                         'entries' => [
                                             [
                                                 'type' => BlockSequenceEntryNode::class,
-                                                'hash' => 2889619696,
+                                                'hash' => 2397796367,
                                             ],
                                             [
                                                 'type' => BlockSequenceEntryNode::class,
-                                                'hash' => 2667960947,
+                                                'hash' => 3213255105,
                                             ],
                                         ],
                                     ],
                                     'children' => [
                                         [
                                             'type' => BlockSequenceEntryNode::class,
-                                            'hash' => 2889619696,
+                                            'hash' => 2397796367,
                                             'properties' => [
                                                 'value' => [
                                                     'type' => ValueNode::class,
-                                                    'hash' => 81809770,
+                                                    'hash' => 1373724271,
                                                 ],
                                             ],
                                             'children' => [
@@ -202,11 +202,11 @@ return [
                                                 ],
                                                 [
                                                     'type' => ValueNode::class,
-                                                    'hash' => 81809770,
+                                                    'hash' => 1373724271,
                                                     'properties' => [
                                                         'nodeProperties' => [
                                                             'type' => NodePropertiesNode::class,
-                                                            'hash' => 2805732162,
+                                                            'hash' => 3273011123,
                                                         ],
                                                         'payload' => [
                                                             'type' => PlainScalarNode::class,
@@ -216,20 +216,20 @@ return [
                                                     'children' => [
                                                         [
                                                             'type' => NodePropertiesNode::class,
-                                                            'hash' => 2805732162,
+                                                            'hash' => 3273011123,
                                                             'properties' => [
                                                                 'tag' => [
-                                                                    'type' => TagNode::class,
-                                                                    'hash' => 1166972359,
+                                                                    'type' => TagPropertyNode::class,
+                                                                    'hash' => 907070353,
                                                                 ],
                                                             ],
                                                             'children' => [
                                                                 [
-                                                                    'type' => TagNode::class,
-                                                                    'hash' => 1166972359,
+                                                                    'type' => TagPropertyNode::class,
+                                                                    'hash' => 907070353,
                                                                     'properties' => [
                                                                         'token' => [
-                                                                            'type' => TokenType::TAG,
+                                                                            'type' => TokenType::TAG_PROPERTY,
                                                                             'text' => '!!str',
                                                                         ],
                                                                     ],
@@ -276,11 +276,11 @@ return [
                                         ],
                                         [
                                             'type' => BlockSequenceEntryNode::class,
-                                            'hash' => 2667960947,
+                                            'hash' => 3213255105,
                                             'properties' => [
                                                 'value' => [
                                                     'type' => ValueNode::class,
-                                                    'hash' => 1176052202,
+                                                    'hash' => 495667851,
                                                 ],
                                             ],
                                             'children' => [
@@ -319,34 +319,34 @@ return [
                                                 ],
                                                 [
                                                     'type' => ValueNode::class,
-                                                    'hash' => 1176052202,
+                                                    'hash' => 495667851,
                                                     'properties' => [
                                                         'nodeProperties' => [
                                                             'type' => NodePropertiesNode::class,
-                                                            'hash' => 538029412,
+                                                            'hash' => 467195616,
                                                         ],
                                                         'payload' => [
                                                             'type' => BlockMappingNode::class,
-                                                            'hash' => 3252043740,
+                                                            'hash' => 1719707210,
                                                         ],
                                                     ],
                                                     'children' => [
                                                         [
                                                             'type' => NodePropertiesNode::class,
-                                                            'hash' => 538029412,
+                                                            'hash' => 467195616,
                                                             'properties' => [
                                                                 'tag' => [
-                                                                    'type' => TagNode::class,
-                                                                    'hash' => 1650325072,
+                                                                    'type' => TagPropertyNode::class,
+                                                                    'hash' => 298035206,
                                                                 ],
                                                             ],
                                                             'children' => [
                                                                 [
-                                                                    'type' => TagNode::class,
-                                                                    'hash' => 1650325072,
+                                                                    'type' => TagPropertyNode::class,
+                                                                    'hash' => 298035206,
                                                                     'properties' => [
                                                                         'token' => [
-                                                                            'type' => TokenType::TAG,
+                                                                            'type' => TokenType::TAG_PROPERTY,
                                                                             'text' => '!!map',
                                                                         ],
                                                                     ],
@@ -367,19 +367,19 @@ return [
                                                         ],
                                                         [
                                                             'type' => BlockMappingNode::class,
-                                                            'hash' => 3252043740,
+                                                            'hash' => 1719707210,
                                                             'properties' => [
                                                                 'entries' => [
                                                                     [
                                                                         'type' => KeyValueCoupleNode::class,
-                                                                        'hash' => 3645671239,
+                                                                        'hash' => 1802573823,
                                                                     ],
                                                                 ],
                                                             ],
                                                             'children' => [
                                                                 [
                                                                     'type' => KeyValueCoupleNode::class,
-                                                                    'hash' => 3645671239,
+                                                                    'hash' => 1802573823,
                                                                     'properties' => [
                                                                         'indent' => [
                                                                             'type' => IndentNode::class,
@@ -395,7 +395,7 @@ return [
                                                                         ],
                                                                         'value' => [
                                                                             'type' => ValueNode::class,
-                                                                            'hash' => 1899913303,
+                                                                            'hash' => 3133840141,
                                                                         ],
                                                                     ],
                                                                     'children' => [
@@ -457,11 +457,11 @@ return [
                                                                         ],
                                                                         [
                                                                             'type' => ValueNode::class,
-                                                                            'hash' => 1899913303,
+                                                                            'hash' => 3133840141,
                                                                             'properties' => [
                                                                                 'nodeProperties' => [
                                                                                     'type' => NodePropertiesNode::class,
-                                                                                    'hash' => 2805732162,
+                                                                                    'hash' => 3273011123,
                                                                                 ],
                                                                                 'payload' => [
                                                                                     'type' => PlainScalarNode::class,
@@ -471,20 +471,20 @@ return [
                                                                             'children' => [
                                                                                 [
                                                                                     'type' => NodePropertiesNode::class,
-                                                                                    'hash' => 2805732162,
+                                                                                    'hash' => 3273011123,
                                                                                     'properties' => [
                                                                                         'tag' => [
-                                                                                            'type' => TagNode::class,
-                                                                                            'hash' => 1166972359,
+                                                                                            'type' => TagPropertyNode::class,
+                                                                                            'hash' => 907070353,
                                                                                         ],
                                                                                     ],
                                                                                     'children' => [
                                                                                         [
-                                                                                            'type' => TagNode::class,
-                                                                                            'hash' => 1166972359,
+                                                                                            'type' => TagPropertyNode::class,
+                                                                                            'hash' => 907070353,
                                                                                             'properties' => [
                                                                                                 'token' => [
-                                                                                                    'type' => TokenType::TAG,
+                                                                                                    'type' => TokenType::TAG_PROPERTY,
                                                                                                     'text' => '!!str',
                                                                                                 ],
                                                                                             ],

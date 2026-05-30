@@ -18,7 +18,7 @@ return [
         'text' => ' ',
     ],
     [
-        'type' => TokenType::TAG,
+        'type' => TokenType::TAG_PROPERTY,
         'text' => '!<tag:clarkevans.com,2002:invoice>',
     ],
     [

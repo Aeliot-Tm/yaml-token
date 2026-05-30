@@ -14,15 +14,15 @@ use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\TagDefinitionNode;
 use Aeliot\YamlToken\Node\TagDirectiveNode;
 use Aeliot\YamlToken\Node\TagHandleNode;
-use Aeliot\YamlToken\Node\TagNode;
 use Aeliot\YamlToken\Node\TagPrefixNode;
+use Aeliot\YamlToken\Node\TagPropertyNode;
 use Aeliot\YamlToken\Node\ValueIndicatorNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 662164097,
+    'hash' => 3128430398,
     'properties' => [],
     'children' => [
         [
@@ -107,7 +107,7 @@ return [
         ],
         [
             'type' => DocumentNode::class,
-            'hash' => 3943709608,
+            'hash' => 73937123,
             'properties' => [],
             'children' => [
                 [
@@ -134,7 +134,7 @@ return [
                 ],
                 [
                     'type' => KeyValueCoupleNode::class,
-                    'hash' => 3845420322,
+                    'hash' => 451338335,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
@@ -146,7 +146,7 @@ return [
                         ],
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 429329634,
+                            'hash' => 880318873,
                         ],
                     ],
                     'children' => [
@@ -197,11 +197,11 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 429329634,
+                            'hash' => 880318873,
                             'properties' => [
                                 'nodeProperties' => [
                                     'type' => NodePropertiesNode::class,
-                                    'hash' => 3253454935,
+                                    'hash' => 2883167107,
                                 ],
                                 'payload' => [
                                     'type' => PlainScalarNode::class,
@@ -211,20 +211,20 @@ return [
                             'children' => [
                                 [
                                     'type' => NodePropertiesNode::class,
-                                    'hash' => 3253454935,
+                                    'hash' => 2883167107,
                                     'properties' => [
                                         'tag' => [
-                                            'type' => TagNode::class,
-                                            'hash' => 1319855130,
+                                            'type' => TagPropertyNode::class,
+                                            'hash' => 216248733,
                                         ],
                                     ],
                                     'children' => [
                                         [
-                                            'type' => TagNode::class,
-                                            'hash' => 1319855130,
+                                            'type' => TagPropertyNode::class,
+                                            'hash' => 216248733,
                                             'properties' => [
                                                 'token' => [
-                                                    'type' => TokenType::TAG,
+                                                    'type' => TokenType::TAG_PROPERTY,
                                                     'text' => '!str',
                                                 ],
                                             ],

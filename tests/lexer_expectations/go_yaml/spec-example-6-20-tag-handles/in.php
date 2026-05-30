@@ -38,7 +38,7 @@ return [
         'text' => "\n",
     ],
     [
-        'type' => TokenType::TAG,
+        'type' => TokenType::TAG_PROPERTY,
         'text' => '!e!foo',
     ],
     [

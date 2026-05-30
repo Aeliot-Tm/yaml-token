@@ -12,14 +12,14 @@ use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\TagDefinitionNode;
 use Aeliot\YamlToken\Node\TagDirectiveNode;
 use Aeliot\YamlToken\Node\TagHandleNode;
-use Aeliot\YamlToken\Node\TagNode;
 use Aeliot\YamlToken\Node\TagPrefixNode;
+use Aeliot\YamlToken\Node\TagPropertyNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 1736740235,
+    'hash' => 103451210,
     'properties' => [],
     'children' => [
         [
@@ -104,7 +104,7 @@ return [
         ],
         [
             'type' => DocumentNode::class,
-            'hash' => 3431235864,
+            'hash' => 275408816,
             'properties' => [],
             'children' => [
                 [
@@ -131,11 +131,11 @@ return [
                 ],
                 [
                     'type' => ValueNode::class,
-                    'hash' => 960067191,
+                    'hash' => 1178143829,
                     'properties' => [
                         'nodeProperties' => [
                             'type' => NodePropertiesNode::class,
-                            'hash' => 2219280949,
+                            'hash' => 1471035659,
                         ],
                         'payload' => [
                             'type' => DoubleQuotedScalarNode::class,
@@ -145,20 +145,20 @@ return [
                     'children' => [
                         [
                             'type' => NodePropertiesNode::class,
-                            'hash' => 2219280949,
+                            'hash' => 1471035659,
                             'properties' => [
                                 'tag' => [
-                                    'type' => TagNode::class,
-                                    'hash' => 472349862,
+                                    'type' => TagPropertyNode::class,
+                                    'hash' => 2997725296,
                                 ],
                             ],
                             'children' => [
                                 [
-                                    'type' => TagNode::class,
-                                    'hash' => 472349862,
+                                    'type' => TagPropertyNode::class,
+                                    'hash' => 2997725296,
                                     'properties' => [
                                         'token' => [
-                                            'type' => TokenType::TAG,
+                                            'type' => TokenType::TAG_PROPERTY,
                                             'text' => '!yaml!str',
                                         ],
                                     ],

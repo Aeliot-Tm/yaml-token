@@ -14,24 +14,24 @@ use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\NodePropertiesNode;
 use Aeliot\YamlToken\Node\PlainScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
-use Aeliot\YamlToken\Node\TagNode;
+use Aeliot\YamlToken\Node\TagPropertyNode;
 use Aeliot\YamlToken\Node\ValueIndicatorNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 1551088360,
+    'hash' => 2397148064,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 4053825193,
+            'hash' => 2250628706,
             'properties' => [],
             'children' => [
                 [
                     'type' => KeyValueCoupleNode::class,
-                    'hash' => 2724644036,
+                    'hash' => 1583172204,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
@@ -43,7 +43,7 @@ return [
                         ],
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 2272409648,
+                            'hash' => 3684559126,
                         ],
                     ],
                     'children' => [
@@ -94,11 +94,11 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 2272409648,
+                            'hash' => 3684559126,
                             'properties' => [
                                 'nodeProperties' => [
                                     'type' => NodePropertiesNode::class,
-                                    'hash' => 979168105,
+                                    'hash' => 3891736067,
                                 ],
                                 'payload' => [
                                     'type' => BlockScalarEntryNode::class,
@@ -108,20 +108,20 @@ return [
                             'children' => [
                                 [
                                     'type' => NodePropertiesNode::class,
-                                    'hash' => 979168105,
+                                    'hash' => 3891736067,
                                     'properties' => [
                                         'tag' => [
-                                            'type' => TagNode::class,
-                                            'hash' => 2941930438,
+                                            'type' => TagPropertyNode::class,
+                                            'hash' => 3479748217,
                                         ],
                                     ],
                                     'children' => [
                                         [
-                                            'type' => TagNode::class,
-                                            'hash' => 2941930438,
+                                            'type' => TagPropertyNode::class,
+                                            'hash' => 3479748217,
                                             'properties' => [
                                                 'token' => [
-                                                    'type' => TokenType::TAG,
+                                                    'type' => TokenType::TAG_PROPERTY,
                                                     'text' => '!binary',
                                                 ],
                                             ],

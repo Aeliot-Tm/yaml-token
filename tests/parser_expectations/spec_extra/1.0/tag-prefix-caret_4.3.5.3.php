@@ -10,24 +10,24 @@ use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\NodePropertiesNode;
 use Aeliot\YamlToken\Node\PlainScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
-use Aeliot\YamlToken\Node\TagNode;
+use Aeliot\YamlToken\Node\TagPropertyNode;
 use Aeliot\YamlToken\Node\ValueIndicatorNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 3940587366,
+    'hash' => 2192863749,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 2695603115,
+            'hash' => 2287936798,
             'properties' => [],
             'children' => [
                 [
                     'type' => KeyValueCoupleNode::class,
-                    'hash' => 1899296697,
+                    'hash' => 3631691058,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
@@ -39,7 +39,7 @@ return [
                         ],
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 3101048695,
+                            'hash' => 469920783,
                         ],
                     ],
                     'children' => [
@@ -90,11 +90,11 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 3101048695,
+                            'hash' => 469920783,
                             'properties' => [
                                 'nodeProperties' => [
                                     'type' => NodePropertiesNode::class,
-                                    'hash' => 1600948359,
+                                    'hash' => 1229209438,
                                 ],
                                 'payload' => [
                                     'type' => PlainScalarNode::class,
@@ -104,20 +104,20 @@ return [
                             'children' => [
                                 [
                                     'type' => NodePropertiesNode::class,
-                                    'hash' => 1600948359,
+                                    'hash' => 1229209438,
                                     'properties' => [
                                         'tag' => [
-                                            'type' => TagNode::class,
-                                            'hash' => 1061493503,
+                                            'type' => TagPropertyNode::class,
+                                            'hash' => 1804031447,
                                         ],
                                     ],
                                     'children' => [
                                         [
-                                            'type' => TagNode::class,
-                                            'hash' => 1061493503,
+                                            'type' => TagPropertyNode::class,
+                                            'hash' => 1804031447,
                                             'properties' => [
                                                 'token' => [
-                                                    'type' => TokenType::TAG,
+                                                    'type' => TokenType::TAG_PROPERTY,
                                                     'text' => '!example.com,2000/^base',
                                                 ],
                                             ],
@@ -164,7 +164,7 @@ return [
                 ],
                 [
                     'type' => KeyValueCoupleNode::class,
-                    'hash' => 2549019944,
+                    'hash' => 776630876,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
@@ -176,7 +176,7 @@ return [
                         ],
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 2337941319,
+                            'hash' => 156582646,
                         ],
                     ],
                     'children' => [
@@ -227,11 +227,11 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 2337941319,
+                            'hash' => 156582646,
                             'properties' => [
                                 'nodeProperties' => [
                                     'type' => NodePropertiesNode::class,
-                                    'hash' => 3796679774,
+                                    'hash' => 3059628976,
                                 ],
                                 'payload' => [
                                     'type' => PlainScalarNode::class,
@@ -241,20 +241,20 @@ return [
                             'children' => [
                                 [
                                     'type' => NodePropertiesNode::class,
-                                    'hash' => 3796679774,
+                                    'hash' => 3059628976,
                                     'properties' => [
                                         'tag' => [
-                                            'type' => TagNode::class,
-                                            'hash' => 3726296306,
+                                            'type' => TagPropertyNode::class,
+                                            'hash' => 1888489508,
                                         ],
                                     ],
                                     'children' => [
                                         [
-                                            'type' => TagNode::class,
-                                            'hash' => 3726296306,
+                                            'type' => TagPropertyNode::class,
+                                            'hash' => 1888489508,
                                             'properties' => [
                                                 'token' => [
-                                                    'type' => TokenType::TAG,
+                                                    'type' => TokenType::TAG_PROPERTY,
                                                     'text' => '!^derived',
                                                 ],
                                             ],
