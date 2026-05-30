@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\AliasNode;
 use Aeliot\YamlToken\Node\AnchorNode;
+use Aeliot\YamlToken\Node\BlockIndentationNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\ExplicitKeyIndicatorNode;
 use Aeliot\YamlToken\Node\KeyNode;
@@ -19,21 +20,21 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 194594982,
+    'hash' => 3274261987,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 2249597379,
+            'hash' => 879521515,
             'properties' => [],
             'children' => [
                 [
                     'type' => KeyValueCoupleNode::class,
-                    'hash' => 620561871,
+                    'hash' => 1601321323,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
-                            'hash' => 3016296729,
+                            'hash' => 1845659871,
                         ],
                         'valueIndicator' => [
                             'type' => ValueIndicatorNode::class,
@@ -47,7 +48,7 @@ return [
                     'children' => [
                         [
                             'type' => KeyNode::class,
-                            'hash' => 3016296729,
+                            'hash' => 1845659871,
                             'properties' => [
                                 'explicitKeyIndicatorNode' => [
                                     'type' => ExplicitKeyIndicatorNode::class,
@@ -75,11 +76,11 @@ return [
                                     'children' => [],
                                 ],
                                 [
-                                    'type' => WhitespaceNode::class,
-                                    'hash' => 1067539092,
+                                    'type' => BlockIndentationNode::class,
+                                    'hash' => 3651176988,
                                     'properties' => [
                                         'token' => [
-                                            'type' => TokenType::WHITESPACE,
+                                            'type' => TokenType::BLOCK_INDENTATION,
                                             'text' => ' ',
                                         ],
                                     ],

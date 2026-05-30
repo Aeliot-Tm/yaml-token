@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Aeliot\YamlToken\Enum\TokenType;
+use Aeliot\YamlToken\Node\BlockIndentationNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\ExplicitKeyIndicatorNode;
 use Aeliot\YamlToken\Node\FlowSequenceEndNode;
@@ -19,21 +20,21 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 1307963517,
+    'hash' => 2406300792,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 173624367,
+            'hash' => 1633606998,
             'properties' => [],
             'children' => [
                 [
                     'type' => KeyValueCoupleNode::class,
-                    'hash' => 401259666,
+                    'hash' => 600986667,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
-                            'hash' => 1626364731,
+                            'hash' => 3206743140,
                         ],
                         'valueIndicator' => [
                             'type' => ValueIndicatorNode::class,
@@ -47,7 +48,7 @@ return [
                     'children' => [
                         [
                             'type' => KeyNode::class,
-                            'hash' => 1626364731,
+                            'hash' => 3206743140,
                             'properties' => [
                                 'explicitKeyIndicatorNode' => [
                                     'type' => ExplicitKeyIndicatorNode::class,
@@ -71,11 +72,11 @@ return [
                                     'children' => [],
                                 ],
                                 [
-                                    'type' => WhitespaceNode::class,
-                                    'hash' => 1067539092,
+                                    'type' => BlockIndentationNode::class,
+                                    'hash' => 3651176988,
                                     'properties' => [
                                         'token' => [
-                                            'type' => TokenType::WHITESPACE,
+                                            'type' => TokenType::BLOCK_INDENTATION,
                                             'text' => ' ',
                                         ],
                                     ],

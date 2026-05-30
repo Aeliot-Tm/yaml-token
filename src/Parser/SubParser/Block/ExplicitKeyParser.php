@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Aeliot\YamlToken\Parser\SubParser\Block;
 
 use Aeliot\YamlToken\Enum\TokenType;
+use Aeliot\YamlToken\Node\BlockIndentationNode;
 use Aeliot\YamlToken\Node\ExplicitKeyIndicatorNode;
 use Aeliot\YamlToken\Node\IndentationNode;
 use Aeliot\YamlToken\Node\KeyNode;
@@ -59,6 +60,12 @@ final readonly class ExplicitKeyParser
         $keyNode->addChild(new ExplicitKeyIndicatorNode($token));
         $parseContext->tokens->advance();
         $token = $parseContext->tokens->current();
+
+        if (TokenType::BLOCK_INDENTATION === $token->type) {
+            $keyNode->addChild(new BlockIndentationNode($token));
+            $parseContext->tokens->advance();
+            $token = $parseContext->tokens->current();
+        }
 
         if (TokenType::WHITESPACE === $token->type) {
             $keyNode->addChild(new WhitespaceNode($token));

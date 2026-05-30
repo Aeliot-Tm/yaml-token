@@ -150,7 +150,7 @@ return [
         'text' => '?',
     ],
     [
-        'type' => TokenType::WHITESPACE,
+        'type' => TokenType::BLOCK_INDENTATION,
         'text' => ' ',
     ],
     [
@@ -178,7 +178,7 @@ return [
         'text' => '?',
     ],
     [
-        'type' => TokenType::WHITESPACE,
+        'type' => TokenType::BLOCK_INDENTATION,
         'text' => ' ',
     ],
     [

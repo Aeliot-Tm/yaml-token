@@ -831,6 +831,24 @@ final class Lexer
         $harvester->stream->addToken(new Token($type, $text, $harvester->cursor->line, $harvester->cursor->column));
     }
 
+    /**
+     * @param string[] $chars
+     */
+    private function readChars(Harvester $harvester, array $chars): string
+    {
+        $result = '';
+        while ($harvester->cursor->position < $harvester->length) {
+            $char = $harvester->input[$harvester->cursor->position];
+            if (\in_array($char, $chars, true)) {
+                $result .= $this->consumeCodePoint($harvester);
+            } else {
+                break;
+            }
+        }
+
+        return $result;
+    }
+
     private function readDoubleQuotedScalar(Harvester $harvester): string
     {
         $result = '"';
@@ -1245,6 +1263,16 @@ final class Lexer
         if ('?' === $char && $this->isMappingKey($harvester)) {
             $this->advance($harvester);
             $harvester->stream->addToken(new Token(TokenType::EXPLICIT_KEY_INDICATOR, '?', $startLine, $startColumn));
+            if (0 === $harvester->cursor->flowDepth) {
+                $spaceChars = $this->readChars($harvester, [' ']);
+                if ('' !== $spaceChars) {
+                    $tokenType = \in_array($harvester->input[$harvester->cursor->position + 1] ?? null, ['#', ...self::CHARS_LINE_BREAK], true)
+                        ? TokenType::WHITESPACE
+                        : TokenType::BLOCK_INDENTATION;
+
+                    $harvester->stream->addToken(new Token($tokenType, $spaceChars, $startLine, $startColumn + 1));
+                }
+            }
 
             return;
         }
@@ -1378,17 +1406,7 @@ final class Lexer
 
     private function readWhitespace(Harvester $harvester): string
     {
-        $result = '';
-        while ($harvester->cursor->position < $harvester->length) {
-            $char = $harvester->input[$harvester->cursor->position];
-            if (\in_array($char, self::CHARS_HORIZONTAL_WHITESPACE, true)) {
-                $result .= $this->consumeCodePoint($harvester);
-            } else {
-                break;
-            }
-        }
-
-        return $result;
+        return $this->readChars($harvester, self::CHARS_HORIZONTAL_WHITESPACE);
     }
 
     private function readYamlDirectiveVersion(Harvester $harvester): string
