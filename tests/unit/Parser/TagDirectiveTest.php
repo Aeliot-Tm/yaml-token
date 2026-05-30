@@ -15,8 +15,8 @@ namespace Aeliot\YamlToken\Test\Unit\Parser;
 
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\StreamNode;
-use Aeliot\YamlToken\Node\TagDirectiveNode;
 use Aeliot\YamlToken\Node\TagDefinitionNode;
+use Aeliot\YamlToken\Node\TagDirectiveNode;
 use Aeliot\YamlToken\Parser\Parser;
 use Aeliot\YamlToken\Parser\ParserBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
