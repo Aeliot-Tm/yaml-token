@@ -16,18 +16,6 @@ Unlike [`symfony/yaml`](https://github.com/symfony/YAML), which is designed for 
 and `array → YAML` conversion, this library provides a mechanism for analyzing and precisely
 manipulating the source YAML.
 
-> ## Project status:
-> 
-> The project is in its early stages of development.
-> The structure and any interfaces are subject to change without notice.
-> 
-> **Not ready for production.** The public API, runtime behavior, and repository layout may change
-> at any time. There are no stability or semantic versioning guarantees.
-> 
-> **Git history may be rewritten.** Maintainers may force-push or otherwise rewrite branches.
-> Older commits may no longer exist on the remote. Do not pin this repository to a specific revision
-> for long-term reproducibility. A previously fetched commit may become unavailable.
-
 ## YAML Specifications
 
 - [YAML 1.0](https://yaml.org/spec/1.0/) (2004-01-29)
