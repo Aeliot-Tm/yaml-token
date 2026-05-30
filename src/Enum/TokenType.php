@@ -56,6 +56,14 @@ enum TokenType: string
         self::LITERAL_BLOCK_SCALAR_INDICATOR,
     ];
 
+    public const SCALARS = [
+        self::DOUBLE_QUOTED_SCALAR,
+        self::FOLDED_BLOCK_SCALAR,
+        self::LITERAL_BLOCK_SCALAR,
+        self::PLAIN_SCALAR,
+        self::SINGLE_QUOTED_SCALAR,
+    ];
+
     public function isFoldedBlockScalarIndicator(): bool
     {
         return self::FOLDED_BLOCK_SCALAR_INDICATOR === $this;
@@ -73,12 +81,6 @@ enum TokenType: string
 
     public function isScalar(): bool
     {
-        return \in_array($this, [
-            self::DOUBLE_QUOTED_SCALAR,
-            self::FOLDED_BLOCK_SCALAR,
-            self::LITERAL_BLOCK_SCALAR,
-            self::PLAIN_SCALAR,
-            self::SINGLE_QUOTED_SCALAR,
-        ], true);
+        return \in_array($this, self::SCALARS, true);
     }
 }
