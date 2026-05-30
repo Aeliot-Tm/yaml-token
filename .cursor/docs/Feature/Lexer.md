@@ -41,7 +41,7 @@ The rules below describe the practical behavior relied upon by lexer unit tests.
     is a separate `NEWLINE`.
   - `%TAG` lines: when the keyword is followed by horizontal whitespace, `!` (start of a tag handle),
     or end of input, the line is split into `TAG_DIRECTIVE` (`%TAG`), optional `WHITESPACE`,
-    `DIRECTIVE_TAG_HANDLE` (`!`, `!!`, or `!name!`), optional `WHITESPACE`, `DIRECTIVE_TAG_PREFIX`
+    `TAG_HANDLE` (`!`, `!!`, or `!name!`), optional `WHITESPACE`, `DIRECTIVE_TAG_PREFIX`
     (URI prefix until whitespace, line break, or `#` that starts a comment), optional `WHITESPACE`,
     optional `COMMENT`, then the line break is a separate `NEWLINE`. If `%TAG` is immediately
     followed by a line break, or `%TAG` is not followed by whitespace/`!` (e.g. glued text),

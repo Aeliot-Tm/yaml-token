@@ -62,7 +62,7 @@ return [
         'text' => ' ',
     ],
     [
-        'type' => TokenType::DIRECTIVE_TAG_HANDLE,
+        'type' => TokenType::TAG_HANDLE,
         'text' => '!',
     ],
     [

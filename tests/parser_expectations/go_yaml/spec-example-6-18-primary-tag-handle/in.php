@@ -12,16 +12,16 @@ use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\NodePropertiesNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\TagDefinitionNode;
-use Aeliot\YamlToken\Node\TagDirectiveHandleNode;
 use Aeliot\YamlToken\Node\TagDirectiveNode;
 use Aeliot\YamlToken\Node\TagDirectivePrefixNode;
+use Aeliot\YamlToken\Node\TagHandleNode;
 use Aeliot\YamlToken\Node\TagNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 2094328032,
+    'hash' => 3706192266,
     'properties' => [],
     'children' => [
         [
@@ -149,7 +149,7 @@ return [
         ],
         [
             'type' => DocumentNode::class,
-            'hash' => 1623991421,
+            'hash' => 2816769556,
             'properties' => [],
             'children' => [
                 [
@@ -176,7 +176,7 @@ return [
                 ],
                 [
                     'type' => TagDefinitionNode::class,
-                    'hash' => 2982154451,
+                    'hash' => 2306599751,
                     'properties' => [],
                     'children' => [
                         [
@@ -202,11 +202,11 @@ return [
                             'children' => [],
                         ],
                         [
-                            'type' => TagDirectiveHandleNode::class,
-                            'hash' => 1410370065,
+                            'type' => TagHandleNode::class,
+                            'hash' => 4139120297,
                             'properties' => [
                                 'token' => [
-                                    'type' => TokenType::DIRECTIVE_TAG_HANDLE,
+                                    'type' => TokenType::TAG_HANDLE,
                                     'text' => '!',
                                 ],
                             ],

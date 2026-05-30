@@ -15,13 +15,13 @@ namespace Aeliot\YamlToken\Node;
 
 class TagDefinitionNode extends AbstractNode
 {
-    private ?TagDirectiveHandleNode $handleNode = null;
+    private ?TagHandleNode $handleNode = null;
     private ?TagDirectiveNode $indicatorNode = null;
     private ?TagDirectivePrefixNode $prefixNode = null;
 
     public function addChild(Node $child): void
     {
-        if ($child instanceof TagDirectiveHandleNode) {
+        if ($child instanceof TagHandleNode) {
             $this->handleNode = $child;
         }
         if ($child instanceof TagDirectiveNode) {
@@ -39,7 +39,7 @@ class TagDefinitionNode extends AbstractNode
         return $this->handleNode?->getHandle();
     }
 
-    public function getHandleNode(): ?TagDirectiveHandleNode
+    public function getHandleNode(): ?TagHandleNode
     {
         return $this->handleNode;
     }
