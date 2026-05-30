@@ -111,7 +111,7 @@ The rules below describe the practical behavior relied upon by lexer unit tests.
     whitespace and the same `:` lookahead as for `VALUE_INDICATOR`; otherwise plain scalar
     `<` / `<<`… is tokenized as `PLAIN_SCALAR`
 - **Anchors, aliases, tags**:
-  - `&name` → `ANCHOR`, `*name` → `ALIAS`
+  - `&name` → `ANCHOR_PROPERTY`, `*name` → `ALIAS`
   - Explicit tag property at a node (not `%TAG` directive lines): one `TAG` token with the full lexeme
     (`!`, `!suffix`, `!!suffix`, `!name!suffix`, or `!<...>` including brackets)
   - Tag suffix / shorthand continues until a forbidden delimiter: whitespace, `[]{} , : #` or `\0`

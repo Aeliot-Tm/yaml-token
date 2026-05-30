@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Aeliot\YamlToken\Enum\TokenType;
-use Aeliot\YamlToken\Node\AnchorNode;
+use Aeliot\YamlToken\Node\AnchorPropertyNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\DocumentStartNode;
 use Aeliot\YamlToken\Node\KeyNode;
@@ -18,12 +18,12 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 3159174083,
+    'hash' => 4262482965,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 1412308321,
+            'hash' => 1016087888,
             'properties' => [],
             'children' => [
                 [
@@ -50,7 +50,7 @@ return [
                 ],
                 [
                     'type' => KeyValueCoupleNode::class,
-                    'hash' => 890268834,
+                    'hash' => 836133514,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
@@ -62,7 +62,7 @@ return [
                         ],
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 4146753561,
+                            'hash' => 2426300621,
                         ],
                     ],
                     'children' => [
@@ -113,11 +113,11 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 4146753561,
+                            'hash' => 2426300621,
                             'properties' => [
                                 'nodeProperties' => [
                                     'type' => NodePropertiesNode::class,
-                                    'hash' => 2965298748,
+                                    'hash' => 104367723,
                                 ],
                                 'payload' => [
                                     'type' => PlainScalarNode::class,
@@ -127,21 +127,21 @@ return [
                             'children' => [
                                 [
                                     'type' => NodePropertiesNode::class,
-                                    'hash' => 2965298748,
+                                    'hash' => 104367723,
                                     'properties' => [
                                         'anchor' => [
-                                            'type' => AnchorNode::class,
-                                            'hash' => 3084221503,
+                                            'type' => AnchorPropertyNode::class,
+                                            'hash' => 2236093770,
                                         ],
                                     ],
                                     'children' => [
                                         [
-                                            'type' => AnchorNode::class,
-                                            'hash' => 3084221503,
+                                            'type' => AnchorPropertyNode::class,
+                                            'hash' => 2236093770,
                                             'properties' => [
                                                 'name' => 'an:chor',
                                                 'token' => [
-                                                    'type' => TokenType::ANCHOR,
+                                                    'type' => TokenType::ANCHOR_PROPERTY,
                                                     'text' => '&an:chor',
                                                 ],
                                             ],

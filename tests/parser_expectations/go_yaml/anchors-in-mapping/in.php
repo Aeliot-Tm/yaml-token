@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Aeliot\YamlToken\Enum\TokenType;
-use Aeliot\YamlToken\Node\AnchorNode;
+use Aeliot\YamlToken\Node\AnchorPropertyNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
@@ -17,21 +17,21 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 2450085353,
+    'hash' => 24067388,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 930039417,
+            'hash' => 1047346043,
             'properties' => [],
             'children' => [
                 [
                     'type' => KeyValueCoupleNode::class,
-                    'hash' => 3636474914,
+                    'hash' => 773366142,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
-                            'hash' => 700872826,
+                            'hash' => 842761322,
                         ],
                         'valueIndicator' => [
                             'type' => ValueIndicatorNode::class,
@@ -45,11 +45,11 @@ return [
                     'children' => [
                         [
                             'type' => KeyNode::class,
-                            'hash' => 700872826,
+                            'hash' => 842761322,
                             'properties' => [
                                 'nodeProperties' => [
                                     'type' => NodePropertiesNode::class,
-                                    'hash' => 78035332,
+                                    'hash' => 2621467804,
                                 ],
                                 'name' => [
                                     'type' => PlainScalarNode::class,
@@ -59,21 +59,21 @@ return [
                             'children' => [
                                 [
                                     'type' => NodePropertiesNode::class,
-                                    'hash' => 78035332,
+                                    'hash' => 2621467804,
                                     'properties' => [
                                         'anchor' => [
-                                            'type' => AnchorNode::class,
-                                            'hash' => 406257572,
+                                            'type' => AnchorPropertyNode::class,
+                                            'hash' => 2802398246,
                                         ],
                                     ],
                                     'children' => [
                                         [
-                                            'type' => AnchorNode::class,
-                                            'hash' => 406257572,
+                                            'type' => AnchorPropertyNode::class,
+                                            'hash' => 2802398246,
                                             'properties' => [
                                                 'name' => 'a',
                                                 'token' => [
-                                                    'type' => TokenType::ANCHOR,
+                                                    'type' => TokenType::ANCHOR_PROPERTY,
                                                     'text' => '&a',
                                                 ],
                                             ],
@@ -165,7 +165,7 @@ return [
                 ],
                 [
                     'type' => KeyValueCoupleNode::class,
-                    'hash' => 482266194,
+                    'hash' => 2976629673,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
@@ -177,7 +177,7 @@ return [
                         ],
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 457199893,
+                            'hash' => 3327746862,
                         ],
                     ],
                     'children' => [
@@ -228,11 +228,11 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 457199893,
+                            'hash' => 3327746862,
                             'properties' => [
                                 'nodeProperties' => [
                                     'type' => NodePropertiesNode::class,
-                                    'hash' => 2664168071,
+                                    'hash' => 3073767884,
                                 ],
                                 'payload' => [
                                     'type' => PlainScalarNode::class,
@@ -242,21 +242,21 @@ return [
                             'children' => [
                                 [
                                     'type' => NodePropertiesNode::class,
-                                    'hash' => 2664168071,
+                                    'hash' => 3073767884,
                                     'properties' => [
                                         'anchor' => [
-                                            'type' => AnchorNode::class,
-                                            'hash' => 1300049557,
+                                            'type' => AnchorPropertyNode::class,
+                                            'hash' => 2001971745,
                                         ],
                                     ],
                                     'children' => [
                                         [
-                                            'type' => AnchorNode::class,
-                                            'hash' => 1300049557,
+                                            'type' => AnchorPropertyNode::class,
+                                            'hash' => 2001971745,
                                             'properties' => [
                                                 'name' => 'd',
                                                 'token' => [
-                                                    'type' => TokenType::ANCHOR,
+                                                    'type' => TokenType::ANCHOR_PROPERTY,
                                                     'text' => '&d',
                                                 ],
                                             ],

@@ -54,7 +54,7 @@ return [
         'text' => ' ',
     ],
     [
-        'type' => TokenType::ANCHOR,
+        'type' => TokenType::ANCHOR_PROPERTY,
         'text' => '&anchor',
     ],
     [

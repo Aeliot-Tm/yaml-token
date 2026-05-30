@@ -17,19 +17,19 @@ use Aeliot\YamlToken\Token\Token;
 
 class AliasNode extends AbstractNode implements KeyNameAssignableInterface, TokenHolderInterface
 {
-    private ?AnchorNode $anchor = null;
+    private ?AnchorPropertyNode $anchor = null;
 
     public function __construct(
         private readonly Token $token,
     ) {
     }
 
-    public function getAnchor(): ?AnchorNode
+    public function getAnchor(): ?AnchorPropertyNode
     {
         return $this->anchor;
     }
 
-    public function setAnchor(AnchorNode $anchor): void
+    public function setAnchor(AnchorPropertyNode $anchor): void
     {
         $this->anchor = $anchor;
     }

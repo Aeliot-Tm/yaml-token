@@ -14,7 +14,7 @@ return [
         'text' => "\n",
     ],
     [
-        'type' => TokenType::ANCHOR,
+        'type' => TokenType::ANCHOR_PROPERTY,
         'text' => '&mapping',
     ],
     [
@@ -22,7 +22,7 @@ return [
         'text' => "\n",
     ],
     [
-        'type' => TokenType::ANCHOR,
+        'type' => TokenType::ANCHOR_PROPERTY,
         'text' => '&key',
     ],
     [
@@ -38,7 +38,7 @@ return [
         'text' => ' ',
     ],
     [
-        'type' => TokenType::ANCHOR,
+        'type' => TokenType::ANCHOR_PROPERTY,
         'text' => '&item',
     ],
     [

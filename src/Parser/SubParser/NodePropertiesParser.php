@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Aeliot\YamlToken\Parser\SubParser;
 
 use Aeliot\YamlToken\Enum\TokenType;
-use Aeliot\YamlToken\Node\AnchorNode;
+use Aeliot\YamlToken\Node\AnchorPropertyNode;
 use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Node\NodePropertiesHolderInterface;
 use Aeliot\YamlToken\Node\NodePropertiesNode;
@@ -27,7 +27,7 @@ use Aeliot\YamlToken\Parser\Helper\ErrorHelper;
 final readonly class NodePropertiesParser
 {
     private const TOKEN_TYPE_NODES = [
-        TokenType::ANCHOR->value => AnchorNode::class,
+        TokenType::ANCHOR_PROPERTY->value => AnchorPropertyNode::class,
         TokenType::TAG->value => TagNode::class,
     ];
 

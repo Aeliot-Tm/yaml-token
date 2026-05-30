@@ -26,7 +26,7 @@ return [
         'text' => ' ',
     ],
     [
-        'type' => TokenType::ANCHOR,
+        'type' => TokenType::ANCHOR_PROPERTY,
         'text' => '&node1',
     ],
     [
@@ -38,7 +38,7 @@ return [
         'text' => '  ',
     ],
     [
-        'type' => TokenType::ANCHOR,
+        'type' => TokenType::ANCHOR_PROPERTY,
         'text' => '&k1',
     ],
     [
@@ -78,7 +78,7 @@ return [
         'text' => ' ',
     ],
     [
-        'type' => TokenType::ANCHOR,
+        'type' => TokenType::ANCHOR_PROPERTY,
         'text' => '&node2',
     ],
     [
@@ -134,7 +134,7 @@ return [
         'text' => '  ',
     ],
     [
-        'type' => TokenType::ANCHOR,
+        'type' => TokenType::ANCHOR_PROPERTY,
         'text' => '&k3',
     ],
     [
@@ -178,7 +178,7 @@ return [
         'text' => '  ',
     ],
     [
-        'type' => TokenType::ANCHOR,
+        'type' => TokenType::ANCHOR_PROPERTY,
         'text' => '&node4',
     ],
     [
@@ -190,7 +190,7 @@ return [
         'text' => '  ',
     ],
     [
-        'type' => TokenType::ANCHOR,
+        'type' => TokenType::ANCHOR_PROPERTY,
         'text' => '&k4',
     ],
     [
@@ -234,7 +234,7 @@ return [
         'text' => '  ',
     ],
     [
-        'type' => TokenType::ANCHOR,
+        'type' => TokenType::ANCHOR_PROPERTY,
         'text' => '&node5',
     ],
     [
@@ -278,7 +278,7 @@ return [
         'text' => ' ',
     ],
     [
-        'type' => TokenType::ANCHOR,
+        'type' => TokenType::ANCHOR_PROPERTY,
         'text' => '&val6',
     ],
     [
@@ -314,7 +314,7 @@ return [
         'text' => '  ',
     ],
     [
-        'type' => TokenType::ANCHOR,
+        'type' => TokenType::ANCHOR_PROPERTY,
         'text' => '&val7',
     ],
     [

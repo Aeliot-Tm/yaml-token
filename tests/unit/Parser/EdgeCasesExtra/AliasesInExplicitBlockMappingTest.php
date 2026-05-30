@@ -15,7 +15,7 @@ namespace Aeliot\YamlToken\Test\Unit\Parser\EdgeCasesExtra;
 
 use Aeliot\YamlToken\Lexer\Lexer;
 use Aeliot\YamlToken\Node\AliasNode;
-use Aeliot\YamlToken\Node\AnchorNode;
+use Aeliot\YamlToken\Node\AnchorPropertyNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\PlainScalarNode;
@@ -28,7 +28,7 @@ use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Parser::class)]
 #[UsesClass(AliasNode::class)]
-#[UsesClass(AnchorNode::class)]
+#[UsesClass(AnchorPropertyNode::class)]
 #[UsesClass(DocumentNode::class)]
 #[UsesClass(KeyValueCoupleNode::class)]
 #[UsesClass(Lexer::class)]
@@ -53,7 +53,7 @@ final class AliasesInExplicitBlockMappingTest extends TestCase
         self::assertInstanceOf(PlainScalarNode::class, $explicitKey->getName());
 
         $declaredAnchor = $explicitKey->getAnchor();
-        self::assertInstanceOf(AnchorNode::class, $declaredAnchor);
+        self::assertInstanceOf(AnchorPropertyNode::class, $declaredAnchor);
         self::assertSame('a', $declaredAnchor->getName());
         self::assertSame($explicitKeyCouple, $declaredAnchor->getDeclarationCouple());
 

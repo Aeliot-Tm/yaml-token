@@ -100,7 +100,7 @@ final readonly class IndentedBlockValueParser
                 continue;
             }
 
-            if (TokenType::ANCHOR === $token->type) {
+            if (TokenType::ANCHOR_PROPERTY === $token->type) {
                 ++$i;
 
                 continue;

@@ -18,7 +18,7 @@ return [
         'text' => ' ',
     ],
     [
-        'type' => TokenType::ANCHOR,
+        'type' => TokenType::ANCHOR_PROPERTY,
         'text' => '&a',
     ],
     [
@@ -90,7 +90,7 @@ return [
         'text' => ' ',
     ],
     [
-        'type' => TokenType::ANCHOR,
+        'type' => TokenType::ANCHOR_PROPERTY,
         'text' => '&c',
     ],
     [
@@ -118,7 +118,7 @@ return [
         'text' => ' ',
     ],
     [
-        'type' => TokenType::ANCHOR,
+        'type' => TokenType::ANCHOR_PROPERTY,
         'text' => '&d',
     ],
     [

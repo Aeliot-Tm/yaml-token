@@ -6,7 +6,7 @@ use Aeliot\YamlToken\Enum\TokenType;
 
 return [
     [
-        'type' => TokenType::ANCHOR,
+        'type' => TokenType::ANCHOR_PROPERTY,
         'text' => '&flowseq',
     ],
     [
@@ -50,7 +50,7 @@ return [
         'text' => ' ',
     ],
     [
-        'type' => TokenType::ANCHOR,
+        'type' => TokenType::ANCHOR_PROPERTY,
         'text' => '&c',
     ],
     [
@@ -86,7 +86,7 @@ return [
         'text' => ' ',
     ],
     [
-        'type' => TokenType::ANCHOR,
+        'type' => TokenType::ANCHOR_PROPERTY,
         'text' => '&e',
     ],
     [
@@ -122,7 +122,7 @@ return [
         'text' => ' ',
     ],
     [
-        'type' => TokenType::ANCHOR,
+        'type' => TokenType::ANCHOR_PROPERTY,
         'text' => '&g',
     ],
     [

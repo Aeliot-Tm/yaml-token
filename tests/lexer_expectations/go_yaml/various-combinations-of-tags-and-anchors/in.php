@@ -14,7 +14,7 @@ return [
         'text' => "\n",
     ],
     [
-        'type' => TokenType::ANCHOR,
+        'type' => TokenType::ANCHOR_PROPERTY,
         'text' => '&a1',
     ],
     [
@@ -54,7 +54,7 @@ return [
         'text' => "\n",
     ],
     [
-        'type' => TokenType::ANCHOR,
+        'type' => TokenType::ANCHOR_PROPERTY,
         'text' => '&a2',
     ],
     [
@@ -78,7 +78,7 @@ return [
         'text' => "\n",
     ],
     [
-        'type' => TokenType::ANCHOR,
+        'type' => TokenType::ANCHOR_PROPERTY,
         'text' => '&a3',
     ],
     [
@@ -110,7 +110,7 @@ return [
         'text' => "\n",
     ],
     [
-        'type' => TokenType::ANCHOR,
+        'type' => TokenType::ANCHOR_PROPERTY,
         'text' => '&a4',
     ],
     [
@@ -126,7 +126,7 @@ return [
         'text' => "\n",
     ],
     [
-        'type' => TokenType::ANCHOR,
+        'type' => TokenType::ANCHOR_PROPERTY,
         'text' => '&a5',
     ],
     [
@@ -190,7 +190,7 @@ return [
         'text' => "\n",
     ],
     [
-        'type' => TokenType::ANCHOR,
+        'type' => TokenType::ANCHOR_PROPERTY,
         'text' => '&anchor6',
     ],
     [
@@ -234,7 +234,7 @@ return [
         'text' => "\n",
     ],
     [
-        'type' => TokenType::ANCHOR,
+        'type' => TokenType::ANCHOR_PROPERTY,
         'text' => '&a8',
     ],
     [
@@ -294,7 +294,7 @@ return [
         'text' => ' ',
     ],
     [
-        'type' => TokenType::ANCHOR,
+        'type' => TokenType::ANCHOR_PROPERTY,
         'text' => '&a10',
     ],
     [
@@ -338,7 +338,7 @@ return [
         'text' => ' ',
     ],
     [
-        'type' => TokenType::ANCHOR,
+        'type' => TokenType::ANCHOR_PROPERTY,
         'text' => '&a11',
     ],
     [

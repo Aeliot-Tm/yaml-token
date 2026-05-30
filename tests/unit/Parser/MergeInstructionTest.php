@@ -15,7 +15,7 @@ namespace Aeliot\YamlToken\Test\Unit\Parser;
 
 use Aeliot\YamlToken\Lexer\Lexer;
 use Aeliot\YamlToken\Node\AliasNode;
-use Aeliot\YamlToken\Node\AnchorNode;
+use Aeliot\YamlToken\Node\AnchorPropertyNode;
 use Aeliot\YamlToken\Node\BlockMappingNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
@@ -33,7 +33,7 @@ use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Parser::class)]
 #[UsesClass(AliasNode::class)]
-#[UsesClass(AnchorNode::class)]
+#[UsesClass(AnchorPropertyNode::class)]
 #[UsesClass(BlockMappingNode::class)]
 #[UsesClass(DocumentNode::class)]
 #[UsesClass(KeyValueCoupleNode::class)]
@@ -69,7 +69,7 @@ YAML);
         self::assertSame('a_alias', $aliases[0]->getName());
 
         $anchor = $aliases[0]->getAnchor();
-        self::assertInstanceOf(AnchorNode::class, $anchor);
+        self::assertInstanceOf(AnchorPropertyNode::class, $anchor);
         self::assertSame('a_alias', $anchor->getName());
 
         $anchorCouple = $aliases[0]->getAnchor()->getDeclarationCouple();

@@ -1299,10 +1299,10 @@ final class Lexer
             return;
         }
 
-        // ANCHOR (&name)
+        // ANCHOR_PROPERTY (&name)
         if ('&' === $char && !$harvester->cursor->suppressAnchorAlias) {
             $anchor = '&'.$this->readAnchorOrAlias($harvester);
-            $harvester->stream->addToken(new Token(TokenType::ANCHOR, $anchor, $startLine, $startColumn));
+            $harvester->stream->addToken(new Token(TokenType::ANCHOR_PROPERTY, $anchor, $startLine, $startColumn));
 
             return;
         }

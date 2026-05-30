@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Aeliot\YamlToken\Parser\Helper;
 
-use Aeliot\YamlToken\Node\AnchorNode;
+use Aeliot\YamlToken\Node\AnchorPropertyNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\Node;
 use Aeliot\YamlToken\Parser\Dto\AnchorsRegistry;
@@ -21,11 +21,11 @@ use Aeliot\YamlToken\Parser\Dto\AnchorsRegistry;
 final readonly class AnchorPostProcessor
 {
     /**
-     * @param AnchorNode[] $anchors
+     * @param AnchorPropertyNode[] $anchors
      */
     public function collectAnchorsRecursive(Node $node, array &$anchors): void
     {
-        if ($node instanceof AnchorNode) {
+        if ($node instanceof AnchorPropertyNode) {
             $anchors[] = $node;
 
             return;

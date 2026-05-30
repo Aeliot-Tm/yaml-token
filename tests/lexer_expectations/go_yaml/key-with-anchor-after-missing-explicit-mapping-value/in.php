@@ -50,7 +50,7 @@ return [
         'text' => "\n",
     ],
     [
-        'type' => TokenType::ANCHOR,
+        'type' => TokenType::ANCHOR_PROPERTY,
         'text' => '&anchor',
     ],
     [

@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Aeliot\YamlToken\TestHelper;
 
 use Aeliot\YamlToken\Node\AliasNode;
-use Aeliot\YamlToken\Node\AnchorNode;
+use Aeliot\YamlToken\Node\AnchorPropertyNode;
 use Aeliot\YamlToken\Node\BlockMappingNode;
 use Aeliot\YamlToken\Node\BlockScalarOptionsNode;
 use Aeliot\YamlToken\Node\BlockSequenceEntryNode;
@@ -64,7 +64,7 @@ final class NodeTreeRepresenter
             $properties['anchorName'] = $stream->getAnchor()?->getName();
         }
 
-        if ($stream instanceof AnchorNode) {
+        if ($stream instanceof AnchorPropertyNode) {
             $properties['name'] = $stream->getName();
         }
 

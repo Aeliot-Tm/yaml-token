@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Aeliot\YamlToken\Test\Unit\Parser\EdgeCasesExtra;
 
 use Aeliot\YamlToken\Lexer\Lexer;
-use Aeliot\YamlToken\Node\AnchorNode;
+use Aeliot\YamlToken\Node\AnchorPropertyNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\FlowSequenceNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
@@ -28,7 +28,7 @@ use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Parser::class)]
-#[UsesClass(AnchorNode::class)]
+#[UsesClass(AnchorPropertyNode::class)]
 #[UsesClass(DocumentNode::class)]
 #[UsesClass(FlowSequenceNode::class)]
 #[UsesClass(KeyValueCoupleNode::class)]
@@ -47,7 +47,7 @@ YAML);
         $couple = $this->getOnlyCouple($stream);
         $anchor = $this->findFirstAnchor($couple->getKey());
 
-        self::assertInstanceOf(AnchorNode::class, $anchor);
+        self::assertInstanceOf(AnchorPropertyNode::class, $anchor);
         self::assertSame('a', $anchor->getName());
         self::assertSame($couple, $anchor->getDeclarationCouple());
     }
@@ -61,14 +61,14 @@ YAML);
         $couple = $this->getOnlyCouple($stream);
         $anchor = $this->findFirstAnchor($couple->getKey());
 
-        self::assertInstanceOf(AnchorNode::class, $anchor);
+        self::assertInstanceOf(AnchorPropertyNode::class, $anchor);
         self::assertSame('a', $anchor->getName());
         self::assertSame($couple, $anchor->getDeclarationCouple());
     }
 
-    private function findFirstAnchor(Node $node): ?AnchorNode
+    private function findFirstAnchor(Node $node): ?AnchorPropertyNode
     {
-        if ($node instanceof AnchorNode) {
+        if ($node instanceof AnchorPropertyNode) {
             return $node;
         }
         foreach ($node->getChildren() as $child) {

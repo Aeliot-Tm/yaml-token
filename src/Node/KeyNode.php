@@ -38,7 +38,7 @@ class KeyNode extends AbstractNode implements NodePropertiesHolderInterface
         parent::addChild($child);
     }
 
-    public function getAnchor(): ?AnchorNode
+    public function getAnchor(): ?AnchorPropertyNode
     {
         return $this->properties?->getAnchor();
     }

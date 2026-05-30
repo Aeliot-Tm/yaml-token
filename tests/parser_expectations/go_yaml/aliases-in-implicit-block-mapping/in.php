@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\AliasNode;
-use Aeliot\YamlToken\Node\AnchorNode;
+use Aeliot\YamlToken\Node\AnchorPropertyNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
@@ -18,21 +18,21 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 1447279256,
+    'hash' => 1161197222,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 822131250,
+            'hash' => 754449371,
             'properties' => [],
             'children' => [
                 [
                     'type' => KeyValueCoupleNode::class,
-                    'hash' => 1696245568,
+                    'hash' => 3288555032,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
-                            'hash' => 700872826,
+                            'hash' => 842761322,
                         ],
                         'valueIndicator' => [
                             'type' => ValueIndicatorNode::class,
@@ -40,17 +40,17 @@ return [
                         ],
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 123636973,
+                            'hash' => 326146698,
                         ],
                     ],
                     'children' => [
                         [
                             'type' => KeyNode::class,
-                            'hash' => 700872826,
+                            'hash' => 842761322,
                             'properties' => [
                                 'nodeProperties' => [
                                     'type' => NodePropertiesNode::class,
-                                    'hash' => 78035332,
+                                    'hash' => 2621467804,
                                 ],
                                 'name' => [
                                     'type' => PlainScalarNode::class,
@@ -60,21 +60,21 @@ return [
                             'children' => [
                                 [
                                     'type' => NodePropertiesNode::class,
-                                    'hash' => 78035332,
+                                    'hash' => 2621467804,
                                     'properties' => [
                                         'anchor' => [
-                                            'type' => AnchorNode::class,
-                                            'hash' => 406257572,
+                                            'type' => AnchorPropertyNode::class,
+                                            'hash' => 2802398246,
                                         ],
                                     ],
                                     'children' => [
                                         [
-                                            'type' => AnchorNode::class,
-                                            'hash' => 406257572,
+                                            'type' => AnchorPropertyNode::class,
+                                            'hash' => 2802398246,
                                             'properties' => [
                                                 'name' => 'a',
                                                 'token' => [
-                                                    'type' => TokenType::ANCHOR,
+                                                    'type' => TokenType::ANCHOR_PROPERTY,
                                                     'text' => '&a',
                                                 ],
                                             ],
@@ -130,11 +130,11 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 123636973,
+                            'hash' => 326146698,
                             'properties' => [
                                 'nodeProperties' => [
                                     'type' => NodePropertiesNode::class,
-                                    'hash' => 4283428407,
+                                    'hash' => 3231633635,
                                 ],
                                 'payload' => [
                                     'type' => PlainScalarNode::class,
@@ -144,21 +144,21 @@ return [
                             'children' => [
                                 [
                                     'type' => NodePropertiesNode::class,
-                                    'hash' => 4283428407,
+                                    'hash' => 3231633635,
                                     'properties' => [
                                         'anchor' => [
-                                            'type' => AnchorNode::class,
-                                            'hash' => 2648657268,
+                                            'type' => AnchorPropertyNode::class,
+                                            'hash' => 1578124260,
                                         ],
                                     ],
                                     'children' => [
                                         [
-                                            'type' => AnchorNode::class,
-                                            'hash' => 2648657268,
+                                            'type' => AnchorPropertyNode::class,
+                                            'hash' => 1578124260,
                                             'properties' => [
                                                 'name' => 'b',
                                                 'token' => [
-                                                    'type' => TokenType::ANCHOR,
+                                                    'type' => TokenType::ANCHOR_PROPERTY,
                                                     'text' => '&b',
                                                 ],
                                             ],

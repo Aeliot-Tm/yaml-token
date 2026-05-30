@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Aeliot\YamlToken\Test\Unit\Parser;
 
 use Aeliot\YamlToken\Lexer\Lexer;
-use Aeliot\YamlToken\Node\AnchorNode;
+use Aeliot\YamlToken\Node\AnchorPropertyNode;
 use Aeliot\YamlToken\Node\BlockMappingNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
@@ -85,7 +85,7 @@ YAML,
         if (null === $rootAnchorName) {
             self::assertNull($value->getAnchor());
         } else {
-            self::assertInstanceOf(AnchorNode::class, $value->getAnchor());
+            self::assertInstanceOf(AnchorPropertyNode::class, $value->getAnchor());
             self::assertSame($rootAnchorName, $value->getAnchor()->getName());
         }
 
@@ -103,7 +103,7 @@ YAML,
 
         $key = $couples[0]->getKey();
         self::assertNotNull($key);
-        self::assertInstanceOf(AnchorNode::class, $key->getAnchor());
+        self::assertInstanceOf(AnchorPropertyNode::class, $key->getAnchor());
         self::assertSame($keyAnchorName, $key->getAnchor()->getName());
         self::assertInstanceOf(TagNode::class, $key->getTag());
         self::assertSame($keyTagText, $key->getTag()->getToken()->text);
@@ -128,7 +128,7 @@ YAML,
 scalar1
 YAML));
 
-        self::assertInstanceOf(AnchorNode::class, $value->getAnchor());
+        self::assertInstanceOf(AnchorPropertyNode::class, $value->getAnchor());
         self::assertSame('a1', $value->getAnchor()->getName());
         self::assertInstanceOf(TagNode::class, $value->getTag());
         self::assertSame('!!str', $value->getTag()->getToken()->text);
@@ -149,7 +149,7 @@ YAML));
 
         self::assertInstanceOf(TagNode::class, $value->getTag());
         self::assertSame('!!str', $value->getTag()->getToken()->text);
-        self::assertInstanceOf(AnchorNode::class, $value->getAnchor());
+        self::assertInstanceOf(AnchorPropertyNode::class, $value->getAnchor());
         self::assertSame('a2', $value->getAnchor()->getName());
 
         $payload = $value->getPayload();
@@ -165,7 +165,7 @@ YAML));
 !!str scalar3
 YAML));
 
-        self::assertInstanceOf(AnchorNode::class, $value->getAnchor());
+        self::assertInstanceOf(AnchorPropertyNode::class, $value->getAnchor());
         self::assertSame('a3', $value->getAnchor()->getName());
         self::assertInstanceOf(TagNode::class, $value->getTag());
         self::assertSame('!!str', $value->getTag()->getToken()->text);

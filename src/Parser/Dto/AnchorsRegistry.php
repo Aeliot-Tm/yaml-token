@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace Aeliot\YamlToken\Parser\Dto;
 
-use Aeliot\YamlToken\Node\AnchorNode;
+use Aeliot\YamlToken\Node\AnchorPropertyNode;
 
 final class AnchorsRegistry
 {
     /**
-     * @var array<string, AnchorNode>
+     * @var array<string, AnchorPropertyNode>
      */
     public array $anchors = [];
 }

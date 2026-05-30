@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\AliasNode;
-use Aeliot\YamlToken\Node\AnchorNode;
+use Aeliot\YamlToken\Node\AnchorPropertyNode;
 use Aeliot\YamlToken\Node\BlockMappingNode;
 use Aeliot\YamlToken\Node\BlockScalarEntryNode;
 use Aeliot\YamlToken\Node\BlockScalarIndicatorNode;
@@ -30,12 +30,12 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 1539061681,
+    'hash' => 1177385356,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 3754819996,
+            'hash' => 823390290,
             'properties' => [],
             'children' => [
                 [
@@ -62,7 +62,7 @@ return [
                 ],
                 [
                     'type' => ValueNode::class,
-                    'hash' => 738598597,
+                    'hash' => 754981072,
                     'properties' => [
                         'nodeProperties' => [
                             'type' => NodePropertiesNode::class,
@@ -70,7 +70,7 @@ return [
                         ],
                         'payload' => [
                             'type' => BlockMappingNode::class,
-                            'hash' => 2482785721,
+                            'hash' => 2058315713,
                         ],
                     ],
                     'children' => [
@@ -110,7 +110,7 @@ return [
                         ],
                         [
                             'type' => BlockMappingNode::class,
-                            'hash' => 2482785721,
+                            'hash' => 2058315713,
                             'properties' => [
                                 'entries' => [
                                     [
@@ -123,7 +123,7 @@ return [
                                     ],
                                     [
                                         'type' => KeyValueCoupleNode::class,
-                                        'hash' => 242714828,
+                                        'hash' => 4276984364,
                                     ],
                                     [
                                         'type' => KeyValueCoupleNode::class,
@@ -359,7 +359,7 @@ return [
                                 ],
                                 [
                                     'type' => KeyValueCoupleNode::class,
-                                    'hash' => 242714828,
+                                    'hash' => 4276984364,
                                     'properties' => [
                                         'key' => [
                                             'type' => KeyNode::class,
@@ -371,7 +371,7 @@ return [
                                         ],
                                         'value' => [
                                             'type' => ValueNode::class,
-                                            'hash' => 1990872080,
+                                            'hash' => 2891983882,
                                         ],
                                     ],
                                     'children' => [
@@ -422,11 +422,11 @@ return [
                                         ],
                                         [
                                             'type' => ValueNode::class,
-                                            'hash' => 1990872080,
+                                            'hash' => 2891983882,
                                             'properties' => [
                                                 'nodeProperties' => [
                                                     'type' => NodePropertiesNode::class,
-                                                    'hash' => 1971890266,
+                                                    'hash' => 2923676253,
                                                 ],
                                                 'payload' => [
                                                     'type' => BlockMappingNode::class,
@@ -436,21 +436,21 @@ return [
                                             'children' => [
                                                 [
                                                     'type' => NodePropertiesNode::class,
-                                                    'hash' => 1971890266,
+                                                    'hash' => 2923676253,
                                                     'properties' => [
                                                         'anchor' => [
-                                                            'type' => AnchorNode::class,
-                                                            'hash' => 3406760715,
+                                                            'type' => AnchorPropertyNode::class,
+                                                            'hash' => 2238844141,
                                                         ],
                                                     ],
                                                     'children' => [
                                                         [
-                                                            'type' => AnchorNode::class,
-                                                            'hash' => 3406760715,
+                                                            'type' => AnchorPropertyNode::class,
+                                                            'hash' => 2238844141,
                                                             'properties' => [
                                                                 'name' => 'id001',
                                                                 'token' => [
-                                                                    'type' => TokenType::ANCHOR,
+                                                                    'type' => TokenType::ANCHOR_PROPERTY,
                                                                     'text' => '&id001',
                                                                 ],
                                                             ],

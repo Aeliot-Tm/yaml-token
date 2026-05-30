@@ -145,7 +145,7 @@ Inside each document, all content paths converge on `ValueParser::parseValue()`:
 | `LookAheadHelper` | Peek at the first significant block head; collect insignificant lines |
 | `MultilineContinuationHelper` | Detect plain scalar continuation lines |
 | `AnchorPostProcessor` | Walk the key subtree and register anchors on `KeyValueCoupleNode` |
-| `AliasResolver` | Resolve `*alias` tokens to their `AnchorNode` |
+| `AliasResolver` | Resolve `*alias` tokens to their `AnchorPropertyNode` |
 | `BlockCollectionLoopHelper` | Advance past blank/comment lines to the next block entry |
 | `PeekOffsetHelper` | Skip whitespace tokens in peek operations |
 
@@ -177,8 +177,8 @@ An empty YAML value is represented as a `ValueNode` with no payload.
 - Anchors on values are registered in `AnchorsRegistry` immediately when `ValueNode` is built.
 - After each `KeyValueCoupleNode` is assembled, `AnchorPostProcessor` recursively walks the key
   subtree and registers all anchors found there (stopping at nested couples).
-- Each `AnchorNode` stores a reference to its declaring `KeyValueCoupleNode` via `getDeclarationCouple()`.
-- `AliasNode` holds a direct reference to the resolved `AnchorNode` via `getAnchor()`.
+- Each `AnchorPropertyNode` stores a reference to its declaring `KeyValueCoupleNode` via `getDeclarationCouple()`.
+- `AliasNode` holds a direct reference to the resolved `AnchorPropertyNode` via `getAnchor()`.
 
 ### Bare-document node properties
 
