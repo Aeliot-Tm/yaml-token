@@ -245,7 +245,7 @@ Represents a `<< : *alias` merge key entry.
 | `addAlias(AliasNode)` | Appends an alias. |
 | `getAliases()` | `list<AliasNode>` |
 
-### YamlVersionDirectiveNode
+### YamlVersionDefinitionNode
 
 `%YAML version` directive.
 

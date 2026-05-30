@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Aeliot\YamlToken\Parser\SubParser;
 
 use Aeliot\YamlToken\Enum\TokenType;
-use Aeliot\YamlToken\Node\YamlVersionDirectiveNode;
+use Aeliot\YamlToken\Node\YamlVersionDefinitionNode;
 use Aeliot\YamlToken\Parser\Dto\ParseContext;
 
 final readonly class YamlDirectiveParser
@@ -24,15 +24,15 @@ final readonly class YamlDirectiveParser
     ) {
     }
 
-    public function parse(ParseContext $parseContext): YamlVersionDirectiveNode
+    public function parse(ParseContext $parseContext): YamlVersionDefinitionNode
     {
-        $YamlVersionDirectiveNode = new YamlVersionDirectiveNode();
+        $YamlVersionDefinitionNode = new YamlVersionDefinitionNode();
 
-        $this->consumer->require($parseContext->tokens, $YamlVersionDirectiveNode, TokenType::YAML_DIRECTIVE);
-        $this->consumer->collectSpaceValueIndicator($parseContext->tokens, $YamlVersionDirectiveNode);
-        $this->consumer->require($parseContext->tokens, $YamlVersionDirectiveNode, TokenType::YAML_VERSION);
-        $this->consumer->collectSpaceAndComments($parseContext->tokens, $YamlVersionDirectiveNode);
+        $this->consumer->require($parseContext->tokens, $YamlVersionDefinitionNode, TokenType::YAML_DIRECTIVE);
+        $this->consumer->collectSpaceValueIndicator($parseContext->tokens, $YamlVersionDefinitionNode);
+        $this->consumer->require($parseContext->tokens, $YamlVersionDefinitionNode, TokenType::YAML_VERSION);
+        $this->consumer->collectSpaceAndComments($parseContext->tokens, $YamlVersionDefinitionNode);
 
-        return $YamlVersionDirectiveNode;
+        return $YamlVersionDefinitionNode;
     }
 }

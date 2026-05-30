@@ -19,7 +19,7 @@ use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\PlainScalarNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\YamlDirectiveNode;
-use Aeliot\YamlToken\Node\YamlVersionDirectiveNode;
+use Aeliot\YamlToken\Node\YamlVersionDefinitionNode;
 use Aeliot\YamlToken\Node\YamlVersionNode;
 use Aeliot\YamlToken\Parser\Exception\UnexpectedTokenException;
 use Aeliot\YamlToken\Parser\Parser;
@@ -33,7 +33,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(DocumentNode::class)]
 #[UsesClass(StreamNode::class)]
 #[UsesClass(YamlDirectiveNode::class)]
-#[UsesClass(YamlVersionDirectiveNode::class)]
+#[UsesClass(YamlVersionDefinitionNode::class)]
 #[UsesClass(YamlVersionNode::class)]
 final class YamlDirectiveTest extends TestCase
 {
@@ -57,7 +57,7 @@ YAML);
 
         $directives = array_values(array_filter(
             $documents[0]->getChildren(),
-            static fn ($n): bool => $n instanceof YamlVersionDirectiveNode,
+            static fn ($n): bool => $n instanceof YamlVersionDefinitionNode,
         ));
         self::assertCount(2, $directives);
     }
@@ -73,7 +73,7 @@ YAML);
 
         $first = $documents[0];
         $directive = $first->getChildren()[0];
-        self::assertInstanceOf(YamlVersionDirectiveNode::class, $directive);
+        self::assertInstanceOf(YamlVersionDefinitionNode::class, $directive);
         self::assertSame('%YAML', $directive->getIndicatorNode()->getToken()->text);
 
         /** @var YamlVersionNode[] $versionNodes */
@@ -97,7 +97,7 @@ YAML);
         $first = $documents[0];
         $children = $first->getChildren();
         self::assertNotEmpty($children);
-        self::assertInstanceOf(YamlVersionDirectiveNode::class, $children[0]);
+        self::assertInstanceOf(YamlVersionDefinitionNode::class, $children[0]);
         $directive = $children[0];
         self::assertSame('%YAML', $directive->getIndicatorNode()->getToken()->text);
 

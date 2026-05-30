@@ -9,22 +9,22 @@ use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 use Aeliot\YamlToken\Node\YamlDirectiveNode;
-use Aeliot\YamlToken\Node\YamlVersionDirectiveNode;
+use Aeliot\YamlToken\Node\YamlVersionDefinitionNode;
 use Aeliot\YamlToken\Node\YamlVersionNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 940903608,
+    'hash' => 1767594360,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 891126261,
+            'hash' => 233426186,
             'properties' => [],
             'children' => [
                 [
-                    'type' => YamlVersionDirectiveNode::class,
-                    'hash' => 1201568678,
+                    'type' => YamlVersionDefinitionNode::class,
+                    'hash' => 3512301739,
                     'properties' => [],
                     'children' => [
                         [

@@ -13,22 +13,22 @@ use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 use Aeliot\YamlToken\Node\YamlDirectiveNode;
-use Aeliot\YamlToken\Node\YamlVersionDirectiveNode;
+use Aeliot\YamlToken\Node\YamlVersionDefinitionNode;
 use Aeliot\YamlToken\Node\YamlVersionNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 1476804684,
+    'hash' => 1693908487,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 345435334,
+            'hash' => 1638151659,
             'properties' => [],
             'children' => [
                 [
-                    'type' => YamlVersionDirectiveNode::class,
-                    'hash' => 3467281353,
+                    'type' => YamlVersionDefinitionNode::class,
+                    'hash' => 2150937590,
                     'properties' => [],
                     'children' => [
                         [
