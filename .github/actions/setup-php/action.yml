@@ -13,3 +13,4 @@ runs:
     - uses: shivammathur/setup-php@v2
       with:
         php-version: ${{ inputs.php-version }}
+        coverage: none
