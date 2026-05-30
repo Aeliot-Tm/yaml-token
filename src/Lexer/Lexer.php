@@ -1358,9 +1358,6 @@ final class Lexer
 
             return;
         }
-
-        $text = $this->consumeCodePoint($harvester);
-        $harvester->stream->addToken(new Token(TokenType::UNRECOGNIZED, $text, $startLine, $startColumn));
     }
 
     private function readUntilNewline(Harvester $harvester): string

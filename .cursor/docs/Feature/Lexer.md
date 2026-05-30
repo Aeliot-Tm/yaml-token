@@ -135,7 +135,6 @@ The rules below describe the practical behavior relied upon by lexer unit tests.
   - `?` is only a stop character at the start of a token (empty result so far); inside an already-started
     plain scalar `?` is a valid `ns-plain-char` per YAML 1.2.2 §7.3.3 rule [129] and does not end the scalar
   - trailing whitespace before newline or a comment does not become part of the plain scalar token
-- **Fallback**: anything not consumed by rules above is emitted as `UNRECOGNIZED` (one UTF-8 code point fragment).
 
 ## Fixture and test rules
 
