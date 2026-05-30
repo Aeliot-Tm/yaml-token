@@ -3,13 +3,13 @@
 declare(strict_types=1);
 
 use Aeliot\YamlToken\Enum\TokenType;
-use Aeliot\YamlToken\Node\DirectiveNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\DocumentStartNode;
 use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
 use Aeliot\YamlToken\Node\NewLineNode;
 use Aeliot\YamlToken\Node\PlainScalarNode;
+use Aeliot\YamlToken\Node\ReservedDirectiveNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\ValueIndicatorNode;
 use Aeliot\YamlToken\Node\ValueNode;
@@ -17,20 +17,20 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 1359125165,
+    'hash' => 75113639,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 2348173980,
+            'hash' => 648945055,
             'properties' => [],
             'children' => [
                 [
-                    'type' => DirectiveNode::class,
-                    'hash' => 2087527958,
+                    'type' => ReservedDirectiveNode::class,
+                    'hash' => 585416954,
                     'properties' => [
                         'token' => [
-                            'type' => TokenType::DIRECTIVE,
+                            'type' => TokenType::RESERVED_DIRECTIVE,
                             'text' => '%FOO bar baz',
                         ],
                     ],

@@ -6,7 +6,7 @@ use Aeliot\YamlToken\Enum\TokenType;
 
 return [
     [
-        'type' => TokenType::DIRECTIVE,
+        'type' => TokenType::RESERVED_DIRECTIVE,
         'text' => '%YAM 1.1',
     ],
     [

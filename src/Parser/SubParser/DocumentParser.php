@@ -16,12 +16,12 @@ namespace Aeliot\YamlToken\Parser\SubParser;
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\BlockSequenceEntryNode;
 use Aeliot\YamlToken\Node\CommentNode;
-use Aeliot\YamlToken\Node\DirectiveNode;
 use Aeliot\YamlToken\Node\DocumentEndNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\DocumentStartNode;
 use Aeliot\YamlToken\Node\IndentNode;
 use Aeliot\YamlToken\Node\NewLineNode;
+use Aeliot\YamlToken\Node\ReservedDirectiveNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 use Aeliot\YamlToken\Parser\Assembler\ParserRegistry;
@@ -159,8 +159,8 @@ final readonly class DocumentParser
             return false;
         }
 
-        if (TokenType::DIRECTIVE === $token->type) {
-            $document->addChild(new DirectiveNode($token));
+        if (TokenType::RESERVED_DIRECTIVE === $token->type) {
+            $document->addChild(new ReservedDirectiveNode($token));
             $parseContext->tokens->advance();
 
             return true;

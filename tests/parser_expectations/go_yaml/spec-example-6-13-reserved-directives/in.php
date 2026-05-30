@@ -4,32 +4,32 @@ declare(strict_types=1);
 
 use Aeliot\YamlToken\Enum\TokenType;
 use Aeliot\YamlToken\Node\CommentNode;
-use Aeliot\YamlToken\Node\DirectiveNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\DocumentStartNode;
 use Aeliot\YamlToken\Node\DoubleQuotedScalarNode;
 use Aeliot\YamlToken\Node\IndentNode;
 use Aeliot\YamlToken\Node\NewLineNode;
+use Aeliot\YamlToken\Node\ReservedDirectiveNode;
 use Aeliot\YamlToken\Node\StreamNode;
 use Aeliot\YamlToken\Node\ValueNode;
 use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 3962342812,
+    'hash' => 2516738563,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 2323267374,
+            'hash' => 1051200619,
             'properties' => [],
             'children' => [
                 [
-                    'type' => DirectiveNode::class,
-                    'hash' => 2182406598,
+                    'type' => ReservedDirectiveNode::class,
+                    'hash' => 737592947,
                     'properties' => [
                         'token' => [
-                            'type' => TokenType::DIRECTIVE,
+                            'type' => TokenType::RESERVED_DIRECTIVE,
                             'text' => '%FOO  bar baz',
                         ],
                     ],

@@ -68,7 +68,7 @@ All extend `SyntaxNode` (constructor accepts `Token`; no additional methods unle
 | `TagDirectiveNode` | `TAG_DIRECTIVE` (`%TAG`) |
 | `TagHandleNode` | `TAG_HANDLE`. `getHandle(): string` returns the handle text. |
 | `TagPrefixNode` | `TAG_PREFIX`. `getPrefix(): string` returns the prefix text. |
-| `DirectiveNode` | Generic unrecognized directive line (`DIRECTIVE` token). |
+| `ReservedDirectiveNode` | Generic unrecognized directive line (`RESERVED_DIRECTIVE` token). |
 
 ## Property Nodes
 

@@ -3,28 +3,28 @@
 declare(strict_types=1);
 
 use Aeliot\YamlToken\Enum\TokenType;
-use Aeliot\YamlToken\Node\DirectiveNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\DocumentStartNode;
 use Aeliot\YamlToken\Node\NewLineNode;
+use Aeliot\YamlToken\Node\ReservedDirectiveNode;
 use Aeliot\YamlToken\Node\StreamNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 1014081463,
+    'hash' => 63084019,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 3865320190,
+            'hash' => 1958866055,
             'properties' => [],
             'children' => [
                 [
-                    'type' => DirectiveNode::class,
-                    'hash' => 2202584059,
+                    'type' => ReservedDirectiveNode::class,
+                    'hash' => 3957063307,
                     'properties' => [
                         'token' => [
-                            'type' => TokenType::DIRECTIVE,
+                            'type' => TokenType::RESERVED_DIRECTIVE,
                             'text' => '%YAM 1.1',
                         ],
                     ],

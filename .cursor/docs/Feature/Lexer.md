@@ -34,7 +34,7 @@ The rules below describe the practical behavior relied upon by lexer unit tests.
     without an intervening document end (§9.2 sloppy-stream edge case).
   - `%YAML` lines: the name must be exact — the character after `L` must be horizontal whitespace,
     `:`, a digit, a line break, or end of input. Otherwise (e.g. `%YAMLL`), the whole `%...` line
-    through the line break is a generic `DIRECTIVE` token. When the boundary matches, the line
+    through the line break is a generic `RESERVED_DIRECTIVE` token. When the boundary matches, the line
     is split into `YAML_DIRECTIVE` (`%YAML`), optional `WHITESPACE`, optional `VALUE_INDICATOR` (`:`),
     optional `WHITESPACE`, `YAML_VERSION` (text until horizontal whitespace, line break,
     or `#` that starts a comment), optional `WHITESPACE`, optional `COMMENT`, then the line break
@@ -46,9 +46,9 @@ The rules below describe the practical behavior relied upon by lexer unit tests.
     optional `COMMENT`, then the line break is a separate `NEWLINE`. If `%TAG` is immediately
     followed by a line break, or `%TAG` is not followed by whitespace/`!` (e.g. glued text),
     the rest of the line is emitted as a single `TAG_DIRECTIVE` token as before.
-  - any other `%...` line: `DIRECTIVE` (text until horizontal whitespace, line break, or `#` that
+  - any other `%...` line: `RESERVED_DIRECTIVE` (text until horizontal whitespace, line break, or `#` that
     starts a comment), optional `WHITESPACE`, optional `COMMENT`, then the line break is a separate
-    `NEWLINE`. A `#` glued to the directive text without separating whitespace stays inside `DIRECTIVE`.
+    `NEWLINE`. A `#` glued to the directive text without separating whitespace stays inside `RESERVED_DIRECTIVE`.
 - **Flow indicators**: `[ ] { } ,` are emitted as flow tokens:
   - `FLOW_SEQUENCE_START`, `FLOW_SEQUENCE_END`
   - `FLOW_MAPPING_START`, `FLOW_MAPPING_END`

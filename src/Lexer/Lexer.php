@@ -1165,10 +1165,10 @@ final class Lexer
             return;
         }
 
-        // DIRECTIVE (%... directive line) — non-indented, only in directive prefix zone (YAML 1.2.2 §6.8).
+        // RESERVED_DIRECTIVE (%... directive line) — non-indented, only in directive prefix zone (YAML 1.2.2 §6.8).
         if ($this->isDirectiveLineStart($harvester)) {
             $directive = $this->readGenericDirectiveLineLexeme($harvester);
-            $harvester->stream->addToken(new Token(TokenType::DIRECTIVE, $directive, $startLine, $startColumn));
+            $harvester->stream->addToken(new Token(TokenType::RESERVED_DIRECTIVE, $directive, $startLine, $startColumn));
 
             return;
         }
