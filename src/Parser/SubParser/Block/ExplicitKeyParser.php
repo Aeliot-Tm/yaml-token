@@ -274,7 +274,7 @@ final readonly class ExplicitKeyParser
             return;
         }
 
-        if (TokenType::ALIAS === $token->type) {
+        if (TokenType::ALIAS_NODE === $token->type) {
             $aliasNode = $this->aliasResolver->resolveAlias($parseContext, $token);
             $keyNode->setName($aliasNode);
             $parseContext->tokens->advance();

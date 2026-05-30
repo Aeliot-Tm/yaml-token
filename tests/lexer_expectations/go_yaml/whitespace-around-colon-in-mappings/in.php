@@ -146,7 +146,7 @@ return [
         'text' => '  ',
     ],
     [
-        'type' => TokenType::ALIAS,
+        'type' => TokenType::ALIAS_NODE,
         'text' => '*alias1',
     ],
     [
@@ -190,7 +190,7 @@ return [
         'text' => '  ',
     ],
     [
-        'type' => TokenType::ALIAS,
+        'type' => TokenType::ALIAS_NODE,
         'text' => '*alias2',
     ],
     [

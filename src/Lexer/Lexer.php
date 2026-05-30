@@ -625,7 +625,7 @@ final class Lexer
     private function onFlowMapScalarLikeNodeEmitted(Harvester $harvester, TokenType $type): void
     {
         if (!\in_array($type, [
-            TokenType::ALIAS,
+            TokenType::ALIAS_NODE,
             TokenType::DOUBLE_QUOTED_SCALAR,
             TokenType::MERGE_INDICATOR,
             TokenType::PLAIN_SCALAR,
@@ -1307,11 +1307,11 @@ final class Lexer
             return;
         }
 
-        // ALIAS (*name)
+        // ALIAS_NODE (*name)
         if ('*' === $char && !$harvester->cursor->suppressAnchorAlias) {
             $alias = '*'.$this->readAnchorOrAlias($harvester);
-            $harvester->stream->addToken(new Token(TokenType::ALIAS, $alias, $startLine, $startColumn));
-            $this->onFlowMapScalarLikeNodeEmitted($harvester, TokenType::ALIAS);
+            $harvester->stream->addToken(new Token(TokenType::ALIAS_NODE, $alias, $startLine, $startColumn));
+            $this->onFlowMapScalarLikeNodeEmitted($harvester, TokenType::ALIAS_NODE);
 
             return;
         }

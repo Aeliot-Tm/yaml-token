@@ -78,7 +78,7 @@ return [
         'text' => ' ',
     ],
     [
-        'type' => TokenType::ALIAS,
+        'type' => TokenType::ALIAS_NODE,
         'text' => '*a1',
     ],
     [

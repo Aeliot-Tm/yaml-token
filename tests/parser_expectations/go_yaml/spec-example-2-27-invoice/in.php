@@ -30,12 +30,12 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 2151077867,
+    'hash' => 1151988871,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 3962780437,
+            'hash' => 3374285272,
             'properties' => [],
             'children' => [
                 [
@@ -62,7 +62,7 @@ return [
                 ],
                 [
                     'type' => ValueNode::class,
-                    'hash' => 813931788,
+                    'hash' => 2867130217,
                     'properties' => [
                         'nodeProperties' => [
                             'type' => NodePropertiesNode::class,
@@ -70,7 +70,7 @@ return [
                         ],
                         'payload' => [
                             'type' => BlockMappingNode::class,
-                            'hash' => 2058315713,
+                            'hash' => 1267352695,
                         ],
                     ],
                     'children' => [
@@ -110,7 +110,7 @@ return [
                         ],
                         [
                             'type' => BlockMappingNode::class,
-                            'hash' => 2058315713,
+                            'hash' => 1267352695,
                             'properties' => [
                                 'entries' => [
                                     [
@@ -127,7 +127,7 @@ return [
                                     ],
                                     [
                                         'type' => KeyValueCoupleNode::class,
-                                        'hash' => 3386721143,
+                                        'hash' => 2327164048,
                                     ],
                                     [
                                         'type' => KeyValueCoupleNode::class,
@@ -1384,7 +1384,7 @@ return [
                                 ],
                                 [
                                     'type' => KeyValueCoupleNode::class,
-                                    'hash' => 3386721143,
+                                    'hash' => 2327164048,
                                     'properties' => [
                                         'key' => [
                                             'type' => KeyNode::class,
@@ -1396,7 +1396,7 @@ return [
                                         ],
                                         'value' => [
                                             'type' => ValueNode::class,
-                                            'hash' => 2295571747,
+                                            'hash' => 46657260,
                                         ],
                                     ],
                                     'children' => [
@@ -1447,22 +1447,22 @@ return [
                                         ],
                                         [
                                             'type' => ValueNode::class,
-                                            'hash' => 2295571747,
+                                            'hash' => 46657260,
                                             'properties' => [
                                                 'payload' => [
                                                     'type' => AliasNode::class,
-                                                    'hash' => 774875236,
+                                                    'hash' => 3429307551,
                                                 ],
                                             ],
                                             'children' => [
                                                 [
                                                     'type' => AliasNode::class,
-                                                    'hash' => 774875236,
+                                                    'hash' => 3429307551,
                                                     'properties' => [
                                                         'name' => 'id001',
                                                         'anchorName' => 'id001',
                                                         'token' => [
-                                                            'type' => TokenType::ALIAS,
+                                                            'type' => TokenType::ALIAS_NODE,
                                                             'text' => '*id001',
                                                         ],
                                                     ],

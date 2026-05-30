@@ -77,7 +77,7 @@ Inside each document, all content paths converge on `ValueParser::parseValue()`:
 | `NEWLINE` in flow context | collect whitespace/comments, recurse |
 | `NEWLINE` in block context | `IndentedBlockValueParser` |
 | scalar tokens | `SimpleScalarParser` or `MultilinePlainScalarParser` |
-| `ALIAS` | `AliasResolver` |
+| `ALIAS_NODE` | `AliasResolver` |
 | `SEQUENCE_ENTRY` | `CompactBlockSequenceParser` |
 | `FLOW_SEQUENCE_START` | `FlowSequenceParser` |
 | `FLOW_MAPPING_START` | `FlowMappingParser` |

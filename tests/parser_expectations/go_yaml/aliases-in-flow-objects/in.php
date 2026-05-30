@@ -25,26 +25,26 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 3534750611,
+    'hash' => 358084944,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 1576319717,
+            'hash' => 3475261640,
             'properties' => [],
             'children' => [
                 [
                     'type' => FlowMappingNode::class,
-                    'hash' => 1907545189,
+                    'hash' => 3260088964,
                     'properties' => [
                         'entries' => [
                             [
                                 'type' => KeyValueCoupleNode::class,
-                                'hash' => 131560916,
+                                'hash' => 1601968219,
                             ],
                             [
                                 'type' => KeyValueCoupleNode::class,
-                                'hash' => 3712115047,
+                                'hash' => 67671932,
                             ],
                         ],
                     ],
@@ -73,7 +73,7 @@ return [
                         ],
                         [
                             'type' => KeyValueCoupleNode::class,
-                            'hash' => 131560916,
+                            'hash' => 1601968219,
                             'properties' => [
                                 'key' => [
                                     'type' => KeyNode::class,
@@ -85,7 +85,7 @@ return [
                                 ],
                                 'value' => [
                                     'type' => ValueNode::class,
-                                    'hash' => 663146519,
+                                    'hash' => 801295602,
                                 ],
                             ],
                             'children' => [
@@ -311,22 +311,22 @@ return [
                                 ],
                                 [
                                     'type' => ValueNode::class,
-                                    'hash' => 663146519,
+                                    'hash' => 801295602,
                                     'properties' => [
                                         'payload' => [
                                             'type' => AliasNode::class,
-                                            'hash' => 1890211799,
+                                            'hash' => 1955139519,
                                         ],
                                     ],
                                     'children' => [
                                         [
                                             'type' => AliasNode::class,
-                                            'hash' => 1890211799,
+                                            'hash' => 1955139519,
                                             'properties' => [
                                                 'name' => 'b',
                                                 'anchorName' => 'b',
                                                 'token' => [
-                                                    'type' => TokenType::ALIAS,
+                                                    'type' => TokenType::ALIAS_NODE,
                                                     'text' => '*b',
                                                 ],
                                             ],
@@ -360,11 +360,11 @@ return [
                         ],
                         [
                             'type' => KeyValueCoupleNode::class,
-                            'hash' => 3712115047,
+                            'hash' => 67671932,
                             'properties' => [
                                 'key' => [
                                     'type' => KeyNode::class,
-                                    'hash' => 255557969,
+                                    'hash' => 2640921991,
                                 ],
                                 'valueIndicator' => [
                                     'type' => ValueIndicatorNode::class,
@@ -372,28 +372,28 @@ return [
                                 ],
                                 'value' => [
                                     'type' => ValueNode::class,
-                                    'hash' => 2492549358,
+                                    'hash' => 938903958,
                                 ],
                             ],
                             'children' => [
                                 [
                                     'type' => KeyNode::class,
-                                    'hash' => 255557969,
+                                    'hash' => 2640921991,
                                     'properties' => [
                                         'name' => [
                                             'type' => AliasNode::class,
-                                            'hash' => 2627008179,
+                                            'hash' => 3399154601,
                                         ],
                                     ],
                                     'children' => [
                                         [
                                             'type' => AliasNode::class,
-                                            'hash' => 2627008179,
+                                            'hash' => 3399154601,
                                             'properties' => [
                                                 'name' => 'a',
                                                 'anchorName' => 'a',
                                                 'token' => [
-                                                    'type' => TokenType::ALIAS,
+                                                    'type' => TokenType::ALIAS_NODE,
                                                     'text' => '*a',
                                                 ],
                                             ],
@@ -436,17 +436,17 @@ return [
                                 ],
                                 [
                                     'type' => ValueNode::class,
-                                    'hash' => 2492549358,
+                                    'hash' => 938903958,
                                     'properties' => [
                                         'payload' => [
                                             'type' => FlowSequenceNode::class,
-                                            'hash' => 2337060252,
+                                            'hash' => 1850564923,
                                         ],
                                     ],
                                     'children' => [
                                         [
                                             'type' => FlowSequenceNode::class,
-                                            'hash' => 2337060252,
+                                            'hash' => 1850564923,
                                             'properties' => [
                                                 'entries' => [
                                                     [
@@ -455,7 +455,7 @@ return [
                                                     ],
                                                     [
                                                         'type' => ValueNode::class,
-                                                        'hash' => 663146519,
+                                                        'hash' => 801295602,
                                                     ],
                                                     [
                                                         'type' => ValueNode::class,
@@ -522,22 +522,22 @@ return [
                                                 ],
                                                 [
                                                     'type' => ValueNode::class,
-                                                    'hash' => 663146519,
+                                                    'hash' => 801295602,
                                                     'properties' => [
                                                         'payload' => [
                                                             'type' => AliasNode::class,
-                                                            'hash' => 1890211799,
+                                                            'hash' => 1955139519,
                                                         ],
                                                     ],
                                                     'children' => [
                                                         [
                                                             'type' => AliasNode::class,
-                                                            'hash' => 1890211799,
+                                                            'hash' => 1955139519,
                                                             'properties' => [
                                                                 'name' => 'b',
                                                                 'anchorName' => 'b',
                                                                 'token' => [
-                                                                    'type' => TokenType::ALIAS,
+                                                                    'type' => TokenType::ALIAS_NODE,
                                                                     'text' => '*b',
                                                                 ],
                                                             ],

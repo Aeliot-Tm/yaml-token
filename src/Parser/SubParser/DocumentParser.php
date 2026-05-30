@@ -278,7 +278,7 @@ final readonly class DocumentParser
             return true;
         }
 
-        if (TokenType::ALIAS === $token->type) {
+        if (TokenType::ALIAS_NODE === $token->type) {
             $document->addChild($this->registry->getValueParser()->parseValue($parseContext, IndentContext::createForBareDocument()));
 
             return true;

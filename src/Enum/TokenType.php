@@ -15,7 +15,7 @@ namespace Aeliot\YamlToken\Enum;
 
 enum TokenType: string
 {
-    case ALIAS = 'ALIAS';
+    case ALIAS_NODE = 'ALIAS_NODE';
     case ANCHOR_PROPERTY = 'ANCHOR_PROPERTY';
     case BLOCK_INDENT = 'BLOCK_INDENT';
     case BLOCK_SCALAR_CHOMPING_INDICATOR = 'BLOCK_SCALAR_CHOMPING_INDICATOR';

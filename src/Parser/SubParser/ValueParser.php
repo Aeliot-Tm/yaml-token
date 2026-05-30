@@ -180,7 +180,7 @@ final readonly class ValueParser
             } else {
                 $this->parsePlainScalarPayload($parseContext, $valueNode, $parentIndent, $token);
             }
-        } elseif (TokenType::ALIAS === $token->type) {
+        } elseif (TokenType::ALIAS_NODE === $token->type) {
             $aliasNode = $this->aliasResolver->resolveAlias($parseContext, $token);
             $valueNode->addChild($aliasNode);
             $parseContext->tokens->advance();

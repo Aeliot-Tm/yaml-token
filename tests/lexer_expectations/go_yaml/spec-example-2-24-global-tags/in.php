@@ -218,7 +218,7 @@ return [
         'text' => ' ',
     ],
     [
-        'type' => TokenType::ALIAS,
+        'type' => TokenType::ALIAS_NODE,
         'text' => '*ORIGIN',
     ],
     [
@@ -334,7 +334,7 @@ return [
         'text' => ' ',
     ],
     [
-        'type' => TokenType::ALIAS,
+        'type' => TokenType::ALIAS_NODE,
         'text' => '*ORIGIN',
     ],
     [

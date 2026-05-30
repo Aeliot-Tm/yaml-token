@@ -20,12 +20,12 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 347164179,
+    'hash' => 3124656143,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 707045242,
+            'hash' => 568275386,
             'properties' => [],
             'children' => [
                 [
@@ -244,7 +244,7 @@ return [
                 ],
                 [
                     'type' => KeyValueCoupleNode::class,
-                    'hash' => 1192190945,
+                    'hash' => 2908400584,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
@@ -256,7 +256,7 @@ return [
                         ],
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 880204350,
+                            'hash' => 3740785683,
                         ],
                     ],
                     'children' => [
@@ -290,22 +290,22 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 880204350,
+                            'hash' => 3740785683,
                             'properties' => [
                                 'payload' => [
                                     'type' => AliasNode::class,
-                                    'hash' => 2627008179,
+                                    'hash' => 3399154601,
                                 ],
                             ],
                             'children' => [
                                 [
                                     'type' => AliasNode::class,
-                                    'hash' => 2627008179,
+                                    'hash' => 3399154601,
                                     'properties' => [
                                         'name' => 'a',
                                         'anchorName' => 'a',
                                         'token' => [
-                                            'type' => TokenType::ALIAS,
+                                            'type' => TokenType::ALIAS_NODE,
                                             'text' => '*a',
                                         ],
                                     ],

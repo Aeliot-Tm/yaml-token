@@ -17,12 +17,12 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 1612365532,
+    'hash' => 3370665584,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 49351345,
+            'hash' => 2088396360,
             'properties' => [],
             'children' => [
                 [
@@ -241,11 +241,11 @@ return [
                 ],
                 [
                     'type' => BlockSequenceEntryNode::class,
-                    'hash' => 362836363,
+                    'hash' => 3239186968,
                     'properties' => [
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 880204350,
+                            'hash' => 3740785683,
                         ],
                     ],
                     'children' => [
@@ -273,22 +273,22 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 880204350,
+                            'hash' => 3740785683,
                             'properties' => [
                                 'payload' => [
                                     'type' => AliasNode::class,
-                                    'hash' => 2627008179,
+                                    'hash' => 3399154601,
                                 ],
                             ],
                             'children' => [
                                 [
                                     'type' => AliasNode::class,
-                                    'hash' => 2627008179,
+                                    'hash' => 3399154601,
                                     'properties' => [
                                         'name' => 'a',
                                         'anchorName' => 'a',
                                         'token' => [
-                                            'type' => TokenType::ALIAS,
+                                            'type' => TokenType::ALIAS_NODE,
                                             'text' => '*a',
                                         ],
                                     ],
@@ -311,11 +311,11 @@ return [
                 ],
                 [
                     'type' => BlockSequenceEntryNode::class,
-                    'hash' => 262440555,
+                    'hash' => 2866161047,
                     'properties' => [
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 663146519,
+                            'hash' => 801295602,
                         ],
                     ],
                     'children' => [
@@ -343,22 +343,22 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 663146519,
+                            'hash' => 801295602,
                             'properties' => [
                                 'payload' => [
                                     'type' => AliasNode::class,
-                                    'hash' => 1890211799,
+                                    'hash' => 1955139519,
                                 ],
                             ],
                             'children' => [
                                 [
                                     'type' => AliasNode::class,
-                                    'hash' => 1890211799,
+                                    'hash' => 1955139519,
                                     'properties' => [
                                         'name' => 'b',
                                         'anchorName' => 'b',
                                         'token' => [
-                                            'type' => TokenType::ALIAS,
+                                            'type' => TokenType::ALIAS_NODE,
                                             'text' => '*b',
                                         ],
                                     ],

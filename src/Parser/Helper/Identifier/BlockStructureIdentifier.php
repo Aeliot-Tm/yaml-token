@@ -47,7 +47,7 @@ final readonly class BlockStructureIdentifier
 
         if (
             TokenType::EXPLICIT_KEY_INDICATOR === $token->type
-            || TokenType::ALIAS === $token->type
+            || TokenType::ALIAS_NODE === $token->type
             || TokenType::VALUE_INDICATOR === $token->type
             || $token->type->isMergeIndicator()
         ) {
