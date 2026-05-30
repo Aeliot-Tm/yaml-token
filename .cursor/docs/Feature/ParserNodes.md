@@ -60,7 +60,7 @@ All extend `SyntaxNode` (constructor accepts `Token`; no additional methods unle
 | `FlowMappingStartNode` | `FLOW_MAPPING_START` (`{`). Extends `FlowMappingBoundNode`. |
 | `FlowMappingEndNode` | `FLOW_MAPPING_END` (`}`). Extends `FlowMappingBoundNode`. |
 | `BlockScalarIndicatorNode` | `FOLDED_BLOCK_SCALAR_INDICATOR` or `LITERAL_BLOCK_SCALAR_INDICATOR` (`>` / `\|`) |
-| `BlockScalarChompingIndicatorNode` | `BLOCK_SCALAR_CHOMPING_INDICATOR` (`+` / `-`) |
+| `BlockScalarChompingIndicatorNode` | `CHOMPING_INDICATOR` (`+` / `-`) |
 | `BlockScalarIndentationIndicatorNode` | `INDENTATION_INDICATOR` (digit) |
 | `MergeIndicatorNode` | `MERGE_INDICATOR` (`<<`) |
 | `YamlDirectiveNode` | `YAML_DIRECTIVE` (`%YAML`) |

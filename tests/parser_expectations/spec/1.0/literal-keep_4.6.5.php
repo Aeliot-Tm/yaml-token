@@ -3,10 +3,10 @@
 declare(strict_types=1);
 
 use Aeliot\YamlToken\Enum\TokenType;
-use Aeliot\YamlToken\Node\BlockScalarChompingIndicatorNode;
 use Aeliot\YamlToken\Node\BlockScalarEntryNode;
 use Aeliot\YamlToken\Node\BlockScalarIndicatorNode;
 use Aeliot\YamlToken\Node\BlockScalarOptionsNode;
+use Aeliot\YamlToken\Node\ChompingIndicatorNode;
 use Aeliot\YamlToken\Node\DocumentNode;
 use Aeliot\YamlToken\Node\KeyNode;
 use Aeliot\YamlToken\Node\KeyValueCoupleNode;
@@ -20,17 +20,17 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 391107450,
+    'hash' => 1459886976,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 1926859120,
+            'hash' => 967577734,
             'properties' => [],
             'children' => [
                 [
                     'type' => KeyValueCoupleNode::class,
-                    'hash' => 677129793,
+                    'hash' => 989125297,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
@@ -42,7 +42,7 @@ return [
                         ],
                         'value' => [
                             'type' => ValueNode::class,
-                            'hash' => 751498262,
+                            'hash' => 4093733293,
                         ],
                     ],
                     'children' => [
@@ -93,30 +93,30 @@ return [
                         ],
                         [
                             'type' => ValueNode::class,
-                            'hash' => 751498262,
+                            'hash' => 4093733293,
                             'properties' => [
                                 'payload' => [
                                     'type' => BlockScalarEntryNode::class,
-                                    'hash' => 1281335219,
+                                    'hash' => 1250834834,
                                 ],
                             ],
                             'children' => [
                                 [
                                     'type' => BlockScalarEntryNode::class,
-                                    'hash' => 1281335219,
+                                    'hash' => 1250834834,
                                     'properties' => [],
                                     'children' => [
                                         [
                                             'type' => BlockScalarOptionsNode::class,
-                                            'hash' => 622944022,
+                                            'hash' => 1396835592,
                                             'properties' => [
                                                 'typeIndicator' => [
                                                     'type' => BlockScalarIndicatorNode::class,
                                                     'hash' => 1768284065,
                                                 ],
                                                 'chompingIndicator' => [
-                                                    'type' => BlockScalarChompingIndicatorNode::class,
-                                                    'hash' => 414092453,
+                                                    'type' => ChompingIndicatorNode::class,
+                                                    'hash' => 2395912562,
                                                 ],
                                             ],
                                             'children' => [
@@ -132,11 +132,11 @@ return [
                                                     'children' => [],
                                                 ],
                                                 [
-                                                    'type' => BlockScalarChompingIndicatorNode::class,
-                                                    'hash' => 414092453,
+                                                    'type' => ChompingIndicatorNode::class,
+                                                    'hash' => 2395912562,
                                                     'properties' => [
                                                         'token' => [
-                                                            'type' => TokenType::BLOCK_SCALAR_CHOMPING_INDICATOR,
+                                                            'type' => TokenType::CHOMPING_INDICATOR,
                                                             'text' => '+',
                                                         ],
                                                     ],

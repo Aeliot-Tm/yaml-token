@@ -17,13 +17,13 @@ use Aeliot\YamlToken\Parser\Exception\UnexpectedStateException;
 
 class BlockScalarOptionsNode extends AbstractNode
 {
-    private ?BlockScalarChompingIndicatorNode $chompingIndicator = null;
+    private ?ChompingIndicatorNode $chompingIndicator = null;
     private ?IndentationIndicatorNode $indentationIndicator = null;
     private ?BlockScalarIndicatorNode $typeIndicator = null;
 
     public function addChild(Node $child): void
     {
-        if ($child instanceof BlockScalarChompingIndicatorNode) {
+        if ($child instanceof ChompingIndicatorNode) {
             if (null !== $this->chompingIndicator) {
                 throw new UnexpectedStateException('Attempt to set block scalar chomping indicator twice');
             }
@@ -43,7 +43,7 @@ class BlockScalarOptionsNode extends AbstractNode
         parent::addChild($child);
     }
 
-    public function getChompingIndicator(): ?BlockScalarChompingIndicatorNode
+    public function getChompingIndicator(): ?ChompingIndicatorNode
     {
         return $this->chompingIndicator;
     }

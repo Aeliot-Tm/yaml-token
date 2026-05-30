@@ -60,7 +60,7 @@ final class Cursor
     public ?TokenType $blockScalarBodyTokenType = null;
 
     /**
-     * Chomping from the block scalar header: set on {@see TokenType::BLOCK_SCALAR_CHOMPING_INDICATOR},
+     * Chomping from the block scalar header: set on {@see TokenType::CHOMPING_INDICATOR},
      * default {@see BlockScalarChomping::Clip} when the header line ends without +/-.
      */
     public ?BlockScalarChomping $blockScalarChomping = null;

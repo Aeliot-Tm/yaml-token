@@ -22,7 +22,7 @@ return [
         'text' => '1',
     ],
     [
-        'type' => TokenType::BLOCK_SCALAR_CHOMPING_INDICATOR,
+        'type' => TokenType::CHOMPING_INDICATOR,
         'text' => '+',
     ],
 ];

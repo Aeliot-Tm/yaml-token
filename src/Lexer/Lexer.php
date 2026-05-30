@@ -1231,7 +1231,7 @@ final class Lexer
             if ('+' === $char || '-' === $char) {
                 $this->advance($harvester);
                 $harvester->cursor->blockScalarChomping = '-' === $char ? BlockScalarChomping::Strip : BlockScalarChomping::Keep;
-                $harvester->stream->addToken(new Token(TokenType::BLOCK_SCALAR_CHOMPING_INDICATOR, $char, $startLine, $startColumn));
+                $harvester->stream->addToken(new Token(TokenType::CHOMPING_INDICATOR, $char, $startLine, $startColumn));
 
                 return;
             }

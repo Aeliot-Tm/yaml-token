@@ -418,7 +418,7 @@ return [
         'text' => '|',
     ],
     [
-        'type' => TokenType::BLOCK_SCALAR_CHOMPING_INDICATOR,
+        'type' => TokenType::CHOMPING_INDICATOR,
         'text' => '-',
     ],
     [

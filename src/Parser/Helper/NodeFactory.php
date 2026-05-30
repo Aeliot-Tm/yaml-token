@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace Aeliot\YamlToken\Parser\Helper;
 
 use Aeliot\YamlToken\Enum\TokenType;
-use Aeliot\YamlToken\Node\BlockScalarChompingIndicatorNode;
 use Aeliot\YamlToken\Node\BlockScalarIndicatorNode;
+use Aeliot\YamlToken\Node\ChompingIndicatorNode;
 use Aeliot\YamlToken\Node\CommentNode;
 use Aeliot\YamlToken\Node\DoubleQuotedScalarNode;
 use Aeliot\YamlToken\Node\FlowEntryNode;
@@ -72,7 +72,7 @@ final readonly class NodeFactory
     public function createSimpleNode(Token $token): Node
     {
         return match ($token->type) {
-            TokenType::BLOCK_SCALAR_CHOMPING_INDICATOR => new BlockScalarChompingIndicatorNode($token),
+            TokenType::CHOMPING_INDICATOR => new ChompingIndicatorNode($token),
             TokenType::INDENTATION_INDICATOR => new IndentationIndicatorNode($token),
             TokenType::COMMENT => new CommentNode($token),
             TokenType::YAML_DIRECTIVE => new YamlDirectiveNode($token),

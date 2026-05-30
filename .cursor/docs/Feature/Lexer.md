@@ -61,7 +61,7 @@ The rules below describe the practical behavior relied upon by lexer unit tests.
     the block-indentation indicator)
   - `LITERAL_BLOCK_SCALAR_INDICATOR` / `FOLDED_BLOCK_SCALAR_INDICATOR` for the `|` / `>` character
   - the rest of the block scalar header line uses the same rules as elsewhere on the line:
-    `WHITESPACE`, `COMMENT`, `BLOCK_SCALAR_CHOMPING_INDICATOR` (`+` or `-`),
+    `WHITESPACE`, `COMMENT`, `CHOMPING_INDICATOR` (`+` or `-`),
     `INDENTATION_INDICATOR` (one digit), then `NEWLINE` ending the header line;
     the cursor holds the expected body token type (`LITERAL_BLOCK_SCALAR` / `FOLDED_BLOCK_SCALAR`)
     while the header line is open
