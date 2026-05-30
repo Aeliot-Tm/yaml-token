@@ -1,4 +1,5 @@
 /.cursor            export-ignore
+/.github            export-ignore
 /.infra             export-ignore
 /.phive             export-ignore
 /bin/dev            export-ignore
