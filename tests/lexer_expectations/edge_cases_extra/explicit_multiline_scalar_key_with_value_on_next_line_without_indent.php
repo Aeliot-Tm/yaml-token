@@ -10,7 +10,7 @@ return [
         'text' => '?',
     ],
     [
-        'type' => TokenType::BLOCK_INDENTATION,
+        'type' => TokenType::BLOCK_INDENT,
         'text' => ' ',
     ],
     [

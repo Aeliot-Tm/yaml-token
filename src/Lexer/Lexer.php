@@ -1268,7 +1268,7 @@ final class Lexer
                 if ('' !== $spaceChars) {
                     $tokenType = \in_array($harvester->input[$harvester->cursor->position + 1] ?? null, ['#', ...self::CHARS_LINE_BREAK], true)
                         ? TokenType::WHITESPACE
-                        : TokenType::BLOCK_INDENTATION;
+                        : TokenType::BLOCK_INDENT;
 
                     $harvester->stream->addToken(new Token($tokenType, $spaceChars, $startLine, $startColumn + 1));
                 }

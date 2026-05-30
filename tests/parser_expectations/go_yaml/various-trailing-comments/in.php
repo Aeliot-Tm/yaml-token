@@ -31,12 +31,12 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 2735365042,
+    'hash' => 4060973737,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 851222043,
+            'hash' => 3865446388,
             'properties' => [],
             'children' => [
                 [
@@ -466,11 +466,11 @@ return [
                 ],
                 [
                     'type' => KeyValueCoupleNode::class,
-                    'hash' => 4185319627,
+                    'hash' => 1168749433,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
-                            'hash' => 839491823,
+                            'hash' => 4030225148,
                         ],
                         'valueIndicator' => [
                             'type' => ValueIndicatorNode::class,
@@ -484,7 +484,7 @@ return [
                     'children' => [
                         [
                             'type' => KeyNode::class,
-                            'hash' => 839491823,
+                            'hash' => 4030225148,
                             'properties' => [
                                 'explicitKeyIndicatorNode' => [
                                     'type' => ExplicitKeyIndicatorNode::class,
@@ -509,10 +509,10 @@ return [
                                 ],
                                 [
                                     'type' => BlockIndentationNode::class,
-                                    'hash' => 3651176988,
+                                    'hash' => 2285796975,
                                     'properties' => [
                                         'token' => [
-                                            'type' => TokenType::BLOCK_INDENTATION,
+                                            'type' => TokenType::BLOCK_INDENT,
                                             'text' => ' ',
                                         ],
                                     ],

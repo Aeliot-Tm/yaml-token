@@ -61,7 +61,7 @@ final readonly class ExplicitKeyParser
         $parseContext->tokens->advance();
         $token = $parseContext->tokens->current();
 
-        if (TokenType::BLOCK_INDENTATION === $token->type) {
+        if (TokenType::BLOCK_INDENT === $token->type) {
             $keyNode->addChild(new BlockIndentationNode($token));
             $parseContext->tokens->advance();
             $token = $parseContext->tokens->current();

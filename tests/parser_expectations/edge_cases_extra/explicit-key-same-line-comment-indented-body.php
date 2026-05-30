@@ -22,21 +22,21 @@ use Aeliot\YamlToken\Node\WhitespaceNode;
 
 return [
     'type' => StreamNode::class,
-    'hash' => 175082355,
+    'hash' => 1508906089,
     'properties' => [],
     'children' => [
         [
             'type' => DocumentNode::class,
-            'hash' => 3918189059,
+            'hash' => 1852306535,
             'properties' => [],
             'children' => [
                 [
                     'type' => KeyValueCoupleNode::class,
-                    'hash' => 1263541912,
+                    'hash' => 496948310,
                     'properties' => [
                         'key' => [
                             'type' => KeyNode::class,
-                            'hash' => 2696409708,
+                            'hash' => 3443913478,
                         ],
                         'valueIndicator' => [
                             'type' => ValueIndicatorNode::class,
@@ -50,7 +50,7 @@ return [
                     'children' => [
                         [
                             'type' => KeyNode::class,
-                            'hash' => 2696409708,
+                            'hash' => 3443913478,
                             'properties' => [
                                 'explicitKeyIndicatorNode' => [
                                     'type' => ExplicitKeyIndicatorNode::class,
@@ -75,10 +75,10 @@ return [
                                 ],
                                 [
                                     'type' => BlockIndentationNode::class,
-                                    'hash' => 3651176988,
+                                    'hash' => 2285796975,
                                     'properties' => [
                                         'token' => [
-                                            'type' => TokenType::BLOCK_INDENTATION,
+                                            'type' => TokenType::BLOCK_INDENT,
                                             'text' => ' ',
                                         ],
                                     ],
