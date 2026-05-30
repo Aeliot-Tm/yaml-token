@@ -30,7 +30,7 @@ final class NodeTraverser implements NodeTraverserInterface
      */
     public function __construct(NodeVisitorInterface ...$visitors)
     {
-        $this->visitors = $visitors;
+        $this->visitors = array_values($visitors);
     }
 
     public function addVisitor(NodeVisitorInterface $visitor): void
@@ -84,15 +84,14 @@ final class NodeTraverser implements NodeTraverserInterface
                 continue;
             }
 
-            if (NodeVisitorSignal::StopTraversal === $return) {
-                $this->stopTraversal = true;
+            switch ($return) {
+                case NodeVisitorSignal::StopTraversal:
+                    $this->stopTraversal = true;
 
-                return;
-            }
-
-            if (NodeVisitorSignal::DontTraverseChildren === $return) {
-                $traverseChildren = false;
-                $lastEnterVisitorIndex = $i;
+                    return;
+                case NodeVisitorSignal::DontTraverseChildren:
+                    $traverseChildren = false;
+                    $lastEnterVisitorIndex = $i;
             }
         }
 
