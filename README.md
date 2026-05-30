@@ -29,6 +29,10 @@ Every element (key, value, indentation, comment) has its position and can be mod
 - [YAML 1.2.2](https://yaml.org/spec/1.2.2/) (2021-10-01)
 - [Specification Changes](https://yaml.org/spec/1.2.2/ext/changes/)
 
+### Mapping project terms to the YAML specification
+
+- [Mapping of project token types to the YAML specification](docs/TokenTypeNamingMapping.md)
+
 ## Acknowledgments
 
 Thanks to [Masaaki Goshima](https://github.com/goccy) for [goccy/go-yaml](https://github.com/goccy/go-yaml)
