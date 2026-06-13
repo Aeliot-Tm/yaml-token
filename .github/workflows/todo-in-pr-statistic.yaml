@@ -19,7 +19,7 @@ jobs:
             paths:
               in: .
               exclude:
-                - tests/fixtures
+                - tests/fixture
                 - var
                 - vendor
             process:
